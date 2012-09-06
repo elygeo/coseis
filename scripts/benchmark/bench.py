@@ -2,6 +2,7 @@
 """
 Benchmarks
 """
+import os
 import cst
 
 # MPI
@@ -17,8 +18,6 @@ points = 100
 power = 3, # Vesta 128 nodes, 1 ppn, 32 threads
 points = 400
 power = range(6)     # Challenger
-
-XXX FIXME random noise
 
 prm = cst.sord.parameters()
 prm.oplevel = 5

@@ -63,8 +63,8 @@ job = cst.util.launch(
 
 # launch CVM-S
 cst.cvms.launch(
-    rundir = os.path.join('run', 'cvms', '%.0f' % dx)
-    iodir = os.path.join('..', 'mesh', '%.0f' % dx)
+    rundir = os.path.join('run', 'cvms', '%.0f' % dx),
+    iodir = os.path.join('..', 'mesh', '%.0f' % dx),
     nproc = nproc,
     depend = job.jobid,
     nsample = nsample,

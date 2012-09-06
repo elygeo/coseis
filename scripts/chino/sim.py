@@ -2,7 +2,7 @@
 """
 SORD simulation
 """
-import os, sys, imp, shutil
+import os, imp, shutil
 import numpy as np
 import pyproj
 import cst

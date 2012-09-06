@@ -67,8 +67,8 @@ for i in range(8):
 
 # run job
 d = os.path.join('run', 'sim', '%.0f' % dx)
-os.makedirs(h)
-for f in 'rho', 'vp', 'vs':
-    os.link(mesh + v + '.bin', h + v + 'bin')
+os.makedirs(d)
+for v in 'rho', 'vp', 'vs':
+    os.link(mesh + v + '.bin', d + v + 'bin')
 cst.sord.run(prm, rundir=d)
 

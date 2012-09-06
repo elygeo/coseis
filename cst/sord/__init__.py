@@ -4,6 +4,7 @@ Support Operator Rupture Dynamics
 from ..util import launch, storage
 from . import fieldnames
 from . import parameters as parameters_default
+launch # silence pyflakes warning
 
 def parameters():
     return storage(**parameters_default.__dict__)
