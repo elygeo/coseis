@@ -332,6 +332,14 @@ def prepare(job=None, **kwargs):
     return job
 
 
+rundir_error = """\
+For safety, run directories are no longer created or replaced.
+To manually create the run directory do:
+
+    import os
+    os.makedirs(%s)
+"""
+
 def skeleton(job=None, **kwargs):
     """
     Create run directory
@@ -345,6 +353,13 @@ def skeleton(job=None, **kwargs):
         for k in kwargs:
             job[k] = kwargs[k]
 
+    # test for previous runs 
+    f = os.path.join(job.rundir, job.name + '.conf.py')
+    if not job.force and os.path.exists(f):
+        raise Exception('Existing job found. Use --force to overwrite')
+    if not os.path.isdir(job.rundir):
+        raise Exception(rundir_error % job.rundir)
+
     # create submit script
     if job.submit:
         f = os.path.join(job.rundir, job.name + '.sh')
@@ -352,9 +367,6 @@ def skeleton(job=None, **kwargs):
         os.chmod(f, 0755)
 
     # save configuration
-    f = os.path.join(job.rundir, job.name + '.conf.py')
-    if not job.force and os.path.exists(f):
-        raise Exception('Existing job found. Use --force to overwrite')
     del(job['options'], job['script'])
     save(f, job)
 

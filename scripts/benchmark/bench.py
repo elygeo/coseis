@@ -26,6 +26,7 @@ prm.oplevel = 6
 prm.itcheck = 9999
 prm.itstats = 9999
 prm.itio = 128
+prm.gridnoise = 0.1
 prm.debug = 0
 prm.delta = 100.0, 100.0, 100.0, 0.0075
 prm.bc1 = prm.bc2 = 0, 0, 0

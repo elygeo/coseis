@@ -153,26 +153,31 @@ def stage(prm, **kwargs):
     # configure and build
     job.command = os.path.join('.', 'sord.x')
     job = util.prepare(job)
+    path = job.rundir + os.sep
     build(job)
 
-    # goto run directory
-    cwd = os.path.realpath(os.getcwd())
-    os.chdir(job.rundir)
+    # check for previous run
+    if os.path.exists(path + 'meta.py'):
+        raise Exception('Previous run found in %s' % path)
 
-    # create input files
-    if os.path.exists('meta.py'):
-        raise Exception('Error: previous run found in this location')
+    # create run scripts 
+    util.skeleton(job)
+    util.archive(path + 'coseis.tgz')
     d = os.path.dirname(__file__)
     f = os.path.join(d, 'src', 'sord.x')
-    shutil.copy2(f, '.')
+    shutil.copy2(f, path)
     if prm.debug > 2:
-        os.mkdir('debug')
+        os.mkdir(path + 'debug')
     if prm.itcheck != 0:
-        os.mkdir('checkpoint')
+        os.mkdir(path + 'checkpoint')
+
+    # save iputput parameters
     del(prm['itbuff'])
-    util.save('parameters.py', prm, expand=['fieldio'], header='# model parameters\n')
-    util.archive('coseis.tgz')
-    util.skeleton(job)
+    util.save(
+        path + 'parameters.py', prm,
+        expand = ['fieldio'],
+        header = '# model parameters\n',
+    )
 
     # metadata
     xis = {}
@@ -197,34 +202,33 @@ def stage(prm, **kwargs):
                 shapes[k] = [1]
 
     # save metadata
-    meta = util.save(None,
-        job,
+    meta = util.save(
+        None, job,
         header = '# configuration\n',
-        keep=['name', 'rundate', 'rundir', 'user', 'os_', 'dtype'],
+        keep = ['name', 'rundate', 'rundir', 'user', 'os_', 'dtype'],
     )
-    meta += util.save(None,
-        prm,
+    meta += util.save(
+        None, prm,
         header = '\n# model parameters\n',
-        expand=['fieldio'],
+        expand = ['fieldio'],
     )
-    meta += util.save(None,
+    meta += util.save(
+        None,
         dict(shapes=shapes, deltas=deltas, xis=xis, indices=indices),
         header = '\n# output dimensions\n',
-        expand=['indices', 'shapes', 'deltas', 'xis'],
+        expand = ['indices', 'shapes', 'deltas', 'xis'],
     )
-    open('meta.py', 'w').write(meta)
+    open(path + 'meta.py', 'w').write(meta)
 
-    # return to initial directory
-    os.chdir(cwd)
-    job.update(prm)
     return job
 
 def run(prm, **kwargs):
     """
     Stage and launch job.
     """
+    from .. import util
     job = stage(prm, **kwargs)
-    launch(job)
+    util.launch(job)
     return job
 
 def expand_slices(shape, slices=[], base=0, new_base=None, round=True):

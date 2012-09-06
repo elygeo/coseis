@@ -84,18 +84,13 @@ def stage(**kwargs):
     import os, sys, re, shutil
     from .. import util
 
+    # configure and build
     print('CVM-S setup')
-
-    # configure
     job = configure(**kwargs)
     job.command = os.path.join('.', 'cvms.x')
     job = util.prepare(job)
-    ver = 'cvms-' + job.version
-
-    # build
-    if not job.prepare:
-        return job
     build(job)
+    ver = 'cvms-' + job.version
 
     # check minimum processors needed for compiled memory size
     path = os.path.dirname(__file__)
@@ -114,15 +109,16 @@ def stage(**kwargs):
         f = os.path.join(path, 'build', ver)
         shutil.copytree(f, job.rundir)
 
-    # input files
-    util.skeleton(job)
-    open('cvms-input', 'w').write(input_template.format(**job))
-    for f in [
-        job.file_rho, job.file_vp, job.file_vs,
-    ]:
+    # clean-up old input files
+    for f in job.file_rho, job.file_vp, job.file_vs:
         f = os.path.join(job.iodir, f)
         if os.path.exists(f):
             os.remove(f)
+
+    # create input files
+    util.skeleton(job)
+    f = os.path.join(job.rundir, 'cvms-input')
+    open(f, 'w').write(input_template.format(**job))
 
     return job
 
