@@ -6,11 +6,11 @@ FFLAGS = {build_fflags}
 
 all: hello.c.x hello.f.x
 
-hello.c.x : hello.c
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
+hello.c.x : hello.c Makefile.in
+	$(CC) $(CFLAGS) -o $@ $< $(LIBS)
 
-hello.f.x : hello.f90
-	$(FC) $(FFLAGS) -o $@ $^ $(LIBS)
+hello.f.x : hello.f90 Makefile.in
+	$(FC) $(FFLAGS) -o $@ $< $(LIBS)
 
 clean:
 	rm -rf *.pyc run hello.?.x hello.?.x.dSYM
