@@ -60,7 +60,7 @@ y.astype('f').tofile(path + 'lat.bin')
 job = cst.util.launch(
     rundir = path,
     nthread = 1,
-    nproc = 4),
+    nproc = 4,
     ppn_range = [4],
     nstripe = nstripe,
     command = os.path.join('.', 'mesh.x'),

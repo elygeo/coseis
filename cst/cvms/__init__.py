@@ -20,7 +20,7 @@ def configure(**kwargs):
     job = util.configure(conf.default, conf.site, conf_local, **kwargs)
     for k, d in job.host_opts_cvms.items():
         if k in job.machine:
-            for k, v in d:
+            for k, v in d.items():
                 job[k] = v
     return job
 
