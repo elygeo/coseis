@@ -157,7 +157,7 @@ def extract(lon, lat, dep, prop=['rho', 'vp', 'vs'], **kwargs):
     lat = np.asarray(lat, 'f')
     dep = np.asarray(dep, 'f')
     shape = dep.shape
-    job = stage(nsample=dep.size, **kwargs)
+    job = stage(nsample=dep.size, iodir='.', **kwargs)
     path = job.rundir + os.sep
     lon.tofile(path + job.file_lon)
     lat.tofile(path + job.file_lat)
@@ -170,5 +170,12 @@ def extract(lon, lat, dep, prop=['rho', 'vp', 'vs'], **kwargs):
     for v in prop:
         f = {'rho': job.file_rho, 'vp': job.file_vp, 'vs': job.file_vs}[v]
         out += [np.fromfile(path + f, 'f').reshape(shape)]
+    os.unlink(path + job.file_lon)
+    os.unlink(path + job.file_lat)
+    os.unlink(path + job.file_dep)
+    os.unlink(path + job.file_rho)
+    os.unlink(path + job.file_vp)
+    os.unlink(path + job.file_vs)
+    os.unlink(path + job.name + '.conf.py')
     return np.array(out)
 

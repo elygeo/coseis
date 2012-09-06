@@ -49,9 +49,9 @@ nstripe = -2
 # command line options
 argv = sys.argv[1:]
 options = [
-    ('i', 'interactive', 'run',   'exec'),
-    ('q', 'queue',       'run',   'submit'),
-    ('f', 'force',       'force', 'true'),
+    ('i', 'interactive', 'run',  'exec'),
+    ('q', 'queue',       'run',  'submit'),
+    ('f', 'force',       'force', True),
 ]
 
 # search for files in PATH
