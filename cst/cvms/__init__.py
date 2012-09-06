@@ -18,9 +18,10 @@ def configure(**kwargs):
     from .. import util, conf
     from . import conf as conf_local
     job = util.configure(conf.default, conf.site, conf_local, **kwargs)
-    for k, v in job.build_cvms.items():
+    for k, d in job.host_opts_cvms.items():
         if k in job.machine:
-            job.build_fflags = v
+            for k, v in d:
+                job[k] = v
     return job
 
 def build(job=None, **kwargs):

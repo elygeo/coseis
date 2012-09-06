@@ -2,7 +2,7 @@
 Coseis Configuration
 """
 
-import os, sys, pwd, socket
+import os, sys, pwd, socket, multiprocessing
 import numpy as np
 
 # email address
@@ -33,13 +33,19 @@ python = 'python'
 machine = ''
 account = ''
 host = os.uname()
-host = ' '.join((host[0], host[4], host[1], socket.getfqdn()))
+host = ' '.join((
+    host[0],
+    host[4],
+    host[1],
+    socket.getfqdn(),
+    #os.environ['HOSTNAME'],
+))
 host_opts = {}
 queue = ''
 queue_opts = []
 ppn_range = []
 maxnodes = 1
-maxcores = 1
+maxcores = multiprocessing.cpu_count()
 maxram = 0
 pmem = 0
 maxtime = 0
