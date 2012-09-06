@@ -15,8 +15,8 @@ proj = pyproj.Proj(proj='utm', zone=11, ellps='WGS84')
 proj = cst.coord.Transform(proj, origin=(-121.0, 34.5), rotate=40.0)
 
 # CH5Hz, Olsen, 2012 Aug 31
-delta = 800.0; nproc = 2; nstripe = 1;
 delta = 8.0; nproc = 32768; nstripe = 32;
+delta = 800.0; nproc = 2; nstripe = 1;
 x, y, z = 56000.0, 40000.0, 28000.0
 proj = pyproj.Proj(proj='tmerc', lon_0=-118.3, lat_0=33.75)
 
@@ -62,14 +62,14 @@ job = cst.util.launch(
     nproc = min(3, nproc),
     nthread = 1,
     nstripe = nstripe,
-    command = './mesh.x',
+    command = os.path.join('.', 'mesh.x'),
     minutes = int(nsample // 100000000),
 )
 
 # launch cvms
 cst.cvms.launch(
-    rundir = path,
-    iodir = path + 'hold',
+    rundir = os.path.join('run', 'cvms'),
+    iodir = os.path.join('..', 'mesh', 'hold'),
     nproc = nproc,
     nthread = 1,
     depend = job.jobid,

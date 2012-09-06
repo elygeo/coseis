@@ -52,6 +52,9 @@ with f3:
         x.tofile(f3)
 
 # launch CVM-S
-n = shape[0] * shape[1] * shape[2]
-cst.cvms.launch(nsample=n, nproc=nproc, iodir=path)
+cst.cvms.launch(
+    nsample = shape[0] * shape[1] * shape[2],
+    iodir = os.path.join('..', 'mesh', 'hold'),
+    nproc = nproc,
+)
 

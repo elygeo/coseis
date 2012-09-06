@@ -362,9 +362,9 @@ def skeleton(job=None, **kwargs):
 
     # create submit script
     if job.submit:
-        f = os.path.join(job.rundir, job.name + '.sh')
-        open(f, 'w').write(job.script)
-        os.chmod(f, 0755)
+        g = os.path.join(job.rundir, job.name + '.sh')
+        open(g, 'w').write(job.script)
+        os.chmod(g, 0755)
 
     # save configuration
     del(job['options'], job['script'])
