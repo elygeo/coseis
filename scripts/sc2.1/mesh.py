@@ -42,8 +42,7 @@ try:
 except OSError:
     pass
 else:
-    fh = os.fdopen(fd, 'wb')
-    with fh:
+    with os.fdopen(fd, 'wb') as fh:
         for i in range(dep.size):
             (z + dep[i]).astype('f').T.tofile(fh)
 
@@ -53,8 +52,7 @@ try:
 except OSError:
     pass
 else:
-    fh = os.fdopen(fd, 'wb')
-    with fh:
+    with os.fdopen(fd, 'wb') as fh:
         for i in range(dep.size):
             x.T.tofile(fh)
 
@@ -64,8 +62,7 @@ try:
 except OSError:
     pass
 else:
-    fh = os.fdopen(fd, 'wb')
-    with fh:
+    with os.fdopen(fd, 'wb') as fh:
         for i in range(dep.size):
             y.T.tofile(fh)
 

@@ -113,8 +113,8 @@ cst.plt.compass_rose(ax, x, y, 2000.0)
 # save figure
 fig.canvas.draw()
 f = os.path.join('run', 'plot')
-if not os.path.exists(f):
-    os.makedirs(f)
+if not os.path.isdir(f):
+    os.mkdir(f)
 f = os.path.join('run', 'plot', 'map%s.pdf' % surface)
 fig.savefig(f, transparent=True)
 f = os.path.join('run', 'plot', 'map%s.png' % surface)

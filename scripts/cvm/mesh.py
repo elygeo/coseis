@@ -59,7 +59,6 @@ y.astype('f').tofile(path + 'lat.bin')
 # launch mesher
 job = cst.util.launch(
     rundir = path,
-    iodir = path + 'hold',
     nproc = min(3, nproc),
     nthread = 1,
     nstripe = nstripe,

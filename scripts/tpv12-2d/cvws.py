@@ -6,7 +6,7 @@ import os, imp
 import numpy as np
 
 # parameters
-path = 'run/'
+path = 'run' + os.sep
 meta = imp.load_source('meta', path + 'meta.py')
 meta.dx = meta.delta[0]
 meta.dt = meta.delta[3]
@@ -75,7 +75,8 @@ for sta in meta.deltas:
         tsv = np.sqrt(y * y + z * z) * 1e-6
         tnm = np.fromfile(f % 'tnm', dtype) * 1e-6
         c   = np.array([t, su1, sv1, ts1, suv, svv, tsv, tnm]).T
-        with open(path + 'cvws/' + sta + '.asc', 'w') as fh:
+        f   = os.path.join(path, 'cvws', sta + '.asc')
+        with open(f, 'w') as fh:
             fh.write(header % meta.__dict__)
             fh.write(header1)
             np.savetxt(fh, c, fmt1)
@@ -92,8 +93,9 @@ for sta in meta.deltas:
         v1 = np.fromfile(f % 'v1', dtype)
         v2 = np.fromfile(f % 'v2', dtype)
         v3 = np.fromfile(f % 'v3', dtype)
-        c   = np.array([t, u1, v1, u2, v2, u3, v3]).T
-        with open(path + 'cvws/' + sta + '.asc', 'w') as fh:
+        c  = np.array([t, u1, v1, u2, v2, u3, v3]).T
+        f  = os.path.join(path, 'cvws', sta + '.asc')
+        with open(f, 'w') as fh:
             fh.write(header % meta.__dict__)
             fh.write(header2)
             np.savetxt(fh, c, fmt2)

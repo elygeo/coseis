@@ -54,7 +54,7 @@ prm.fieldio += [
     ('=w', 'svm', [-41, -1,-1,()], 'p40d.bin'),
 ]
 
-# launch SORD
+# run SORD
 os.mkdir('run')
 cst.sord.run(prm)
 

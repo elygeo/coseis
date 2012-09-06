@@ -3,7 +3,7 @@
 SCEC Code Validation Workshop, Test Problem 12
 FIXME: prestress not correct
 """
-import math
+import os, math
 import numpy as np
 import cst
 prm = cst.sord.parameters()
@@ -124,9 +124,9 @@ for x, y, z in [
         p = p.replace('body-', 'body-0')
         prm.fieldio += [('=w', f, [j,k,l,()], p)]
 
-# stage job
-job = cst.sord.stage(prm)
-path = job.rundir + '/'
+# run directory
+path = 'run' + os.sep
+os.mkdir(path)
 
 # pre-stress
 d = np.arange(prm.shape[1]) * alpha * prm.delta[1]
@@ -140,6 +140,6 @@ x.astype('f').tofile(path + 's11.bin')
 y.astype('f').tofile(path + 's22.bin')
 z.astype('f').tofile(path + 's33.bin')
 
-# launch job
-cst.sord.launch(job)
+# run SORD
+cst.sord.run(prm)
 

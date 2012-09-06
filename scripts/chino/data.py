@@ -16,8 +16,7 @@ stations = [
 
 # data directory
 path = os.path.join('run', 'data')
-if not os.path.exists(path):
-    os.makedirs(path)
+os.makedirs(path)
 
 # moment tensor
 f = os.path.join(path, '%s.mts.py')

@@ -50,8 +50,7 @@ try:
 except OSError:
     pass
 else:
-    fh = os.fdopen(fd, 'wb')
-    with fh:
+    with os.fdopen(fd, 'wb') as fh:
         for i in range(dep.size):
             (dep[i] + z0 + w[i] * z).T.tofile(fh)
 
@@ -71,8 +70,7 @@ try:
 except OSError:
     pass
 else:
-    fh = os.fdopen(fd, 'wb')
-    with fh:
+    with os.fdopen(fd, 'wb') as fh:
         vm = cst.cvmh.Extraction(x, y, 'vp', vs30)
         vmin, vmax = np.inf, -np.inf
         for i in range(dep.size):
@@ -89,8 +87,7 @@ try:
 except OSError:
     pass
 else:
-    fh = os.fdopen(fd, 'wb')
-    with fh:
+    with os.fdopen(fd, 'wb') as fh:
         vm = cst.cvmh.Extraction(x, y, 'vp', vs30)
         vmin, vmax = np.inf, -np.inf
         for i in range(dep.size):
@@ -107,8 +104,7 @@ try:
 except OSError:
     pass
 else:
-    fh = os.fdopen(fd, 'wb')
-    with fh:
+    with os.fdopen(fd, 'wb') as fh:
         vm = cst.cvmh.Extraction(x, y, 'vs', vs30)
         vmin, vmax = np.inf, -np.inf
         for i in range(dep.size):

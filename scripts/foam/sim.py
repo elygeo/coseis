@@ -100,7 +100,7 @@ prm.fieldio += [
     #('=w', 'v2', s_[:,k,2:l.::10], 'xsec.bin'),
 ]
 
-# launch SORD code
+# run SORD
 d = os.path.join('run', '%02.0f' % (weakzone * 100))
 os.makedirs(d)
 cst.sord.run(prm, rundir=d)

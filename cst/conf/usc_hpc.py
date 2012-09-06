@@ -12,7 +12,7 @@ setenv F90 gfortran
 python = '/home/rcf-11/gely/local/python/bin/python'
 rate = 1.1e6
 queue = 'default'
-mpout = 0
+#mpout = 0
 
 queue_opts = [
     ('default',  {'maxnodes': 256, 'maxcores': 8, 'maxram': 12288, 'maxtime': 1440}),

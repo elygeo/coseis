@@ -129,7 +129,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         )
 
         # launch cvms
-        job = cst.cvms.stage(
+        job = cst.cvms.launch(
             rundir = path,
             iodir = path + 'hold',
             nproc = nproc,
@@ -148,7 +148,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         x, y = proj_cvmh(x, y)
         x.astype('f').T.tofile(path + 'x.bin')
         y.astype('f').T.tofile(path + 'y.bin')
-        cst.conf.launch(
+        cst.util.launch(
             rundir = path,
             nproc = min(4, nproc),
             nstripe = nstripe,

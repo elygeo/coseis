@@ -34,7 +34,7 @@ register = False
 # cvm version
 for cvm in 'cvms', 'cvmh', 'cvmg':
 
-    # locations
+    # simulation name
     mesh = 'ch%04.0f%s' % (dx, cvm[-1])
     name = mesh + surf[0]
 
@@ -105,7 +105,6 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     prm.ihypo = j, k, l
 
     # receivers
-    stagein = 'hold/',
     if register:
         m = '=w'
     else:
@@ -150,15 +149,20 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
                 ('=w', f, s_[:,k,:,::10], 'hold/xsec-ew-%s.bin' % f),
             ]
 
-    # save metadata
+    # run directory
     path = os.path.join('run', 'sim', name) + os.sep
-    s = '\n'.join((
-        open(mesh + 'meta.py').read(),
-        open(mts).read(),
-        open(path + 'meta.py').read(),
-    ))
-    open(path + 'meta.py', 'w').write(s)
+    hold = os.path.join(path, 'hold') + os.sep
+    os.makedirs(hold)
+
+    # save metadata
     os.link(mesh + 'box.txt', path + 'box.txt')
+    f1 = open(mesh + 'meta.py')
+    f2 = open(mts)
+    f3 = open(path + 'meta.py')
+    with f1, f2, f3:
+        s = '\n'.join([f1.read(), f2.read(), f3.read()])
+    with open(path + 'meta.py', 'w') as fh:
+        fh.write(s)
 
     # save decimated mesh
     if surf_out:
@@ -168,8 +172,9 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
             s[::ns,::ns].tofile(path + f)
 
     # link input files
-    for f in 'z3.bin', 'rho.bin', 'vp.bin', 'vs.bin':
-        os.link(mesh + 'hold/' + f, path + 'hold/' + f)
+    h = mesh + 'hold' + os.sep
+    for f in 'z3', 'rho', 'vp', 'vs':
+        os.link(h + f + '.bin', hold + f + '.bin')
 
     # run SORD
     job = cst.sord.run(prm, rundir=path)

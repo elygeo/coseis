@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import os
 import cst
 prm = cst.sord.parameters()
 
@@ -107,9 +108,8 @@ for dx, np in runs:
             ('=w', f, [-1,k,-2,()], 'P2-%s.bin' % f),     # mode III point
         ]
 
-    # launch SORD code
-    cst.sord.run(
-        prm,
-        rundir = 'run/tpv3/%03.0f' % dx,
-    )
+    # run SORD
+    d = os.path.join('run', 'tpv3', '%03.0f' % dx)
+    os.makedirs(d)
+    cst.sord.run(prm, rundir=d)
 
