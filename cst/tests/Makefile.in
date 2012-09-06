@@ -6,10 +6,10 @@ FFLAGS = {build_fflags}
 
 all: hello.c.x hello.f.x
 
-hello.c.x : hello.c Makefile.in
+hello.c.x : hello.c Makefile
 	$(CC) $(CFLAGS) -o $@ $< $(LIBS)
 
-hello.f.x : hello.f90 Makefile.in
+hello.f.x : hello.f90 Makefile
 	$(FC) $(FFLAGS) -o $@ $< $(LIBS)
 
 clean:

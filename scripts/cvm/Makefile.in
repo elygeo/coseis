@@ -6,7 +6,7 @@ CFLAGS = {build_cflags} \
     -DDELTA={delta} \
     -DZ_START={z_start}
 
-mesh.x : mesh.c Makefile.in
+mesh.x : mesh.c Makefile
 	$(CC) $(CFLAGS) -o $@ $< $(LIBS)
 
 clean :
