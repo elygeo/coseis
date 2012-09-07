@@ -64,7 +64,7 @@ job = cst.util.launch(
     ppn_range = [4],
     nstripe = nstripe,
     command = os.path.join('.', 'mesh.x'),
-    minutes = int(nsample // 100000000),
+    minutes = int(nsample // 1000000000),
 )
 
 # launch cvms
