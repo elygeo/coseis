@@ -106,7 +106,11 @@ def stage(**kwargs):
         sys.exit('Need at lease %s processors for this mesh size' % minproc)
 
     # create run directory
-    if not os.path.exists(job.rundir):
+    if os.path.exists(job.rundir):
+        f = os.path.join(job.rundir, 'cvms.x')
+        if not os.path.exists(f):
+            raise Exception('%s exists' % job.rundir)
+    else:
         f = os.path.join(path, 'build', ver)
         shutil.copytree(f, job.rundir)
 

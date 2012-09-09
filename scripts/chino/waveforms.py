@@ -35,7 +35,6 @@ def spectrum(x):
 
 # metadata
 path = os.path.join('run', 'sim')
-path = 'tmp'
 sims = 'ch0100sf', 'ch0100hf', 'ch0100gf'
 sims = 'ch0050sf', 'ch0050hf', 'ch0050gf'
 meta = os.path.join(path, sims[0], 'meta.py')
@@ -91,8 +90,8 @@ plt.rc('font', size=8)
 plt.rc('legend', fontsize=8)
 plt.rc('axes', lw=0.5, color_cycle=color_cycle)
 plt.rc('lines', lw=0.5, solid_joinstyle='round')
-fig1 = plt.figure(None, (6.4, 8.0), 100, 'w')
 fig1 = False
+fig1 = plt.figure(None, (6.4, 8.0), 100, 'w')
 
 # loop over station groups
 for igroup, group in enumerate(station_groups):

@@ -54,7 +54,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         int(abs(y / delta[1]) + 1.5),
         int(abs(z / delta[2]) + 1.5),
     )
-    ncell = (x - 1) * (y - 1) * (z - 1),
+    ncell = (shape[0] - 1) * (shape[1] - 1) * (shape[2] - 1)
 
     # corners
     x, y, z = bounds
@@ -83,7 +83,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     y = np.arange(shape[1]) * delta[1] + y[0]
     y, x = np.meshgrid(y, x)
     x, y = proj(x, y, inverse=True)
-    z = cst.coord.interp2(topo_extent, topo, (x, y))
+    z = cst.interpolate.interp2(topo_extent, topo, (x, y))
 
     # metadata
     mesh_id = '%s%04.f%s' % (label, dx, cvm[-1])
@@ -127,7 +127,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
             ppn_range = [4],
             nstripe = nstripe,
             command = '{python} mesh.py',
-            minutes = ncell // 120000000,
+            minutes = int(ncell // 120000000),
         )
 
         # launch cvms
@@ -157,7 +157,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
             ppn_range = [4],
             nstripe = nstripe,
             command = '{python} mesh-cvmh.py',
-            minutes = ncell // 120000000, # nearest
-            #minutes = ncell // 36000000, # linear
+            minutes = int(ncell // 120000000), # nearest
+            #minutes = int(ncell // 36000000), # linear
         )
 

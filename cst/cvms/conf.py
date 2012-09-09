@@ -16,6 +16,7 @@ file_vs = 'vs.bin'
 nthread = 1
 build_fflags = '-O3 -Wall'
 minutes = 60
+rundir = 'run/cvms'
 
 # host specific configuration
 host_opts_cvms = {

@@ -11,6 +11,7 @@ Steps:
 2.  Run ``map.py`` to generate the stations map
     ::
 
+        python map-data.py
         python map.py
 
 3.  Edit ``material.py`` to set the mesh resolution and CVM version, and run it

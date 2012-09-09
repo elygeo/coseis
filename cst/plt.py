@@ -104,7 +104,7 @@ def lengthscale(ax, x, y, w=None, label='%s', style='k-', **kwargs):
     x = -l, l, float('nan'), -l, -l, float('nan'),  l, l
     y =  0, 0, float('nan'), -w,  w, float('nan'), -w, w
     x, y = 0.5 / l * np.dot(rot, [x, y])
-    theta = math.arctan2(dy, dx) * 180.0 / math.pi
+    theta = math.atan2(dy, dx) * 180.0 / math.pi
     h1 = ax.plot(x0 + x, y0 + y, style, clip_on=False)
     h2 = text(ax, x0, y0, label, ha='center', va='center', rotation=theta, **kwargs)
     return h1, h2
@@ -125,10 +125,10 @@ def compass_rose(ax, x, y, r, style='k-', **kwargs):
     x_ = (x+c, x-c), (x+s, x-s)
     y_ = (y+s, y-s), (y-c, y+c)
     h += [
-        text(ax, x_[0,0], y_[0,0], 'E', ha='left', va='center', **kwargs),
-        text(ax, x_[0,1], y_[0,1], 'W', ha='right', va='center', **kwargs),
-        text(ax, x_[1,0], y_[1,0], 'S', ha='center', va='top', **kwargs),
-        text(ax, x_[1,1], y_[1,1], 'N', ha='center', va='bottom', **kwargs),
+        text(ax, x_[0][0], y_[0][0], 'E', ha='left', va='center', **kwargs),
+        text(ax, x_[0][1], y_[0][1], 'W', ha='right', va='center', **kwargs),
+        text(ax, x_[1][0], y_[1][0], 'S', ha='center', va='top', **kwargs),
+        text(ax, x_[1][1], y_[1][1], 'N', ha='center', va='bottom', **kwargs),
     ]
     return h
 
