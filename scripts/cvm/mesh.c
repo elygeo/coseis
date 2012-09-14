@@ -31,6 +31,8 @@ for (k = 0; k < 2; k++) {
         path0 = strrchr(path, '/') + 1;
         err = (stream = fopen(path0, "r")) == NULL;
         err = err || fread(buff, sizeof(float), nnode, stream) != nnode;
+        fseek(stream, 0, SEEK_END);
+        err = err || ftell(stream) != sizeof(float) * nnode;
         if (fclose(stream) || err) {
             close(fh);
             remove(path);
