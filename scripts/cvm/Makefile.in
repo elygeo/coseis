@@ -1,10 +1,10 @@
 CC = {build_cc}
 LIBS = {build_libs}
 CFLAGS = {build_cflags} \
-    -DSHAPE_X={shape_x} \
-    -DSHAPE_Z={shape_z} \
+    -DNNODE={nnode} \
+    -DNZ={nz} \
     -DDELTA={delta} \
-    -DZ_START={z_start}
+    -DZSTART={zstart}
 
 mesh.x : mesh.c Makefile
 	$(CC) $(CFLAGS) -o $@ $< $(LIBS)

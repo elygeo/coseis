@@ -11,7 +11,11 @@ Data retrieval and processing tools.
 import os
 repo = os.path.join(os.path.dirname(__file__), 'data')
 if not os.path.exists(repo):
-    os.mkdir(repo)
+    f = os.path.join(repo, '../data')
+    if os.path.exists(f):
+        os.symlink('../data', repo)
+    else:
+        os.mkdir(repo)
 del(os)
 
 def upsample(f):

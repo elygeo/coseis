@@ -38,10 +38,10 @@ y = y.astype('f')
 cfg = cst.util.configure()
 m = open('Makefile.in').read()
 m = m.format(
-    shape_x = shape[0] * shape[1],
-    shape_z = shape[2],
+    nnode = shape[0] * shape[1],
+    nz = shape[2],
     delta = delta,
-    z_start = 0.0,
+    zstart = 0.0,
     **cfg
 )
 open('Makefile', 'w').write(m)

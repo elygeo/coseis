@@ -1,81 +1,71 @@
-// CVM-S Mesher
-// Reads 2D mesh files and extends them to 3D.
+// Create CVM-S 3D input mesh from 2D mesh.
 // Can be run concurrently for each file (3 processes).
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+#include <stdio.h>    // for printf(), fdopen, fopen(), remove()
+#include <stdlib.h>   // for malloc(), exit()
+#include <fcntl.h>    // for open(), mode, flags
+#include <unistd.h>   // for close()
+#include <string.h>   // for strrchr()
+//#include <sys/stat.h>
 
-int main(int argc, char *argv[]) {
-
-const int flags = O_WRONLY | O_CREAT | O_EXCL;
+int
+main(int argc, char *argv[])
+{
+const float zstart = ZSTART, delta = DELTA;
+const size_t nnode = NNODE;
+const int nz = NZ;
 const int mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
-const float z_start = Z_START, delta = DELTA;
-const size_t m = SHAPE_X, n = SHAPE_Z;
-const size_t b = sizeof(float);
-float *x = (float *)malloc(m * b);
-int fh, e;
-size_t i, j;
-FILE *f;
+const int flags = O_WRONLY | O_CREAT | O_EXCL;
+const char *files[] = {"hold/lon.bin", "hold/lat.bin", "hold/dep.bin"};
+const char *path, *path0;
+float *buff = (float *)malloc(nnode * sizeof(float));
+FILE *stream;
+int j, k, fh, err;
+size_t i;
 
-// longitude
-fh = open("hold/lon.bin", flags, mode);
-if (fh >= 0) {
-    f = fopen("lon.bin", "r");
-    e = f == NULL || fread(x, b, m, f) != m;
-    e = fclose(f) || e;
-    f = fdopen(fh, "w");
-    e = f == NULL || e;
-    for (j = 0; j < n; j++) {
-        if (e) break;
-        e = fwrite(x, b, m, f) != m;
-    }
-    e = fclose(f) || e;
-    if (e) {
-        remove("hold/lon.bin");
-        printf("Error in lon file\n");
-    }
-}
-
-// latitude
-fh = open("hold/lat.bin", flags, mode);
-if (fh >= 0) {
-    f = fopen("lat.bin", "r");
-    e = f == NULL || fread(x, b, m, f) != m;
-    e = fclose(f) || e;
-    f = fdopen(fh, "w");
-    e = f == NULL || e;
-    for (j = 0; j < n; j++) {
-        if (e) break;
-        e = fwrite(x, b, m, f) != m;
-    }
-    e = fclose(f) || e;
-    if (e) {
-        remove("hold/lat.bin");
-        printf("Error in lat file\n");
+// lon/lat
+for (k = 0; k < 2; k++) {
+    path = files[k];
+    fh = open(path, flags, mode);
+    if (fh >= 0) {
+        path0 = strrchr(path, '/') + 1;
+        err = (stream = fopen(path0, "r")) == NULL;
+        err = err || fread(buff, sizeof(float), nnode, stream) != nnode;
+        if (fclose(stream) || err) {
+            close(fh);
+            remove(path);
+            printf("Error reading %s\n", path0);
+            exit(1);
+        }
+        err = (stream = fdopen(fh, "w")) == NULL;
+        for (j = 0; j < nz && !err; j++)
+            err = fwrite(buff, sizeof(float), nnode, stream) != nnode;
+        if (fclose(stream) || err) {
+            remove(path);
+            printf("Error writing %s\n", path);
+            exit(1);
+        }
     }
 }
 
 // depth
-fh = open("hold/dep.bin", flags, mode);
+path = files[2];
+fh = open(path, flags, mode);
 if (fh >= 0) {
-    f = fdopen(fh, "w");
-    e = f == NULL;
-    for (j = 0; j < n; j++) {
-        if (e) break;
-        for (i = 0; i < m; i++) x[i] = z_start + j * delta;
-        e = fwrite(x, b, m, f) != m;
+    err = (stream = fdopen(fh, "w")) == NULL;
+    for (j = 0; j < nz && !err; j++) {
+        for (i = 0; i < nnode; i++)
+            buff[i] = zstart + j * delta;
+        err = fwrite(buff, sizeof(float), nnode, stream) != nnode;
     }
-    e = fclose(f) || e;
-    if (e) {
-        remove("hold/dep.bin");
-        printf("Error in dep file\n");
+    if (fclose(stream) || err) {
+        remove(path);
+        printf("Error writing %s\n", path);
+        exit(1);
     }
 }
 
 // all done
 return 0;
-
 }
 

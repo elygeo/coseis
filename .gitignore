@@ -17,6 +17,7 @@ tmp
 TODO
 /dev
 /cst/conf/site.py
+/data
 /cst/data
 /cst/cvms/build
 /cst/sord/src/Makefile
