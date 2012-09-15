@@ -79,7 +79,7 @@ build_libs = ''
 build_ldflags = '-g -O3 -Wall -fopenmp -fbounds-check -ffpe-trap=invalid,zero,overflow'
 build_ldflags = '-g -O3 -Wall -fopenmp -pg'
 build_ldflags = '-g -O3 -Wall -fopenmp'
-build_cflags = build_ldflags + ' -std=c11 -pedantic'
+build_cflags = build_ldflags + ' -pedantic'
 build_fflags = build_ldflags + ' -fimplicit-none -fdefault-real-8'
 build_fflags = build_ldflags + ' -fimplicit-none'
 

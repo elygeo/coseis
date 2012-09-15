@@ -1,0 +1,16 @@
+CC = {build_cc}
+LIBS = {build_libs}
+CFLAGS = {build_cflags} \
+    -DNX={nx} \
+    -DNY={ny} \
+    -DNZ={nz} \
+    -DDELTA={delta} \
+    -DNPML={npml} \
+    -DNTOP={ntop}
+
+mesh.x : mesh.c Makefile
+	$(CC) $(CFLAGS) -o $@ $< $(LIBS)
+
+clean :
+	rm -rf run mesh.x mesh.x.dSYM
+

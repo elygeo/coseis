@@ -2,7 +2,7 @@
 """
 Material model extraction from CVM
 """
-import os, imp, shutil
+import os, imp, shutil, subprocess
 import numpy as np
 import pyproj
 import cst
@@ -33,7 +33,8 @@ bounds = (-80 * s + d, 48 * s - d), (-58 * s + d, 54 * s - d), (0.0, 48 * s - dx
 origin = mts.longitude, mts.latitude, mts.depth
 
 # loop over cvm versions
-for cvm in 'cvms', 'cvmh', 'cvmg':
+#for cvm in 'cvms', 'cvmh', 'cvmg':
+for cvm in 'cvms',:
 
     # projection
     projection = dict(proj='tmerc', lon_0=origin[0], lat_0=origin[1])
@@ -117,6 +118,22 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
 
     # cvm-s
     if cvm == 'cvms':
+
+        # build mesher
+        cfg = cst.util.configure()
+        m = open('Makefile.in').read()
+        m = m.format(
+            nx = shape[0],
+            ny = shape[1],
+            nz = shape[2],
+            delta = abs(delta[0]),
+            ntop = ntop,
+            npml = npml,
+            **cfg
+        )
+        open('Makefile', 'w').write(m)
+        subprocess.check_call(['make'])
+        asdf
 
         # launch mesher
         shutil.copy2('mesh.py', path)
