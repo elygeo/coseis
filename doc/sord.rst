@@ -95,13 +95,12 @@ of possible SORD parameters and default values are specified in `parameters.py
 Running jobs
 ------------
 
-The ``cst.sord.run()`` function does four tasks: (1) configure job
-parameters (2) compile the source code if necessary (3) create a new run
-directory populated with executable code and input files, and (4) launch the
-job interactively or through a batch processing system.  Step (2) only occurs
-as needed for a fresh install or when the source code has been modified.  By
-default, step (4) is skipped, giving the user an opportunity to inspect the
-run directory prior to launching the job.
+The ``cst.sord.run()`` function does four tasks: (1) configure job parameters
+(2) compile the source code if necessary (3) populate the run directory with
+necessary executable, input, and metadata files, and (4) launch the job
+interactively or through a batch processing system.  By default, step (4) is
+skipped, giving the user an opportunity to inspect the run directory prior to
+launching the job.
 
 Field I/O
 ---------
@@ -215,14 +214,14 @@ slip surface of a symmetric rupture.
 Example: a 3D problem with a free surface at Z=0, and PML absorbing boundaries
 on all other boundary faces::
 
-    nn  = 50, 50, 50
+    shape = 50, 50, 50, 100
     bc1 = 10, 10,  0
     bc2 = 10, 10, 10
 
 Example: a 2D antiplane strain problem with PML absorbing boundaries.  The
 number of nodes is 2 for the zero-width axis::
 
-    nn  = 50, 50,  2
+    shape  = 50, 50, 2, 100
     bc1 = 10, 10, -1
     bc2 = 10, 10, -1
 
@@ -242,10 +241,10 @@ nodes are given by ``int(ihypo(faultnormal))``, and ``int(ihypo(faultnormal)) +
 fault plane located at z = 100.0, and double nodes at l = (21, 22), may be set
 up as such::
 
-    dx = 5.0
+    delta = 5.0, 5.0, 5.0, 0.1
     faultnormal = 3
     ihypo = 21, 21, 21.5
-    nn  = 41, 41, 42
+    shape  = 41, 41, 42, 100
     bc1 = 0, 0, 0
     bc2 = 0, 0, 0
 
@@ -257,14 +256,14 @@ must lie at the model boundary, and the and the cell-centered anti-mirror
 symmetry condition used.  For example, reducing the size of the previous
 example to put the rupture surface along the far z boundary::
 
-    nn = 41, 41, 22
+    shape = 41, 41, 22, 100
     bc2 = 0, 0, -2
 
 Alternatively, put the rupture surface along the near z boundary
 ::
 
     ihypo = 21, 21, 1.5
-    nn = 41, 41, 22
+    shape = 41, 41, 22, 100
     bc1 = 0, 0, -2
     bc2 = 0, 0, 0
 
@@ -274,7 +273,7 @@ axis, and node-centered anti-mirror symmetry along the anti-plane axis, to reduc
 computations eight-fold::
 
     ihypo = 21, 21, 21.5
-    nn = 21, 21, 22
+    shape = 21, 21, 22, 100
     bc1 = 0, 0, 0
     bc2 = -1, 1, -2
 
@@ -316,19 +315,19 @@ following example is used to illustrate.  Using 4096 cores, compute spontaneous
 rupture, outputting slip-velocity on the fault plane as well as vertical
 ground-motions at selected sites::
 
-    nproc3 = 1, 1024, 4                        # number of processes in j, k, l
-    nn = 6000, 4000, 800                       # number of mesh nodes
-    faultnormal = 2                            # fault normal to y-axis
-    ihypo = 2000, 2000, 100                    # hypocenter indices
-    i = (2000,4000), 2000, (1,160), (1,-1, 10) # fault output 4d region
+    nproc3 = 1, 1024, 4                  # number of processes in j, k, l
+    shape = 6000, 4000, 800, 10000       # number of mesh nodes and time steps
+    faultnormal = 2                      # fault normal to y-axis
+    ihypo = 2000.0, 2000.0, 100.0        # hypocenter (in logical coordinates)
+    i = s_[2000:4000,2000,1:160,1:-1:10] # fault output 4d region
     fieldio = [
         ('=w', 'sv1', i, 'slip-velocity-x'),
         ('=w', 'sv2', i, 'slip-velocity-y'),
         ('=w', 'sv3', i, 'slip-velocity-z'),
-        ('=w', 'v3', [2000, 1000, -1, ()], 'vz-station-1'),
-        ('=w', 'v3', [2000, 1500, -1, ()], 'vz-station-2'),
-        ('=w', 'v3', [2000, 2500, -1, ()], 'vz-station-3'),
-        ('=w', 'v3', [2000, 3000, -1, ()], 'vz-station-4'),
+        ('=w', 'v3', s_[2000,1000,-1,:], 'vz-station-1'),
+        ('=w', 'v3', s_[2000,1500,-1,:], 'vz-station-2'),
+        ('=w', 'v3', s_[2000,2500,-1,:], 'vz-station-3'),
+        ('=w', 'v3', s_[2000,3000,-1,:], 'vz-station-4'),
     ]
 
 Here the problem has been partitioned (using nproc3) such that the entire fault
@@ -409,34 +408,46 @@ configured by editing ``conf.py``.
 Profiling
 ---------
 
-Internal code timings, for benchmarking performance, are collected and saved to
-the ``prof/`` directory.  The file format is flat binary that can be examined
-with the UNIX command ``od -f``.  Eight categories are timed for every time
-iteration step, and save in the following files:
+Internal code timings, for benchmarking performance, are collected and saved
+for each run.  Eight categories are timed for every time iteration step, and
+save in the following files:
 
-    **1time**: Time integration subroutine.
+    **prof-1time.bin**: Time integration subroutine.
 
-    **2stress**: Stress subroutine.
+    **prof-2stress.bin**: Stress subroutine.
 
-    **3accel**: Acceleration subroutine, including multiprocessor halo swapping
-    communications.
+    **prof-3accel.bin**: Acceleration subroutine, including multiprocessor halo
+    swapping communications.
 
-    **4stats**: Statistics subroutine, including multiprocessor min/max reductions.
+    **prof-4stats.bin**: Statistics subroutine, including multiprocessor min/max
+    reductions.
 
-    **5ckpt**: Checkpoint subroutine.
+    **prof-5ckpt.bin**: Checkpoint subroutine.
 
-    **6mp**: Aggregate of all multiprocessor operations, including halo swap,
-    global reductions, and parallel I/O.
+    **prof-6mp.bin**: Aggregate of all multiprocessor operations, including halo
+    swap, global reductions, and parallel I/O.
 
-    **7io**: Aggregate of all input and output operations, including checkpointing
-    and field I/O.
+    **prof-7io.bin**: Aggregate of all input and output operations, including
+    checkpointing and field I/O.
 
-    **8step**: Total for complete time iteration.
+    **prof-8step.bin**: Total for complete time iteration.
+
+The file format is flat binary that can be examined with the
+UNIX command ``od -f``, or summarized using the ``stats`` utility 
+included with Coseis. For example::
+
+    $ ~/coseis/bin/stats prof-*
+
+         Min       Max         Mean      N
+    0.007108  0.050063    0.0182206  36001 prof-1time.bin
+    0.058548  0.212697     0.116968  36001 prof-2stress.bin
+    0.141528     2.702     0.568846  36001 prof-3accel.bin
+       1e-06   67.2009    0.0205376  36001 prof-4stats.bin
+           0  0.008744  2.96786e-06  36001 prof-5ckpt.bin
+    0.021656   67.7519     0.394482  36001 prof-6mp.bin
+       5e-06  0.708743  0.000152639  36001 prof-7io.bin
+    0.211541    67.999     0.724721  36001 prof-8step.bin
 
 Profiling can be very difficult to interpret for multiprocessor runs.  Timing
 is only saved for the master processor.  It can be helpful to synchronize the
 processors using ``debug = 2`` to give more accurate relative timing values.
-
-Additionally, SORD can be run with compiler generated code profiling using the
-``-p`` or ``--profiling`` option.
-

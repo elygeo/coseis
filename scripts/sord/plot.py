@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 path = 'run/'
 meta = imp.load_source('meta', path + 'meta.py')
 n  = meta.shape[1], meta.shape[0]
-vx = np.fromfile(path + 'vx.bin', 'f').reshape(n)
-vy = np.fromfile(path + 'vy.bin', 'f').reshape(n)
+vx = np.fromfile(path + 'vx.bin', meta.dtype).reshape(n)
+vy = np.fromfile(path + 'vy.bin', meta.dtype).reshape(n)
 vm = np.sqrt(vx * vx + vy * vy)
 fig = plt.figure(figsize=(3,3))
 ax = plt.gca()

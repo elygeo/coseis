@@ -33,8 +33,7 @@ bounds = (-80 * s + d, 48 * s - d), (-58 * s + d, 54 * s - d), (0.0, 48 * s - dx
 origin = mts.longitude, mts.latitude, mts.depth
 
 # loop over cvm versions
-#for cvm in 'cvms', 'cvmh', 'cvmg':
-for cvm in 'cvms',:
+for cvm in 'cvms', 'cvmh', 'cvmg':
 
     # projection
     projection = dict(proj='tmerc', lon_0=origin[0], lat_0=origin[1])
