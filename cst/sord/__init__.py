@@ -21,10 +21,9 @@ def build(job=None, **kwargs):
     import os, subprocess
     from .. import util
 
-    # src directory
+    # source directory
     cwd = os.getcwd()
     path = os.path.dirname(__file__)
-    path = os.path.join(path, 'src')
     os.chdir(path)
 
     # makefile
@@ -165,7 +164,7 @@ def stage(prm, **kwargs):
     util.skeleton(job)
     util.archive(path + 'coseis.tgz')
     d = os.path.dirname(__file__)
-    f = os.path.join(d, 'src', 'sord.x')
+    f = os.path.join(d, 'sord.x')
     shutil.copy2(f, path)
     if prm.debug > 2:
         os.mkdir(path + 'debug')
