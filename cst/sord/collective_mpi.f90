@@ -4,7 +4,7 @@ implicit none
 integer :: file_null
 integer, private :: np3(3), comm1d(3), comm2d(3), comm3d, itype, rtype
 private :: commrank, mpopen
-include 'mpif.h'
+include 'mpif.h' ! mpi module broken on Blue Gene so include instead
 contains
 
 ! initialize
