@@ -196,5 +196,5 @@ collective.mod : collective_mpi.o
 	@true
 
 clean :
-	rm -f *.o *.mod *.x *.lst
+	rm -f *.o *.mod *.x *.lst *.pyc
 

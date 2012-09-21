@@ -18,5 +18,5 @@ collective.mod : collective_{mode}.o
 	@true
 
 clean :
-	rm -f *.o *.mod *.x *.lst
+	rm -f *.o *.mod *.x *.lst *.pyc
 
