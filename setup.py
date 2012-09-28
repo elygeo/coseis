@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# Test modification
 
 if __name__ != '__main__':
     raise Exception('not a module')

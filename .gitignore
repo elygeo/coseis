@@ -19,6 +19,7 @@ TODO
 /cst/conf/site.py
 /data
 /cst/data
+/cst/build
 /cst/cvms/build
 /cst/sord/Makefile
 /cst/tests/Makefile
