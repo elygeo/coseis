@@ -161,6 +161,8 @@ def read(faults=None, extent=None, version='CFM4-socal-primary'):
     for f in faults:
         if type(f) in (list, tuple):
             f, segs = f
+            if type(segs) is int:
+                segs = [segs]
         else:
             segs = range(nseg[f])
         for i in segs:
@@ -239,19 +241,19 @@ def search(cat, patterns, split=False):
     else:
         match = []
         for p in patterns:
-            if ~isinstance(p, basestring):
-                match.append(p)
-            else:
+            if isinstance(p, basestring):
                 p = p.lower()
                 m = (k for k in cat if p in k.lower())
                 if split:
                     m = ((k, i) for k in m for i in range(cat[k]))
                 match.extend(m)
+            else:
+                match.append(p)
         match = sorted(match)
     return match
 
 
-def explore(faults=None, split=False):
+def explore(faults=None, split=False, basemap=True):
     """
     CFMX: Community Fault Model Explorer
     ====================================
@@ -296,33 +298,36 @@ def explore(faults=None, split=False):
     fig.scene.disable_render = True
 
     # DEM
-    dem, extent = data.dem(extent, mesh=True)
-    x, y, z = dem
-    x, y = proj(x, y)
-    mlab.mesh(x, y, z, color=(1,1,1), opacity=0.3)
+    if basemap:
+        dem, extent = data.dem(extent, mesh=True)
+        x, y, z = dem
+        x, y = proj(x, y)
+        mlab.mesh(x, y, z, color=(1,1,1), opacity=0.3)
 
     # base map
-    ddeg = 0.5 / 60.0
-    x, y = np.c_[
-        data.mapdata('coastlines', resolution, extent, 10.0, delta=ddeg),
-        [float('nan'), float('nan')],
-        data.mapdata('borders', resolution, extent, delta=ddeg),
-    ]
-    x -= 360.0
-    z = interpolate.interp2(extent, dem[2], (x, y))
-    x, y = proj(x, y)
-    i = np.isnan(z)
-    x[i] = float('nan')
-    y[i] = float('nan')
-    mlab.plot3d(x, y, z, color=(0,0,0), line_width=1, tube_radius=None)
+    if basemap:
+        ddeg = 0.5 / 60.0
+        x, y = np.c_[
+            data.mapdata('coastlines', resolution, extent, 10.0, delta=ddeg),
+            [float('nan'), float('nan')],
+            data.mapdata('borders', resolution, extent, delta=ddeg),
+        ]
+        x -= 360.0
+        z = interpolate.interp2(extent, dem[2], (x, y))
+        x, y = proj(x, y)
+        i = np.isnan(z)
+        x[i] = float('nan')
+        y[i] = float('nan')
+        mlab.plot3d(x, y, z, color=(0,0,0), line_width=1, tube_radius=None)
 
     # fault surfaces
-    print '\nReading fault surfaces:\n'
+    faults = search(catalog(), faults, split)
+    print '\nReading %s fault surfaces:\n' % len(faults)
     names = {}
     coords = []
-    for f in search(catalog(), faults):
+    for f in faults:
         print('    ' + repr(f))
-        f = read(f)
+        f = read([f])
         x, y = proj(f.lon, f.lat)
         z, t = f.z, f.tri.T
         s = mlab.triangular_mesh(x, y, z, t, representation='surface', color=color_bg)
@@ -366,7 +371,8 @@ def explore(faults=None, split=False):
             mlab.view(view_azimuth, view_elevation)
             fig.scene.camera.view_angle = view_angle
         elif k in '/?h':
-            print __doc__
+            from .cfm import explore
+            print explore.__doc__
         fig.scene.disable_render = False
         return
 
@@ -375,6 +381,6 @@ def explore(faults=None, split=False):
     mlab.view(view_azimuth, view_elevation)
     fig.scene.camera.view_angle = view_angle
     fig.scene.disable_render = False
-    mlab.show()
     print "\nPress H in the figure window for help."
+    mlab.show()
 

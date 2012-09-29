@@ -1,7 +1,10 @@
-#!/usr/bin/env ipython --gui=wx -i
+#!/usr/bin/env ipython --gui=wx -i --
+#!/usr/bin/env python -i
 import sys, getopt
 import cst
-opts, faults = getopt.getopt(sys.argv[1:], 's')
-split = '-s' in dict(opts)
-cst.cfm.explore(faults, split)
+opts, faults = getopt.getopt(sys.argv[1:], 'sn')
+opts = dict(opts)
+split = '-s' in opts
+basemap = '-n' not in opts
+cst.cfm.explore(faults, split, basemap)
 
