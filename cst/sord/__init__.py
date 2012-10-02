@@ -55,7 +55,6 @@ def build(job=None, **kwargs):
             'material_model.f90',
             'kinematic_source.f90',
             'material_resample.f90',
-            'checkpoint.f90',
             'time_integration.f90',
             'stress.f90',
             'dynamic_rupture.f90',
@@ -168,8 +167,6 @@ def stage(prm, **kwargs):
     shutil.copy2(f, path)
     if prm.debug > 2:
         os.mkdir(path + 'debug')
-    if prm.itcheck != 0:
-        os.mkdir(path + 'checkpoint')
 
     # save iputput parameters
     del(prm['itbuff'])
@@ -335,8 +332,6 @@ def prepare_param(prm):
     # intervals
     nt = prm.shape[3]
     prm.itio = max(1, min(prm.itio, nt))
-    if prm.itcheck % prm.itio != 0:
-        prm.itcheck = (prm.itcheck // prm.itio + 1) * prm.itio
 
     # hypocenter coordinates
     nn = prm.shape[:3]

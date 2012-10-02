@@ -13,7 +13,6 @@ use material_model
 use kinematic_source
 use dynamic_rupture
 use material_resample
-use checkpoint
 use time_integration
 use stress
 use acceleration
@@ -31,22 +30,20 @@ call initialize(np0, ip);        master = ip == 0; prof0(1)  = timer(6)
 call read_parameters;                              prof0(2)  = timer(6)
 call setup_dimensions;     if (sync) call barrier; prof0(3)  = timer(6)
 if (master) write (*, '(a)') 'SORD - Support Operator Rupture Dynamics'
-call look_for_checkpoint;  if (sync) call barrier; prof0(4)  = timer(6)
-call allocate_arrays;      if (sync) call barrier; prof0(5)  = timer(6)
-call init_grid;            if (sync) call barrier; prof0(6)  = timer(6)
-call init_material;        if (sync) call barrier; prof0(7)  = timer(6)
-call init_pml;             if (sync) call barrier; prof0(8)  = timer(6)
-call init_finite_source;   if (sync) call barrier; prof0(9)  = timer(6)
-call init_rupture;         if (sync) call barrier; prof0(10) = timer(6)
-call resample_material;    if (sync) call barrier; prof0(11) = timer(6)
-call read_checkpoint;      if (sync) call barrier; prof0(12) = timer(6)
+call allocate_arrays;      if (sync) call barrier; prof0(4)  = timer(6)
+call init_grid;            if (sync) call barrier; prof0(5)  = timer(6)
+call init_material;        if (sync) call barrier; prof0(6)  = timer(6)
+call init_pml;             if (sync) call barrier; prof0(7)  = timer(6)
+call init_finite_source;   if (sync) call barrier; prof0(8)  = timer(6)
+call init_rupture;         if (sync) call barrier; prof0(9)  = timer(6)
+call resample_material;    if (sync) call barrier; prof0(10) = timer(6)
 fh = -1
 if (mpout /= 0) fh = file_null
 allocate (prof(8,itio))
-prof0(13) = iotimer
-prof0(14) = timer(7)
+prof0(11) = iotimer
+prof0(12) = timer(7)
 if (master) call rio1(fh(9), prof0, 'w', 'prof-main.bin', 16, 0, mpout, verb)
-prof0(14) = timer(7)
+prof0(12) = timer(7)
 
 ! main loop
 if (master) write (*, '(a,i6,a)') 'Main loop:', nt, ' steps'
@@ -60,7 +57,6 @@ call step_time;           if (sync) call barrier; prof(1,jp) = timer(5)
 call step_stress;         if (sync) call barrier; prof(2,jp) = timer(5)
 call step_accel;          if (sync) call barrier; prof(3,jp) = timer(5)
 call stats;               if (sync) call barrier; prof(4,jp) = timer(5)
-call write_checkpoint;    if (sync) call barrier; prof(5,jp) = timer(5)
 prof(6,jp) = mptimer
 prof(7,jp) = iotimer
 prof(8,jp) = timer(6)
@@ -70,7 +66,6 @@ if (it == nt .or. modulo(it, itio) == 0) then
         call rio1(fh(2), prof(2,:jp), 'w', 'prof-2stress.bin', nt, it-jp, mpout, verb)
         call rio1(fh(3), prof(3,:jp), 'w', 'prof-3accel.bin',  nt, it-jp, mpout, verb)
         call rio1(fh(4), prof(4,:jp), 'w', 'prof-4stats.bin',  nt, it-jp, mpout, verb)
-        call rio1(fh(5), prof(5,:jp), 'w', 'prof-5ckpt.bin',   nt, it-jp, mpout, verb)
         call rio1(fh(6), prof(6,:jp), 'w', 'prof-6mp.bin',     nt, it-jp, mpout, verb)
         call rio1(fh(7), prof(7,:jp), 'w', 'prof-7io.bin',     nt, it-jp, mpout, verb)
         call rio1(fh(8), prof(8,:jp), 'w', 'prof-8step.bin',   nt, it-jp, mpout, verb)

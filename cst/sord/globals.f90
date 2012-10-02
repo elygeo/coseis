@@ -4,7 +4,7 @@ implicit none
 
 ! input parameters, see parameters.py for documentation
 integer, dimension(3) :: nproc3, bc1, bc2, n1expand, n2expand
-integer :: shape_(4), itstats, itio, itcheck, itstop, npml, ppml, oplevel, mpin, &
+integer :: shape_(4), itstats, itio, itstop, npml, ppml, oplevel, mpin, &
     mpout, debug, faultopening, irup, faultnormal, nsource
 real :: delta(4), tm0, rho1, rho2, vp1, vp2, vs1, vs2, gam1, gam2, hourglass(2), &
     vdamp, rexpand, affine(9), gridnoise, ihypo(3), vpml, slipvector(3)

@@ -87,7 +87,6 @@ case ('svtol');        read (str, *, iostat=ios) key, op, svtol
 case ('nproc3');       read (str, *, iostat=ios) key, op, nproc3
 case ('itstats');      read (str, *, iostat=ios) key, op, itstats
 case ('itio');         read (str, *, iostat=ios) key, op, itio
-case ('itcheck');      read (str, *, iostat=ios) key, op, itcheck
 case ('itstop');       read (str, *, iostat=ios) key, op, itstop
 case ('debug');        read (str, *, iostat=ios) key, op, debug
 case ('mpin');         read (str, *, iostat=ios) key, op, mpin
