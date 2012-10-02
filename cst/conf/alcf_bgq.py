@@ -37,7 +37,7 @@ nthread = 32
 launch = 'runjob --exe {command} -n {nproc} -p {ppn} --verbose=INFO --block $COBALT_PARTNAME ${{COBALT_CORNER:+--corner}} $COBALT_CORNER ${{COBALT_SHAPE:+--shape}} $COBALT_SHAPE --envs BG_SHAREDMEMSIZE=32MB PAMID_VERBOSE=1 VPROF_PROFILE=yes OMP_NUM_THREADS={nthread}\n'
 
 # compilers
-build_cc = 'mpixlcc_r'
+build_cc = 'mpixlc_r'
 build_fc = 'mpixlf2003_r'
 build_ld = 'mpixlf2003_r'
 build_fflags = build_ldflags + ' -qlist -qreport -qrealsize=8'

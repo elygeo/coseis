@@ -48,7 +48,7 @@ nthread = 4
 launch = 'cobalt-mpirun -mode smp -verbose 2 -np {nproc} -env OMP_NUM_THREADS={nthread} {command}'
 
 # HPM
-build_cc = 'mpixlcc_r'
+build_cc = 'mpixlc_r'
 build_fc = 'mpixlf2003_r'
 build_libs = '/home/morozov/lib/libmpihpm.a'
 build_cflags = build_ldflags + ' -qlist -qreport'
