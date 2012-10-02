@@ -11,9 +11,9 @@ Data retrieval and processing tools.
 import os
 repo = os.path.join(os.path.dirname(__file__), 'data')
 if not os.path.exists(repo):
-    f = os.path.join(repo, '../data')
+    f = os.path.join(os.path.dirname(__file__), '..', '..', 'coseis-data')
     if os.path.exists(f):
-        os.symlink('../data', repo)
+        os.symlink('../../coseis-data', repo)
     else:
         os.mkdir(repo)
 del(os)
@@ -143,16 +143,16 @@ def etopo1(downsample=1):
         print('Retrieving %s' % url)
         data = urllib.urlopen(url)
         data = cStringIO.StringIO(data.read())
-        print('Creating %s' % filename0)
         data = zipfile.ZipFile(data)
         data = data.read('etopo1_ice_g_i2.bin')
         data = np.fromstring(data, '<i2').reshape(shape).T[:,::-1]
+        print('Creating %s' % filename0)
         np.save(filename0, data)
         del(data)
     if not os.path.exists(filename):
-        print('Creating %s' % filename)
         data = np.load(filename0, mmap_mode='c')
         data = downsample_sphere(data, downsample)
+        print('Creating %s' % filename)
         np.save(filename, data)
         del(data)
     return np.load(filename, mmap_mode='c')
@@ -193,7 +193,6 @@ def globe30(tile=(0, 1), fill=True):
             f = urllib.urlopen(u)
             f = cStringIO.StringIO(f.read())
             z += gzip.GzipFile(fileobj=f).read()
-        print('Creating %s' % filename)
         z = np.fromstring(z, '<i2').reshape(shape).T[:,::-1]
         if fill:
             n = shape[1] // 2
@@ -212,6 +211,7 @@ def globe30(tile=(0, 1), fill=True):
             i = z == -500
             z[i] = y[i]
             del(y, i)
+        print('Creating %s' % filename)
         np.save(filename, z)
         del(z)
     return np.load(filename, mmap_mode='c')
