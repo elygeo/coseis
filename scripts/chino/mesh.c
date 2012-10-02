@@ -19,7 +19,9 @@ const int mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
 const int flags = O_WRONLY | O_CREAT | O_EXCL;
 const char *files[] = {"hold/lon.bin", "hold/lat.bin", "hold/dep.bin", "hold/z3.bin"};
 const char *path, *path0;
-const size_t nnode = nx * ny, ncell = (nx - 1) * (ny - 1);
+const size_t nnode = nx * ny;
+const size_t ncell = (nx - 1) * (ny - 1);
+const size_t size = sizeof(float);
 float *buff0 = (float *)malloc(nnode * sizeof(float));
 float *buff = (float *)malloc(nnode * sizeof(float));
 FILE *stream;
@@ -34,9 +36,9 @@ for (k = 0; k < 2; k++) {
     if (fh >= 0) {
         path0 = strrchr(path, '/') + 1;
         err = (stream = fopen(path0, "r")) == NULL;
-        err = err || fread(buff, sizeof(float), nnode, stream) != nnode;
+        err = err || fread(buff, size, nnode, stream) != nnode;
         fseek(stream, 0, SEEK_END);
-        err = err || ftell(stream) != sizeof(float) * nnode;
+        err = err || ftell(stream) != size * nnode;
         if (fclose(stream) || err) {
             close(fh);
             remove(path);
@@ -47,7 +49,7 @@ for (k = 0; k < 2; k++) {
         average(buff, nx, ny);
         err = (stream = fdopen(fh, "w")) == NULL;
         for (j = 0; j < nz - 1 && !err; j++)
-            err = fwrite(buff, sizeof(float), ncell, stream) != ncell;
+            err = fwrite(buff, size, ncell, stream) != ncell;
         if (fclose(stream) || err) {
             remove(path);
             printf("Error writing %s\n", path);
@@ -61,7 +63,7 @@ path = files[2];
 fh = open(path, flags, mode);
 if (fh >= 0) {
     err = (stream = fopen("topo.bin", "r")) == NULL;
-    err = err || fread(buff0, sizeof(float), nnode, stream) != nnode;
+    err = err || fread(buff0, size, nnode, stream) != nnode;
     if (fclose(stream) || err) {
         close(fh);
         remove(path);
@@ -79,7 +81,7 @@ if (fh >= 0) {
         w = w < 1.0 ? w : 1.0;
         for (i = 0; i < nx; i++);
             buff[i] = buff[i] * w;
-        err = fwrite(buff, sizeof(float), ncell, stream) != ncell;
+        err = fwrite(buff, size, ncell, stream) != ncell;
     }
     if (fclose(stream) || err) {
         remove(path);
@@ -94,17 +96,15 @@ fh = open(path, flags, mode);
 if (fh >= 0) {
     err = (stream = fopen("topo.bin", "r")) == NULL;
     path0 = strrchr(path, '/') + 1;
-    err = err || fread(buff0, sizeof(float), nnode, stream) != nnode;
+    err = err || fread(buff0, size, nnode, stream) != nnode;
     if (fclose(stream) || err) {
         close(fh);
         remove(path);
         printf("Error reading topo.bin\n");
         exit(1);
     }
-    z0 = mean(buff0, nnode);
-    for (i = 0; i < nnode; i++)
-        buff0[i] -= z0;
-    extrude(buff, nx, ny, npml);
+    z0 = demean(buff0, nnode);
+    extrude(buff0, nx, ny, npml);
     err = (stream = fdopen(fh, "w")) == NULL;
     n = nz - ntop - npml - 1;
     for (j = 0; j < nz && !err; j++) {
@@ -114,7 +114,7 @@ if (fh >= 0) {
         w = w < 1.0 ? w : 1.0;
         for (i = 0; i < nx; i++);
             buff[i] = buff[i] * w;
-        err = fwrite(buff, sizeof(float), nnode, stream) != nnode;
+        err = fwrite(buff, size, nnode, stream) != nnode;
     }
     if (fclose(stream) || err) {
         remove(path);

@@ -13,16 +13,19 @@ average(float *x, const int nx, const int ny)
     return;
 }
                              
-// compute the mean of an array of floats
+// remove the mean from an array of floats
 float
-mean(float *x, const size_t n)
+demean(float *x, const size_t n)
 {
     float xbar;
     size_t i;
     xbar = 0.0;
     for (i = 0; i < n; i++)
         xbar += x[i];
-    return xbar / n;
+    xbar /= n;
+    for (i = 0; i < n; i++)
+        x[i] -= xbar;
+    return xbar;
 }
                              
 // fill np outer layers from inner layer
