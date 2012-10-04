@@ -8,6 +8,7 @@ use globals
 use collective
 use utilities
 integer :: nl(3)
+character(32) :: filename
 
 ! dimensions
 dx = delta(1:3)
@@ -70,8 +71,8 @@ end if
 verb = master .and. debug > 0
 sync = debug > 1
 if (debug > 2) then
-    write (str, "(a,i6.6,a)") 'debug/db', ipid, '.py'
-    open (1, file=str, status='replace')
+    write (filename, "(a,i6.6,a)") 'debug/db', ipid, '.py'
+    open (1, file=filename, status='replace')
     write (1, "('ifn     = ', i8)") ifn
     write (1, "('irup    = ', i8)") irup
     write (1, "('ip      = ', i8)") ip

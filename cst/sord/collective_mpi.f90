@@ -100,6 +100,16 @@ integer :: e
 call mpi_barrier(comm3d, e)
 end subroutine
 
+! broadcast chacacter 1d
+subroutine cbroadcast1(c1, coords)
+character, intent(inout) :: c1(:)
+integer, intent(in) :: coords(3)
+integer :: comm, root, i, e
+i = size(c1)
+call commrank(comm, root, coords)
+call mpi_bcast(c1(1), i, mpi_character, root, comm, e)
+end subroutine
+
 ! broadcast real 1d
 subroutine rbroadcast1(f1, coords)
 real, intent(inout) :: f1(:)

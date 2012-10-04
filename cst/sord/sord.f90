@@ -19,8 +19,8 @@ use acceleration
 use utilities
 use statistics
 implicit none
-integer :: jp = 0, fh(9)
-real :: prof0(14) = 0.0
+integer :: jp = 0, fh(7)
+real :: prof0(10) = 0.0
 real, allocatable :: prof(:,:)
 
 ! initialization
@@ -39,36 +39,49 @@ call init_rupture;         if (sync) call barrier; prof0(9)  = timer(6)
 call resample_material;    if (sync) call barrier; prof0(10) = timer(6)
 fh = -1
 if (mpout /= 0) fh = file_null
-allocate (prof(8,itio))
-prof0(11) = iotimer
-prof0(12) = timer(7)
-if (master) call rio1(fh(9), prof0, 'w', 'prof-main.bin', 16, 0, mpout, verb)
-prof0(12) = timer(7)
+
+! write profile info
+if (master) then
+    open (1, file='prof-init.txt', status='replace')
+    write (1, "(g15.7,'  initialize')")         prof0(1)
+    write (1, "(g15.7,'  read_parameters')")    prof0(2)
+    write (1, "(g15.7,'  setup_dimensions')")   prof0(3)
+    write (1, "(g15.7,'  allocate_arrays')")    prof0(4)
+    write (1, "(g15.7,'  init_grid')")          prof0(5)
+    write (1, "(g15.7,'  init_material')")      prof0(6)
+    write (1, "(g15.7,'  init_pml')")           prof0(7)
+    write (1, "(g15.7,'  init_finite_source')") prof0(8)
+    write (1, "(g15.7,'  init_rupture')")       prof0(9)
+    write (1, "(g15.7,'  resample_material')")  prof0(10)
+    close (1)
+end if
 
 ! main loop
 if (master) write (*, '(a,i6,a)') 'Main loop:', nt, ' steps'
+allocate (prof(7,itio))
+prof(1,1) = timer(7)
 loop: do while (it < nt)
 it = it + 1
 jp = jp + 1
 mptimer = 0.0
 iotimer = 0.0
 prof(1,jp) = timer(5)
-call step_time;           if (sync) call barrier; prof(1,jp) = timer(5)
-call step_stress;         if (sync) call barrier; prof(2,jp) = timer(5)
-call step_accel;          if (sync) call barrier; prof(3,jp) = timer(5)
-call stats;               if (sync) call barrier; prof(4,jp) = timer(5)
-prof(6,jp) = mptimer
-prof(7,jp) = iotimer
-prof(8,jp) = timer(6)
+call step_time;     if (sync) call barrier; prof(1,jp) = timer(5)
+call step_stress;   if (sync) call barrier; prof(2,jp) = timer(5)
+call step_accel;    if (sync) call barrier; prof(3,jp) = timer(5)
+call stats;         if (sync) call barrier; prof(4,jp) = timer(5)
+prof(5,jp) = mptimer
+prof(6,jp) = iotimer
+prof(7,jp) = timer(6)
 if (it == nt .or. modulo(it, itio) == 0) then
     if (master) then
         call rio1(fh(1), prof(1,:jp), 'w', 'prof-1time.bin',   nt, it-jp, mpout, verb)
         call rio1(fh(2), prof(2,:jp), 'w', 'prof-2stress.bin', nt, it-jp, mpout, verb)
         call rio1(fh(3), prof(3,:jp), 'w', 'prof-3accel.bin',  nt, it-jp, mpout, verb)
         call rio1(fh(4), prof(4,:jp), 'w', 'prof-4stats.bin',  nt, it-jp, mpout, verb)
-        call rio1(fh(6), prof(6,:jp), 'w', 'prof-6mp.bin',     nt, it-jp, mpout, verb)
-        call rio1(fh(7), prof(7,:jp), 'w', 'prof-7io.bin',     nt, it-jp, mpout, verb)
-        call rio1(fh(8), prof(8,:jp), 'w', 'prof-8step.bin',   nt, it-jp, mpout, verb)
+        call rio1(fh(5), prof(5,:jp), 'w', 'prof-5mp.bin',     nt, it-jp, mpout, verb)
+        call rio1(fh(6), prof(6,:jp), 'w', 'prof-6io.bin',     nt, it-jp, mpout, verb)
+        call rio1(fh(7), prof(7,:jp), 'w', 'prof-7step.bin',   nt, it-jp, mpout, verb)
         open (1, file='currentstep', status='replace')
         write (1, '(i6)') it
         close (1)
@@ -80,12 +93,7 @@ end do loop
 
 ! finish up
 if (sync) call barrier
-prof0(1) = timer(7)
-prof0(2) = timer(8)
-if (master) then
-    call rio1(fh(9), prof0(:2), 'w', 'prof-main.bin', 16, 14, mpout, verb)
-    write (*, '(a)') 'Finished!'
-end if
+if (master) write (*, '(a)') 'Finished!'
 call finalize
 
 end program

@@ -40,6 +40,7 @@ use fortran_io
 character(*), intent(in) :: passes, field
 real, intent(inout) :: f(:,:,:)
 character(4) :: pass
+character(256) :: filename
 integer :: i1(3), i2(3), i3(3), i4(3), di(3), m(4), n(4), o(4), &
     it1, it2, dit, i, j, k, l, ipass
 real :: val
@@ -197,10 +198,10 @@ case ('=r', '+r', '=R', '+R')
         n(4) = min(io%nb, (it2 - it) / dit + 1)
         m(4) = (it2 - it1) / dit + 1
         o(4) = (it  - it1) / dit
-        str = io%filename
+        filename = io%filename
         if (any(n(1:3) /= m(1:3)) .and. mpin == 0) &
-            write (str, '(2a,i6.6)') trim(str), '-', ipid
-        call rio2(io%fh, io%buff(:,:n(4)), 'r', str, m, n, o, mpin, verb)
+            write (filename, '(2a,i6.6)') trim(filename), '-', ipid
+        call rio2(io%fh, io%buff(:,:n(4)), 'r', filename, m, n, o, mpin, verb)
         io%ib = 0
         if (any(n < 1)) then
             deallocate (io%buff)
@@ -316,10 +317,10 @@ case ('=w', '=wi')
         n(4) = io%ib
         m(4) = (it2 - it1) / dit + 1
         o(4) = (it  - it1) / dit + 1 - n(4)
-        str = io%filename
+        filename = io%filename
         if (any(n(1:3) /= m(1:3)) .and. mpout == 0) &
-            write (str, '(2a,i6.6)') trim(str), '-', ipid
-        call rio2(io%fh, io%buff(:,:n(4)), 'w', str, m, n, o, mpout, verb)
+            write (filename, '(2a,i6.6)') trim(filename), '-', ipid
+        call rio2(io%fh, io%buff(:,:n(4)), 'w', filename, m, n, o, mpout, verb)
         io%ib = 0
         if (it == it2 .or. any(n < 1)) then
             deallocate (io%buff)
@@ -343,9 +344,9 @@ if (i > 0 .and. debug > 3 .and. it <= 8) then
         idebug = 0
     end if
     idebug = idebug + 1
-    write (str, "(a,3(i4.4,'-'),a)") 'debug/f', it, idebug, ipid, field
-    write (*, '(2a)') 'Opening file: ', trim(str)
-    open (1, file=str, status='replace')
+    write (filename, "(a,3(i4.4,'-'),a)") 'debug/f', it, idebug, ipid, field
+    write (*, '(2a)') 'Opening file: ', trim(filename)
+    open (1, file=filename, status='replace')
     do l = 1, size(f, 3)
         write (1, '(i4,1x,i4,1x,a)') it, l, field
         do k = 1, size(f, 2)

@@ -12,7 +12,6 @@ real :: tau, source1(3), source2(3), vrup, rcrit, trelax, svtol !, tmnucl, delts
 character(16) :: source, pulse
 
 ! miscellaneous parameters
-real, parameter :: pi = 3.14159265
 real :: &
     mptimer,        & ! MPI timing
     iotimer,        & ! i/o timing
@@ -44,8 +43,6 @@ logical :: &
     sync,           & ! synchronize processes
     verb,           & ! print messages
     master            ! master process flag
-character(256) :: &
-    str               ! string for storing file names
 
 ! 1d dynamic arrays
 real, allocatable, dimension(:) :: &

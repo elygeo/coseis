@@ -14,8 +14,8 @@ use statistics
 real :: rr, xhypo(3), xi(3), w
 integer :: i1(3), i2(3), i, j, k, l
 
+if (master .and. faultnormal > 0) write (*, '(a)') 'Rupture initialization'
 if (ifn == 0) return
-if (master) write (*, '(a)') 'Rupture initialization'
 
 ! allocate arrays
 i1 = nm
@@ -23,19 +23,9 @@ i1(ifn) = 1
 j = i1(1)
 k = i1(2)
 l = i1(3)
-
-! rupture vectors
 allocate ( &
     !ts0(j,k,l,3), & ! [ZS]
     !tp(j,k,l,3), & ! [ZS]
-    nhat(j,k,l,3), &
-    t0(j,k,l,3), &
-    t1(j,k,l,3), &
-    t2(j,k,l,3), &
-    t3(j,k,l,3) )
-
-! rupture scalars
-allocate ( &
     !af(j,k,l), & ! [ZS]
     !bf(j,k,l), & ! [ZS]
     !v0(j,k,l), & ! [ZS]
@@ -47,6 +37,11 @@ allocate ( &
     !svtrl(j,k,l), & ! [ZS]
     !svold(j,k,l), & ! [ZS]
     !sv0(j,k,l), & ! [ZS]
+    nhat(j,k,l,3), &
+    t0(j,k,l,3), &
+    t1(j,k,l,3), &
+    t2(j,k,l,3), &
+    t3(j,k,l,3), &
     mus(j,k,l), &
     mud(j,k,l), &
     dc(j,k,l), &
@@ -62,7 +57,8 @@ allocate ( &
     tn(j,k,l), &
     ts(j,k,l), &
     f1(j,k,l), &
-    f2(j,k,l) )
+    f2(j,k,l) &
+)
 
 ! i/o
 sl = 0.0
