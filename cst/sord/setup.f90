@@ -32,7 +32,6 @@ nnoff = nl3 * ip3 - nhalo
 ! master process
 ip3root = floor((ihypo - 1.0) / nl3)
 master = all(ip3 == ip3root)
-if (.not. master) itstop = 0
 
 ! size of arrays
 nl = min(nl3, nn - nnoff - nhalo)

@@ -17,7 +17,8 @@ real :: m(9), tol, h
 logical :: err
 integer, allocatable :: seed(:)
 
-if (master) write (*, '(a)') 'Grid generation'
+if (sync) call barrier
+if (master) call message('Grid generation')
 
 ! create rectangular mesh with double nodes at the fault
 w1 = 0.0

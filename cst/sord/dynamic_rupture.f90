@@ -14,7 +14,9 @@ use statistics
 real :: rr, xhypo(3), xi(3), w
 integer :: i1(3), i2(3), i, j, k, l
 
-if (master .and. faultnormal > 0) write (*, '(a)') 'Rupture initialization'
+if (faultnormal == 0) return
+if (sync) call barrier
+if (master) call message('Rupture initialization')
 if (ifn == 0) return
 
 ! allocate arrays
@@ -242,7 +244,6 @@ use statistics
 integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
 
 if (ifn == 0) return
-if (verb) write (*, '(a)') 'Rupture'
 
 ! indices
 i1 = 1

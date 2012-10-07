@@ -8,8 +8,9 @@ include 'mpif.h' ! mpi module broken on Blue Gene so include instead
 contains
 
 ! initialize
-subroutine initialize(np0, ip)
+subroutine initialize(np0, ip, master)
 integer, intent(out) :: np0, ip
+logical, intent(out) :: master
 integer :: i, m, n, e
 integer(4) :: i4
 real :: r
@@ -18,6 +19,7 @@ file_null = mpi_file_null
 call mpi_init(e)
 call mpi_comm_size(mpi_comm_world, np0, e)
 call mpi_comm_rank(mpi_comm_world, ip, e)
+master = ip == 0
 itype = mpi_integer
 rtype = mpi_real
 inquire (iolength=m) i
@@ -101,12 +103,10 @@ call mpi_barrier(comm3d, e)
 end subroutine
 
 ! broadcast chacacter 1d
-subroutine cbroadcast1(c1, coords)
+subroutine cbroadcast1(c1)
 character, intent(inout) :: c1(:)
-integer, intent(in) :: coords(3)
 integer :: comm, root, i, e
 i = size(c1)
-call commrank(comm, root, coords)
 call mpi_bcast(c1(1), i, mpi_character, root, comm, e)
 end subroutine
 
@@ -130,34 +130,12 @@ call commrank(comm, root, coords)
 call mpi_bcast(f4(1,1,1,1), i, rtype, root, comm, e)
 end subroutine
 
-! reduce integer
-subroutine ireduce(i0out, i0, op, coords)
-integer, intent(out) :: i0out
-integer, intent(in) :: i0, coords(3)
-character(*), intent(in) :: op
-integer :: iop, comm, root, e
-select case (op)
-case ('min', 'allmin'); iop = mpi_min
-case ('max', 'allmax'); iop = mpi_max
-case ('sum', 'allsum'); iop = mpi_sum
-case default
-stop 'problem in ireduce'
-end select
-call commrank(comm, root, coords)
-if (op(1:3) == 'all') then
-    call mpi_allreduce(i0, i0out, 1, itype, iop, comm, e)
-else
-    call mpi_reduce(i0, i0out, 1, itype, iop, root, comm, e)
-end if
-end subroutine
-
 ! reduce real 1d
-subroutine rreduce1(f1out, f1, op, coords)
+subroutine rreduce1(f1out, f1, op)
 real, intent(out) :: f1out(:)
 real, intent(in) :: f1(:)
 character(*), intent(in) :: op
-integer, intent(in) :: coords(3)
-integer :: iop, comm, root, e, i
+integer :: iop, e, i
 select case (op)
 case ('min', 'allmin'); iop = mpi_min
 case ('max', 'allmax'); iop = mpi_max
@@ -165,22 +143,20 @@ case ('sum', 'allsum'); iop = mpi_sum
 case default
 stop 'problem in rreduce1'
 end select
-call commrank(comm, root, coords)
 i = size(f1)
 if (op(1:3) == 'all') then
-    call mpi_allreduce(f1(1), f1out(1), i, rtype, iop, comm, e)
+    call mpi_allreduce(f1(1), f1out(1), i, rtype, iop, comm3d, e)
 else
-    call mpi_reduce(f1(1), f1out(1), i, rtype, iop, root, comm, e)
+    call mpi_reduce(f1(1), f1out(1), i, rtype, iop, 0, comm3d, e)
 end if
 end subroutine
 
 ! reduce real 2d
-subroutine rreduce2(f2out, f2, op, coords)
+subroutine rreduce2(f2out, f2, op)
 real, intent(out) :: f2out(:,:)
 real, intent(in) :: f2(:,:)
 character(*), intent(in) :: op
-integer, intent(in) :: coords(3)
-integer :: iop, comm, root, e, i
+integer :: iop, e, i
 select case (op)
 case ('min', 'allmin'); iop = mpi_min
 case ('max', 'allmax'); iop = mpi_max
@@ -188,12 +164,11 @@ case ('sum', 'allsum'); iop = mpi_sum
 case default
 stop 'problem in rreduce2'
 end select
-call commrank(comm, root, coords)
 i = size(f2)
 if (op(1:3) == 'all') then
-    call mpi_allreduce(f2(1,1), f2out(1,1), i, rtype, iop, comm, e)
+    call mpi_allreduce(f2(1,1), f2out(1,1), i, rtype, iop, comm3d, e)
 else
-    call mpi_reduce(f2(1,1), f2out(1,1), i, rtype, iop, root, comm, e)
+    call mpi_reduce(f2(1,1), f2out(1,1), i, rtype, iop, 0, comm3d, e)
 end if
 end subroutine
 
@@ -268,7 +243,7 @@ end do
 end subroutine
 
 ! 2d real input/output
-subroutine rio2(fh, f2, mode, filename, mm, nn, oo, mpio, verb)
+subroutine rio2(fh, f2, mode, filename, mm, nn, oo, mpio)
 use fortran_io
 integer, intent(inout) :: fh
 real, intent(inout) :: f2(:,:)
@@ -276,17 +251,16 @@ character(1), intent(in) :: mode
 character(*), intent(in) :: filename
 integer, intent(inout) :: mm(:), nn(:), oo(:)
 integer, intent(in) :: mpio
-logical, intent(in) :: verb
 integer :: i, e
 integer(kind=mpi_offset_kind) :: offset
 i = size(oo)
 if (mpio == 0) then
     if (any(nn <= 0)) return
-    call frio2(fh, f2, mode, filename, mm(i), oo(i), verb)
+    call frio2(fh, f2, mode, filename, mm(i), oo(i))
     return
 end if
 if (fh == mpi_file_null) then
-    call mpopen(fh, mode, filename, mm, nn, oo, verb)
+    call mpopen(fh, mode, filename, mm, nn, oo)
     if (any(nn <= 0)) return
 end if
 offset = oo(i)
@@ -313,7 +287,7 @@ end if
 end subroutine
 
 ! 2d integer input/output
-subroutine iio2(fh, f2, mode, filename, mm, nn, oo, mpio, verb)
+subroutine iio2(fh, f2, mode, filename, mm, nn, oo, mpio)
 use fortran_io
 integer, intent(inout) :: fh
 integer, intent(inout) :: f2(:,:)
@@ -321,17 +295,16 @@ character(1), intent(in) :: mode
 character(*), intent(in) :: filename
 integer, intent(inout) :: mm(:), nn(:), oo(:)
 integer, intent(in) :: mpio
-logical, intent(in) :: verb
 integer :: i, e
 integer(kind=mpi_offset_kind) :: offset
 i = size(oo)
 if (mpio == 0) then
     if (any(nn <= 0)) return
-    call fiio2(fh, f2, mode, filename, mm(i), oo(i), verb)
+    call fiio2(fh, f2, mode, filename, mm(i), oo(i))
     return
 end if
 if (fh == mpi_file_null) then
-    call mpopen(fh, mode, filename, mm, nn, oo, verb)
+    call mpopen(fh, mode, filename, mm, nn, oo)
     if (any(nn <= 0)) return
 end if
 offset = oo(i)
@@ -358,51 +331,50 @@ end if
 end subroutine
 
 ! 1d real input/output
-subroutine rio1(fh, f1, mode, filename, m, o, mpio, verb)
+subroutine rio1(fh, f1, mode, filename, m, o, mpio)
 integer, intent(inout) :: fh
 real, intent(inout) :: f1(:)
 character(1), intent(in) :: mode
 character(*), intent(in) :: filename
 integer, intent(in) :: m, o, mpio
-logical, intent(in) :: verb
 integer :: mm(2), nn(2), oo(2)
 real :: f2(1,size(f1))
 if (mode == 'w') f2(1,:) = f1
 mm = (/1, m/)
 nn = (/1, size(f1)/)
 oo = (/0, o/)
-call rio2(fh, f2, mode, filename, mm, nn, oo, mpio, verb)
+call rio2(fh, f2, mode, filename, mm, nn, oo, mpio)
 if (mode == 'r') f1 = f2(1,:)
 end subroutine
 
 ! 1d real input/output
-subroutine iio1(fh, f1, mode, filename, m, o, mpio, verb)
+subroutine iio1(fh, f1, mode, filename, m, o, mpio)
 integer, intent(inout) :: fh
 integer, intent(inout) :: f1(:)
 character(1), intent(in) :: mode
 character(*), intent(in) :: filename
 integer, intent(in) :: m, o, mpio
-logical, intent(in) :: verb
 integer :: mm(2), nn(2), oo(2)
 integer :: f2(1,size(f1))
 if (mode == 'w') f2(1,:) = f1
 mm = (/1, m/)
 nn = (/1, size(f1)/)
 oo = (/0, o/)
-call iio2(fh, f2, mode, filename, mm, nn, oo, mpio, verb)
+call iio2(fh, f2, mode, filename, mm, nn, oo, mpio)
 if (mode == 'r') f1 = f2(1,:)
 end subroutine
 
 ! open file with MPIIO
 ! does not use mm(4) or nn(4)
-subroutine mpopen(fh, mode, filename, mm, nn, oo, verb)
+subroutine mpopen(fh, mode, filename, mm, nn, oo)
+use utilities
 integer, intent(out) :: fh
 character(1), intent(in) :: mode
 character(*), intent(in) :: filename
 integer, intent(in) :: mm(:), nn(:), oo(:)
-logical, intent(in) :: verb
 integer :: mmm(size(mm)), nnn(size(nn)), ooo(size(oo)), ndims, i, n, ip, ftype, comm0, comm, e
 integer(kind=mpi_offset_kind) :: offset = 0
+character(128) :: str
 n = size(mm)
 ndims = count(mm(1:n-1) > 1)
 do i = 1, n-1
@@ -422,8 +394,9 @@ call mpi_comm_split(comm0, 1, 0, comm, e)
 call mpi_comm_size(comm, n, e)
 call mpi_comm_rank(comm, i, e)
 call mpi_comm_rank(mpi_comm_world, ip, e)
-if (verb .and. i == 0) write (*, '(i8,3a,i8,a,i2,2a)') &
-    ip, ' Opening (', mode, ')', n, 'P', ndims, 'D file: ', trim(filename)
+write (str, '(i8,3a,i8,a,i2,2a)') ip, ' Opening (', mode, ')', n, 'P', &
+    ndims, 'D file: ', filename
+if (i == 0) call message(str)
 n = size(oo)
 if (mode == 'r') then
     i = mpi_mode_rdonly

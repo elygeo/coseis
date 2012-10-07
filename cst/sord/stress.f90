@@ -13,10 +13,10 @@ use field_io_mod
 use statistics
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, p
 
-if (verb) write (*, '(a)') 'Stress'
+! init
+call set_halo(s1, 0.0, i1cell, i2cell)
 
 ! loop over component and derivative direction
-call set_halo(s1, 0.0, i1cell, i2cell)
 doic: do ic  = 1, 3
 doid: do iid = 1, 3; id = modulo(ic + iid - 1, 3) + 1
 
@@ -229,7 +229,7 @@ call field_io('<>', 'w23', w2(:,:,:,1))
 call field_io('<>', 'w31', w2(:,:,:,2))
 call field_io('<>', 'w12', w2(:,:,:,3))
 if (modulo(it, itstats) == 0) then
-    call tensor_norm(s1, w1, w2, i1core, i2core, (/ 1, 1, 1 /))
+    call tensor_norm(s1, w1, w2, i1core, i2core, (/1, 1, 1/))
     call set_halo(s1, -1.0, i1core, i2core)
     wmaxloc = maxloc(s1)
     wmax = s1(wmaxloc(1),wmaxloc(2),wmaxloc(3))

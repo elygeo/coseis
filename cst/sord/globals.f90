@@ -4,7 +4,7 @@ implicit none
 
 ! input parameters, see parameters.py for documentation
 integer, dimension(3) :: nproc3, bc1, bc2, n1expand, n2expand
-integer :: shape_(4), itstats, itio, itstop, npml, ppml, oplevel, mpin, &
+integer :: shape_(4), itstats, itio, npml, ppml, oplevel, mpin, &
     mpout, debug, faultopening, irup, faultnormal, nsource
 real :: delta(4), tm0, rho1, rho2, vp1, vp2, vs1, vs2, gam1, gam2, hourglass(2), &
     vdamp, rexpand, affine(9), gridnoise, ihypo(3), vpml, slipvector(3)
@@ -13,8 +13,6 @@ character(16) :: source, pulse
 
 ! miscellaneous parameters
 real :: &
-    mptimer,        & ! MPI timing
-    iotimer,        & ! i/o timing
     dt,             & ! time step length
     dx(3),          & ! spatial step lengths
     tm                ! time
@@ -24,6 +22,8 @@ integer :: &
     ifn,            & ! fault normal component=abs(faultnormal)
     ip,             & ! process rank
     ipid,           & ! processor Id
+    clock_halo,     & ! timer for halo exchange
+    clock_io,       & ! timer for field i/o
     np0               ! number of processes available
 integer, dimension(3) :: &
     nn,             & ! shape of global mesh
@@ -44,7 +44,7 @@ logical :: &
     verb,           & ! print messages
     master            ! master process flag
 
-! 1d dynamic arrays
+! 1d arrays
 real, allocatable, dimension(:) :: &
     dx1, dx2, dx3,  & ! x, y, z rectangular element size
     dn1,            & ! pml node damping -2*d     / (2+d*dt)

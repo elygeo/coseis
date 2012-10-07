@@ -8,18 +8,14 @@ use globals
 use utilities
 use field_io_mod
 use statistics
+use collective
 integer :: i, j, k, l
 real :: u, v
+character(32) :: str
 
-! status
-if (master) then
-    if (verb) then
-        write (*, '(a,i6)') 'Time step', it
-    else
-        write (*, '(a)', advance='no') '.'
-        if (modulo(it, 50) == 0 .or. it == nt) write (*, '(i6)') it
-    end if
-end if
+if (sync) call barrier
+write(str, '(a,i8)') 'Time step', it
+if (master) call message(str)
 
 ! save previous slip velocity
 if (ifn /= 0) then
@@ -54,7 +50,7 @@ call field_io('<>', 'v1', vv(:,:,:,1))
 call field_io('<>', 'v2', vv(:,:,:,2))
 call field_io('<>', 'v3', vv(:,:,:,3))
 if (modulo(it, itstats) == 0) then
-    call vector_norm(s1, vv, i1core, i2core, (/ 1, 1, 1 /))
+    call vector_norm(s1, vv, i1core, i2core, (/1, 1, 1/))
     call set_halo(s1, -1.0, i1core, i2core)
     vmaxloc = maxloc(s1)
     vmax = s1(vmaxloc(1),vmaxloc(2),vmaxloc(3))
@@ -66,7 +62,7 @@ call field_io('<>', 'u1', uu(:,:,:,1))
 call field_io('<>', 'u2', uu(:,:,:,2))
 call field_io('<>', 'u3', uu(:,:,:,3))
 if (modulo(it, itstats) == 0) then
-    call vector_norm(s1, uu, i1core, i2core, (/ 1, 1, 1 /))
+    call vector_norm(s1, uu, i1core, i2core, (/1, 1, 1/))
     call set_halo(s1, -1.0, i1core, i2core)
     umaxloc = maxloc(s1)
     umax = s1(umaxloc(1),umaxloc(2),umaxloc(3))

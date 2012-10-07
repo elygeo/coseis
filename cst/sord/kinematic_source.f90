@@ -13,14 +13,15 @@ use collective
 use utilities
 integer :: n, i, fh
 if (nsource == 0) return
-if (master) write (*, '(a)') 'Finite source initialize'
+if (sync) call barrier
+if (master) call message('Finite source initialization')
 n = abs(nsource)
 allocate (src_xi(n,3))
 fh = -1
 if (mpin /= 0) fh = file_null
-call rio1(fh, src_xi(:,1), 'r', 'source-xi1.bin', n, 0, mpin, verb)
-call rio1(fh, src_xi(:,2), 'r', 'source-xi2.bin', n, 0, mpin, verb)
-call rio1(fh, src_xi(:,3), 'r', 'source-xi3.bin', n, 0, mpin, verb)
+call rio1(fh, src_xi(:,1), 'r', 'source-xi1.bin', n, 0, mpin)
+call rio1(fh, src_xi(:,2), 'r', 'source-xi2.bin', n, 0, mpin)
+call rio1(fh, src_xi(:,3), 'r', 'source-xi3.bin', n, 0, mpin)
 if (source == 'force') then
     do i = 1, 3
         src_xi(:,i) = src_xi(:,i) - nnoff(i)
@@ -32,9 +33,9 @@ if (source == 'force') then
         end if
     end do
     allocate (src_nt(n), src_dt(n), src_t0(n), src_w1(n,3))
-    call rio1(fh, src_w1(:,1), 'r', 'source-w11.bin', n, 0, mpin, verb)
-    call rio1(fh, src_w1(:,2), 'r', 'source-w12.bin', n, 0, mpin, verb)
-    call rio1(fh, src_w1(:,3), 'r', 'source-w13.bin', n, 0, mpin, verb)
+    call rio1(fh, src_w1(:,1), 'r', 'source-w11.bin', n, 0, mpin)
+    call rio1(fh, src_w1(:,2), 'r', 'source-w12.bin', n, 0, mpin)
+    call rio1(fh, src_w1(:,3), 'r', 'source-w13.bin', n, 0, mpin)
 else
     do i = 1, 3
         src_xi(:,i) = src_xi(:,i) - 0.5 - nnoff(i)
@@ -46,19 +47,19 @@ else
         end if
     end do
     allocate (src_nt(n), src_dt(n), src_t0(n), src_w1(n,3), src_w2(n,3))
-    call rio1(fh, src_w1(:,1), 'r', 'source-w11.bin', n, 0, mpin, verb)
-    call rio1(fh, src_w1(:,2), 'r', 'source-w22.bin', n, 0, mpin, verb)
-    call rio1(fh, src_w1(:,3), 'r', 'source-w33.bin', n, 0, mpin, verb)
-    call rio1(fh, src_w2(:,1), 'r', 'source-w23.bin', n, 0, mpin, verb)
-    call rio1(fh, src_w2(:,2), 'r', 'source-w31.bin', n, 0, mpin, verb)
-    call rio1(fh, src_w2(:,3), 'r', 'source-w12.bin', n, 0, mpin, verb)
+    call rio1(fh, src_w1(:,1), 'r', 'source-w11.bin', n, 0, mpin)
+    call rio1(fh, src_w1(:,2), 'r', 'source-w22.bin', n, 0, mpin)
+    call rio1(fh, src_w1(:,3), 'r', 'source-w33.bin', n, 0, mpin)
+    call rio1(fh, src_w2(:,1), 'r', 'source-w23.bin', n, 0, mpin)
+    call rio1(fh, src_w2(:,2), 'r', 'source-w31.bin', n, 0, mpin)
+    call rio1(fh, src_w2(:,3), 'r', 'source-w12.bin', n, 0, mpin)
 end if
-call rio1(fh, src_t0, 'r', 'source-t0.bin', n, 0, mpin, verb)
-call rio1(fh, src_dt, 'r', 'source-dt.bin', n, 0, mpin, verb)
-call iio1(fh, src_nt, 'r', 'source-nt.bin', n, 0, mpin, verb)
+call rio1(fh, src_t0, 'r', 'source-t0.bin', n, 0, mpin)
+call rio1(fh, src_dt, 'r', 'source-dt.bin', n, 0, mpin)
+call iio1(fh, src_nt, 'r', 'source-nt.bin', n, 0, mpin)
 n = sum(src_nt)
 allocate (src_history(n))
-call rio1(fh, src_history, 'r', 'source-history.bin', n, 0, mpin, verb)
+call rio1(fh, src_history, 'r', 'source-history.bin', n, 0, mpin)
 end subroutine
 
 ! add finite source to force vector or strain/stress tensor
@@ -67,7 +68,6 @@ use globals
 integer :: i1(3), i2(3), i, j, k, l, isrc, itoff
 real :: xi(3), t, h, w
 if (nsource == 0) return
-if (verb) write (*, '(a)') 'Finite source'
 itoff = 0
 do isrc = 1, abs(nsource)
     i = floor((tm - src_t0(isrc)) / src_dt(isrc)) + 1
@@ -131,7 +131,6 @@ if (any(i2 < i1)) then
     pulse = 'none'
     return
 end if
-if (verb) write (*, '(a)') 'Point source'
 f = time_function(pulse, tm, dt, tau)
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
@@ -159,7 +158,6 @@ if (any(i2 < i1)) then
     pulse = 'none'
     return
 end if
-if (verb) write (*, '(a)') 'Point source'
 f = time_function(pulse, tm, dt, tau)
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)

@@ -10,7 +10,8 @@ use boundary_cond
 use utilities
 integer :: i1(3), i2(3), bc(3)
 
-if (master) write (*, '(a)') 'Resample material model'
+if (sync) call barrier
+if (master) call message('Resample material')
 
 ! mass ratio
 s2 = mr * vc

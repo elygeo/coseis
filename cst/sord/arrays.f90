@@ -5,9 +5,14 @@ contains
 
 subroutine allocate_arrays
 use globals
+use collective
+use utilities
 integer :: j, k, l
 
-! 3d
+if (sync) call barrier
+if (master) call message('Allocate arrays')
+
+! 3d arrays
 j = nm(1)
 k = nm(2)
 l = nm(3)
@@ -23,8 +28,7 @@ allocate ( &
     gam(j,k,l), &
     yy(j,k,l), &
     s1(j,k,l), &
-    s2(j,k,l) &
-)
+    s2(j,k,l) )
 
 end subroutine
 

@@ -14,10 +14,9 @@ use utilities
 use field_io_mod
 use statistics
 use collective
-integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iq, p
-real :: rr
+integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iq, p, tic, toc
 
-if (verb) write (*, '(a)') 'Acceleration'
+! init
 call set_halo(s1, 0.0, i1node, i2node)
 
 ! loop over component and derivative direction
@@ -229,10 +228,11 @@ call vector_bc(w1, bc1, bc2, i1bc, i2bc)
 call step_rupture
 
 ! swap halo
-rr = timer(2)
-call vector_swap_halo(w1, nhalo)
 if (sync) call barrier
-mptimer = mptimer + timer(2)
+call system_clock(tic)
+call vector_swap_halo(w1, nhalo)
+call system_clock(toc)
+clock_halo = clock_halo + toc - tic
 
 ! nodal force output
 call field_io('>', 'f1', w1(:,:,:,1))
@@ -257,7 +257,7 @@ call field_io('<>', 'a1', w1(:,:,:,1))
 call field_io('<>', 'a2', w1(:,:,:,2))
 call field_io('<>', 'a3', w1(:,:,:,3))
 if (modulo(it, itstats) == 0) then
-    call vector_norm(s1, w1, i1core, i2core, (/ 1, 1, 1 /))
+    call vector_norm(s1, w1, i1core, i2core, (/1, 1, 1/))
     call set_halo(s1, -1.0, i1core, i2core)
     amaxloc = maxloc(s1)
     amax = s1(amaxloc(1),amaxloc(2),amaxloc(3))

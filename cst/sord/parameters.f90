@@ -1,5 +1,6 @@
 ! read model parameters
 module parameters
+use utilities
 implicit none
 contains
 
@@ -11,6 +12,7 @@ inquire (file='parameters.py', size=n)
 call read_parameters1(n)
 end subroutine
 
+! read parameters sub-function
 subroutine read_parameters1(n)
 use globals
 use field_io_mod
@@ -105,7 +107,6 @@ case ('svtol');        read (str(:j), *, iostat=ios) key, op, svtol
 case ('nproc3');       read (str(:j), *, iostat=ios) key, op, nproc3
 case ('itstats');      read (str(:j), *, iostat=ios) key, op, itstats
 case ('itio');         read (str(:j), *, iostat=ios) key, op, itio
-case ('itstop');       read (str(:j), *, iostat=ios) key, op, itstop
 case ('debug');        read (str(:j), *, iostat=ios) key, op, debug
 case ('mpin');         read (str(:j), *, iostat=ios) key, op, mpin
 case ('mpout');        read (str(:j), *, iostat=ios) key, op, mpout

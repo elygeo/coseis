@@ -1,6 +1,7 @@
 ! miscellaneous utilities
 module utilities
 implicit none
+integer :: clock0
 contains
 
 ! array copy
@@ -8,7 +9,7 @@ subroutine r3copy(f, g)
 real, intent(in) :: f(:,:,:)
 real, intent(out) :: g(:,:,:)
 integer :: n(3), j, k, l
-n = (/ size(f,1), size(f,2), size(f,3) /)
+n = (/size(f,1), size(f,2), size(f,3)/)
 !$omp parallel do schedule(static) private(j, k, l)
 do l = 1, n(3)
 do k = 1, n(2)
@@ -25,7 +26,7 @@ subroutine r3fill(f, r)
 real, intent(inout) :: f(:,:,:)
 real, intent(in) :: r
 integer :: n(3), j, k, l
-n = (/ size(f,1), size(f,2), size(f,3) /)
+n = (/size(f,1), size(f,2), size(f,3)/)
 !$omp parallel do schedule(static) private(j, k, l)
 do l = 1, n(3)
 do k = 1, n(2)
@@ -42,7 +43,7 @@ subroutine r3scale(f, r)
 real, intent(inout) :: f(:,:,:)
 real, intent(in) :: r
 integer :: n(3), j, k, l
-n = (/ size(f,1), size(f,2), size(f,3) /)
+n = (/size(f,1), size(f,2), size(f,3)/)
 !$omp parallel do schedule(static) private(j, k, l)
 do l = 1, n(3)
 do k = 1, n(2)
@@ -58,7 +59,7 @@ end subroutine
 subroutine r3invert(f)
 real, intent(inout) :: f(:,:,:)
 integer :: n(3), j, k, l
-n = (/ size(f,1), size(f,2), size(f,3) /)
+n = (/size(f,1), size(f,2), size(f,3)/)
 !$omp parallel do schedule(static) private(j, k, l)
 do l = 1, n(3)
 do k = 1, n(2)
@@ -75,7 +76,7 @@ subroutine r30min(f, r)
 real, intent(inout) :: f(:,:,:)
 real, intent(in) :: r
 integer :: n(3), j, k, l
-n = (/ size(f,1), size(f,2), size(f,3) /)
+n = (/size(f,1), size(f,2), size(f,3)/)
 !$omp parallel do schedule(static) private(j, k, l)
 do l = 1, n(3)
 do k = 1, n(2)
@@ -92,7 +93,7 @@ subroutine r30max(f, r)
 real, intent(inout) :: f(:,:,:)
 real, intent(in) :: r
 integer :: n(3), j, k, l
-n = (/ size(f,1), size(f,2), size(f,3) /)
+n = (/size(f,1), size(f,2), size(f,3)/)
 !$omp parallel do schedule(static) private(j, k, l)
 do l = 1, n(3)
 do k = 1, n(2)
@@ -110,7 +111,7 @@ real, intent(out) :: r(:,:,:)
 real, intent(in) :: x(:,:,:,:), x0(3)
 integer, intent(in) :: i1(3), i2(3)
 integer :: n(3), j, k, l
-n = (/ size(r,1), size(r,2), size(r,3) /)
+n = (/size(r,1), size(r,2), size(r,3)/)
 if (any(i1 < 1 .or. i2 > n)) stop 'error in radius'
 !$omp parallel do schedule(static) private(j, k, l)
 do l = i1(3), i2(3)
@@ -132,7 +133,7 @@ real, intent(out) :: f2(:,:,:)
 real, intent(in) :: f1(:,:,:)
 integer, intent(in) :: i1(3), i2(3), d
 integer :: n(3), j, k, l
-n = (/ size(f1,1), size(f1,2), size(f1,3) /)
+n = (/size(f1,1), size(f1,2), size(f1,3)/)
 if (any(i1 < 1 .or. i2 > n)) stop 'error in average'
 !$omp parallel do schedule(static) private(j, k, l)
 do l = i1(3), i2(3)
@@ -156,7 +157,7 @@ real, intent(inout) :: f(:,:,:)
 real, intent(in) :: r
 integer, intent(in) :: i1(3), i2(3)
 integer :: n(3), i3(3), i4(3)
-n = (/ size(f,1), size(f,2), size(f,3) /)
+n = (/size(f,1), size(f,2), size(f,3)/)
 i3 = min(i1, n + 1)
 i4 = max(i2, 0)
 if (n(1) > 1) f(:i3(1)-1,:,:) = r
@@ -173,7 +174,7 @@ real, intent(out) :: f(:,:,:)
 real, intent(in) :: w(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), di(3)
 integer :: n(3), j, k, l
-n = (/ size(f,1), size(f,2), size(f,3) /)
+n = (/size(f,1), size(f,2), size(f,3)/)
 if (any(i1 < 1 .or. i2 > n)) stop 'error in vector_norm'
 !$omp parallel do schedule(static) private(j, k, l)
 do l = i1(3), i2(3), di(3)
@@ -195,7 +196,7 @@ real, intent(out) :: f(:,:,:)
 real, intent(in) :: w1(:,:,:,:), w2(:,:,:,:)
 integer, intent(in) :: i1(3), i2(3), di(3)
 integer :: n(3), j, k, l
-n = (/ size(f,1), size(f,2), size(f,3) /)
+n = (/size(f,1), size(f,2), size(f,3)/)
 if (any(i1 < 1 .or. i2 > n)) stop 'error in tensor_norm'
 !$omp parallel do schedule(static) private(j, k, l)
 do l = i1(3), i2(3), di(3)
@@ -221,7 +222,7 @@ real, intent(inout) :: f(:,:,:)
 integer, intent(in) :: i3(3), i4(3), di(3)
 integer :: i1(3), i2(3), n(3), i, j, k, l, d
 real :: h1, h2
-n = (/ size(f,1), size(f,2), size(f,3) /)
+n = (/size(f,1), size(f,2), size(f,3)/)
 i1 = i3
 i2 = i4
 where (i1 < 1) i1 = i1 + (-i1 / di + 1) * di
@@ -331,24 +332,16 @@ end select
 time_function = f
 end function
 
-! timer
-real function timer(i)
-integer, intent(in) :: i
-integer(8), save :: timers(8)
-integer, save :: clock0, clockrate, clockmax
-integer :: clock1
-if (i == 0) then
-    call system_clock(clock0, clockrate, clockmax)
-    timer = 0.0
-    timers = 0
-else
-    call system_clock(clock1)
-    timers = timers + clock1 - clock0
-    clock0 = clock1
-    timer = real(timers(i)) / real(clockrate)
-    timers(:i) = 0
-end if
-end function
+! log message
+subroutine message(str)
+character(*), intent(in) :: str
+integer :: clock
+write (*, '(a)', advance='no') '.'
+call system_clock(clock)
+open (1, file='sord.log', position='append')
+write (1, '(i8,x,a)') clock, str
+close (1)
+end subroutine
 
 end module
 

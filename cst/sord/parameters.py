@@ -18,9 +18,8 @@ mpin = 1			# input:  0=separate files, 1=MPI-IO, -1=non-collective MPI-IO
 mpout = 1			# output: 0=separate files, 1=MPI-IO, -1=non-collective MPI-IO
 itstats = 10			# interval for calculating statistics
 itio = 50			# interval for writing i/o buffers
-itstop = 0			# for testing, simulates code crash
 itbuff = 10
-debug = 0			# >0 verbose, >1 sync, >2 mpi vars, >3 I/O
+debug = 1			# >0 verbose, >1 sync, >2 mpi vars, >3 I/O
 
 # Wave model parameters
 shape = 41, 41, 42, 41		# mesh size (nx, ny, nz, nt)
