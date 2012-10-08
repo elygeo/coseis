@@ -182,7 +182,7 @@ def stage(prm, **kwargs):
     util.save(
         path + 'parameters.py', prm,
         expand = ['fieldio'],
-        header = '# model parameters\n',
+        header = '# SORD input parameters (auto-generated file).\n',
     )
 
     # metadata
