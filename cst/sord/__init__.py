@@ -53,7 +53,7 @@ def build(job=None, **kwargs):
             'setup.f90',
             'grid_generation.f90',
             'material_model.f90',
-            'pml.f90',
+            'boundary_pml.f90',
             'kinematic_source.f90',
             'material_resample.f90',
             'time_integration.f90',

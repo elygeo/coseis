@@ -15,10 +15,10 @@ character(16) :: source, pulse
 real :: &
     dt,             & ! time step length
     dx(3),          & ! spatial step lengths
-    tm                ! time
+    tm = 0.0          ! time
 integer :: &
     nt,             & ! number of time steps
-    it,             & ! current time step
+    it = 0,         & ! current time step
     ifn,            & ! fault normal component=abs(faultnormal)
     ip,             & ! process rank
     ipid,           & ! processor Id

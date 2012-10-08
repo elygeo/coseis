@@ -10,6 +10,9 @@ use utilities
 integer :: nl(3)
 character(32) :: filename
 
+if (sync) call barrier
+if (master) print *, clock(), 'Setup dimensions'
+
 ! dimensions
 dx = delta(1:3)
 dt = delta(4)

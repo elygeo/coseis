@@ -1,5 +1,5 @@
 ! perfectly matche layer
-module pml
+module boundary_pml
 implicit none
 contains
 

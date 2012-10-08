@@ -45,7 +45,6 @@ case (3); yy(:,:,irup) = 0.0
 end select
 
 ! initial state
-tm = 0.0
 vv = 0.0
 uu = 0.0
 w1 = 0.0
