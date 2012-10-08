@@ -189,15 +189,7 @@ td {
 <li><a class="reference internal" href="#defining-the-fault-rupture-surface" id="id9">Defining the fault rupture surface</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#memory-usage-and-scaling" id="id10">Memory Usage and Scaling</a><ul>
-<li><a class="reference internal" href="#achieving-i-o-performance" id="id11">Achieving I/O Performance</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#development" id="id12">Development</a><ul>
-<li><a class="reference internal" href="#debugging" id="id13">Debugging</a></li>
-<li><a class="reference internal" href="#profiling" id="id14">Profiling</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#memory-usage-and-scaling" id="id10">Memory Usage and Scaling</a></li>
 </ul>
 </div>
 <div class="section" id="summary">
@@ -479,142 +471,23 @@ memory bandwidth improvement, in the future, on-the-fly operators may become
 faster than stored operators.  The operator type is controlled by the
 <tt class="docutils literal">oplevel</tt> parameter, but can generally be left alone, as the default is to
 automatically detect rectilinear and curvilinear meshes and assign the proper
-operator type for fastest performance.</p>
+operator type for fastest performance. The allowed values are:</p>
+<blockquote>
+<div class="line-block">
+<div class="line">0: Auto pick 2 or 6</div>
+<div class="line">1: Mesh with constant spacing dx</div>
+<div class="line">2: Rectangular mesh</div>
+<div class="line">3: Parallelepiped mesh</div>
+<div class="line">4: One-point quadrature</div>
+<div class="line">5: Exactly integrated elements</div>
+<div class="line">6: Saved operators, nearly as fast as 2, but doubles the memory usage</div>
+</div>
+</blockquote>
 <p>On current hardware, computation time is on the order of the one second per
 time step per one million mesh points.  SORD scalability has been benchmarked
-up to 16 thousand processors at the TACC Ranger facility.  The following chart
-is the wall-time per step for 8 million mesh points per core (click for PDF):</p>
-<a class="reference external image-reference" href="../scripts/benchmark/sord-benchmark-ranger.pdf"><img alt="../scripts/benchmark/sord-benchmark-ranger.png" src="../scripts/benchmark/sord-benchmark-ranger.png" /></a>
-<p>This benchmark tests computation only. For many applications, disk output is
-the primary bottleneck and will limit scalability.</p>
-<div class="section" id="achieving-i-o-performance">
-<h4>Achieving I/O Performance</h4>
-<p>For computations with significant disk input and output, on large numbers of
-cores, domain decomposition layout is critical to performance.  The most
-important principle is to minimize partitioning of I/O amongst processes.  A
-best-case scenario is that a file is accessed by only a single processes.  The
-following example is used to illustrate.  Using 4096 cores, compute spontaneous
-rupture, outputting slip-velocity on the fault plane as well as vertical
-ground-motions at selected sites:</p>
-<pre class="literal-block">
-nproc3 = 1, 1024, 4                  # number of processes in j, k, l
-shape = 6000, 4000, 800, 10000       # number of mesh nodes and time steps
-faultnormal = 2                      # fault normal to y-axis
-ihypo = 2000.0, 2000.0, 100.0        # hypocenter (in logical coordinates)
-i = s_[2000:4000,2000,1:160,1:-1:10] # fault output 4d region
-fieldio = [
-    ('=w', 'sv1', i, 'slip-velocity-x'),
-    ('=w', 'sv2', i, 'slip-velocity-y'),
-    ('=w', 'sv3', i, 'slip-velocity-z'),
-    ('=w', 'v3', s_[2000,1000,-1,:], 'vz-station-1'),
-    ('=w', 'v3', s_[2000,1500,-1,:], 'vz-station-2'),
-    ('=w', 'v3', s_[2000,2500,-1,:], 'vz-station-3'),
-    ('=w', 'v3', s_[2000,3000,-1,:], 'vz-station-4'),
-]
-</pre>
-<p>Here the problem has been partitioned (using nproc3) such that the entire fault
-output surface lies on a single process by making many thin slices parallel to
-the fault-plane, and placing the first vertical domain boundary below the depth
-of the fault output region.  The surface stations are located at a single node
-point, so they always naturally occur on a single process.  With this
-configuration no coordination is required amongst the processes, and all I/O
-occurs independently.</p>
-<p>To scale this problem to higher numbers of processes, we eventually must start
-partitioning the fault-plane I/O.  In that case, the second most important
-principle for designing domain decomposition is to minimize I/O striping.
-Striping is an alternating or cyclical pattern of access to file from multiple
-processes.  A best-case scenario is for each processes to accesses a contiguous
-section of a file, rather than many small segments.  The important thing to
-know about SORD is that I/O occurs in Fortran-contiguous order, where the first
-index changes fastest.  To scale up our example to 32,768 cores, we prevent
-striping by keeping the number of processes along the x-axis equal to one:</p>
-<pre class="literal-block">
-nproc3 = 1, 1024, 32
-</pre>
-<p>Some I/O layouts are not amenable to minimizing partitioning and striping.  An
-example is two orthogonal output planes, such as the fault surface in addition
-to the entire ground surface.  One solution to that situation is to run
-multiple computations for each of the desired outputs, with each optimally
-partitioned for the output.</p>
-<p>In cases where minimizing partitioning and striping does not achieve acceptable
-performance, depending on the system architecture, it may be useful to test
-non-collective MPI-IO by setting the parameter:</p>
-<pre class="literal-block">
-mpout = -1
-</pre>
-<p>When all else fails, another option is to turn off MPI-IO altogether with:</p>
-<pre class="literal-block">
-mpout = 0
-</pre>
-<p>In that case, each process writes a separate output file.  If you have been
-careful to minimize I/O striping, assembling the separate output files may be
-as simple as concatenating them together with the UNIX <tt class="docutils literal">cat</tt> utility.  This
-approach is limited by the capability of the file system to handle large
-numbers files.</p>
-</div>
-</div>
-<div class="section" id="development">
-<h3>Development</h3>
-<p>Suggestions for improvements, and contributions to the SORD code and
-documentation are greatly appreciated.</p>
-<div class="section" id="debugging">
-<h4>Debugging</h4>
-<p>The <tt class="docutils literal">debug</tt> input parameter is useful for finding problems, and can take the
-following values:</p>
-<blockquote>
-<p><strong>0</strong>: Debugging off.</p>
-<p><strong>1</strong>: Verbose status output.</p>
-<p><strong>2</strong>: Synchronize multiple processors. This is useful for tracking down MPI
-related bugs.</p>
-<p><strong>3</strong>: Dump field variable output in text files at every step. Only do this
-for small tests or you will fill up your disk!</p>
-</blockquote>
-<p>During testing, compiler checks, such as array overflow and floating-point
-exceptions, can be turned on with the <tt class="docutils literal"><span class="pre">-t</span></tt> or <tt class="docutils literal"><span class="pre">--testing</span></tt> option.
-Additionally, to compile and run under a debugger use the <tt class="docutils literal"><span class="pre">-g</span></tt> or
-<tt class="docutils literal"><span class="pre">--debugging</span></tt> option.  Naturally, these options depend on the capabilities of
-the particular compiler.  The specific flags passed to the compiler can be
-configured by editing <tt class="docutils literal">conf.py</tt>.</p>
-</div>
-<div class="section" id="profiling">
-<h4>Profiling</h4>
-<p>Internal code timings, for benchmarking performance, are collected and saved
-for each run.  Eight categories are timed for every time iteration step, and
-save in the following files:</p>
-<blockquote>
-<p><strong>prof-1time.bin</strong>: Time integration subroutine.</p>
-<p><strong>prof-2stress.bin</strong>: Stress subroutine.</p>
-<p><strong>prof-3accel.bin</strong>: Acceleration subroutine, including multiprocessor halo
-swapping communications.</p>
-<p><strong>prof-4stats.bin</strong>: Statistics subroutine, including multiprocessor min/max
-reductions.</p>
-<p><strong>prof-5ckpt.bin</strong>: Checkpoint subroutine.</p>
-<p><strong>prof-6mp.bin</strong>: Aggregate of all multiprocessor operations, including halo
-swap, global reductions, and parallel I/O.</p>
-<p><strong>prof-7io.bin</strong>: Aggregate of all input and output operations, including
-checkpointing and field I/O.</p>
-<p><strong>prof-8step.bin</strong>: Total for complete time iteration.</p>
-</blockquote>
-<p>The file format is flat binary that can be examined with the
-UNIX command <tt class="docutils literal">od <span class="pre">-f</span></tt>, or summarized using the <tt class="docutils literal">stats</tt> utility
-included with Coseis. For example:</p>
-<pre class="literal-block">
-$ ~/coseis/bin/stats prof-*
-
-     Min       Max         Mean      N
-0.007108  0.050063    0.0182206  36001 prof-1time.bin
-0.058548  0.212697     0.116968  36001 prof-2stress.bin
-0.141528     2.702     0.568846  36001 prof-3accel.bin
-   1e-06   67.2009    0.0205376  36001 prof-4stats.bin
-       0  0.008744  2.96786e-06  36001 prof-5ckpt.bin
-0.021656   67.7519     0.394482  36001 prof-6mp.bin
-   5e-06  0.708743  0.000152639  36001 prof-7io.bin
-0.211541    67.999     0.724721  36001 prof-8step.bin
-</pre>
-<p>Profiling can be very difficult to interpret for multiprocessor runs.  Timing
-is only saved for the master processor.  It can be helpful to synchronize the
-processors using <tt class="docutils literal">debug = 2</tt> to give more accurate relative timing values.</p>
-</div>
+up to 64 thousand processors at ALCF.  The following chart
+is the wall-time per step per core (click for PDF):</p>
+<a class="reference external image-reference" href="../doc/sord-mpi-benchmark.pdf"><img alt="../doc/sord-mpi-benchmark.png" src="../doc/sord-mpi-benchmark.png" /></a>
 </div>
 </div>
 </body>

@@ -44,6 +44,7 @@ do it = 1, nt
     if (master) print *, clock(), 'Step  ', it
 end do
 
+if (master) print *, clock(), 'Finished!'
 call finalize
 
 end program

@@ -277,18 +277,6 @@ computations eight-fold::
     bc1 = 0, 0, 0
     bc2 = -1, 1, -2
 
-Spatial difference operator level
----------------------------------
-
-    0: Auto pick 2 or 6
-    1: Mesh with constant spacing dx
-    2: Rectangular mesh
-    3: Parallelepiped mesh
-    4: One-point quadrature
-    5: Exactly integrated elements
-    6: Saved operators, nearly as fast as 2, but doubles the memory usage
-
-
 Memory Usage and Scaling
 ========================
 
@@ -302,85 +290,21 @@ memory bandwidth improvement, in the future, on-the-fly operators may become
 faster than stored operators.  The operator type is controlled by the
 ``oplevel`` parameter, but can generally be left alone, as the default is to
 automatically detect rectilinear and curvilinear meshes and assign the proper
-operator type for fastest performance.
+operator type for fastest performance. The allowed values are:
+
+    | 0: Auto pick 2 or 6
+    | 1: Mesh with constant spacing dx
+    | 2: Rectangular mesh
+    | 3: Parallelepiped mesh
+    | 4: One-point quadrature
+    | 5: Exactly integrated elements
+    | 6: Saved operators, nearly as fast as 2, but doubles the memory usage
 
 On current hardware, computation time is on the order of the one second per
 time step per one million mesh points.  SORD scalability has been benchmarked
-up to 16 thousand processors at the TACC Ranger facility.  The following chart
-is the wall-time per step for 8 million mesh points per core (click for PDF):
+up to 64 thousand processors at ALCF.  The following chart
+is the wall-time per step per core (click for PDF):
 
-.. image:: ../scripts/benchmark/sord-benchmark-ranger.png
-    :target: ../scripts/benchmark/sord-benchmark-ranger.pdf
-
-This benchmark tests computation only. For many applications, disk output is
-the primary bottleneck and will limit scalability.
-
-Achieving I/O Performance
--------------------------
-
-For computations with significant disk input and output, on large numbers of
-cores, domain decomposition layout is critical to performance.  The most
-important principle is to minimize partitioning of I/O amongst processes.  A
-best-case scenario is that a file is accessed by only a single processes.  The
-following example is used to illustrate.  Using 4096 cores, compute spontaneous
-rupture, outputting slip-velocity on the fault plane as well as vertical
-ground-motions at selected sites::
-
-    nproc3 = 1, 1024, 4                  # number of processes in j, k, l
-    shape = 6000, 4000, 800, 10000       # number of mesh nodes and time steps
-    faultnormal = 2                      # fault normal to y-axis
-    ihypo = 2000.0, 2000.0, 100.0        # hypocenter (in logical coordinates)
-    i = s_[2000:4000,2000,1:160,1:-1:10] # fault output 4d region
-    fieldio = [
-        ('=w', 'sv1', i, 'slip-velocity-x'),
-        ('=w', 'sv2', i, 'slip-velocity-y'),
-        ('=w', 'sv3', i, 'slip-velocity-z'),
-        ('=w', 'v3', s_[2000,1000,-1,:], 'vz-station-1'),
-        ('=w', 'v3', s_[2000,1500,-1,:], 'vz-station-2'),
-        ('=w', 'v3', s_[2000,2500,-1,:], 'vz-station-3'),
-        ('=w', 'v3', s_[2000,3000,-1,:], 'vz-station-4'),
-    ]
-
-Here the problem has been partitioned (using nproc3) such that the entire fault
-output surface lies on a single process by making many thin slices parallel to
-the fault-plane, and placing the first vertical domain boundary below the depth
-of the fault output region.  The surface stations are located at a single node
-point, so they always naturally occur on a single process.  With this
-configuration no coordination is required amongst the processes, and all I/O
-occurs independently.
-
-To scale this problem to higher numbers of processes, we eventually must start
-partitioning the fault-plane I/O.  In that case, the second most important
-principle for designing domain decomposition is to minimize I/O striping.
-Striping is an alternating or cyclical pattern of access to file from multiple
-processes.  A best-case scenario is for each processes to accesses a contiguous
-section of a file, rather than many small segments.  The important thing to
-know about SORD is that I/O occurs in Fortran-contiguous order, where the first
-index changes fastest.  To scale up our example to 32,768 cores, we prevent
-striping by keeping the number of processes along the x-axis equal to one::
-
-    nproc3 = 1, 1024, 32
-
-Some I/O layouts are not amenable to minimizing partitioning and striping.  An
-example is two orthogonal output planes, such as the fault surface in addition
-to the entire ground surface.  One solution to that situation is to run
-multiple computations for each of the desired outputs, with each optimally
-partitioned for the output.
-
-In cases where minimizing partitioning and striping does not achieve acceptable
-performance, depending on the system architecture, it may be useful to test
-non-collective MPI-IO by setting the parameter::
-
-    mpout = -1
-
-When all else fails, another option is to turn off MPI-IO altogether with:
-::
-
-    mpout = 0
-
-In that case, each process writes a separate output file.  If you have been
-careful to minimize I/O striping, assembling the separate output files may be
-as simple as concatenating them together with the UNIX ``cat`` utility.  This
-approach is limited by the capability of the file system to handle large
-numbers files.
+.. image:: ../doc/sord-mpi-benchmark.png
+    :target: ../doc/sord-mpi-benchmark.pdf
 
