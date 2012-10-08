@@ -8,7 +8,7 @@ use setup
 use arrays
 use grid_generation
 use material_model
-use boundardy_pml
+use boundary_pml
 use kinematic_source
 use dynamic_rupture
 use material_resample

@@ -20,3 +20,6 @@ collective.mod : collective_{mode}.o
 clean :
 	rm -f *.o *.mod *.x *.lst *.pyc
 
+distclean : clean
+	rm Makefile
+

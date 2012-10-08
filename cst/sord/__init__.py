@@ -14,11 +14,11 @@ class get_slices:
         return item
 s_ = get_slices()
 
-def build(job=None, **kwargs):
+def configure(job=None, force=False, **kwargs):
     """
-    Build SORD code.
+    Create SORD Makefile.
     """
-    import os, subprocess
+    import os
     from .. import util
 
     # source directory
@@ -27,7 +27,7 @@ def build(job=None, **kwargs):
     os.chdir(path)
 
     # makefile
-    if not os.path.exists('Makefile'):
+    if force or not os.path.exists('Makefile'):
 
         # configure
         if job == None:
@@ -85,14 +85,22 @@ def build(job=None, **kwargs):
         # makefile
         m = open('Makefile.in').read()
         m = m.format(objects=objects, rules=rules, mode=mode, **job)
+        m = '# Auto-generated file. Will be overwritten.\n\n' + m
         open('Makefile', 'w').write(m)
-
-    # make
-    subprocess.check_call(['make', '-j', '2'])
 
     # finished
     os.chdir(cwd)
 
+    return
+
+def make(job=None, **kwargs):
+    """
+    Build SORD code.
+    """
+    import os, subprocess
+    configure(job, **kwargs)
+    p = os.path.dirname(__file__)
+    subprocess.check_call(['make', '-j', '2', '-C', p])
     return
 
 def stage(prm, **kwargs):
