@@ -18,7 +18,7 @@ elif target == ['sord']:
 elif target == ['test']:
     cst.tests.test_suite.test()
 elif target == ['build_all']:
-    cst.sord.build()
+    cst.sord.make()
     cst.cvms.build()
     cst.cvmh.cvmh_voxet()
     cst.cfm.catalog()

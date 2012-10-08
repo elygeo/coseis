@@ -14,7 +14,7 @@ use utilities
 use field_io_mod
 use statistics
 use collective
-integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iq, p, tic, toc
+integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iq, p
 
 ! init
 call set_halo(s1, 0.0, i1node, i2node)
@@ -229,10 +229,9 @@ call step_rupture
 
 ! swap halo
 if (sync) call barrier
-call system_clock(tic)
+timers(1) = clock()
 call vector_swap_halo(w1, nhalo)
-call system_clock(toc)
-clock_halo = clock_halo + toc - tic
+timers(1) = clock() - timers(1)
 
 ! nodal force output
 call field_io('>', 'f1', w1(:,:,:,1))

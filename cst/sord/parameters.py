@@ -16,12 +16,6 @@ gridnoise = 0.0			# random noise added to mesh, assumes planar fault
 oplevel = 0			# spatial difference operator level
 vdamp = -1.0			# Vs dependent damping
 hourglass = 1.0, 1.0		# hourglass stiffness (1) and viscosity (2)
-fieldio = [			# field I/O
-    ('=', 'rho', [], 2670.0),	# density
-    ('=', 'vp',  [], 6000.0),	# P-wave speed
-    ('=', 'vs',  [], 3464.0),	# S-wave speed
-    ('=', 'gam', [],    0.0),	# viscosity
-]
 rho1 = -1.0			# min density
 rho2 = -1.0			# max density
 vp1 = -1.0			# min P-wave speed
@@ -62,4 +56,12 @@ tau = 0.03			# source characteristic time
 # Placeholders
 i1pml = 0, 0, 0
 i2pml = 42, 42, 43
+
+# Field I/O
+fieldio = [			# field I/O
+    ('=', 'rho', [], 2670.0),	# density
+    ('=', 'vp',  [], 6000.0),	# P-wave speed
+    ('=', 'vs',  [], 3464.0),	# S-wave speed
+    ('=', 'gam', [],    0.0),	# viscosity
+]
 

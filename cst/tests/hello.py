@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-def build():
+def make():
     import subprocess
     import cst
     d = cst.util.configure()
@@ -12,7 +12,7 @@ def build():
 def test(argv=[]):
     import os, shutil
     import cst
-    build()
+    make()
     d = 'run/hello-c'
     os.makedirs(d)
     shutil.copy2('hello.c.x', d)

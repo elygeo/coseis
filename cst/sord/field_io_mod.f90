@@ -42,12 +42,12 @@ real, intent(inout) :: f(:,:,:)
 character(4) :: pass
 character(256) :: filename
 integer :: i1(3), i2(3), i3(3), i4(3), di(3), m(4), n(4), o(4), &
-    it1, it2, dit, i, j, k, l, ipass, tic, toc
+    it1, it2, dit, i, j, k, l, ipass
 real :: val
 
 ! profiling
 if (sync) call barrier
-call system_clock(tic)
+timers(2) = timers(2) - clock()
 
 ! pass loop
 do ipass = 1, len(passes)
@@ -201,7 +201,7 @@ case ('=r', '+r', '=R', '+R')
         filename = io%filename
         if (any(n(1:3) /= m(1:3)) .and. mpin == 0) &
             write (filename, '(2a,i6.6)') trim(filename), '-', ipid
-        call rio2(io%fh, io%buff(:,:n(4)), 'r', filename, m, n, o, mpin)
+        call rio2(io%fh, io%buff(:,:n(4)), 'r', trim(filename), m, n, o, mpin)
         io%ib = 0
         if (any(n < 1)) then
             deallocate (io%buff)
@@ -320,7 +320,7 @@ case ('=w', '=wi')
         filename = io%filename
         if (any(n(1:3) /= m(1:3)) .and. mpout == 0) &
             write (filename, '(2a,i6.6)') trim(filename), '-', ipid
-        call rio2(io%fh, io%buff(:,:n(4)), 'w', filename, m, n, o, mpout)
+        call rio2(io%fh, io%buff(:,:n(4)), 'w', trim(filename), m, n, o, mpout)
         io%ib = 0
         if (it == it2 .or. any(n < 1)) then
             deallocate (io%buff)
@@ -357,8 +357,7 @@ end if
 
 ! profiling
 if (sync) call barrier
-call system_clock(toc)
-clock_io = clock_io + toc - tic
+timers(2) = timers(2) + clock()
 
 end subroutine
 

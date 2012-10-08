@@ -20,8 +20,9 @@ use statistics
 
 implicit none
 
-call system_clock(clock0)
+call system_clock(clock0, clockrate)
 call initialize(np0, ip, master)
+if (master) print *, clockrate, 'Clock rate'
 call read_parameters
 call setup_dimensions
 call allocate_arrays
@@ -31,13 +32,16 @@ call init_pml
 call init_finite_source
 call init_rupture
 call resample_material
+if (master) print *, clock(), 'Loop  ', nt
 
 do it = 1, nt
-    call system_clock(clock1)
+    call system_clock(clock0)
+    timers = 0
     call step_time
     call step_stress
     call step_accel
     call stats
+    if (master) print *, clock(), 'Step  ', it
 end do
 
 call finalize

@@ -12,9 +12,6 @@ use collective
 integer :: i, j, k, l
 real :: u, v
 
-if (sync) call barrier
-if (master) print *, clock(), 'Step', it
-
 ! save previous slip velocity
 if (ifn /= 0) then
     select case (ifn)

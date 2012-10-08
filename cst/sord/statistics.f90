@@ -1,4 +1,4 @@
-! collect statistics
+! collect statistics and timing
 module statistics
 integer, dimension(3) :: &
     amaxloc, vmaxloc, umaxloc, wmaxloc
@@ -16,13 +16,14 @@ use collective
 use utilities
 logical, save :: init = .true.
 integer, save :: fh(20), j = 0
-real, save, allocatable :: prof(:,:), maxl(:,:), suml(:,:), maxg(:,:), sumg(:,:)
-integer :: m, o, i, tic, toc, clockrate
+integer, save, allocatable :: prof(:,:)
+real, save, allocatable :: maxl(:,:), suml(:,:), maxg(:,:), sumg(:,:)
+integer :: m, o, i
 real :: val
 
 ! init 
 if (sync) call barrier
-call system_clock(tic)
+timers(3) = clock()
 
 ! allocate buffers
 if (init) then
@@ -113,18 +114,17 @@ if (j > 0 .and. (modulo(it, itio) == 0 .or. it == nt)) then
 end if
 
 ! profile
-call system_clock(toc, clockrate)
+if (sync) call barrier
 if (master) then
+    timers(4) = clock()
+    timers(3) = timers(4) - timers(3)
     i = modulo(it - 1, itio) + 1
-    prof(1,i) = real(clock_halo)   / real(clockrate)
-    prof(2,i) = real(clock_io)     / real(clockrate)
-    prof(3,i) = real(toc - tic)    / real(clockrate)
-    prof(4,i) = real(toc - clock1) / real(clockrate)
+    prof(:,i) = timers
     if (i == itio .or. it == nt) then
-        call rio1(fh(17), prof(1,:i), 'w', 'prof-halo.bin',  nt, it-i, mpout)
-        call rio1(fh(18), prof(2,:i), 'w', 'prof-io.bin',    nt, it-i, mpout)
-        call rio1(fh(19), prof(3,:i), 'w', 'prof-stats.bin', nt, it-i, mpout)
-        call rio1(fh(20), prof(4,:i), 'w', 'prof-step.bin',  nt, it-i, mpout)
+        call iio1(fh(17), prof(1,:i), 'w', 'prof-halo.bin',  nt, it-i, mpout)
+        call iio1(fh(18), prof(2,:i), 'w', 'prof-io.bin',    nt, it-i, mpout)
+        call iio1(fh(19), prof(3,:i), 'w', 'prof-stats.bin', nt, it-i, mpout)
+        call iio1(fh(20), prof(4,:i), 'w', 'prof-step.bin',  nt, it-i, mpout)
     end if
 end if
 

@@ -1,5 +1,6 @@
 ! fortran binary i/o
 module fortran_io
+use utilities
 integer, parameter :: fio_file_null = -1
 integer, private :: filehandle = 10
 contains
@@ -15,12 +16,17 @@ integer :: i, n
 if (fh == fio_file_null) then
     filehandle = filehandle + 1
     fh = filehandle
-    print '(4a)', 'Opening (', mode, ') file: ', filename
     inquire (iolength=i) f2(:,1)
-    if (mode == 'r' .or. o > 0) then
+    if (mode == 'r') then
+        print *, clock(), 'Read  ', filename
+        open (fh, file=filename, recl=i, form='unformatted', access='direct', &
+        status='old')
+    elseif (o > 0) then
+        print *, clock(), 'Append', filename
         open (fh, file=filename, recl=i, form='unformatted', access='direct', &
         status='old')
     else
+        print *, clock(), 'Write ', filename
         open (fh, file=filename, recl=i, form='unformatted', access='direct', &
         status='new')
     end if
@@ -53,12 +59,17 @@ integer :: i, n
 if (fh == fio_file_null) then
     filehandle = filehandle + 1
     fh = filehandle
-    print '(4a)', 'Opening (', mode, ') file: ', filename
     inquire (iolength=i) f2(:,1)
-    if (mode == 'r' .or. o > 0) then
+    if (mode == 'r') then
+        print *, clock(), 'Read  ', filename
+        open (fh, file=filename, recl=i, form='unformatted', access='direct', &
+        status='old')
+    elseif (o > 0) then
+        print *, clock(), 'Append', filename
         open (fh, file=filename, recl=i, form='unformatted', access='direct', &
         status='old')
     else
+        print *, clock(), 'Write ', filename
         open (fh, file=filename, recl=i, form='unformatted', access='direct', &
         status='new')
     end if

@@ -22,8 +22,6 @@ integer :: &
     ifn,            & ! fault normal component=abs(faultnormal)
     ip,             & ! process rank
     ipid,           & ! processor Id
-    clock_halo,     & ! timer for halo exchange
-    clock_io,       & ! timer for field i/o
     np0               ! number of processes available
 integer, dimension(3) :: &
     nn,             & ! shape of global mesh

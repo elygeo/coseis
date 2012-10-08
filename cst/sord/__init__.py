@@ -162,7 +162,7 @@ def stage(prm, **kwargs):
     job.command = os.path.join('.', 'sord.x')
     job = util.prepare(job)
     path = job.rundir + os.sep
-    build(job)
+    make(job)
 
     # check for previous run
     if os.path.exists(path + 'meta.py'):

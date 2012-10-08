@@ -1,7 +1,7 @@
 ! miscellaneous utilities
 module utilities
 implicit none
-integer :: clock0, clock1
+integer :: clockrate, clock0, timers(4)
 contains
 
 ! array copy

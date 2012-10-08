@@ -367,11 +367,13 @@ end subroutine
 ! open file with MPIIO
 ! does not use mm(4) or nn(4)
 subroutine mpopen(fh, mode, filename, mm, nn, oo)
+use utilities
 integer, intent(out) :: fh
 character(1), intent(in) :: mode
 character(*), intent(in) :: filename
 integer, intent(in) :: mm(:), nn(:), oo(:)
-integer :: mmm(size(mm)), nnn(size(nn)), ooo(size(oo)), ndims, i, n, ftype, comm0, comm, e
+integer :: mmm(size(mm)), nnn(size(nn)), ooo(size(oo))
+integer :: ndims, i, n, imode, ftype, comm0, comm, e
 integer(kind=mpi_offset_kind) :: offset = 0
 n = size(mm)
 ndims = count(mm(1:n-1) > 1)
@@ -391,18 +393,18 @@ end if
 call mpi_comm_split(comm0, 1, 0, comm, e)
 call mpi_comm_size(comm, n, e)
 call mpi_comm_rank(comm, i, e)
-if (i == 0) print '(3a,i8,a,i2,2a)', &
-    'Opening (', mode, ')', n, 'P', ndims, 'D file: ', filename
-n = size(oo)
 if (mode == 'r') then
-    i = mpi_mode_rdonly
-elseif (oo(n) == 0) then
-    i = mpi_mode_wronly + mpi_mode_create + mpi_mode_excl
+    if (i == 0) print *, clock(), 'Read  ', n, filename
+    imode = mpi_mode_rdonly
+elseif (oo(size(oo)) == 0) then
+    if (i == 0) print *, clock(), 'Write ', n, filename
+    imode = mpi_mode_wronly + mpi_mode_create + mpi_mode_excl
 else
-    i = mpi_mode_wronly
+    if (i == 0) print *, clock(), 'Append', n, filename
+    imode = mpi_mode_wronly
 end if
 call mpi_file_set_errhandler(mpi_file_null, mpi_errors_are_fatal, e)
-call mpi_file_open(comm, filename, i, mpi_info_null, fh, e)
+call mpi_file_open(comm, filename, imode, mpi_info_null, fh, e)
 ftype = rtype
 if (ndims > 0) then
     mmm = pack(mm, mm > 1, mm)

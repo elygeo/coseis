@@ -3,8 +3,8 @@
 import os, shutil
 import cst.tests
 
-cst.tests.hello.build()
-cst.sord.build()
+cst.tests.hello.make()
+cst.sord.make()
 
 cwd = os.getcwd()
 os.chdir(os.path.dirname(__file__))
