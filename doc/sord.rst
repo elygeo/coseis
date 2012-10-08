@@ -305,6 +305,6 @@ time step per one million mesh points.  SORD scalability has been benchmarked
 up to 64 thousand processors at ALCF.  The following chart
 is the wall-time per step per core (click for PDF):
 
-.. image:: ../doc/sord-mpi-benchmark.png
-    :target: ../doc/sord-mpi-benchmark.pdf
+.. image:: sord-mpi-benchmark.png
+    :target: sord-mpi-benchmark.pdf
 
