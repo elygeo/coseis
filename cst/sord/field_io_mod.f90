@@ -210,7 +210,7 @@ case ('=r', '+r', '=R', '+R')
         end if
         if ( any(io%buff(:,:n(4)) /= io%buff(:,:n(4))) .or. &
             maxval(io%buff(:,:n(4))) > huge(val) ) then
-            write (0, *) 'NaN/Inf in ', io%filename
+            write (0,*) 'NaN/Inf in ', trim(io%filename)
             stop
         end if
     end if
@@ -329,7 +329,7 @@ case ('=w', '=wi')
         end if
     end if
 case default
-    write (0, *) "bad i/o mode '", trim(io%mode), "' for ", trim(io%filename)
+    write (0,*) "bad i/o mode '", trim(io%mode), "' for ", trim(io%filename)
     stop
 end select
 
@@ -345,7 +345,6 @@ if (i > 0 .and. debug > 3 .and. it <= 8) then
     end if
     idebug = idebug + 1
     write (filename, "(a,3(i4.4,'-'),a)") 'debug/f', it, idebug, ipid, field
-    write (*, '(2a)') 'Opening file: ', trim(filename)
     open (1, file=filename, status='replace')
     do l = 1, size(f, 3)
         write (1, '(i4,1x,i4,1x,a)') it, l, field

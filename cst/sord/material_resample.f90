@@ -11,7 +11,7 @@ use utilities
 integer :: i1(3), i2(3), bc(3)
 
 if (sync) call barrier
-if (master) call message('Resample material')
+if (master) print *, clock(), 'Resample material'
 
 ! mass ratio
 s2 = mr * vc

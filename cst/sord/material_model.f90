@@ -8,11 +8,11 @@ use globals
 use collective
 use utilities
 use field_io_mod
-real :: max_l(14), max_g(14), vmin, vmax, cfl1, cfl2, r, s
+real :: maxl(14), maxg(14), vmin, vmax, cfl1, cfl2, r, s
 integer :: i1(3), i2(3), j1, k1, l1, j2, k2, l2, j, k, l
 
 if (sync) call barrier
-if (master) call message('Material model')
+if (master) print *, clock(), 'Material model'
 
 ! init arrays
 call r3fill(mr, 0.0)
@@ -93,22 +93,22 @@ k1 = i1(2); k2 = i2(2)
 l1 = i1(3); l2 = i2(3)
 
 ! minima
-max_l(1) = -minval(mr(j1:j2,k1:k2,l1:l2))
-max_l(2) = -minval(s1(j1:j2,k1:k2,l1:l2))
-max_l(3) = -minval(s2(j1:j2,k1:k2,l1:l2))
-max_l(4) = -minval(gam(j1:j2,k1:k2,l1:l2))
-max_l(5) = -minval(lam(j1:j2,k1:k2,l1:l2))
-max_l(6) = -minval(mu(j1:j2,k1:k2,l1:l2))
-max_l(7) = -minval(yy(j1:j2,k1:k2,l1:l2))
+maxl(1) = -minval(mr(j1:j2,k1:k2,l1:l2))
+maxl(2) = -minval(s1(j1:j2,k1:k2,l1:l2))
+maxl(3) = -minval(s2(j1:j2,k1:k2,l1:l2))
+maxl(4) = -minval(gam(j1:j2,k1:k2,l1:l2))
+maxl(5) = -minval(lam(j1:j2,k1:k2,l1:l2))
+maxl(6) = -minval(mu(j1:j2,k1:k2,l1:l2))
+maxl(7) = -minval(yy(j1:j2,k1:k2,l1:l2))
 
 ! maxima
-max_l(8)  = maxval(mr(j1:j2,k1:k2,l1:l2))
-max_l(9)  = maxval(s1(j1:j2,k1:k2,l1:l2))
-max_l(10) = maxval(s2(j1:j2,k1:k2,l1:l2))
-max_l(11) = maxval(gam(j1:j2,k1:k2,l1:l2))
-max_l(12) = maxval(lam(j1:j2,k1:k2,l1:l2))
-max_l(13) = maxval(mu(j1:j2,k1:k2,l1:l2))
-max_l(14) = maxval(yy(j1:j2,k1:k2,l1:l2))
+maxl(8)  = maxval(mr(j1:j2,k1:k2,l1:l2))
+maxl(9)  = maxval(s1(j1:j2,k1:k2,l1:l2))
+maxl(10) = maxval(s2(j1:j2,k1:k2,l1:l2))
+maxl(11) = maxval(gam(j1:j2,k1:k2,l1:l2))
+maxl(12) = maxval(lam(j1:j2,k1:k2,l1:l2))
+maxl(13) = maxval(mu(j1:j2,k1:k2,l1:l2))
+maxl(14) = maxval(yy(j1:j2,k1:k2,l1:l2))
 
 ! output
 call field_io('>', 'rho', mr)
@@ -137,17 +137,17 @@ end do
 !$omp end parallel do
 
 ! global maxima
-call rreduce1(max_g, max_l, 'allmax')
+call rreduce1(maxg, maxl, 'allmax')
 
 ! vs harmonic mean for pml
 if (vpml <= 0.0) then
-    vmin = -max_g(3)
-    vmax =  max_g(9)
+    vmin = -maxg(3)
+    vmax =  maxg(9)
     vpml = 2.0 * vmin * vmax / (vmin + vmax)
 end if
 
 ! Courant condition
-vmax = max_g(9)
+vmax = maxg(9)
 r = dx(1) * dx(1) + dx(2) * dx(2) + dx(3) * dx(3)
 cfl1 = dt * vmax * sqrt(3.0 / r)
 cfl2 = dt * vmax * 3.0 / sqrt(r)
@@ -156,15 +156,15 @@ cfl2 = dt * vmax * 3.0 / sqrt(r)
 if (master) then
     open (1, file='stats-material.txt', status='replace')
     write (1, "(2g15.7,'  cfl')") cfl1, cfl2
-    write (1, "(2g15.7,'  rho')") -max_g(1), max_g(8)
-    write (1, "(2g15.7,'  vp')")  -max_g(2), max_g(9)
-    write (1, "(2g15.7,'  vs')")  -max_g(3), max_g(10)
-    write (1, "(2g15.7,'  gam')") -max_g(4), max_g(11)
-    write (1, "(2g15.7,'  lam')") -max_g(5), max_g(12)
-    write (1, "(2g15.7,'  mu')")  -max_g(6), max_g(13)
-    write (1, "(2g15.7,'  nu')")  -max_g(7), max_g(14)
+    write (1, "(2g15.7,'  rho')") -maxg(1), maxg(8)
+    write (1, "(2g15.7,'  vp')")  -maxg(2), maxg(9)
+    write (1, "(2g15.7,'  vs')")  -maxg(3), maxg(10)
+    write (1, "(2g15.7,'  gam')") -maxg(4), maxg(11)
+    write (1, "(2g15.7,'  lam')") -maxg(5), maxg(12)
+    write (1, "(2g15.7,'  mu')")  -maxg(6), maxg(13)
+    write (1, "(2g15.7,'  nu')")  -maxg(7), maxg(14)
     close (1)
-    if (any(max_g(1:7) > 0.0)) write (0, '(a)') 'Warning: negative moduli'
+    if (any(maxg(1:7) > 0.0)) stop 'negative moduli'
     if (cfl2 > 1.0) stop 'Courant condition not satisfied!'
 end if
 

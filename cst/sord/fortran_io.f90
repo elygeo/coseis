@@ -1,7 +1,7 @@
 ! fortran binary i/o
 module fortran_io
-use utilities
 integer, parameter :: fio_file_null = -1
+integer, private :: filehandle = 10
 contains
 
 subroutine fiio2(fh, f2, mode, filename, m, o)
@@ -11,14 +11,11 @@ integer, intent(inout) :: f2(:,:)
 character(1), intent(in) :: mode
 character(*), intent(in) :: filename
 integer, intent(in) :: m, o
-integer, save :: filehandle = 10
 integer :: i, n
-character(64) :: str
 if (fh == fio_file_null) then
     filehandle = filehandle + 1
     fh = filehandle
-    write (str, '(2a)') 'Opening file: ', filename
-    call message(str)
+    print '(4a)', 'Opening (', mode, ') file: ', filename
     inquire (iolength=i) f2(:,1)
     if (mode == 'r' .or. o > 0) then
         open (fh, file=filename, recl=i, form='unformatted', access='direct', &
@@ -52,14 +49,11 @@ real, intent(inout) :: f2(:,:)
 character(1), intent(in) :: mode
 character(*), intent(in) :: filename
 integer, intent(in) :: m, o
-integer, save :: filehandle = 10
 integer :: i, n
-character(64) :: str
 if (fh == fio_file_null) then
     filehandle = filehandle + 1
     fh = filehandle
-    write (str, '(2a)') 'Opening file: ', filename
-    call message(str)
+    print '(4a)', 'Opening (', mode, ') file: ', filename
     inquire (iolength=i) f2(:,1)
     if (mode == 'r' .or. o > 0) then
         open (fh, file=filename, recl=i, form='unformatted', access='direct', &

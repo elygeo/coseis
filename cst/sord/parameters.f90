@@ -22,6 +22,8 @@ character(12) :: key
 character(1) :: op
 character(n) :: str
 
+if (master) print *, clock(), 'Read parameters'
+
 ! i/o pointers
 allocate (io0)
 io => io0
@@ -33,7 +35,7 @@ open (1, file='parameters.py', recl=n, form='unformatted', access='direct', &
     status='old')
 read (1, rec=1) str
 close (1)
-write (*,*) 'YYY', n, str(:32)
+print *, 'YYY', n, str(:32)
 j = -1
 
 doline: do
@@ -44,8 +46,8 @@ j = scan(str, new_line('a')) - 1
 if (j == -1) exit doline
 if (j == 0) cycle doline
 
-write (*,*) 'YYY', str(:32)
-write (*,*) 'XXX', str(:j)
+print *, 'YYY', str(:32)
+print *, 'XXX', str(:j)
 stop
 
 ! strip comments and punctuation
@@ -134,7 +136,7 @@ end select
 
 ! error check
 if (ios /= 0) then
-    if (master) write (0, *) 'bad input: ', trim(str(:j))
+    if (master) write (0,*), 'bad input: ', trim(str(:j))
     stop
 end if
 

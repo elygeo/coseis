@@ -50,11 +50,11 @@ if (modulo(it, itstats) == 0) then
     maxl(4,j) = wmax
     val = maxval(maxl)
     if (val /= val .or. val > huge(val)) then
-        write (0, *) 'NaN/Inf!'
-        write (0, *) 'amax:', amaxloc + nnoff, amax
-        write (0, *) 'vmax:', vmaxloc + nnoff, vmax
-        write (0, *) 'umax:', umaxloc + nnoff, umax
-        write (0, *) 'wmax:', wmaxloc + nnoff, wmax
+        write (0,*), 'NaN/Inf!'
+        write (0,*), 'amax:', amaxloc + nnoff, amax
+        write (0,*), 'vmax:', vmaxloc + nnoff, vmax
+        write (0,*), 'umax:', umaxloc + nnoff, umax
+        write (0,*), 'wmax:', wmaxloc + nnoff, wmax
         stop
     end if
     if (faultnormal > 0) then
@@ -119,7 +119,7 @@ if (master) then
     prof(1,i) = real(clock_halo)   / real(clockrate)
     prof(2,i) = real(clock_io)     / real(clockrate)
     prof(3,i) = real(toc - tic)    / real(clockrate)
-    prof(4,i) = real(toc - clock0) / real(clockrate)
+    prof(4,i) = real(toc - clock1) / real(clockrate)
     if (i == itio .or. it == nt) then
         call rio1(fh(17), prof(1,:i), 'w', 'prof-halo.bin',  nt, it-i, mpout)
         call rio1(fh(18), prof(2,:i), 'w', 'prof-io.bin',    nt, it-i, mpout)

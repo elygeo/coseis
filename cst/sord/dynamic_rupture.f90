@@ -16,7 +16,7 @@ integer :: i1(3), i2(3), i, j, k, l
 
 if (faultnormal == 0) return
 if (sync) call barrier
-if (master) call message('Rupture initialization')
+if (master) print *, clock(), 'Rupture initialization'
 if (ifn == 0) return
 
 ! allocate arrays
@@ -105,7 +105,7 @@ i1 = maxloc(t3(:,:,:,3))
 rr = t3(i1(1),i1(2),i1(3),3)
 i1(ifn) = irup
 i1 = i1 + nnoff
-if (rr > 0.0) write (0, *) 'Warning: positive normal traction: ', rr, i1
+if (rr > 0.0) write (0,*) 'Warning: positive normal traction: ', rr, i1
 
 ! lock fault in pml region
 i1 = i1pml + 1

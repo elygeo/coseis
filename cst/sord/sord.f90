@@ -33,7 +33,7 @@ call init_rupture
 call resample_material
 
 do it = 1, nt
-    call system_clock(clock0)
+    call system_clock(clock1)
     call step_time
     call step_stress
     call step_accel

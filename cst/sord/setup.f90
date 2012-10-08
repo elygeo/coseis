@@ -67,7 +67,6 @@ if (ifn /= 0) then
 end if
 
 ! debugging
-verb = master .and. debug > 0
 sync = debug > 1
 if (debug > 2) then
     write (filename, "(a,i6.6,a)") 'debug/db', ipid, '.py'

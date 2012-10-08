@@ -270,7 +270,8 @@ end do
 end do
 !$omp end parallel do
 
-case default; stop 'illegal operator'
+case default
+stop 'illegal operator'
 
 end select
 

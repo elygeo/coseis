@@ -18,7 +18,7 @@ logical :: err
 integer, allocatable :: seed(:)
 
 if (sync) call barrier
-if (master) call message('Grid generation')
+if (master) print *, clock(), 'Grid generation'
 
 ! create rectangular mesh with double nodes at the fault
 w1 = 0.0
@@ -276,7 +276,7 @@ do i = 1, 3
 end do
 call field_io('>', 'vc', vc)
 if (err) then
-    write (0, *) 'ERROR: negative cell volume. Wrong sign in dx or problem with mesh.'
+    write (0,*) 'Negative cell volume. Wrong sign in dx or problem with mesh.'
     stop
 end if
 

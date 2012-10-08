@@ -11,11 +11,9 @@ use statistics
 use collective
 integer :: i, j, k, l
 real :: u, v
-character(32) :: str
 
 if (sync) call barrier
-write(str, '(a,i8)') 'Time step', it
-if (master) call message(str)
+if (master) print *, clock(), 'Step', it
 
 ! save previous slip velocity
 if (ifn /= 0) then

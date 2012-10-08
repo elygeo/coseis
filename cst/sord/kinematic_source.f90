@@ -14,7 +14,7 @@ use utilities
 integer :: n, i, fh
 if (nsource == 0) return
 if (sync) call barrier
-if (master) call message('Finite source initialization')
+if (master) print *, clock(), 'Finite source initialization'
 n = abs(nsource)
 allocate (src_xi(n,3))
 fh = -1

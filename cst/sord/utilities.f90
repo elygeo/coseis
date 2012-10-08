@@ -1,7 +1,7 @@
 ! miscellaneous utilities
 module utilities
 implicit none
-integer :: clock0
+integer :: clock0, clock1
 contains
 
 ! array copy
@@ -326,22 +326,17 @@ case ('ricker2')
     b = sqrt(a / pi) * 4.0 * a
     f = exp(-a * t * t) * b * (a * t * t - 0.5)
 case default
-    write (0, *) 'invalid time func: ', trim(pulse)
+    write (0,*), 'invalid time func: ', trim(pulse)
     stop
 end select
 time_function = f
 end function
 
-! log message
-subroutine message(str)
-character(*), intent(in) :: str
-integer :: clock
-write (*, '(a)', advance='no') '.'
+! clock timer
+integer function clock()
 call system_clock(clock)
-open (1, file='sord.log', position='append')
-write (1, '(i8,x,a)') clock, str
-close (1)
-end subroutine
+clock = clock - clock0
+end function
 
 end module
 

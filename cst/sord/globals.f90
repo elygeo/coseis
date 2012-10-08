@@ -41,7 +41,6 @@ integer, dimension(3) :: &
     nnoff             ! offset between local and global indices
 logical :: &
     sync,           & ! synchronize processes
-    verb,           & ! print messages
     master            ! master process flag
 
 ! 1d arrays

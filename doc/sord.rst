@@ -277,6 +277,17 @@ computations eight-fold::
     bc1 = 0, 0, 0
     bc2 = -1, 1, -2
 
+Spatial difference operator level
+---------------------------------
+
+    0: Auto pick 2 or 6
+    1: Mesh with constant spacing dx
+    2: Rectangular mesh
+    3: Parallelepiped mesh
+    4: One-point quadrature
+    5: Exactly integrated elements
+    6: Saved operators, nearly as fast as 2, but doubles the memory usage
+
 
 Memory Usage and Scaling
 ========================
@@ -373,81 +384,3 @@ as simple as concatenating them together with the UNIX ``cat`` utility.  This
 approach is limited by the capability of the file system to handle large
 numbers files.
 
-
-Development
-===========
-
-Suggestions for improvements, and contributions to the SORD code and
-documentation are greatly appreciated.
-
-
-Debugging
----------
-
-The ``debug`` input parameter is useful for finding problems, and can take the
-following values:
-
-    **0**: Debugging off.
-
-    **1**: Verbose status output.
-
-    **2**: Synchronize multiple processors. This is useful for tracking down MPI
-    related bugs.
-
-    **3**: Dump field variable output in text files at every step. Only do this
-    for small tests or you will fill up your disk!
-
-During testing, compiler checks, such as array overflow and floating-point
-exceptions, can be turned on with the ``-t`` or ``--testing`` option.
-Additionally, to compile and run under a debugger use the ``-g`` or
-``--debugging`` option.  Naturally, these options depend on the capabilities of
-the particular compiler.  The specific flags passed to the compiler can be
-configured by editing ``conf.py``.
-
-
-Profiling
----------
-
-Internal code timings, for benchmarking performance, are collected and saved
-for each run.  Eight categories are timed for every time iteration step, and
-save in the following files:
-
-    **prof-1time.bin**: Time integration subroutine.
-
-    **prof-2stress.bin**: Stress subroutine.
-
-    **prof-3accel.bin**: Acceleration subroutine, including multiprocessor halo
-    swapping communications.
-
-    **prof-4stats.bin**: Statistics subroutine, including multiprocessor min/max
-    reductions.
-
-    **prof-5ckpt.bin**: Checkpoint subroutine.
-
-    **prof-6mp.bin**: Aggregate of all multiprocessor operations, including halo
-    swap, global reductions, and parallel I/O.
-
-    **prof-7io.bin**: Aggregate of all input and output operations, including
-    checkpointing and field I/O.
-
-    **prof-8step.bin**: Total for complete time iteration.
-
-The file format is flat binary that can be examined with the
-UNIX command ``od -f``, or summarized using the ``stats`` utility 
-included with Coseis. For example::
-
-    $ ~/coseis/bin/stats prof-*
-
-         Min       Max         Mean      N
-    0.007108  0.050063    0.0182206  36001 prof-1time.bin
-    0.058548  0.212697     0.116968  36001 prof-2stress.bin
-    0.141528     2.702     0.568846  36001 prof-3accel.bin
-       1e-06   67.2009    0.0205376  36001 prof-4stats.bin
-           0  0.008744  2.96786e-06  36001 prof-5ckpt.bin
-    0.021656   67.7519     0.394482  36001 prof-6mp.bin
-       5e-06  0.708743  0.000152639  36001 prof-7io.bin
-    0.211541    67.999     0.724721  36001 prof-8step.bin
-
-Profiling can be very difficult to interpret for multiprocessor runs.  Timing
-is only saved for the master processor.  It can be helpful to synchronize the
-processors using ``debug = 2`` to give more accurate relative timing values.

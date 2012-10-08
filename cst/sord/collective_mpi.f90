@@ -51,7 +51,7 @@ np3 = nproc3
 call mpi_cart_create(mpi_comm_world, 3, np3, period, .true., comm3d, e)
 if (comm3d == mpi_comm_null) then
     call mpi_comm_rank(mpi_comm_world, ip, e)
-    write (*, *) ip, ' unused process'
+    write (0,*) 'Unused process:', ip
     call mpi_finalize(e)
     stop
 end if
@@ -91,7 +91,7 @@ elseif (n == 1) then
     coords1 = coords(i:i)
     call mpi_cart_rank(comm, coords1, rank, e)
 else
-    write (0, *) 'problem in commrank: ', coords
+    write (0,*) 'problem in commrank: ', coords
     stop
 end if
 end subroutine
@@ -367,14 +367,12 @@ end subroutine
 ! open file with MPIIO
 ! does not use mm(4) or nn(4)
 subroutine mpopen(fh, mode, filename, mm, nn, oo)
-use utilities
 integer, intent(out) :: fh
 character(1), intent(in) :: mode
 character(*), intent(in) :: filename
 integer, intent(in) :: mm(:), nn(:), oo(:)
-integer :: mmm(size(mm)), nnn(size(nn)), ooo(size(oo)), ndims, i, n, ip, ftype, comm0, comm, e
+integer :: mmm(size(mm)), nnn(size(nn)), ooo(size(oo)), ndims, i, n, ftype, comm0, comm, e
 integer(kind=mpi_offset_kind) :: offset = 0
-character(128) :: str
 n = size(mm)
 ndims = count(mm(1:n-1) > 1)
 do i = 1, n-1
@@ -393,10 +391,8 @@ end if
 call mpi_comm_split(comm0, 1, 0, comm, e)
 call mpi_comm_size(comm, n, e)
 call mpi_comm_rank(comm, i, e)
-call mpi_comm_rank(mpi_comm_world, ip, e)
-write (str, '(i8,3a,i8,a,i2,2a)') ip, ' Opening (', mode, ')', n, 'P', &
-    ndims, 'D file: ', filename
-if (i == 0) call message(str)
+if (i == 0) print '(3a,i8,a,i2,2a)', &
+    'Opening (', mode, ')', n, 'P', ndims, 'D file: ', filename
 n = size(oo)
 if (mode == 'r') then
     i = mpi_mode_rdonly

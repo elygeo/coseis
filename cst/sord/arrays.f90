@@ -10,7 +10,7 @@ use utilities
 integer :: j, k, l
 
 if (sync) call barrier
-if (master) call message('Allocate arrays')
+if (master) print *, clock(), 'Allocate arrays'
 
 ! 3d arrays
 j = nm(1)
