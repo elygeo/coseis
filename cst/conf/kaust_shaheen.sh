@@ -5,8 +5,8 @@
 # @ job_name = {name}
 # @ bg_size = {nodes}
 # @ wall_clock_limit = {walltime}
-# @ error = {name}.error
-# @ output = {name}.output
+# @ error = {name}.err
+# @ output = {name}.out
 # @ initialdir = {rundir}
 # @ notify_user = {email}
 # @ notification = never
@@ -17,9 +17,9 @@
 cd "{rundir}"
 env >> {name}.env
 
-echo "$( date ): {name} started" >> {name}.log
+echo "$( date ): {name} started" >> {name}.out
 {pre}
 {launch}
 {post}
-echo "$( date ): {name} finished" >> {name}.log
+echo "$( date ): {name} finished" >> {name}.out
 

@@ -21,7 +21,7 @@ use statistics
 implicit none
 
 call system_clock(clock0, clockrate)
-call initialize(np0, ip, master)
+call initialize(master)
 if (master) print *, clockrate, 'Clock rate'
 call read_parameters
 call setup_dimensions
@@ -41,7 +41,7 @@ do it = 1, nt
     call step_stress
     call step_accel
     call stats
-    if (master) print *, clock(), 'Step  ', it
+    if (master .and. modulo(it, 10) == 0) print *, clock(), 'Step  ', it
 end do
 
 if (master) print *, clock(), 'Finished!'

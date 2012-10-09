@@ -200,7 +200,7 @@ case ('=r', '+r', '=R', '+R')
         o(4) = (it  - it1) / dit
         filename = io%filename
         if (any(n(1:3) /= m(1:3)) .and. mpin == 0) &
-            write (filename, '(2a,i6.6)') trim(filename), '-', ipid
+            write (filename, '(2a,i6.6)') trim(filename), '-', ip
         call rio2(io%fh, io%buff(:,:n(4)), 'r', trim(filename), m, n, o, mpin)
         io%ib = 0
         if (any(n < 1)) then
@@ -319,7 +319,7 @@ case ('=w', '=wi')
         o(4) = (it  - it1) / dit + 1 - n(4)
         filename = io%filename
         if (any(n(1:3) /= m(1:3)) .and. mpout == 0) &
-            write (filename, '(2a,i6.6)') trim(filename), '-', ipid
+            write (filename, '(2a,i6.6)') trim(filename), '-', ip
         call rio2(io%fh, io%buff(:,:n(4)), 'w', trim(filename), m, n, o, mpout)
         io%ib = 0
         if (it == it2 .or. any(n < 1)) then
@@ -344,7 +344,7 @@ if (i > 0 .and. debug > 3 .and. it <= 8) then
         idebug = 0
     end if
     idebug = idebug + 1
-    write (filename, "(a,3(i4.4,'-'),a)") 'debug/f', it, idebug, ipid, field
+    write (filename, "(a,3(i4.4,'-'),a)") 'debug/f', it, idebug, ip, field
     open (1, file=filename, status='replace')
     do l = 1, size(f, 3)
         write (1, '(i4,1x,i4,1x,a)') it, l, field

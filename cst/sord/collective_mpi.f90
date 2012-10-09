@@ -8,8 +8,7 @@ include 'mpif.h' ! mpi module broken on Blue Gene so include instead
 contains
 
 ! initialize
-subroutine initialize(np0, ip, master)
-integer, intent(out) :: np0, ip
+subroutine initialize(master)
 logical, intent(out) :: master
 integer :: i, m, n, e
 integer(4) :: i4
@@ -17,9 +16,8 @@ real :: r
 real(4) :: r4
 file_null = mpi_file_null
 call mpi_init(e)
-call mpi_comm_size(mpi_comm_world, np0, e)
-call mpi_comm_rank(mpi_comm_world, ip, e)
-master = ip == 0
+call mpi_comm_rank(mpi_comm_world, i, e)
+master = i == 0
 itype = mpi_integer
 rtype = mpi_real
 inquire (iolength=m) i
@@ -42,10 +40,10 @@ call mpi_finalize(e)
 end subroutine
 
 ! process rank
-subroutine rank(ip3, ipid, nproc3)
-integer, intent(out) :: ip3(3), ipid
+subroutine rank(ip, ip3, nproc3)
+integer, intent(out) :: ip, ip3(3)
 integer, intent(in) :: nproc3(3)
-integer :: ip, i, e
+integer :: i, e
 logical :: hat(3), period(3) = .false.
 np3 = nproc3
 call mpi_cart_create(mpi_comm_world, 3, np3, period, .true., comm3d, e)
@@ -57,7 +55,6 @@ if (comm3d == mpi_comm_null) then
 end if
 call mpi_comm_rank(comm3d, ip, e)
 call mpi_cart_coords(comm3d, ip, 3, ip3, e)
-ipid = ip3(1) + np3(1) * (ip3(2) + np3(2) * ip3(3))
 do i = 1, 3
     hat = .false.
     hat(i) = .true.
@@ -102,12 +99,18 @@ integer :: e
 call mpi_barrier(comm3d, e)
 end subroutine
 
-! broadcast chacacter 1d
-subroutine cbroadcast1(c1)
-character, intent(inout) :: c1(:)
-integer :: comm, root, i, e
-i = size(c1)
-call mpi_bcast(c1(1), i, mpi_character, root, comm, e)
+! broadcast chacacter string
+subroutine cbroadcast(str)
+character(*), intent(inout) :: str
+integer :: e
+call mpi_bcast(str, len(str), mpi_character, 0, mpi_comm_world, e)
+end subroutine
+
+! broadcast integer
+subroutine ibroadcast(i)
+integer, intent(inout) :: i
+integer :: e
+call mpi_bcast(i, 1, mpi_integer, 0, mpi_comm_world, e)
 end subroutine
 
 ! broadcast real 1d

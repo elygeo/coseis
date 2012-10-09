@@ -100,11 +100,11 @@ script = """\
 #!/bin/sh
 cd "{rundir}"
 env >> {name}.env
-echo "$( date ): {name} started" >> {name}.log
+echo "$( date ): {name} started" >> {name}.out
 {pre}
 {launch}
 {post}
-echo "$( date ): {name} finished" >> {name}.log
+echo "$( date ): {name} finished" >> {name}.out
 """
 
 # detect machine from the hostname

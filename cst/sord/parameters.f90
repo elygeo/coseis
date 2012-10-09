@@ -1,6 +1,7 @@
 ! read model parameters
 module parameters
-use utilities
+use globals
+use collective
 implicit none
 contains
 
@@ -8,14 +9,15 @@ contains
 ! so call sub-function and allocate on the stack.
 subroutine read_parameters
 integer :: n
-inquire (file='parameters.py', size=n)
+if (master) inquire (file='parameters.py', size=n)
+call ibroadcast(n)
 call read_parameters1(n)
 end subroutine
 
 ! read parameters sub-function
 subroutine read_parameters1(n)
-use globals
 use field_io_mod
+use utilities
 integer, intent(in) :: n
 integer :: ios, i, j
 character(256) :: line
@@ -23,7 +25,15 @@ character(12) :: key
 character(1) :: op
 character(n) :: str
 
-if (master) print *, clock(), 'Read parameters'
+! read with master process
+if (master) then
+    print *, clock(), 'Read parameters'
+    open (1, file='parameters.py', recl=n, form='unformatted', access='direct', &
+        status='old')
+    read (1, rec=1) str
+    close (1)
+end if
+call cbroadcast(str)
 
 ! i/o pointers
 allocate (io0)
@@ -31,13 +41,7 @@ io => io0
 io%next => io0
 io%field = 'head'
 
-! read parameter file
-open (1, file='parameters.py', recl=n, form='unformatted', access='direct', &
-    status='old')
-read (1, rec=1) str
-close (1)
 j = -1
-
 doline: do
 
 ! find newline

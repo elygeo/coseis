@@ -12,7 +12,7 @@ use utilities
 use field_io_mod
 use statistics
 real :: rr, xhypo(3), xi(3), w
-integer :: i1(3), i2(3), i, j, k, l
+integer :: i1(3), i2(3), i, j, k, l, root(3)
 
 if (faultnormal == 0) return
 if (sync) call barrier
@@ -183,7 +183,9 @@ if (rcrit > 0.0 .and. vrup > 0.0) then
         end do
         end do
     end if
-    call rbroadcast1(xhypo, ip2root)
+    root = ip3hypo
+    root(ifn) = -1
+    call rbroadcast1(xhypo, root)
     do i = 1, 3
         select case (ifn)
         case (1); t2(1,:,:,i) = w1(irup,:,:,i) - xhypo(i)

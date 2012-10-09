@@ -23,18 +23,21 @@ nt = max(shape_(4), 0)
 ifn = abs(faultnormal)
 
 ! partition for parallelization
-if (np0 == 1) nproc3 = 1
 nl3 = (nn - 1) / nproc3 + 1
 nhalo = 1
 if (ifn /= 0) nhalo(ifn) = 2
 nl3 = max(nl3, nhalo)
 nproc3 = (nn - 1) / nl3 + 1
-call rank(ip3, ipid, nproc3)
-nnoff = nl3 * ip3 - nhalo
+call rank(ip, ip3, nproc3)
 
 ! master process
-ip3root = floor((ihypo - 1.0) / nl3)
-master = all(ip3 == ip3root)
+master = ip == 0
+
+! offset from local to global indices
+nnoff = nl3 * ip3 - nhalo
+
+! process rank for hypocenter 
+ip3hypo = floor((ihypo - 1.0) / nl3)
 
 ! size of arrays
 nl = min(nl3, nn - nnoff - nhalo)
@@ -61,10 +64,8 @@ i1pml = i1pml - nnoff
 i2pml = i2pml - nnoff
 
 ! map rupture index to local indices, and test if fault on this process
-ip2root = ip3root
 irup = 0
 if (ifn /= 0) then
-    ip2root(ifn) = -1
     irup = floor(ihypo(ifn) + 0.000001) - nnoff(ifn)
     if (irup + 1 < i1core(ifn) .or. irup > i2core(ifn)) ifn = 0
 end if
@@ -72,12 +73,11 @@ end if
 ! debugging
 sync = debug > 1
 if (debug > 2) then
-    write (filename, "(a,i6.6,a)") 'debug/db', ipid, '.py'
+    write (filename, "(a,i6.6,a)") 'debug/db', ip, '.py'
     open (1, file=filename, status='replace')
     write (1, "('ifn     = ', i8)") ifn
     write (1, "('irup    = ', i8)") irup
     write (1, "('ip      = ', i8)") ip
-    write (1, "('ipid    = ', i8)") ipid
     write (1, "('nproc3  = ', i8, 2(',', i8))") nproc3
     write (1, "('ip3     = ', i8, 2(',', i8))") ip3
     write (1, "('nn      = ', i8, 2(',', i8))") nn

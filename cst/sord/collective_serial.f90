@@ -5,12 +5,11 @@ integer :: file_null
 contains
 
 ! initialize
-subroutine initialize(np0, ip)
+subroutine initialize(master)
 use fortran_io
-integer, intent(out) :: np0, ip
+logical, intent(out) :: master
 file_null = fio_file_null
-ip = 0
-np0 = 1
+master = .true.
 end subroutine
 
 ! finalize
@@ -18,16 +17,28 @@ subroutine finalize
 end subroutine
 
 ! process rank
-subroutine rank(ip3, ipid, nproc3)
-integer, intent(out) :: ip3(3), ipid
+subroutine rank(ip, ip3, nproc3)
+integer, intent(out) :: ip, ip3(3)
 integer, intent(in) :: nproc3(3)
+ip = 0
 ip3 = nproc3
 ip3 = 0
-ipid = 0
 end subroutine
 
 ! barrier
 subroutine barrier
+end subroutine
+
+! broadcast chacacter string
+subroutine cbroadcast(str)
+character(*), intent(inout) :: str
+str(1:1) = str(1:1)
+end subroutine
+
+! broadcast integer
+subroutine ibroadcast(i)
+integer, intent(inout) :: i
+i = i
 end subroutine
 
 ! broadcast real 1d

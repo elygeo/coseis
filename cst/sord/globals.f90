@@ -17,20 +17,17 @@ real :: &
     dx(3),          & ! spatial step lengths
     tm = 0.0          ! time
 integer :: &
-    nt,             & ! number of time steps
     it = 0,         & ! current time step
+    nt,             & ! number of time steps
     ifn,            & ! fault normal component=abs(faultnormal)
-    ip,             & ! process rank
-    ipid,           & ! processor Id
-    np0               ! number of processes available
+    ip                ! process rank
 integer, dimension(3) :: &
     nn,             & ! shape of global mesh
     nm,             & ! shape of local 3D arrays
     nl3,            & ! number of mesh nodes per process
     nhalo,          & ! number of ghost nodes
     ip3,            & ! 3d process rank
-    ip3root,        & ! 3d root process rank
-    ip2root,        & ! 2d root process rank
+    ip3hypo,        & ! hypocenter 3d rank
     i1bc, i2bc,     & ! model boundary
     i1pml, i2pml,   & ! pml boundary
     i1core, i2core, & ! core region
