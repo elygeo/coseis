@@ -399,22 +399,24 @@ def launch(job=None, **kwargs):
         print(job.submit)
         c = shlex.split(job.submit)
         p = subprocess.Popen(c, stdout=subprocess.PIPE)
-        stdout = p.communicate()[0]
-        print(stdout)
+        out = p.communicate()[0]
+        print(out)
         if p.returncode:
             raise Exception('Submit failed')
-        d = re.search(job.submit_pattern, stdout).groupdict()
+        d = re.search(job.submit_pattern, out).groupdict()
         job.update(d)
         save(job.name + '.conf.py', job)
     else:
         save(job.name + '.conf.py', job)
-        for c in job.pre, job.launch, job.post:
-            if c:
-                print(c)
-                if '\n' in c or ';' in c or '|' in c:
-                    subprocess.check_call(c, shell=True)
-                elif c:
-                    subprocess.check_call(shlex.split(c))
+        out = open(job.name + '.out', 'w')
+        with out:
+            for c in job.pre, job.launch, job.post:
+                if c:
+                    print(c)
+                    if '\n' in c or ';' in c or '|' in c:
+                        subprocess.check_call(c, shell=True, stdout=out)
+                    elif c:
+                        subprocess.check_call(shlex.split(c), stdout=out)
 
     os.chdir(cwd)
     return job

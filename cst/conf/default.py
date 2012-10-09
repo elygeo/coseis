@@ -101,9 +101,9 @@ script = """\
 cd "{rundir}"
 env >> {name}.env
 echo "$( date ): {name} started" >> {name}.out
-{pre}
-{launch}
-{post}
+{pre} >> {name}.out
+{launch} >> {name}.out
+{post} >> {name}.out
 echo "$( date ): {name} finished" >> {name}.out
 """
 

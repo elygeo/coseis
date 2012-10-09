@@ -110,7 +110,7 @@ def stage(prm, **kwargs):
     import os, shutil
     from .. import util
 
-    print('\nSORD setup')
+    print('\nSORD: Support Operator Rupture Dynamics')
 
     # parameters
     if type(prm) == dict:
