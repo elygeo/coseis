@@ -409,11 +409,12 @@ def launch(job=None, **kwargs):
     else:
         save(job.name + '.conf.py', job)
         for c in job.pre, job.launch, job.post:
-            print(c)
-            if '\n' in c or ';' in c or '|' in c:
-                subprocess.check_call(c, shell=True)
-            elif c:
-                subprocess.check_call(shlex.split(c))
+            if c:
+                print(c)
+                if '\n' in c or ';' in c or '|' in c:
+                    subprocess.check_call(c, shell=True)
+                elif c:
+                    subprocess.check_call(shlex.split(c))
 
     os.chdir(cwd)
     return job

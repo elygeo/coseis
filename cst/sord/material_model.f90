@@ -154,7 +154,7 @@ cfl2 = dt * vmax * 3.0 / sqrt(r)
 
 ! output statistics
 if (master) then
-    open (1, file='stats-material.txt', status='replace')
+    open (1, file='material.txt', status='replace')
     write (1, "(2g15.7,'  cfl')") cfl1, cfl2
     write (1, "(2g15.7,'  rho')") -maxg(1), maxg(8)
     write (1, "(2g15.7,'  vp')")  -maxg(2), maxg(9)
