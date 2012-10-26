@@ -226,8 +226,9 @@ def dem(extent, scale=1.0, downsample=0, mesh=False):
     extent: (lon_min, lon_max), (lat_min, lat_max)
     scale: Scaling factor for elevation data
     downsample:
-        0: GLOBE 30 sec, with missing data filled by ETOPO1
-        1: ETOPO1 60 sec
+        <0: Upsample by factor of 2
+        0:  GLOBE 30 sec, with missing data filled by ETOPO1
+        1:  ETOPO1 60 sec
         >1: Down-sample factor for ETOPO1
     mesh: if True return lon and lat mesh with z
 

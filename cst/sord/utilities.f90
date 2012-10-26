@@ -4,127 +4,75 @@ implicit none
 integer :: clockrate, clock0, timers(4)
 contains
 
+! clock timer
+integer function clock()
+call system_clock(clock)
+clock = clock - clock0
+end function
+
 ! array copy
-subroutine r3copy(f, g)
-real, intent(in) :: f(:,:,:)
-real, intent(out) :: g(:,:,:)
-integer :: n(3), j, k, l
-n = (/size(f,1), size(f,2), size(f,3)/)
-!$omp parallel do schedule(static) private(j, k, l)
-do l = 1, n(3)
-do k = 1, n(2)
-do j = 1, n(1)
-    g(j,k,l) = f(j,k,l)
-end do
-end do
+subroutine rcopy(f, g, n)
+real, intent(in) :: f(n)
+real, intent(out) :: g(n)
+integer, intent(in) :: n
+integer :: i
+!$omp parallel do schedule(static) private(i)
+do i = 1, n
+    g(i) = f(i)
 end do
 !$omp end parallel do
 end subroutine
 
 ! array fill
-subroutine r3fill(f, r)
-real, intent(inout) :: f(:,:,:)
+subroutine rfill(f, r, n)
+real, intent(inout) :: f(n)
 real, intent(in) :: r
-integer :: n(3), j, k, l
-n = (/size(f,1), size(f,2), size(f,3)/)
-!$omp parallel do schedule(static) private(j, k, l)
-do l = 1, n(3)
-do k = 1, n(2)
-do j = 1, n(1)
-    f(j,k,l) = r
-end do
-end do
-end do
-!$omp end parallel do
-end subroutine
-
-! array scale
-subroutine r3scale(f, r)
-real, intent(inout) :: f(:,:,:)
-real, intent(in) :: r
-integer :: n(3), j, k, l
-n = (/size(f,1), size(f,2), size(f,3)/)
-!$omp parallel do schedule(static) private(j, k, l)
-do l = 1, n(3)
-do k = 1, n(2)
-do j = 1, n(1)
-    f(j,k,l) = f(j,k,l) * r
-end do
-end do
+integer, intent(in) :: n
+integer :: i
+!$omp parallel do schedule(static) private(i)
+do i = 1, n
+    f(i) = r
 end do
 !$omp end parallel do
 end subroutine
 
 ! array reciprocal
-subroutine r3invert(f)
-real, intent(inout) :: f(:,:,:)
-integer :: n(3), j, k, l
-n = (/size(f,1), size(f,2), size(f,3)/)
-!$omp parallel do schedule(static) private(j, k, l)
-do l = 1, n(3)
-do k = 1, n(2)
-do j = 1, n(1)
-    if (f(j,k,l) /= 0.0) f(j,k,l) = 1.0 / f(j,k,l)
-end do
-end do
+subroutine rinvert(f, n)
+real, intent(inout) :: f(n)
+integer, intent(in) :: n
+integer :: i
+!$omp parallel do schedule(static) private(i)
+do i = 1, n
+    if (f(i) /= 0.0) f(i) = 1.0 / f(i)
 end do
 !$omp end parallel do
 end subroutine
 
-! minimum
-subroutine r30min(f, r)
-real, intent(inout) :: f(:,:,:)
-real, intent(in) :: r
-integer :: n(3), j, k, l
-n = (/size(f,1), size(f,2), size(f,3)/)
-!$omp parallel do schedule(static) private(j, k, l)
-do l = 1, n(3)
-do k = 1, n(2)
-do j = 1, n(1)
-    f(j,k,l) = min(f(j,k,l), r)
-end do
-end do
-end do
-!$omp end parallel do
-end subroutine
-
-! maximum
-subroutine r30max(f, r)
-real, intent(inout) :: f(:,:,:)
-real, intent(in) :: r
-integer :: n(3), j, k, l
-n = (/size(f,1), size(f,2), size(f,3)/)
-!$omp parallel do schedule(static) private(j, k, l)
-do l = 1, n(3)
-do k = 1, n(2)
-do j = 1, n(1)
-    f(j,k,l) = max(f(j,k,l), r)
-end do
-end do
-end do
-!$omp end parallel do
-end subroutine
-
-! squared distance to x0
-subroutine radius(r, x, x0, i1, i2)
-real, intent(out) :: r(:,:,:)
-real, intent(in) :: x(:,:,:,:), x0(3)
-integer, intent(in) :: i1(3), i2(3)
-integer :: n(3), j, k, l
-n = (/size(r,1), size(r,2), size(r,3)/)
-if (any(i1 < 1 .or. i2 > n)) stop 'error in radius'
-!$omp parallel do schedule(static) private(j, k, l)
-do l = i1(3), i2(3)
-do k = i1(2), i2(2)
-do j = i1(1), i2(1)
-    r(j,k,l) = &
-    ( (x(j,k,l,1) - x0(1)) * (x(j,k,l,1) - x0(1)) &
-    + (x(j,k,l,2) - x0(2)) * (x(j,k,l,2) - x0(2)) &
-    + (x(j,k,l,3) - x0(3)) * (x(j,k,l,3) - x0(3)) )
-end do
-end do
-end do
-!$omp end parallel do
+! limit real array to min/max range
+subroutine rlimits(f, fmin, fmax, n)
+real, intent(inout) :: f(n)
+real, intent(in) :: fmin, fmax
+integer, intent(in) :: n
+integer :: i
+if (fmin > 0.0 .and. fmax > 0.0) then
+    !$omp parallel do schedule(static) private(i)
+    do i = 1, n
+        f(i) = max(min(f(i), fmax), fmin)
+    end do
+    !$omp end parallel do
+elseif (fmin > 0.0) then
+    !$omp parallel do schedule(static) private(i)
+    do i = 1, n
+        f(i) = max(f(i), fmin)
+    end do
+    !$omp end parallel do
+elseif (fmax > 0.0) then
+    !$omp parallel do schedule(static) private(i)
+    do i = 1, n
+        f(i) = min(f(i), fmax)
+    end do
+    !$omp end parallel do
+end if
 end subroutine
 
 ! average of local eight values
@@ -326,16 +274,10 @@ case ('ricker2')
     b = sqrt(a / pi) * 4.0 * a
     f = exp(-a * t * t) * b * (a * t * t - 0.5)
 case default
-    write (0,*), 'invalid time func: ', trim(pulse)
+    write (0,*) 'invalid time func: ', trim(pulse)
     stop
 end select
 time_function = f
-end function
-
-! clock timer
-integer function clock()
-call system_clock(clock)
-clock = clock - clock0
 end function
 
 end module

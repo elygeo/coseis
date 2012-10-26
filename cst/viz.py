@@ -36,16 +36,16 @@ def img2pdf(img, dpi=150, mode=None):
     """
     import subprocess, cStringIO
     import Image
-    fh = cStringIO.StringIO()
     img = Image.fromarray(img)
-    img.save(fh, format='png')
-    cmd = 'convert', '-density', str(dpi), 'png:-', 'pdf:-'
-    pid = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    fh = pid.communicate(fh.getvalue())[0]
+    s = cStringIO.StringIO()
+    img.save(s, format='png')
+    c = 'convert', '-density', str(dpi), 'png:-', 'pdf:-'
+    p = subprocess.Popen(c, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    s = pid.communicate(s.getvalue())[0]
     if mode != 'str':
-        fh = cStringIO.StringIO(fh)
-        fh.reset()
-    return(fh)
+        s = cStringIO.StringIO(s)
+        s.reset()
+    return(s)
 
 def pdf_merge(layers):
     """

@@ -137,7 +137,7 @@ end select
 
 ! error check
 if (ios /= 0) then
-    if (master) write (0,*), 'bad input: ', trim(str(:j))
+    if (master) write (0,*) 'bad input: ', trim(str(:j))
     stop
 end if
 

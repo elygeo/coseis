@@ -14,7 +14,7 @@ if target == []:
     pprint.pprint(cfg)
     print(doc)
 elif target == ['sord']:
-    cst.sord.build()
+    cst.sord.make()
 elif target == ['test']:
     cst.tests.test_suite.test()
 elif target == ['build_all']:

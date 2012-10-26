@@ -15,26 +15,23 @@ if (sync) call barrier
 if (master) print *, clock(), 'Material model'
 
 ! init arrays
-call r3fill(mr, 0.0)
-call r3fill(lam, 0.0)
-call r3fill(mu, 0.0)
-call r3fill(gam, 0.0)
+call rfill(mr, 0.0, size(mr))
+call rfill(lam, 0.0, size(lam))
+call rfill(mu, 0.0, size(mu))
+call rfill(gam, 0.0, size(gam))
 
 ! inputs
 call field_io('<', 'rho', mr)
 call field_io('<', 'vp',  lam)
 call field_io('<', 'vs',  mu)
 call field_io('<', 'gam', gam)
-call r3copy(lam, s1)
-call r3copy(mu, s2)
+call rcopy(lam, s1, size(s1))
+call rcopy(mu, s2, size(s2))
 
 ! limits
-if (rho1 > 0.0) call r30max(mr, rho1)
-if (rho2 > 0.0) call r30min(mr, rho2)
-if (vp1  > 0.0) call r30max(s1, vp1)
-if (vp2  > 0.0) call r30min(s1, vp2)
-if (vs1  > 0.0) call r30max(s2, vs1)
-if (vs2  > 0.0) call r30min(s2, vs2)
+call rlimits(mr, rho1, rho2, size(mr))
+call rlimits(s1, vp1, vp2, size(s1))
+call rlimits(s2, vs1, vs2, size(s2))
 
 ! velocity dependent viscosity
 if (vdamp > 0.0) then
@@ -54,8 +51,7 @@ if (vdamp > 0.0) then
 end if
 
 ! limits
-if (gam1 > 0.0) call r30max(gam, gam1)
-if (gam2 > 0.0) call r30min(gam, gam2)
+call rlimits(gam, gam1, gam2, size(gam))
 
 ! halos
 call scalar_swap_halo(mr,  nhalo)

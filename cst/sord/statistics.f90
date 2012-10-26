@@ -51,11 +51,11 @@ if (modulo(it, itstats) == 0) then
     maxl(4,j) = wmax
     val = maxval(maxl)
     if (val /= val .or. val > huge(val)) then
-        write (0,*), 'NaN/Inf!'
-        write (0,*), 'amax:', amaxloc + nnoff, amax
-        write (0,*), 'vmax:', vmaxloc + nnoff, vmax
-        write (0,*), 'umax:', umaxloc + nnoff, umax
-        write (0,*), 'wmax:', wmaxloc + nnoff, wmax
+        write (0,*) 'NaN/Inf!'
+        write (0,*) 'amax:', amaxloc + nnoff, amax
+        write (0,*) 'vmax:', vmaxloc + nnoff, vmax
+        write (0,*) 'umax:', umaxloc + nnoff, umax
+        write (0,*) 'wmax:', wmaxloc + nnoff, wmax
         stop
     end if
     if (faultnormal > 0) then
