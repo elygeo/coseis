@@ -1,4 +1,4 @@
-#!/usr/bin/env ipython -i --gui=wx
+#!/usr/bin/env python
 
 def test():
     """

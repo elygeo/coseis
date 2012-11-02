@@ -22,6 +22,8 @@ def configure(**kwargs):
         if k in job.machine:
             for k, v in d.items():
                 job[k] = v
+    job.command = os.path.join('.', 'cvms.x')
+    assert job.version in ('2.2', '3.0', '4.0')
     return job
 
 def build(job=None, **kwargs):
@@ -33,7 +35,6 @@ def build(job=None, **kwargs):
     # configure
     if job == None:
         job = configure(options=[], **kwargs)
-    assert job.version in ('2.2', '3.0', '4.0')
     ver = 'cvms-' + job.version
     job.rundir = os.path.join(job.rundir, ver)
     if job.build_mpi:
@@ -70,9 +71,12 @@ def build(job=None, **kwargs):
         shutil.copy2(f, '.')
 
     # build
-    m = os.path.join('..', '..', 'Makefile.in')
-    m = open(m).read().format(mode=mode, **job)
-    open('Makefile', 'w').write(m)
+    f = os.path.join('..', '..', 'in.h.in')
+    f = open(f).read().format(**job)
+    open('in.h', 'w').write(f)
+    f = os.path.join('..', '..', 'Makefile.in')
+    f = open(f).read().format(mode=mode, **job)
+    open('Makefile', 'w').write(f)
     subprocess.check_call(['make'])
 
     # finished
@@ -86,25 +90,21 @@ def stage(**kwargs):
     import os, sys, re, shutil
     from .. import util
 
-    # configure and build
+    # configure
     print('CVM-S setup')
     job = configure(**kwargs)
-    job.command = os.path.join('.', 'cvms.x')
     job = util.prepare(job)
-    build(job)
     ver = 'cvms-' + job.version
 
-    # check minimum processors needed for compiled memory size
-    path = os.path.dirname(__file__)
-    f = os.path.join(path, 'build', ver, 'in.h')
-    string = open(f).read()
-    pattern = 'ibig *= *([0-9]*)'
-    n = int(re.search(pattern, string).groups()[0])
-    minproc = int(job.nsample / n)
-    if job.nsample % n != 0:
-        minproc += 1
-    if minproc > job.nproc:
-        sys.exit('Need at lease %s processors for this mesh size' % minproc)
+    # check memory usage
+    n = (job.nsample - 1) // job.nproc + 1
+    p = (job.nsample - 1) // job.max_samples + 1
+    if p > job.nproc:
+        sys.exit('nsample = %s requires nproc >= %s or max_samples >= %s' %
+            (job.nsample, p, n))
+
+    # build code
+    build(job)
 
     # create run directory
     if os.path.exists(job.rundir):

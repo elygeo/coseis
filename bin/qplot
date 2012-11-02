@@ -8,13 +8,14 @@ plot [options] <datafile>
 
 Options
 -------
--t <dtype>  NumpPy dtype string
--c <clim>   Set upper color scale limit to constant value.
--s          For image series, step through with mouse clicks.
+-t <dtype>     NumpPy dtype string
+-c <clim>      Set upper color scale limit to constant value.
+-p <exponent>  Eponent power applied to data
 """
 import os, sys, imp, getopt
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.animation as ani
 
 def stats(f, msg=''):
     """
@@ -29,12 +30,15 @@ def plot(*argv):
     Quick multi-purpose plotting.
     """
     # options
-    opts, files = getopt.getopt(argv, 'sc:t:')
+    opts, files = getopt.getopt(argv, 'c:t:p:')
     opts = dict(opts)
     clim = None
+    power = None
     if '-c' in opts:
         clim = float(opts['-c'])
         clim = -clim, clim
+    if '-p' in opts:
+        power = float(opts['-p'])
 
     # loop over files
     for file in files:
@@ -94,10 +98,12 @@ def plot(*argv):
 
         # create figure
         fig = plt.figure(None, (12, 7.2))
+        ax = fig.add_subplot(111)
 
         # XY plot or 2D image
         if len(shape) < 3:
-            ax = fig.add_subplot(111)
+            if power:
+                data **= power
             if len(shape) == 1:
                 stats(data, title)
                 t = np.arange(data.size) * delta[0]
@@ -113,29 +119,33 @@ def plot(*argv):
                 if clim:
                     im.set_clim(*clim)
             ax.set_title(title)
-            fig.ginput(1, 0, False)
+            plt.show()
 
         # 3D series of images
         else:
+            plt.ion()
+            fig.show()
             f1 = open(file)
+            n  = shape[0] * shape[1]
+            nn = shape[1], shape[0]
             for it in range(shape[-1]):
-                nn = shape[1], shape[0]
-                n = shape[0] * shape[1]
                 data = np.fromfile(f1, dtype, n).reshape(nn).T
-                fig.clf()
-                ax = fig.add_subplot(111)
-                ax.set_title('%s %s' % (title, it * delta[-1]))
                 stats(data, '%s %s' % (title, it * delta[-1]))
-                im = ax.imshow(data.T, origin='lower', interpolation='nearest')
-                fig.colorbar(im, orientation='horizontal')
+                ax.set_title('%s %s' % (title, it * delta[-1]))
+                if power:
+                    data **= power
+                if it == 0:
+                    im = ax.imshow(data.T, origin='lower', interpolation='nearest')
+                    fig.colorbar(im, orientation='horizontal')
+                else:
+                    im.set_array(data.T)
                 if clim:
                     im.set_clim(*clim)
-                fig.show()
-                if '-s' in opts:
-                    fig.ginput(1, 0, False)
-            if '-s' not in opts:
-                fig.show()
+                else:
+                    im.autoscale()
+                fig.canvas.draw()
                 fig.ginput(1, 0, False)
+                         
 
 # continue if command line
 if __name__ == '__main__':

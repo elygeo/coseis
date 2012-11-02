@@ -13,6 +13,7 @@ file_vp = 'vp.bin'
 file_vs = 'vs.bin'
 
 # configuration
+max_samples = 4800000
 nthread = 1
 build_fflags = '-O3 -Wall'
 minutes = 60

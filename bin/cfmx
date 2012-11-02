@@ -1,5 +1,5 @@
+#!/usr/bin/env python
 #!/usr/bin/env ipython --gui=wx -i --
-#!/usr/bin/env python -i
 import sys, getopt
 import cst
 opts, faults = getopt.getopt(sys.argv[1:], 'sn')
