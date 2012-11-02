@@ -42,15 +42,8 @@ f = os.path.join('run', 'data', 'beachball.txt')
 np.savetxt(f, b)
 
 # topography
-ddeg = 0.5 / 60.0
-z, extent = cst.data.topo(extent)
-x, y = extent
-n = z.shape
-x = x[0] + ddeg * np.arange(n[0])
-y = y[0] + ddeg * np.arange(n[1])
-y, x = np.meshgrid(y, x)
-v = 1000,
-x, y = cst.plt.contour(x, y, z, v)[0]
+x, y, z = cst.data.dem(extent)
+x, y = cst.plt.contour(x, y, z, [1000])[0]
 f = os.path.join('run', 'data', 'mountains.txt')
 np.savetxt(f, np.array([x, y]).T)
 

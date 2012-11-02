@@ -10,11 +10,8 @@ from enthought.mayavi import mlab
 import cst
 
 # parameters
-format = 'png'; dpi = 150.0
-format = 'pdf'; dpi = 300.0
-draft = False
-draft = True
-field = 'z25'
+outfile = 'z25.png'; dpi = 150.0
+outfile = 'z25.pdf'; dpi = 300.0
 path = os.path.join('run', 'mesh') + os.sep
 proj = pyproj.Proj(proj='tmerc', lon_0=-117.25, lat_0=33.75, k=0.001)
 title = 'SCEC Community\nVelocity Model'
@@ -103,7 +100,7 @@ cst.plt.text(leg, 0.87, 0.95, title, ha='center', va='top', size=10,
      weight='bold', color='w', edgecolor='k')
 
 # create overlay
-if format == 'pdf':
+if outfile.endwith('pdf'):
     over = cst.plt.savefig(fig0, format='pdf', transparent=True, distill=False)
 else:
     aa = 3
@@ -135,18 +132,7 @@ cmap = [
     (38, 38, 40, 40, 25, 20, 17, 17), # blue
     (80, 80, 80, 80, 80, 80, 80, 80), # alpha
 ]
-ddeg = 0.5 / 60.0
-z, extent = cst.data.topo(extent, scale=0.001)
-x, y = extent
-n = z.shape
-if draft:
-    x = x[0] + ddeg * np.arange(n[0])
-    y = y[0] + ddeg * np.arange(n[1])
-else:
-    x = x[0] + 0.5 * ddeg * np.arange(n[0] * 2 - 1)
-    y = y[0] + 0.5 * ddeg * np.arange(n[1] * 2 - 1)
-    z = cst.data.upsample(z)
-y, x = np.meshgrid(y, x)
+x, y, z = cst.data.dem(extent, scale=0.001, downsample=-1)
 s = np.maximum(0.01, z)
 i = (x + y) < -84.0
 s[i] = z[i]
@@ -169,15 +155,10 @@ fig.scene.light_manager.lights[1].activate = False
 fig.scene.light_manager.lights[2].activate = False
 
 # surface plot
-n = shape[:2]
-x = np.fromfile(path + 'lon.bin', 'f').reshape(n[::-1]).T
-y = np.fromfile(path + 'lat.bin', 'f').reshape(n[::-1]).T
-z = np.fromfile(path + field + '.bin', 'f').reshape(n[::-1]).T * 0.001
+x = np.load(path + 'lon.npy')
+y = np.load(path + 'lat.npy')
+z = np.load(path + 'z25.npy')
 x, y = proj(x, y)
-if draft:
-    x = x[::2]
-    y = y[::2]
-    z = z[::2]
 cmap = cst.mlab.colormap(colormap, colorexp)
 surf = mlab.mesh(x, y, 10 - z, scalars=z, figure=fig)
 surf.module_manager.scalar_lut_manager.lut.table = cmap
@@ -196,10 +177,9 @@ fig.scene.parallel_projection = True
 fig.scene.camera.parallel_scale = axis[3]
 
 # combine overlay and save image
-f = field + '.' + format
 print f
 out = cst.mlab.screenshot(fig)
-if format == 'pdf':
+if outfile.endswith('pdf'):
     out = cst.viz.img2pdf(out, dpi=dpi)
     out = cst.viz.pdf_merge((out, over))
     open(f, 'wb').write(out.getvalue())

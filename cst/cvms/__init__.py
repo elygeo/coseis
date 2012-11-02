@@ -35,6 +35,7 @@ def build(job=None, **kwargs):
         job = configure(options=[], **kwargs)
     assert job.version in ('2.2', '3.0', '4.0')
     ver = 'cvms-' + job.version
+    job.rundir = os.path.join(job.rundir, ver)
     if job.build_mpi:
         mode = 'mpi'
     else:

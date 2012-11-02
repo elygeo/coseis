@@ -41,6 +41,6 @@ else:
         z[i] = ((val - v1[i]) / (v2[i] - v1[i]) + j - 1 + 0.5 * cell) * dz
 
 # write output
-f = os.path.join('run', 'mesh', 'z25.bin')
-z.tofile(f)
+f = os.path.join('run', 'mesh', 'z25.npy')
+np.save(f, z)
 

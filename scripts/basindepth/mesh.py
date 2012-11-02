@@ -34,22 +34,21 @@ meta = dict(
 path = os.path.join('run', 'mesh') + os.sep
 os.makedirs(path + 'hold')
 cst.util.save(path + 'meta.py', meta)
-x.tofile(path + 'lon.bin')
-y.tofile(path + 'lat.bin')
+np.save(path + 'lon.bin', x)
+np.save(path + 'lat.bin', y)
 
 # write input files
 path = os.path.join('run', 'mesh', 'hold') + os.sep
-f1 = open(path + 'lon.bin', 'wb')
-f2 = open(path + 'lat.bin', 'wb')
-f3 = open(path + 'dep.bin', 'wb')
-with f1, f2:
+with open(path + 'lon.bin', 'wb') as f:
     for i in range(z.size):
-        x.tofile(f1)
-        y.tofile(f2)
-with f3:
+        x.tofile(f)
+with open(path + 'lat.bin', 'wb') as f:
+    for i in range(z.size):
+        y.tofile(f)
+with open(path + 'dep.bin', 'wb') as f:
     for i in range(z.size):
         x.fill(z[i])
-        x.tofile(f3)
+        x.tofile(f)
 
 # launch CVM-S
 cst.cvms.launch(

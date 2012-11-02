@@ -32,58 +32,55 @@ s, d = 1000.0, 0.5 * dx
 bounds = (-80 * s + d, 48 * s - d), (-58 * s + d, 54 * s - d), (0.0, 48 * s - dx)
 origin = mts.longitude, mts.latitude, mts.depth
 
+# projection
+projection = dict(proj='tmerc', lon_0=origin[0], lat_0=origin[1])
+proj = pyproj.Proj(**projection)
+transform = {}
+
+# uniform zone in pml and to deepest source depth
+max_source_depth = origin[2]
+npml = 10
+npml = min(npml, int(8000.0 / delta[0] + 0.5))
+ntop = int(max_source_depth / abs(delta[2]) + 2.5)
+
+# dimensions
+x, y, z = bounds
+x, y, z = x[1] - x[0], y[1] - y[0], z[1] - z[0]
+shape = (
+    int(abs(x / delta[0]) + 1.5),
+    int(abs(y / delta[1]) + 1.5),
+    int(abs(z / delta[2]) + 1.5),
+)
+ncell = (shape[0] - 1) * (shape[1] - 1) * (shape[2] - 1)
+
+# corners
+x, y, z = bounds
+x = x[0], x[1], x[1], x[0]
+y = y[0], y[0], y[1], y[1]
+x, y = proj(x, y, inverse=True)
+corners = tuple(x), tuple(y)
+
+# box
+x, y, z = bounds
+x = np.arange(shape[0]) * delta[0] + x[0]
+y = np.arange(shape[1]) * delta[1] + y[0]
+y, x = np.meshgrid(y, x)
+x = np.concatenate([x[:,0], x[-1,1:], x[-2::-1,-1], x[0,-2::-1]])
+y = np.concatenate([y[:,0], y[-1,1:], y[-2::-1,-1], y[0,-2::-1]])
+x, y = proj(x, y, inverse=True)
+box = x, y
+extent = (x.min(), x.max()), (y.min(), y.max())
+
+# mesh
+x, y, z = bounds
+x = np.arange(shape[0]) * delta[0] + x[0]
+y = np.arange(shape[1]) * delta[1] + y[0]
+y, x = np.meshgrid(y, x)
+x, y = proj(x, y, inverse=True)
+z = cst.data.dem([x, y])
+
 # loop over cvm versions
 for cvm in 'cvms', 'cvmh', 'cvmg':
-
-    # projection
-    projection = dict(proj='tmerc', lon_0=origin[0], lat_0=origin[1])
-    proj = pyproj.Proj(**projection)
-    transform = {}
-
-    # uniform zone in pml and to deepest source depth
-    max_source_depth = origin[2]
-    npml = 10
-    npml = min(npml, int(8000.0 / delta[0] + 0.5))
-    ntop = int(max_source_depth / abs(delta[2]) + 2.5)
-
-    # dimensions
-    x, y, z = bounds
-    x, y, z = x[1] - x[0], y[1] - y[0], z[1] - z[0]
-    shape = (
-        int(abs(x / delta[0]) + 1.5),
-        int(abs(y / delta[1]) + 1.5),
-        int(abs(z / delta[2]) + 1.5),
-    )
-    ncell = (shape[0] - 1) * (shape[1] - 1) * (shape[2] - 1)
-
-    # corners
-    x, y, z = bounds
-    x = x[0], x[1], x[1], x[0]
-    y = y[0], y[0], y[1], y[1]
-    x, y = proj(x, y, inverse=True)
-    corners = tuple(x), tuple(y)
-
-    # box
-    x, y, z = bounds
-    x = np.arange(shape[0]) * delta[0] + x[0]
-    y = np.arange(shape[1]) * delta[1] + y[0]
-    y, x = np.meshgrid(y, x)
-    x = np.concatenate([x[:,0], x[-1,1:], x[-2::-1,-1], x[0,-2::-1]])
-    y = np.concatenate([y[:,0], y[-1,1:], y[-2::-1,-1], y[0,-2::-1]])
-    x, y = proj(x, y, inverse=True)
-    box = x, y
-    extent = (x.min(), x.max()), (y.min(), y.max())
-
-    # topography
-    topo, topo_extent = cst.data.topo(extent)
-
-    # mesh
-    x, y, z = bounds
-    x = np.arange(shape[0]) * delta[0] + x[0]
-    y = np.arange(shape[1]) * delta[1] + y[0]
-    y, x = np.meshgrid(y, x)
-    x, y = proj(x, y, inverse=True)
-    z = cst.interpolate.interp2(topo_extent, topo, (x, y))
 
     # metadata
     mesh_id = '%s%04.f%s' % (label, dx, cvm[-1])
@@ -163,9 +160,9 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         # launch mesher + cvmh
         shutil.copy2('mesh-cvmh.py', path)
         proj_cvmh = pyproj.Proj(**cst.cvmh.projection)
-        x, y = proj_cvmh(x, y)
-        x.astype('f').T.tofile(path + 'x.bin')
-        y.astype('f').T.tofile(path + 'y.bin')
+        x_, y_ = proj_cvmh(x, y)
+        x_.astype('f').T.tofile(path + 'x.bin')
+        y_.astype('f').T.tofile(path + 'y.bin')
         cst.util.launch(
             rundir = path,
             nthread = 1,

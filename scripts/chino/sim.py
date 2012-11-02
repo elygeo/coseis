@@ -156,13 +156,12 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
 
     # save metadata
     os.link(mesh + 'box.txt', path + 'box.txt')
-    f1 = open(mesh + 'meta.py')
-    f2 = open(mts)
-    f3 = open(path + 'meta.py')
-    with f1, f2, f3:
-        s = '\n'.join([f1.read(), f2.read(), f3.read()])
-    with open(path + 'meta.py', 'w') as fh:
-        fh.write(s)
+    s = '\n'.join([
+        f1 = open(mesh + 'meta.py').read(),
+        f2 = open(mts).read(),
+        f3 = open(path + 'meta.py').read(),
+    ])
+    open(path + 'meta.py', 'w').write(s)
 
     # save decimated mesh
     if surf_out:

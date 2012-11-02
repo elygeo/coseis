@@ -49,31 +49,33 @@ def colormap(*args, **kwargs):
     cmap = LinearSegmentedColormap('cmap', cmap, n)
     return cmap
 
-def colorbar(fig, cmap, clim, title=None, rect=None, ticks=None, ticklabels=None, boxcolor='k', boxalpha=1.0, boxwidth=0.2, **kwargs):
+def colorbar(fig, cmap, clim, title=None, rect=None, ticks=None, ticklabels=None, **kwargs):
     """
     Matplotlib enhanced colorbar.
     """
+    import numpy as np
     if rect is None:
         rect = 0.25, 0.08, 0.5, 0.02
-    axis = clim[0], clim[1], 0, 1
     ax = fig.add_axes(rect)
-    x = axis[0], axis[0], axis[1], axis[1], axis[0]
-    y = axis[2], axis[3], axis[3], axis[2], axis[2]
-    ax.plot(x, y, '-', c=boxcolor, lw=boxwidth*2, alpha=boxalpha, clip_on=False)
-    ax.imshow([range(1001)], cmap=cmap, extent=axis)
-    ax.axis('off')
-    ax.axis('tight')
-    ax.axis(axis)
+    x = np.linspace(clim[0], clim[-1], 1001)
+    if len(clim) > 2:
+        ax.contourf(x, [0, 1], [x, x], clim, cmap=cmap, **kwargs)
+        ax.contourf(x, [0, 1], [x, x], clim, cmap=cmap, **kwargs)
+    else:
+        ax.imshow(x, cmap=cmap, **kwargs)
+    ax.axis([clim[0], clim[-1], 0, 1])
+    ax.tick_params(length=0)
+    if not ticks:
+        if len(clim) > 2:
+            ticks = clim
+        else:
+            ticks = clim[0], 0.5 * (clim[0] + clim[1]), clim[1]
+    ax.set_xticks(ticks)
+    ax.set_yticks([])
+    if ticklabels:
+        ax.set_xticklabels(ticklabels)
     if title:
-        x = 0.5 * (clim[0] + clim[1])
-        text(ax, x, 2, title, ha='center', va='baseline', **kwargs)
-    if ticks is None:
-        ticks = clim[0], 0.5 * (clim[0] + clim[1]), clim[1]
-    if ticklabels is None:
-        ticklabels = ticks
-    for i, x in enumerate(ticks):
-        s = '%s' % ticklabels[i]
-        text(ax, x, -0.6, s, ha='center', va='top', **kwargs)
+        ax.set_title(title)
     return ax
 
 def lengthscale(ax, x, y, w=None, label='%s', style='k-', **kwargs):

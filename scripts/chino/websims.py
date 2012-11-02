@@ -53,22 +53,9 @@ for path in glob.glob(sims):
     wsmeta = open(template).read()
     open(path + 'ws-meta.py', 'w').write(wsmeta % meta.__dict__)
 
-    # topography
-    topo, extent = cst.data.topo(extent)
-    x, y = extent
-    topo_extent = (x[0] + 360.0, x[1] + 360.0), y
-
     # mountains
-    x, y = topo_extent
-    n = topo.shape
-    ddeg = 0.5 / 60.0
-    x = x[0] + ddeg * np.arange(n[0])
-    y = y[0] + ddeg * np.arange(n[1])
-    y, x = np.meshgrid(y, x)
-    x, y = proj(x, y)
-    v = 1000,
-    x, y = cst.plt.contour(x, y, topo, v)[0]
-    z = np.empty_like(x)
+    x, y, z = cst.data.dem(extent)
+    x, y = cst.plt.contour(x, y, z, [1000,])[0]
     z.fill(1000.0)
     np.savetxt(path + 'mountains-xyz.txt', scale * np.array([x,y,z]).T)
 
@@ -98,7 +85,7 @@ for path in glob.glob(sims):
     with f1, f2:
         for kind in 'coastlines',:
             x, y = cst.data.mapdata(kind, 'high', extent, 10.0)
-            z = cst.coord.interp2(topo_extent, topo, (x, y))
+            z = cst.date.dem((x, y))
             np.savetxt(f1, np.array([x,y,z]).T)
             x, y = proj(x, y)
             x, y, i = cst.data.clipdata(x, y, bounds)

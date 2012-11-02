@@ -40,30 +40,15 @@ def vs30_wald(rebuild=False):
     """
     Wald, et al. Vs30 map.
     """
-    import os, urllib, gzip, cStringIO
+    import os
     import numpy as np
-    from . import interpolate
-
-    filename = os.path.join(repo, 'cvmh-vs30-wald.npy')
-    url = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/Western_US.grd.gz'
-    if not rebuild and os.path.exists(filename):
-        data = np.load(filename)
-    else:
-        print('Downloading %s' % url)
-        data = urllib.urlopen(url).read()
-        data = cStringIO.StringIO(data)
-        data = gzip.open(data).read()[19512:]
-        dtype = '>f'
-        nx, ny = 2280, 2400
-        data = np.fromstring(data, dtype).reshape((ny, nx)).T
-        delta = 0.25 / 60
-        x = -125.0 + delta, -106.0 - delta
-        y =   30.0 + delta,   50.0 - delta
-        extent = x, y
+    from . import data
+    f = os.path.join(repo, 'cvmh-vs30-wald.npy')
+    if not os.path.exists(f):
         x, y = gtl_coords()
-        data = interpolate.interp2(extent, data, (x, y), method='linear').astype('f')
-        np.save(filename, data)
-    return extent_gtl, None, data
+        v = data.vs30_wald(x, y)
+        np.save(f, v)
+    return extent_gtl, None, np.load(f, mmap_mode='c')
 
 
 def vs30_wills(rebuild=False):
@@ -107,7 +92,7 @@ def vs30_wills(rebuild=False):
             extent = (x0, x1), (y1, y2)
             v = fh.read(nx * ny * bytes)
             v = np.fromstring(v, dtype).astype('f').reshape((ny, nx)).T
-            v[v<=0] = float('nan')
+            v[v <= 0] = float('nan')
             interpolate.interp2(extent, v, (x, y), data, bound=True, mask_nan=True)
         print('')
         np.save(filename, data)

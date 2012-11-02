@@ -2,18 +2,17 @@
 """
 Print binary file statistics. Default data type is 4 byte floating point.
 """
-import os, sys
+import os, sys, imp
 import numpy as np
 
 block = 64 * 1024 * 1024
-dtype = 'f'
+arg_dtype = None
 args = []
 for a in sys.argv[1:]:
     if a[0] == '-':
-        dtype = a[1:].replace('l', '<').replace('b', '>')
+        arg_dtype = a[1:].replace('l', '<').replace('b', '>')
     else:
         args += [a]
-nb = np.dtype(dtype).itemsize
 
 print('         Min          Max         Mean            N')
 for filename in args:
@@ -25,7 +24,19 @@ for filename in args:
         rmin = r.min()
         rmax = r.max()
         rmean = r.mean()
+        filename += ' ' + str(r.shape)
     else:
+        if arg_dtype:
+            dtype = arg_dtype
+        else:
+            meta = os.path.dirname(filename)
+            meta = os.path.join(meta, 'meta.py')
+            try:
+                meta = imp.load_source('meta', meta)
+                dtype = meta.dtype
+            except:
+                dtype = 'f'
+        nb = np.dtype(dtype).itemsize
         n = os.path.getsize(filename)
         if n == 0 or n % nb != 0:
             continue

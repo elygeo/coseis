@@ -1,4 +1,4 @@
-#!/usr/bin/env ipython --gui=qt
+#!/usr/bin/env python
 """
 Quick multi-purpose plotting.
 
@@ -77,8 +77,8 @@ def plot(*argv):
                 tail = os.sep.join(f[i:])
                 meta = os.path.join(path, 'meta.py')
                 if os.path.exists(meta):
+                    meta = imp.load_source('meta', meta)
                     try:
-                        meta = imp.load_source('meta', meta)
                         shape = meta.shapes[tail]
                         delta = meta.deltas[tail]
                         dtype = meta.dtype
@@ -90,11 +90,13 @@ def plot(*argv):
             elif len(shape) == 2:
                 nn = shape[1], shape[0]
                 n = shape[0] * shape[1]
-                data = np.fromfile(file, dtype, n).reshape(nn)
+                data = np.fromfile(file, dtype, n).reshape(nn).T
+
+        # create figure
+        fig = plt.figure(None, (12, 7.2))
 
         # XY plot or 2D image
         if len(shape) < 3:
-            fig = plt.figure()
             ax = fig.add_subplot(111)
             if len(shape) == 1:
                 stats(data, title)
@@ -103,41 +105,37 @@ def plot(*argv):
             elif len(shape) == 2 and shape[0] == 2:
                 stats(data[0], title)
                 stats(data[1], title)
-                ax = fig.add_subplot(111)
                 ax.plot(data[0], data[1])
             elif len(shape) == 2:
                 stats(data, title)
-                ax = fig.add_subplot(111)
-                im = ax.imshow(data, interpolation='nearest')
-                ax.set_aspect('auto')
-                plt.colorbar(im)
+                im = ax.imshow(data.T, origin='lower', interpolation='nearest')
+                plt.colorbar(im, orientation='horizontal')
                 if clim:
                     im.set_clim(*clim)
             ax.set_title(title)
-            fig.show()
             fig.ginput(1, 0, False)
 
         # 3D series of images
         else:
-            fig = plt.figure()
             f1 = open(file)
-            for it in range( shape[-1] ):
+            for it in range(shape[-1]):
                 nn = shape[1], shape[0]
                 n = shape[0] * shape[1]
-                data = np.fromfile(f1, dtype, n).reshape(nn)
+                data = np.fromfile(f1, dtype, n).reshape(nn).T
                 fig.clf()
                 ax = fig.add_subplot(111)
                 ax.set_title('%s %s' % (title, it * delta[-1]))
                 stats(data, '%s %s' % (title, it * delta[-1]))
-                im = ax.imshow(data, interpolation='nearest')
-                fig.colorbar(im)
+                im = ax.imshow(data.T, origin='lower', interpolation='nearest')
+                fig.colorbar(im, orientation='horizontal')
                 if clim:
                     im.set_clim(*clim)
-                fig.canvas.draw()
-                fig.canvas.Update()
                 fig.show()
                 if '-s' in opts:
                     fig.ginput(1, 0, False)
+            if '-s' not in opts:
+                fig.show()
+                fig.ginput(1, 0, False)
 
 # continue if command line
 if __name__ == '__main__':
