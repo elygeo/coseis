@@ -4,6 +4,7 @@ Print binary file statistics. Default data type is 4 byte floating point.
 """
 import os, sys, imp
 import numpy as np
+from numpy.lib.npyio import format as npy
 
 block = 64 * 1024 * 1024
 arg_dtype = None
@@ -14,17 +15,13 @@ for a in sys.argv[1:]:
     else:
         args += [a]
 
-print('         Min          Max         Mean            N')
+print('         Min          Max         Mean  Shape')
 for filename in args:
-    if not os.path.isfile(filename):
-        continue
+    fh = open(filename, 'rb')
     if filename.endswith('npy'):
-        r = np.load(filename)
-        n = r.size
-        rmin = r.min()
-        rmax = r.max()
-        rmean = r.mean()
-        filename += ' ' + str(r.shape)
+        npy.read_magic(fh)
+        shape, fcont, dtype = npy.read_array_header_1_0(fh)
+        n = np.prod(shape)
     else:
         if arg_dtype:
             dtype = arg_dtype
@@ -41,18 +38,18 @@ for filename in args:
         if n == 0 or n % nb != 0:
             continue
         n //= nb
-        fh = open(filename, 'rb')
-        rmin =  np.inf
-        rmax = -np.inf
-        rsum = 0.0
-        i = 0
-        while i < n:
-            b = min(n-i, block)
-            r = np.fromfile(fh, dtype=dtype, count=b)
-            rmin = min(rmin, r.min())
-            rmax = max(rmax, r.max())
-            rsum += r.astype('d').sum()
-            i += b
-        rmean = rsum / n
-    print('%12g %12g %12g %12d %s' % (rmin, rmax, rmean, n, filename))
+        shape = [int(n)]
+    rmin =  np.inf
+    rmax = -np.inf
+    rsum = 0.0
+    i = 0
+    while i < n:
+        b = min(n - i, block)
+        r = np.fromfile(fh, dtype=dtype, count=b)
+        rmin = min(rmin, r.min())
+        rmax = max(rmax, r.max())
+        rsum += r.astype('d').sum()
+        i += b
+    rmean = rsum / n
+    print('%12g %12g %12g  %s  %s' % (rmin, rmax, rmean, shape, filename))
 

@@ -15,14 +15,16 @@ Options
 import os, sys, imp, getopt
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.animation as ani
 
 def stats(f, msg=''):
     """
     Display statistic of a NumPy array f with optional message.
     """
     i = ~np.isnan(f)
-    print(f[i].min(), f[i].max(), f[i].mean(), msg)
+    rmin = f[i].min().copy()
+    rmax = f[i].max().copy()
+    rmean = f[i].astype('d').mean()
+    print('%12g %12g %12g  %s  %s' % (rmin, rmax, rmean, f.shape, msg))
     return
 
 def plot(*argv):
@@ -40,6 +42,10 @@ def plot(*argv):
     if '-p' in opts:
         power = float(opts['-p'])
 
+    # init
+    fig = plt.figure(figsize=(12, 7.2))
+    print('         Min          Max         Mean  Shape')
+
     # loop over files
     for file in files:
 
@@ -49,7 +55,7 @@ def plot(*argv):
 
         # options
         title = os.path.splitext(os.path.split(file)[-1])[0]
-        delta = 1,
+        delta = None
         dtype = 'f'
         if '-t' in opts:
             dtype = opts['-t'].replace('l', '<').replace('b', '>')
@@ -57,12 +63,6 @@ def plot(*argv):
         # read text file
         if file.lower().endswith('.txt'):
             data = np.loadtxt(file).T
-            shape = data.shape
-
-        # read NumPy file
-        elif file.lower().endswith('.npy'):
-            data = np.load(file)
-            shape = data.shape
 
         # read SAC file
         elif file.lower().endswith('.sac'):
@@ -70,70 +70,86 @@ def plot(*argv):
             data = obspy.core.read(file)[0]
             delta = data.stats.delta,
             data = data.data
-            shape = data.shape
 
-        # read binary file with SORD metadata (if present)
-        else:
-            shape = 0,
+        # read NumPy file with metadata (if present)
+        elif file.lower().endswith('.npy'):
             f = os.path.split(file)
-            for i in range(1,len(f)):
+            for i in range(1, len(f)):
                 path = os.sep.join(f[:-i])
                 tail = os.sep.join(f[i:])
                 meta = os.path.join(path, 'meta.py')
                 if os.path.exists(meta):
                     meta = imp.load_source('meta', meta)
                     try:
-                        shape = meta.shapes[tail]
                         delta = meta.deltas[tail]
-                        dtype = meta.dtype
                         break
                     except:
                         pass
-            if len(shape) == 1:
-                data = np.fromfile(file, dtype)
-            elif len(shape) == 2:
-                nn = shape[1], shape[0]
-                n = shape[0] * shape[1]
-                data = np.fromfile(file, dtype, n).reshape(nn).T
+            data = np.load(file, mmap_mode='c')
 
-        # create figure
-        fig = plt.figure(None, (12, 7.2))
-        ax = fig.add_subplot(111)
-
-        # XY plot or 2D image
-        if len(shape) < 3:
-            if power:
-                data **= power
-            if len(shape) == 1:
-                stats(data, title)
-                t = np.arange(data.size) * delta[0]
-                ax.plot(t, data)
-            elif len(shape) == 2 and shape[0] == 2:
-                stats(data[0], title)
-                stats(data[1], title)
-                ax.plot(data[0], data[1])
-            elif len(shape) == 2:
-                stats(data, title)
-                im = ax.imshow(data.T, origin='lower', interpolation='nearest')
-                plt.colorbar(im, orientation='horizontal')
-                if clim:
-                    im.set_clim(*clim)
-            ax.set_title(title)
-            plt.show()
-
-        # 3D series of images
+        # read binary file with metadata (if present)
         else:
-            plt.ion()
-            fig.show()
-            f1 = open(file)
-            n  = shape[0] * shape[1]
-            nn = shape[1], shape[0]
-            for it in range(shape[-1]):
-                data = np.fromfile(f1, dtype, n).reshape(nn).T
-                stats(data, '%s %s' % (title, it * delta[-1]))
-                ax.set_title('%s %s' % (title, it * delta[-1]))
+            shape = None
+            f = os.path.split(file)
+            for i in range(1, len(f)):
+                path = os.sep.join(f[:-i])
+                tail = os.sep.join(f[i:])
+                meta = os.path.join(path, 'meta.py')
+                if os.path.exists(meta):
+                    meta = imp.load_source('meta', meta)
+                    try:
+                        dtype = meta.dtype
+                        shape = meta.shapes[tail]
+                        delta = meta.deltas[tail]
+                        break
+                    except:
+                        pass
+            if shape:
+                data = np.memmap(file, dtype, 'r', 0, shape, 'F')
+            else:
+                data = np.memmap(file, dtype, 'r')
+
+        # metadata
+        shape = data.shape
+        if delta == None:
+            delta = len(shape) * [1]
+
+        # setup figure
+        fig.clf()
+        ax = fig.add_subplot(111)
+        ax.set_title(title)
+
+        # plot
+        if len(shape) == 1:
+            stats(data, title)
+            if power:
+                data = data ** power
+            x = np.arange(data.size) * delta[0]
+            ax.plot(x, data)
+        elif len(shape) == 2 and shape[0] == 2:
+            stats(data[0], title)
+            stats(data[1], title)
+            if power:
+                data = data[0], data[1] ** power
+            ax.plot(data[0], data[1])
+        elif len(shape) == 2:
+            stats(data, title)
+            if power:
+                data = data ** power
+            im = ax.imshow(data.T, origin='lower', interpolation='nearest')
+            plt.colorbar(im, orientation='horizontal')
+            if clim:
+                im.set_clim(*clim)
+        elif len(shape) == 3:
+            for it in range(shape[2]):
+                if file.lower().endswith('.npy'):
+                    data = np.load(file, mmap_mode='c')[:,:,it]
+                else:
+                    data = np.memmap(file, dtype, 'r', 0, shape, 'F')[:,:,it]
+                stats(data, '%s %s' % (title, it * delta[2]))
+                ax.set_title('%s %s' % (title, it * delta[2]))
                 if power:
-                    data **= power
+                    data = data ** power
                 if it == 0:
                     im = ax.imshow(data.T, origin='lower', interpolation='nearest')
                     fig.colorbar(im, orientation='horizontal')
@@ -145,7 +161,10 @@ def plot(*argv):
                     im.autoscale()
                 fig.canvas.draw()
                 fig.ginput(1, 0, False)
-                         
+        else:
+            sys.exit('more than 3 dimensions not supported')
+        fig.canvas.draw()
+        fig.ginput(1, 0, False)
 
 # continue if command line
 if __name__ == '__main__':

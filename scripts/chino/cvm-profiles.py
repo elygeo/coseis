@@ -21,6 +21,9 @@ r, p, s = cst.cvms.extract(x, y, z, ['rho', 'vp', 'vs'], rundir='run/cvms')
 r.astype('f').tofile(path + 'cvms-rho.bin')
 p.astype('f').tofile(path + 'cvms-vp.bin')
 s.astype('f').tofile(path + 'cvms-vs.bin')
+np.save(path + 'cvms-rho.npy', r.astype('f'))
+np.save(path + 'cvms-vp.npy',  p.astype('f'))
+np.save(path + 'cvms-vs.npy',  s.astype('f'))
 
 # project to cvm-h coordinates
 proj = pyproj.Proj(**cst.cvmh.projection)
@@ -31,10 +34,16 @@ r, p, s = cst.cvmh.extract(x, y, z, ['rho', 'vp', 'vs'], False, vs30=None, no_da
 r.astype('f').tofile(path + 'cvmh-rho.bin')
 p.astype('f').tofile(path + 'cvmh-vp.bin')
 s.astype('f').tofile(path + 'cvmh-vs.bin')
+np.save(path + 'cvmh-rho.npy', r.astype('f'))
+np.save(path + 'cvmh-vp.npy',  p.astype('f'))
+np.save(path + 'cvmh-vs.npy',  s.astype('f'))
 
 # cvmg
 r, p, s = cst.cvmh.extract(x, y, z, ['rho', 'vp', 'vs'], False)
 r.astype('f').tofile(path + 'cvmg-rho.bin')
 p.astype('f').tofile(path + 'cvmg-vp.bin')
 s.astype('f').tofile(path + 'cvmg-vs.bin')
+np.save(path + 'cvmg-rho.npy', r.astype('f'))
+np.save(path + 'cvmg-vp.npy',  p.astype('f'))
+np.save(path + 'cvmg-vs.npy',  s.astype('f'))
 

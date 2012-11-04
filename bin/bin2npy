@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+"""
+Convert binary files to Numpy
+"""
+import sys, imp
+import numpy as np
+
+meta = imp.load_source('meta', 'meta.py')
+dtype = meta.dtype
+
+for f in sys.argv[1:]:
+    f1 = f.replace('.bin', '.npy')
+    if f == f1:
+        sys.exit('Missing .bin extention')
+    if f in meta.shapes:
+        print(f)
+        n = meta.shapes[f]
+        v = np.fromfile(f, dtype).reshape(n[::-1]).T
+    else:
+        print('Warning: no shape information found for ' + f)
+        v = np.fromfile(f, dtype)
+    np.save(f1, v)
+

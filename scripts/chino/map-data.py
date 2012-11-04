@@ -24,11 +24,6 @@ y = y[0], y[0], y[1], y[1]
 x, y = np.array(proj(x, y, inverse=True))
 extent = (x.min(), x.max()), (y.min(), y.max())
 
-# setup plot
-fig = plt.figure()
-fig.clf()
-ax = fig.add_axes()
-
 # source
 m = mts.double_couple_clvd
 m = m['mzz'], m['mxx'], m['myy'], m['mxz'], -m['myz'], -m['mxy']
@@ -41,25 +36,17 @@ b = np.concatenate(p) * 0.005
 f = os.path.join('run', 'data', 'beachball.txt')
 np.savetxt(f, b)
 
-# topography
-x, y, z = cst.data.dem(extent)
-x, y = cst.plt.contour(x, y, z, [1000])[0]
-f = os.path.join('run', 'data', 'mountains.txt')
-np.savetxt(f, np.array([x, y]).T)
-
 # coastlines and boarders
 x, y = cst.data.mapdata('coastlines', 'high', extent, 10.0)
 x -= 360.0
 f = os.path.join('run', 'data', 'coastlines.txt')
 np.savetxt(f, np.array([x, y]).T)
 
-# mesh
-ddeg = 0.5 / 60.0
-x, y = extent
-x = x[0] + ddeg * np.arange(n[0])
-y = y[0] + ddeg * np.arange(n[1])
-yy, xx = np.meshgrid(y, x)
-zz = np.empty_like(xx)
+# topography
+xx, yy, zz = cst.data.dem(extent, mesh=True)
+x, y = cst.plt.contour(xx, yy, zz, [1000])[0]
+f = os.path.join('run', 'data', 'mountains.txt')
+np.savetxt(f, np.array([x, y]).T)
 
 # surface
 zz.fill(0.0)
