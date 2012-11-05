@@ -14,6 +14,7 @@ Options
 """
 import os, sys, imp, getopt
 import numpy as np
+from numpy.lib.npyio import format as npy
 import matplotlib.pyplot as plt
 
 def stats(f, msg=''):
@@ -32,7 +33,7 @@ def plot(*argv):
     Quick multi-purpose plotting.
     """
     # options
-    opts, files = getopt.getopt(argv, 'c:t:p:')
+    opts, args = getopt.getopt(argv, 'c:t:p:')
     opts = dict(opts)
     clim = None
     power = None
@@ -47,70 +48,78 @@ def plot(*argv):
     print('         Min          Max         Mean  Shape')
 
     # loop over files
-    for file in files:
-
-        # test for file
-        if not os.path.exists(file):
-            sys.exit('No such file: %s' % file)
+    for filename in args:
 
         # options
-        title = os.path.splitext(os.path.split(file)[-1])[0]
+        title = os.path.splitext(os.path.split(filename)[-1])[0]
         delta = None
         dtype = 'f'
         if '-t' in opts:
             dtype = opts['-t'].replace('l', '<').replace('b', '>')
 
         # read text file
-        if file.lower().endswith('.txt'):
-            data = np.loadtxt(file).T
+        if filename.lower().endswith('.txt'):
+            data = np.loadtxt(filename).T
 
         # read SAC file
-        elif file.lower().endswith('.sac'):
+        elif filename.lower().endswith('.sac'):
             import obspy.core
-            data = obspy.core.read(file)[0]
+            data = obspy.core.read(filename)[0]
             delta = data.stats.delta,
             data = data.data
 
         # read NumPy file with metadata (if present)
-        elif file.lower().endswith('.npy'):
-            f = os.path.split(file)
+        elif filename.lower().endswith('.npy'):
+            f = os.path.split(filename)
             for i in range(1, len(f)):
                 path = os.sep.join(f[:-i])
-                tail = os.sep.join(f[i:])
+                tail = os.sep.join(f[i:])[:-4] + '.bin'
                 meta = os.path.join(path, 'meta.py')
                 if os.path.exists(meta):
                     meta = imp.load_source('meta', meta)
-                    try:
-                        delta = meta.deltas[tail]
-                        break
-                    except:
-                        pass
-            data = np.load(file, mmap_mode='c')
+                    if hasattr(meta, 'deltas'):
+                        if tail in meta.deltas:
+                            delta = meta.deltas[tail]
+                    break
+            fh = open(filename, 'rb')
+            npy.read_magic(fh)
+            shape, fcont, dtype = npy.read_array_header_1_0(fh)
+            assert(fcont == True or len(shape) == 1)
+            if len(shape) < 3:
+                fh.close()
+                data = np.load(filename)
 
         # read binary file with metadata (if present)
         else:
-            shape = None
-            f = os.path.split(file)
+            shape = []
+            f = os.path.split(filename)
             for i in range(1, len(f)):
                 path = os.sep.join(f[:-i])
                 tail = os.sep.join(f[i:])
                 meta = os.path.join(path, 'meta.py')
                 if os.path.exists(meta):
                     meta = imp.load_source('meta', meta)
-                    try:
+                    if hasattr(meta, 'dtype'):
                         dtype = meta.dtype
-                        shape = meta.shapes[tail]
-                        delta = meta.deltas[tail]
-                        break
-                    except:
-                        pass
-            if shape:
-                data = np.memmap(file, dtype, 'r', 0, shape, 'F')
+                    if hasattr(meta, 'deltas'):
+                        if tail in meta.deltas:
+                            delta = meta.deltas[tail]
+                    if hasattr(meta, 'shapes'):
+                        if tail in meta.shapes:
+                            shape = meta.shapes[tail]
+                    break
+            if len(shape) < 3:
+                if shape:
+                    data = np.fromfile(filename, dtype).reshape(shape[::-1]).T
+                else:
+                    data = np.fromfile(filename, dtype)
+                    shape = data.shape
             else:
-                data = np.memmap(file, dtype, 'r')
+                fh = open(filename, 'rb')
 
-        # metadata
-        shape = data.shape
+        # meta
+        if len(shape) > 3:
+            sys.exit('more than 3 dimensions not supported')
         if delta == None:
             delta = len(shape) * [1]
 
@@ -140,12 +149,10 @@ def plot(*argv):
             plt.colorbar(im, orientation='horizontal')
             if clim:
                 im.set_clim(*clim)
-        elif len(shape) == 3:
+        else:
+            n = shape[0] * shape[1]
             for it in range(shape[2]):
-                if file.lower().endswith('.npy'):
-                    data = np.load(file, mmap_mode='c')[:,:,it]
-                else:
-                    data = np.memmap(file, dtype, 'r', 0, shape, 'F')[:,:,it]
+                data = np.fromfile(fh, dtype, n).reshape(shape[1::-1]).T
                 stats(data, '%s %s' % (title, it * delta[2]))
                 ax.set_title('%s %s' % (title, it * delta[2]))
                 if power:
@@ -159,10 +166,9 @@ def plot(*argv):
                     im.set_clim(*clim)
                 else:
                     im.autoscale()
+                fig.show()
                 fig.canvas.draw()
                 fig.ginput(1, 0, False)
-        else:
-            sys.exit('more than 3 dimensions not supported')
         fig.canvas.draw()
         fig.ginput(1, 0, False)
 

@@ -6,6 +6,7 @@ import os, sys, imp
 import numpy as np
 from numpy.lib.npyio import format as npy
 
+# options
 block = 64 * 1024 * 1024
 arg_dtype = None
 args = []
@@ -15,30 +16,50 @@ for a in sys.argv[1:]:
     else:
         args += [a]
 
+# init
 print('         Min          Max         Mean  Shape')
+
+# loop over files
 for filename in args:
-    fh = open(filename, 'rb')
+  
+    # NumPy file
     if filename.endswith('npy'):
+        fh = open(filename, 'rb')
         npy.read_magic(fh)
         shape, fcont, dtype = npy.read_array_header_1_0(fh)
         n = np.prod(shape)
+
+    # raw binary with metadata (if present)
     else:
+        shape = None
+        dtype = 'f'
+        f = os.path.split(filename)
+        for i in range(1, len(f)):
+            path = os.sep.join(f[:-i])
+            tail = os.sep.join(f[i:])
+            meta = os.path.join(path, 'meta.py')
+            if os.path.exists(meta):
+                meta = imp.load_source('meta', meta)
+                if hasattr(meta, 'dtype'):
+                    dtype = meta.dtype
+                if hasattr(meta, 'shapes'):
+                    if tail in meta.shapes:
+                        shape = meta.shapes[tail]
+                break
         if arg_dtype:
             dtype = arg_dtype
+        if shape:
+            n = np.prod(shape)
         else:
-            meta = os.path.dirname(filename)
-            meta = os.path.join(meta, 'meta.py')
-            try:
-                meta = imp.load_source('meta', meta)
-                dtype = meta.dtype
-            except:
-                dtype = 'f'
-        nb = np.dtype(dtype).itemsize
-        n = os.path.getsize(filename)
-        if n == 0 or n % nb != 0:
-            continue
-        n //= nb
-        shape = [int(n)]
+            nb = np.dtype(dtype).itemsize
+            n = os.path.getsize(filename)
+            if n == 0 or n % nb != 0:
+                continue
+            n //= nb
+            shape = [int(n)]
+        fh = open(filename, 'rb')
+
+    # compute stats
     rmin =  np.inf
     rmax = -np.inf
     rsum = 0.0
@@ -51,5 +72,5 @@ for filename in args:
         rsum += r.astype('d').sum()
         i += b
     rmean = rsum / n
-    print('%12g %12g %12g  %s  %s' % (rmin, rmax, rmean, shape, filename))
+    print('%12g %12g %12g  %s  %s' % (rmin, rmax, rmean, list(shape), filename))
 
