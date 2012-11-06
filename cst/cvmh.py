@@ -46,7 +46,7 @@ def vs30_wald(rebuild=False):
     f = os.path.join(repo, 'cvmh-vs30-wald.npy')
     if not os.path.exists(f):
         x, y = gtl_coords()
-        v = data.vs30_wald(x, y)
+        v = data.vs30_wald([x, y])
         np.save(f, v)
     return extent_gtl, None, np.load(f, mmap_mode='c')
 

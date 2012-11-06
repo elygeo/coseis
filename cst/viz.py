@@ -41,7 +41,7 @@ def img2pdf(img, dpi=150, mode=None):
     img.save(s, format='png')
     c = 'convert', '-density', str(dpi), 'png:-', 'pdf:-'
     p = subprocess.Popen(c, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    s = pid.communicate(s.getvalue())[0]
+    s = p.communicate(s.getvalue())[0]
     if mode != 'str':
         s = cStringIO.StringIO(s)
         s.reset()

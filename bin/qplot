@@ -84,7 +84,8 @@ def plot(*argv):
             fh = open(filename, 'rb')
             npy.read_magic(fh)
             shape, fcont, dtype = npy.read_array_header_1_0(fh)
-            assert(fcont == True or len(shape) == 1)
+            if not fcont:
+                shape = shape[::-1]
             if len(shape) < 3:
                 fh.close()
                 data = np.load(filename)

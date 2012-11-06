@@ -15,6 +15,7 @@ input_template = """\
 """
 
 def configure(**kwargs):
+    import os
     from .. import util, conf
     from . import conf as conf_local
     job = util.configure(conf.default, conf.site, conf_local, **kwargs)
@@ -87,7 +88,7 @@ def stage(**kwargs):
     """
     Stage job
     """
-    import os, sys, re, shutil
+    import os, sys, shutil
     from .. import util
 
     # configure
@@ -112,7 +113,8 @@ def stage(**kwargs):
         if not os.path.exists(f):
             raise Exception('%s exists' % job.rundir)
     else:
-        f = os.path.join(path, 'build', ver)
+        d = os.path.dirname(__file__)
+        f = os.path.join(d, 'build', ver)
         shutil.copytree(f, job.rundir)
 
     # clean-up old input files

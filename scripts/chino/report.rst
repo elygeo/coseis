@@ -2,8 +2,22 @@
     :format: latex html
 .. default-role:: raw-math
 
-2008 `$M_w$` 5.4 Chino Hills
-============================
+2008 `$M_w$` 5.4 Chino Hills ground motion simulations
+======================================================
+
+Ground motions from the 2008 `$M_w$` 5.4 Chino Hills, CA earthquake are
+compared to simulations using the CVM-S 4.0 and CVM-H 6.3 + GTL. The source is
+a point double couple and CLVD moment tensor obtained from the Southern
+California Seismic Network, with a time function `$m(t) = t/T^2 e^{-t/T}$`
+where `$T = 0.25$` sec.  The minimum S-wave velocity is truncated at 500 m/s,
+obscuring some details of the GTL model. The velocity models are sampled at 50
+meter resolution, requiring 5.5 billion mesh points for the simulation domain
+(Fig. 12).  Simulations were computed with the Support Operator Rupture
+Dynamics code (SORD, Ely, et al., 2008), using 15,360 processes on the NICS
+Kraken super-computer, requiring eight hours run time per simulation. These
+preliminary results show general agreement in amplitude and character among the
+observed and synthetic data (Figs. 13-15). Additional analysis and simulations
+are needed to adequately quantify effects of the new GTL model.
 
 .. figure:: map.pdf
 

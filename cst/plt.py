@@ -49,27 +49,26 @@ def colormap(*args, **kwargs):
     cmap = LinearSegmentedColormap('cmap', cmap, n)
     return cmap
 
-def colorbar(fig, cmap, clim, title=None, rect=None, ticks=None, ticklabels=None, **kwargs):
+def colorbar(fig, cmap, ticks, title=None, rect=None, contours=None, ticklabels=None, **kwargs):
     """
     Matplotlib enhanced colorbar.
     """
     import numpy as np
+    if len(ticks) == 2:
+        ticks = ticks[0], 0.5 * (ticks[0] + ticks[1]), ticks[1]
     if rect is None:
         rect = 0.25, 0.08, 0.5, 0.02
     ax = fig.add_axes(rect)
-    x = np.linspace(clim[0], clim[-1], 1001)
-    if len(clim) > 2:
-        ax.contourf(x, [0, 1], [x, x], clim, cmap=cmap, **kwargs)
-        ax.contourf(x, [0, 1], [x, x], clim, cmap=cmap, **kwargs)
+    v = ticks[0], ticks[-1], -0.5, 0.5
+    x = np.linspace(v[0], v[1], 1001)
+    if contours:
+        ax.contourf(x, v[2:], [x, x], contours, cmap=cmap, **kwargs)
+        ax.contourf(x, v[2:], [x, x], contours, cmap=cmap, **kwargs)
     else:
-        ax.imshow(x, cmap=cmap, **kwargs)
-    ax.axis([clim[0], clim[-1], 0, 1])
+        ax.imshow([x.T], cmap=cmap, extent=v, **kwargs)
+    ax.axis('tight')
+    ax.axis(v)
     ax.tick_params(length=0)
-    if not ticks:
-        if len(clim) > 2:
-            ticks = clim
-        else:
-            ticks = clim[0], 0.5 * (clim[0] + clim[1]), clim[1]
     ax.set_xticks(ticks)
     ax.set_yticks([])
     if ticklabels:
