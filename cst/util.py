@@ -408,15 +408,13 @@ def launch(job=None, **kwargs):
         save(job.name + '.conf.py', job)
     else:
         save(job.name + '.conf.py', job)
-        out = open(job.name + '.out', 'w')
-        with out:
-            for c in job.pre, job.launch, job.post:
-                if c:
-                    print(c)
-                    if '\n' in c or ';' in c or '|' in c:
-                        subprocess.check_call(c, shell=True, stdout=out)
-                    elif c:
-                        subprocess.check_call(shlex.split(c), stdout=out)
+        for c in job.pre, job.launch, job.post:
+            if c:
+                print(c)
+                if '\n' in c or ';' in c or '|' in c:
+                    subprocess.check_call(c, shell=True)
+                elif c:
+                    subprocess.check_call(shlex.split(c))
 
     os.chdir(cwd)
     return job

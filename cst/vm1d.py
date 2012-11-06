@@ -54,7 +54,7 @@ def boore_rock(depth):
     -------
     vs: Array of S-wave velocities in m/s
     """
-    import np
+    import numpy as np
     depth = np.asarray(depth)
     vs = np.empty_like(depth)
     vs.fill(float('nan'))
