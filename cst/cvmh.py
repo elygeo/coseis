@@ -36,7 +36,7 @@ def gtl_coords(delta_gtl=250.0):
     return x, y
 
 
-def vs30_wald(rebuild=False):
+def vs30_wald():
     """
     Wald, et al. Vs30 map.
     """
@@ -365,7 +365,7 @@ class Extraction():
                 v0, vt = self.gtl
                 a = 0.5
                 b = 2.0 / 3.0
-                c = 1.5
+                c = 2.0
                 z = z / zt
                 f = z + b * (z - z * z)
                 g = a - (a + 3.0 * c) * z + c * z * z + 2.0 * c * np.sqrt(z)

@@ -404,9 +404,10 @@ def vs30_wald(coords=None):
     x = -125.0 + d, -106.0 - d
     y =   30.0 + d,   50.0 - d
     extent = x, y
-    if coords != None:
-        v = interpolate.interp2(extent, v, coords, method='linear')
-    return v
+    if coords == None:
+        return v, extent
+    else:
+        return interpolate.interp2(extent, v, coords, method='linear')
 
 def us_place_names():
     """
