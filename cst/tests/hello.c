@@ -9,8 +9,8 @@ MPI_Comm_rank(MPI_COMM_WORLD, &i);
 MPI_Comm_size(MPI_COMM_WORLD, &n);
 fprintf(stdout,"Process %d of %d\n", i, n);
 fflush(stdout);
-#pragma omp parallel
-sleep(1);
+#pragma omp parallel for schedule(static) private(i)
+for (i = 0; i < 100000000; i++) continue;
 MPI_Finalize();
 return 0;
 
