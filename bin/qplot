@@ -8,9 +8,10 @@ plot [options] <datafile>
 
 Options
 -------
--t <dtype>     NumpPy dtype string
+-d <dtype>     NumpPy dtype string
 -c <clim>      Set upper color scale limit to constant value.
 -p <exponent>  Eponent power applied to data
+-t             Transpose data
 """
 import os, sys, imp, getopt
 import numpy as np
@@ -33,15 +34,16 @@ def plot(*argv):
     Quick multi-purpose plotting.
     """
     # options
-    opts, args = getopt.getopt(argv, 'c:t:p:')
+    opts, args = getopt.getopt(argv, 'c:d:p:t')
     opts = dict(opts)
     clim = None
     power = None
+    transpose = '-t' in opts
+    if '-p' in opts:
+        power = float(opts['-p'])
     if '-c' in opts:
         clim = float(opts['-c'])
         clim = -clim, clim
-    if '-p' in opts:
-        power = float(opts['-p'])
 
     # init
     fig = plt.figure(figsize=(12, 7.2))
@@ -55,7 +57,7 @@ def plot(*argv):
         delta = None
         dtype = 'f'
         if '-t' in opts:
-            dtype = opts['-t'].replace('l', '<').replace('b', '>')
+            dtype = opts['-d'].replace('l', '<').replace('b', '>')
 
         # read text file
         if filename.lower().endswith('.txt'):
@@ -89,6 +91,7 @@ def plot(*argv):
             if len(shape) < 3:
                 fh.close()
                 data = np.load(filename)
+                shape = data.shape
 
         # read binary file with metadata (if present)
         else:
@@ -136,24 +139,30 @@ def plot(*argv):
                 data = data ** power
             x = np.arange(data.size) * delta[0]
             ax.plot(x, data)
-        elif len(shape) == 2 and shape[0] == 2:
-            stats(data[0], title)
-            stats(data[1], title)
-            if power:
-                data = data[0], data[1] ** power
-            ax.plot(data[0], data[1])
         elif len(shape) == 2:
-            stats(data, title)
-            if power:
-                data = data ** power
-            im = ax.imshow(data.T, origin='lower', interpolation='nearest')
-            plt.colorbar(im, orientation='horizontal')
-            if clim:
-                im.set_clim(*clim)
+            if transpose or shape[1] == 2:
+                data = data.T
+                shape = data.shape
+            if shape[0] == 2:
+                stats(data[0], title)
+                stats(data[1], title)
+                if power:
+                    data = data[0], data[1] ** power
+                ax.plot(data[0], data[1])
+            else:
+                stats(data, title)
+                if power:
+                    data = data ** power
+                im = ax.imshow(data.T, origin='lower', interpolation='nearest')
+                plt.colorbar(im, orientation='horizontal')
+                if clim:
+                    im.set_clim(*clim)
         else:
             n = shape[0] * shape[1]
             for it in range(shape[2]):
                 data = np.fromfile(fh, dtype, n).reshape(shape[1::-1]).T
+                if transpose:
+                    data = data.T
                 stats(data, '%s %s' % (title, it * delta[2]))
                 ax.set_title('%s %s' % (title, it * delta[2]))
                 if power:

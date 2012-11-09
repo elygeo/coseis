@@ -48,7 +48,7 @@ def vs30_wald():
         x, y = gtl_coords()
         v = data.vs30_wald([x, y])
         np.save(f, v)
-    return extent_gtl, None, np.load(f, mmap_mode='c')
+    return extent_gtl, None, np.load(f)
 
 
 def vs30_wills(rebuild=False):
