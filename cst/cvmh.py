@@ -10,7 +10,6 @@ del(os)
 # parameters
 projection = dict(proj='utm', zone=11, datum='NAD27', ellps='clrk66')
 extent = (131000.0, 828000.0), (3431000.0, 4058000.0), (-200000.0, 4900.0)
-extent_gtl = (-31000.0, 849000.0), (3410000.0, 4274000.0)
 prop2d = {'topo': '1', 'base': '2', 'moho': '3'}
 prop3d = {'vp': '1', 'vs': '3', 'tag': '2'}
 voxet3d = {
@@ -19,84 +18,30 @@ voxet3d = {
     'lab':    ('CVM_HR', True),
 }
 
-
-def gtl_coords(delta_gtl=250.0):
-    """
-    Create GTL lon/lat mesh coordinates.
-    """
+def vs30_model(x, y, version='wald'):
+    import os, urllib, subprocess
     import numpy as np
-    import pyproj
-    proj = pyproj.Proj(**projection)
-    d = 0.5 * delta_gtl
-    x, y = extent_gtl
-    x = np.arange(x[0], x[1] + d, delta_gtl)
-    y = np.arange(y[0], y[1] + d, delta_gtl)
-    y, x = np.meshgrid(y, x)
-    x, y = proj(x, y, inverse=True)
-    return x, y
-
-
-def vs30_wald():
-    """
-    Wald, et al. Vs30 map.
-    """
-    import os
-    import numpy as np
-    from . import data
-    f = os.path.join(repo, 'cvmh-vs30-wald.npy')
-    if not os.path.exists(f):
-        x, y = gtl_coords()
-        v = data.vs30_wald([x, y])
-        np.save(f, v)
-    return extent_gtl, None, np.load(f)
-
-
-def vs30_wills(rebuild=False):
-    """
-    Wills and Clahan Vs30 map.
-    """
-    import os, sys, urllib, subprocess
-    import numpy as np
-    from . import interpolate
-
-    url = 'http://earth.usc.edu/~gely/cvm-data/cvmh-vs30-wills.npy'
-    filename = os.path.join(repo, os.path.basename(url))
-    if not rebuild:
-        if not os.path.exists(filename):
-            print('Downloading %s' % url)
-            urllib.urlretrieve(url, filename)
-        data = np.load(filename)
-    else:
-        data = vs30_wald()[2]
-        x, y = gtl_coords()
-        url = 'opensha.usc.edu:/export/opensha/data/siteData/wills2006.bin'
-        f = os.path.join(repo, os.path.basename(url))
+    from . import data, interpolate
+    if version not in ['wald', 'wills']:
+        raise Exception()
+    z = data.vs30_wald(x, y)
+    if version == 'wills':
+        delta = 0.000439344930055
+        x0 = -121.12460921883338
+        y0 = 32.53426695497164
+        u = 'http://earth.usc.edu/~gely/cvm-data/vs30-wills-cvmh.npy.gz'
+        f = os.path.join(repo, 'vs30-wills-cvmh.npy')
         if not os.path.exists(f):
-            print('Downloading %s' % url)
-            subprocess.check_call(['scp', url, f])
-        fh = open(f, 'rb')
-        dtype = '<i2'
-        bytes = np.dtype(dtype).itemsize
-        delta = 0.00021967246502752
-        nx, ny, nz = 49867, 1048, 42 # slowest, least memory
-        nx, ny, nz = 49867, 1834, 24 # medium
-        nx, ny, nz = 49867, 2751, 16 # fastest, most memory
-        x0, y0 = -124.52997177169, 32.441345502265
-        x1 = x0 + (nx - 1) * delta
-        print('Resampling Wills Vs30 (takes about 5 min)')
-        for k in range(nz):
-            sys.stdout.write('.')
-            sys.stdout.flush()
-            y1 = y0 + ((nz - k) * ny - 1) * delta
-            y2 = y0 + ((nz - k) * ny - ny) * delta
-            extent = (x0, x1), (y1, y2)
-            v = fh.read(nx * ny * bytes)
-            v = np.fromstring(v, dtype).astype('f').reshape((ny, nx)).T
-            v[v <= 0] = float('nan')
-            interpolate.interp2(extent, v, (x, y), data, bound=True, mask_nan=True)
-        print('')
-        np.save(filename, data)
-    return extent_gtl, None, data
+            print('Downloading %s' % u)
+            urllib.urlretrieve(u, f)
+            subprocess.check_call(['gunzip', f])
+        w = np.load(f, mmap_mode='c')
+        xlim = x0, x0 + delta * (w.shape[0] - 1)
+        ylim = y0, y0 + delta * (w.shape[1] - 1)
+        extent = xlim, ylim
+        interpolate.interp2(extent, w, (x, y), z, method='nearest',
+            bound=True, mask=True, no_data_val=0)
+    return z
 
 
 def nafe_drake(f):
@@ -242,7 +187,7 @@ class Model():
     Init parameters
     ---------------
     prop:
-        2d property: 'topo', 'base', 'moho', 'wald', or 'wills'
+        2d property: 'topo', 'base', 'moho'
         3d property: 'vp', 'vs', or 'tag'
     voxet:
         3d voxet list: ['mantle', 'crust', 'lab']
@@ -261,11 +206,7 @@ class Model():
     """
     def __init__(self, prop, voxet=['mantle', 'crust'], no_data_value=None, version='11.9.0'):
         self.prop = prop
-        if prop == 'wald':
-            self.voxet = [vs30_wald()]
-        elif prop == 'wills':
-            self.voxet = [vs30_wills()]
-        elif prop in prop2d:
+        if prop in prop2d:
             self.voxet = [cvmh_voxet(prop, version=version)]
         else:
             self.voxet = []
@@ -298,6 +239,7 @@ class Extraction():
     vs30: 'wills', 'wald', None, or Model object.
     topo: 'topo' or Model object.
     interpolation: 'nearest', or 'linear'.
+    geographic: X Y coordinate type, True for geographic, False for UTM.
     **kwargs: Keyword arguments passed to Model()
 
     Call parameters
@@ -312,32 +254,42 @@ class Extraction():
     out: Property samples at coordinates (x, y, z)
     """
 
-    def __init__(self, x, y, vm, vs30='wills', topo='topo', interpolation='nearest',
-        **kwargs):
+    def __init__(self, x, y, vm, vs30='wills', topo='topo',
+        interpolation='nearest', geographic=True, **kwargs):
         import numpy as np
         x = np.asarray(x)
         y = np.asarray(y)
-        if type(vm) is str:
+        if isinstance(vm, basestring):
             vm = Model(vm, **kwargs)
         if vm.prop in prop2d:
             raise Exception('Cannot extract 2D model')
         elif vm.prop == 'tag':
             vs30 = None
-        if type(topo) is str:
+        if isinstance(topo, basestring):
             topo = Model(topo, **kwargs)
+        if geographic:
+            import pyproj
+            lon, lat = x, y
+            proj = pyproj.Proj(**projection)
+            x, y = proj(lon, lat)
+            x = x.astype(lon.dtype)
+            y = y.astype(lat.dtype)
         z0 = topo(x, y, interpolation='linear')
-        if type(vs30) is str:
-            vs30 = Model(vs30, **kwargs)
         if vs30 is None:
             zt = None
         else:
             zt = 350.0
-            v0 = vs30(x, y, interpolation='linear')
+            if not geographic:
+                import pyproj
+                proj = pyproj.Proj(**projection)
+                lon, lat = proj(x, y, inverse=True)
+                lon = lon.astype(x.dtype)
+                lat = lat.astype(y.dtype)
+            v0 = vs30_model(lon, lat, vs30)
             if vm.prop == 'vp':
                 v0 = brocher_vp(v0)
             vt = vm(x, y, z0 - zt, interpolation=interpolation)
-            if 0: # FIXME add option for this
-                v0 = np.maximum(vt, v0)
+            v0 = np.minimum(vt, v0) # XXX new feature
             if np.isnan(vt).any():
                 print('WARNING: NaNs in GTL')
             self.gtl = v0, vt
@@ -374,7 +326,7 @@ class Extraction():
         return out
 
 
-def extract(x, y, z, vm=['rho', 'vp', 'vs'], geographic=True, by_depth=True, **kwargs):
+def extract(x, y, z, vm=['rho', 'vp', 'vs'], by_depth=True, **kwargs):
     """
     Simple CVM-H extraction.
 
@@ -382,7 +334,6 @@ def extract(x, y, z, vm=['rho', 'vp', 'vs'], geographic=True, by_depth=True, **k
     ----------
     x, y, z: Coordinates arrays
     vm: 'rho', 'vp', 'vs', 'tag', or Model object.
-    geographic: X Y coordinate type, True for geographic, False for UTM.
     by_depth: Z coordinate type, True for depth, False for elevation.
     **kwargs: Keyword arguments passed to Extraction()
 
@@ -391,18 +342,10 @@ def extract(x, y, z, vm=['rho', 'vp', 'vs'], geographic=True, by_depth=True, **k
     out: Property samples at coordinates (x, y, z)
     """
     import numpy as np
-    import pyproj
-
     x = np.asarray(x)
     y = np.asarray(y)
     if type(vm) not in [list, tuple]:
         vm = [vm]
-    if geographic:
-        proj = pyproj.Proj(**projection)
-        dtype = x.dtype
-        x, y = proj(x, y)
-        x = x.astype(dtype)
-        y = y.astype(dtype)
     out = []
     f = None
     for v in vm:

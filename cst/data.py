@@ -217,13 +217,13 @@ def globe30(tile=(0, 1), fill=True):
     return np.load(filename, mmap_mode='c')
 
 
-def dem(extent, scale=1.0, downsample=0):
+def dem(coords, scale=1.0, downsample=0, mesh=False):
     """
     Extract digital elevation model for given region.
 
     Parameters
     ----------
-    extent: (lon, lat)
+    coords: (lon, lat)
         If length of lon and lat are 2, they specify the region limits,
         otherwise they specify interpolation points
     scale: Scaling factor for elevation data
@@ -244,28 +244,28 @@ def dem(extent, scale=1.0, downsample=0):
     import math
     import numpy as np
     from . import interpolate
-    xx, yy = np.asarray(extent)
-    mesh = xx.size == 2 and yy.size == 2
-    if mesh:
-        xlim, ylim = extent
+    x, y = np.asarray(coords)
+    sample = x.size > 2 or y.size > 2
+    if sample:
+        xlim = x.min(), x.max()
+        ylim = y.min(), y.max()
     else:
-        xlim = xx.min(), xx.max()
-        ylim = yy.min(), yy.max()
+        xlim, ylim = coords
     if downsample > 0:
-        d = 60 // downsample
+        res = 60 // downsample
         x0, y0 = -180.0, -90.0
     else:
-        d = 120
-        x0 = -180.0 + 0.5 / d
-        y0 =  -90.0 + 0.5 / d
-    j0 = int(math.floor((xlim[0] - x0) % 360 * d))
-    j1 = int(math.ceil((xlim[1] - x0) % 360 * d))
-    k0 = int(math.floor((ylim[0] - y0) * d))
-    k1 = int(math.ceil((ylim[1] - y0) * d))
-    r = 1.0 / d
-    x = j0 * r + x0, j1 * r + x0
-    y = k0 * r + y0, k1 * r + y0
-    extent = x, y
+        res = 120
+        x0 = -180.0 + 0.5 / res
+        y0 =  -90.0 + 0.5 / res
+    j0 = int(math.floor((xlim[0] - x0) % 360 * res))
+    j1 = int(math.ceil((xlim[1] - x0) % 360 * res))
+    k0 = int(math.floor((ylim[0] - y0) * res))
+    k1 = int(math.ceil((ylim[1] - y0) * res))
+    delta = 1.0 / res
+    xlim = x0 + j0 * delta, x0 + j1 * delta
+    ylim = y0 + k0 * delta, y0 + k1 * delta
+    extent = xlim, ylim
     if downsample > 0:
         z = etopo1(downsample)[j0:j1,k0:k1]
     else:
@@ -281,18 +281,69 @@ def dem(extent, scale=1.0, downsample=0):
         z = globe30(tile0)[j0:j1+1,k0:k1+1]
         if downsample < 0:
             z = upsample(z)
-            d *= 2
+            res *= 2
     z = z * scale # always do this to convert to float
-    if mesh:
-        ddeg = 1.0 / d
+    if sample:
+        return interpolate.interp2(extent, z, (x, y))
+    elif mesh:
+        delta = 1.0 / res
         n = z.shape
-        x = x[0] + ddeg * np.arange(n[0])
-        y = y[0] + ddeg * np.arange(n[1])
+        x = xlim[0] + delta * np.arange(n[0])
+        y = ylim[0] + delta * np.arange(n[1])
         y, x = np.meshgrid(y, x)
         return (x, y, z)
     else:
-        return interpolate.interp2(extent, z, (xx, yy))
+        return extent, z
 topo = dem
+
+
+def vs30_wald(x, y, mesh=False, region='Western_US'):
+    """
+    Wald, et al. Vs30 map.
+    """
+    import os, math, gzip, urllib, cStringIO
+    import numpy as np
+    from . import interpolate
+    f = os.path.join(repo, 'vs30-wald-%s.npy') % region.lower().replace('_', '-')
+    u = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/%s.grd.gz'
+    if not os.path.exists(f):
+        u = u % region
+        print('Downloading %s' % u)
+        z = urllib.urlopen(u).read()
+        z = cStringIO.StringIO(z)
+        z = gzip.GzipFile(fileobj=z).read()[19512:]
+        z = np.fromstring(z, '>f').reshape((2400, 2280)).T
+        np.save(f, z)
+    x = np.asarray(x)
+    y = np.asarray(y)
+    sample = x.size > 2 or y.size > 2
+    if sample:
+        xlim = x.min(), x.max()
+        ylim = y.min(), y.max()
+    else:
+        xlim, ylim = x, y
+    res = 120
+    delta = 1.0 / res
+    x0 = -125.0 + 0.5 * delta
+    y0 =   30.0 + 0.5 * delta
+    j0 = int(math.floor((xlim[0] - x0) % 360 * res))
+    j1 = int(math.ceil((xlim[1] - x0) % 360 * res))
+    k0 = int(math.floor((ylim[0] - y0) * res))
+    k1 = int(math.ceil((ylim[1] - y0) * res))
+    xlim = x0 + j0 * delta, x0 + j1 * delta
+    ylim = y0 + k0 * delta, y0 + k1 * delta
+    extent = xlim, ylim
+    z = np.load(f, mmap_mode='c')[j0:j1+1,k0:k1+1]
+    if sample:
+        return interpolate.interp2(extent, z, (x, y), method='linear')
+    elif mesh:
+        n = z.shape
+        x = xlim[0] + delta * np.arange(n[0])
+        y = ylim[0] + delta * np.arange(n[1])
+        y, x = np.meshgrid(y, x)
+        return (x, y, z)
+    else:
+        return extent, z
 
 
 def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0, max_level=4, delta=None, clip=1):
@@ -383,31 +434,6 @@ def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0
         yy = np.concatenate(yy)[:-1]
     return np.array([xx, yy], 'f')
 
-def vs30_wald(coords=None):
-    """
-    Wald, et al. Vs30 map.
-    """
-    import os, urllib, gzip, cStringIO
-    import numpy as np
-    from . import interpolate
-    f = os.path.join(repo, 'vs30-wald.npy')
-    u = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/Western_US.grd.gz'
-    if not os.path.exists(f):
-        print('Downloading %s' % u)
-        v = urllib.urlopen(u).read()
-        v = cStringIO.StringIO(v)
-        v = gzip.GzipFile(fileobj=v).read()[19512:]
-        v = np.fromstring(v, '>f').reshape((2400, 2280)).T
-        np.save(f, v)
-    v = np.load(f, mmap_mode='c')
-    d = 0.25 / 60
-    x = -125.0 + d, -106.0 - d
-    y =   30.0 + d,   50.0 - d
-    extent = x, y
-    if coords == None:
-        return v, extent
-    else:
-        return interpolate.interp2(extent, v, coords, method='linear')
 
 def us_place_names():
     """

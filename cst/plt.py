@@ -238,10 +238,12 @@ def contour(*args, **kwargs):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     if concat:
-        for cc in ax.contour(*args, **kwargs).collections:
+        for ccc in ax.contour(*args, **kwargs).collections:
             p = []
-            for c in cc.get_paths():
-                p += c.to_polygons() + [[[float('nan'), float('nan')]]]
+            for cc in ccc.get_paths():
+                p += cc.to_polygons() + [[[float('nan'), float('nan')]]]
+                #for c in cc.to_polygons():
+                #    p += [c, [[float('nan'), float('nan')]]]
             if p:
                 del p[-1]
                 pp += [np.concatenate(p).T]

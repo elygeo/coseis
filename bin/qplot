@@ -8,9 +8,10 @@ plot [options] <datafile>
 
 Options
 -------
--d <dtype>     NumpPy dtype string
 -c <clim>      Set upper color scale limit to constant value.
+-d <dtype>     NumpPy dtype string
 -p <exponent>  Eponent power applied to data
+-s <step>      Decimate data
 -t             Transpose data
 """
 import os, sys, imp, getopt
@@ -34,13 +35,16 @@ def plot(*argv):
     Quick multi-purpose plotting.
     """
     # options
-    opts, args = getopt.getopt(argv, 'c:d:p:t')
+    opts, args = getopt.getopt(argv, 'c:d:p:s:t')
     opts = dict(opts)
-    clim = None
     power = None
+    step = None
+    clim = None
     transpose = '-t' in opts
     if '-p' in opts:
         power = float(opts['-p'])
+    if '-s' in opts:
+        step = int(opts['-s'])
     if '-c' in opts:
         clim = float(opts['-c'])
         clim = -clim, clim
@@ -56,7 +60,7 @@ def plot(*argv):
         title = os.path.splitext(os.path.split(filename)[-1])[0]
         delta = None
         dtype = 'f'
-        if '-t' in opts:
+        if '-d' in opts:
             dtype = opts['-d'].replace('l', '<').replace('b', '>')
 
         # read text file
@@ -134,6 +138,8 @@ def plot(*argv):
 
         # plot
         if len(shape) == 1:
+            if step:
+                data = data[::step]
             stats(data, title)
             if power:
                 data = data ** power
@@ -144,12 +150,16 @@ def plot(*argv):
                 data = data.T
                 shape = data.shape
             if shape[0] == 2:
+                if step:
+                    data = data[:,::step]
                 stats(data[0], title)
                 stats(data[1], title)
                 if power:
                     data = data[0], data[1] ** power
                 ax.plot(data[0], data[1])
             else:
+                if step:
+                    data = data[::step,::step]
                 stats(data, title)
                 if power:
                     data = data ** power
@@ -161,6 +171,8 @@ def plot(*argv):
             n = shape[0] * shape[1]
             for it in range(shape[2]):
                 data = np.fromfile(fh, dtype, n).reshape(shape[1::-1]).T
+                if step:
+                    data = data[::step,::step]
                 if transpose:
                     data = data.T
                 stats(data, '%s %s' % (title, it * delta[2]))

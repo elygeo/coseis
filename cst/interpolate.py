@@ -2,7 +2,7 @@
 Interpolation tools.
 """
 
-def interp(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
+def interp(xlim, f, xi, fi=None, method='nearest', bound=False, mask=False, no_data_val='nan'):
     """
     1D piecewise interpolation of function values specified on regular grid.
 
@@ -15,7 +15,8 @@ def interp(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
     method: Interpolation method, 'nearest' or 'linear'.
     bound: If true, do not extrapolation values outside the coordinate range. A
         tuple species the left and right boundaries independently.
-    mask_nan: If true and `fi` is passed, NaNs are masked from output.
+    mask: If true and `fi` is passed, non_data_vals are masked from output.
+    no_data_val: value to insert for empty data.
 
     Returns
     -------
@@ -26,11 +27,13 @@ def interp(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
     f = np.asarray(f)
     xi = np.asarray(xi)
 
-   # test for empty data
+    # test for empty data
+    if no_data_val == 'nan':
+        no_data_val = float('nan')
     if f.size == 0:
         if fi is None:
             fi = np.empty_like(xi)
-            fi.fill(float('nan'))
+            fi.fill(no_data_val)
         return fi
 
     # logical coordinates
@@ -41,11 +44,11 @@ def interp(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
     x = (x - x_[0]) / (x_[1] - x_[0]) * (nx - 1)
 
     # compute mask
-    mask = False
+    m = False
     if type(bound) not in (tuple, list):
         bound = bound, bound
-    if bound[0]: mask = mask | (x < 0)
-    if bound[1]: mask = mask | (x > nx - 1)
+    if bound[0]: m = m | (x < 0)
+    if bound[1]: m = m | (x > nx - 1)
     x = np.minimum(np.maximum(x, 0), nx - 1)
 
     # NaNs
@@ -65,22 +68,24 @@ def interp(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
 
     # apply mask
     if fi is None:
-        nans = nans | mask
-        f[...,nans] = float('nan')
+        nans = nans | m
+        f[...,nans] = no_data_val
         fi = f
     else:
-        if mask_nan:
-            mask = mask | nans | np.isnan(f)
+        if not mask:
+            f[...,nans] = no_data_val
+        elif str(no_data_val) == 'nan':
+            m = m | nans | np.isnan(f)
         else:
-            f[...,nans] = float('nan')
-        if mask is False:
+            m = m | nans | (f == no_data_val)
+        if m is False:
             fi[...] = f[...]
         else:
-            fi[...,~mask] = f[...,~mask]
+            fi[...,~m] = f[...,~m]
     return fi
 
 
-def interp2(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
+def interp2(xlim, f, xi, fi=None, method='nearest', bound=False, mask=False, no_data_val='nan'):
     """
     2D piecewise interpolation of function values specified on regular grid.
 
@@ -93,10 +98,12 @@ def interp2(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False)
     xi = np.asarray(xi)
 
     # test for empty data
+    if no_data_val == 'nan':
+        no_data_val = float('nan')
     if f.size == 0:
         if fi is None:
             fi = np.empty_like(xi)
-            fi.fill(float('nan'))
+            fi.fill(no_data_val)
         return fi
 
     # logical coordinates
@@ -108,14 +115,14 @@ def interp2(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False)
     y = (y - y_[0]) / (y_[1] - y_[0]) * (ny - 1)
 
     # compute mask
-    mask = False
+    m = False
     if type(bound) not in (tuple, list):
         bound = [(bound, bound)] * 2
     bx, by = bound
-    if bx[0]: mask = mask | (x < 0)
-    if by[0]: mask = mask | (y < 0)
-    if bx[1]: mask = mask | (x > nx - 1)
-    if by[1]: mask = mask | (y > ny - 1)
+    if bx[0]: m = m | (x < 0)
+    if by[0]: m = m | (y < 0)
+    if bx[1]: m = m | (x > nx - 1)
+    if by[1]: m = m | (y > ny - 1)
     x = np.minimum(np.maximum(x, 0), nx - 1)
     y = np.minimum(np.maximum(y, 0), ny - 1)
 
@@ -142,22 +149,24 @@ def interp2(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False)
 
     # apply mask
     if fi is None:
-        nans = nans | mask
-        f[...,nans] = float('nan')
+        nans = nans | m
+        f[...,nans] = no_data_val
         fi = f
     else:
-        if mask_nan:
-            mask = mask | nans | np.isnan(f)
+        if not mask:
+            f[...,nans] = no_data_val
+        elif str(no_data_val) == 'nan':
+            m = m | nans | np.isnan(f)
         else:
-            f[...,nans] = float('nan')
-        if mask is False:
+            m = m | nans | (f == no_data_val)
+        if m is False:
             fi[...] = f[...]
         else:
-            fi[...,~mask] = f[...,~mask]
+            fi[...,~m] = f[...,~m]
     return fi
 
 
-def interp3(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False):
+def interp3(xlim, f, xi, fi=None, method='nearest', bound=False, mask=False, no_data_val='nan'):
     """
     3D piecewise interpolation of function values specified on regular grid.
 
@@ -170,10 +179,12 @@ def interp3(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False)
     xi = np.asarray(xi)
 
     # test for empty data
+    if no_data_val == 'nan':
+        no_data_val = float('nan')
     if f.size == 0:
         if fi is None:
             fi = np.empty_like(xi)
-            fi.fill(float('nan'))
+            fi.fill(no_data_val)
         return fi
 
     # logical coordinates
@@ -186,16 +197,16 @@ def interp3(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False)
     z = (z - z_[0]) / (z_[1] - z_[0]) * (nz - 1)
 
     # compute mask
-    mask = False
+    m = False
     if type(bound) not in (tuple, list):
         bound = [(bound, bound)] * 3
     bx, by, bz = bound
-    if bx[0]: mask = mask | (x < 0)
-    if by[0]: mask = mask | (y < 0)
-    if bz[0]: mask = mask | (z < 0)
-    if bx[1]: mask = mask | (x > nx - 1)
-    if by[1]: mask = mask | (y > ny - 1)
-    if bz[1]: mask = mask | (z > nz - 1)
+    if bx[0]: m = m | (x < 0)
+    if by[0]: m = m | (y < 0)
+    if bz[0]: m = m | (z < 0)
+    if bx[1]: m = m | (x > nx - 1)
+    if by[1]: m = m | (y > ny - 1)
+    if bz[1]: m = m | (z > nz - 1)
     x = np.minimum(np.maximum(x, 0), nx - 1)
     y = np.minimum(np.maximum(y, 0), ny - 1)
     z = np.minimum(np.maximum(z, 0), nz - 1)
@@ -230,22 +241,24 @@ def interp3(xlim, f, xi, fi=None, method='nearest', bound=False, mask_nan=False)
 
     # apply mask
     if fi is None:
-        nans = nans | mask
-        f[...,nans] = float('nan')
+        nans = nans | m
+        f[...,nans] = no_data_val
         fi = f
     else:
-        if mask_nan:
-            mask = mask | nans | np.isnan(f)
+        if not mask:
+            f[...,nans] = no_data_val
+        elif str(no_data_val) == 'nan':
+            m = m | nans | np.isnan(f)
         else:
-            f[...,nans] = float('nan')
-        if mask is False:
+            m = m | nans | (f == no_data_val)
+        if m is False:
             fi[...] = f[...]
         else:
-            fi[...,~mask] = f[...,~mask]
+            fi[...,~m] = f[...,~m]
     return fi
 
 
-def trinterp(x, f, t, xi, fi=None):
+def trinterp(x, f, t, xi, fi=None, no_data_val=float('nan')):
     """
     2D linear interpolation of function values specified on triangular mesh.
 
@@ -269,7 +282,7 @@ def trinterp(x, f, t, xi, fi=None):
     xi, yi = xi
     if fi == None:
         fi = np.empty_like(xi)
-        fi.fill(float('nan'))
+        fi.fill(no_data_val)
 
     # tolerance
     lmin = -0.000001
