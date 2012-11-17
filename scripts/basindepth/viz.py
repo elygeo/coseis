@@ -177,16 +177,16 @@ fig.scene.parallel_projection = True
 fig.scene.camera.parallel_scale = axis[3]
 
 # combine overlay and save image
-print f
+print outfile
 out = cst.mlab.screenshot(fig)
 if outfile.endswith('pdf'):
     out = cst.viz.img2pdf(out, dpi=dpi)
     out = cst.viz.pdf_merge((out, over))
-    open(f, 'wb').write(out.getvalue())
+    open(outfile, 'wb').write(out.getvalue())
 else:
     out = Image.fromarray(out, 'RGB')
     out.paste(over, mask=over)
-    out.save(f)
+    out.save(outfile)
 
 fig.scene.disable_render = False
 

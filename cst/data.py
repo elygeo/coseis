@@ -335,7 +335,8 @@ def vs30_wald(x, y, mesh=False, region='Western_US'):
     extent = xlim, ylim
     z = np.load(f, mmap_mode='c')[j0:j1+1,k0:k1+1]
     if sample:
-        return interpolate.interp2(extent, z, (x, y), method='linear')
+        z = interpolate.interp2(extent, z, (x, y), method='linear')
+        return z
     elif mesh:
         n = z.shape
         x = xlim[0] + delta * np.arange(n[0])

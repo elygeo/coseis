@@ -102,7 +102,7 @@ def interp2(xlim, f, xi, fi=None, method='nearest', bound=False, mask=False, no_
         no_data_val = float('nan')
     if f.size == 0:
         if fi is None:
-            fi = np.empty_like(xi)
+            fi = np.empty_like(xi[0])
             fi.fill(no_data_val)
         return fi
 
@@ -183,7 +183,7 @@ def interp3(xlim, f, xi, fi=None, method='nearest', bound=False, mask=False, no_
         no_data_val = float('nan')
     if f.size == 0:
         if fi is None:
-            fi = np.empty_like(xi)
+            fi = np.empty_like(xi[0])
             fi.fill(no_data_val)
         return fi
 

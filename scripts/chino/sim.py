@@ -157,9 +157,9 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     # save metadata
     os.link(mesh + 'box.txt', path + 'box.txt')
     s = '\n'.join([
-        f1 = open(mesh + 'meta.py').read(),
-        f2 = open(mts).read(),
-        f3 = open(path + 'meta.py').read(),
+        open(mesh + 'meta.py').read(),
+        open(mts).read(),
+        open(path + 'meta.py').read(),
     ])
     open(path + 'meta.py', 'w').write(s)
 

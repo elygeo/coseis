@@ -4,7 +4,6 @@ Map plot
 """
 import os, imp
 import numpy as np
-import matplotlib.pyplot as plt
 import pyproj
 from obspy.imaging import beachball
 import cst

@@ -129,7 +129,6 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         )
         open('Makefile', 'w').write(m)
         subprocess.check_call(['make'])
-        asdf
 
         # launch mesher
         shutil.copy2('mesh.py', path)
