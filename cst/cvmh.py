@@ -299,6 +299,7 @@ class Extraction():
 
     def __call__(self, z, out=None, min_depth=None, by_depth=True):
         import numpy as np
+        from . import vm1d
         x, y, z0, zt = self.x, self.y, self.z0, self.zt
         vm, interpolation = self.vm, self.interpolation
         z = np.asarray(z)
@@ -315,14 +316,8 @@ class Extraction():
                 min_depth = z.min()
             if min_depth < zt:
                 v0, vt = self.gtl
-                a = 0.5
-                b = 2.0 / 3.0
-                c = 2.0
-                z = z / zt
-                f = z + b * (z - z * z)
-                g = a - (a + 3.0 * c) * z + c * z * z + 2.0 * c * np.sqrt(z)
-                i = z < 1.0
-                out[i] = (f * vt + g * v0)[i]
+                i = z < zt
+                out[i] = vm1d.vs30gtl(v0, vt, z, zt)[i]
         return out
 
 
