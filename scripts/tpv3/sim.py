@@ -27,8 +27,8 @@ runs = [
     (100.0, (1, 1, 1)),
 ]
 runs = [( 50.0, (1, 1, 1))]
-runs = [(150.0, (1, 1, 1))]
 runs = [(300.0, (1, 1, 1))]
+runs = [(150.0, (1, 1, 2))]
 
 # near side boundary conditions:
 # PML absorbing boundaries for the x, y and z boundaries

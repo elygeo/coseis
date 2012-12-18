@@ -297,7 +297,7 @@ def dem(coords, scale=1.0, downsample=0, mesh=False):
 topo = dem
 
 
-def vs30_wald(x, y, mesh=False, region='Western_US'):
+def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):
     """
     Wald, et al. Vs30 map.
     """
@@ -335,7 +335,7 @@ def vs30_wald(x, y, mesh=False, region='Western_US'):
     extent = xlim, ylim
     z = np.load(f, mmap_mode='c')[j0:j1+1,k0:k1+1]
     if sample:
-        z = interpolate.interp2(extent, z, (x, y), method='linear')
+        z = interpolate.interp2(extent, z, (x, y), method=method)
         return z
     elif mesh:
         n = z.shape

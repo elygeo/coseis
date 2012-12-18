@@ -18,14 +18,18 @@ voxet3d = {
     'lab':    ('CVM_HR', True),
 }
 
-def vs30_model(x, y, version='wald'):
+def vs30_model(x, y, version='wills+wald', method='nearest'):
     import os, urllib, subprocess
     import numpy as np
     from . import data, interpolate
-    if version not in ['wald', 'wills']:
+    if version not in ['wills', 'wald', 'wills+wald']:
         raise Exception()
-    z = data.vs30_wald(x, y)
-    if version == 'wills':
+    if 'wald' in version:
+        z = data.vs30_wald(x, y, method=method)
+    else:
+        z = np.empty_like(x)
+        z.fill(float('nan'))
+    if 'wills' in version:
         delta = 0.000439344930055
         x0 = -121.12460921883338
         y0 = 32.53426695497164
@@ -39,7 +43,7 @@ def vs30_model(x, y, version='wald'):
         xlim = x0, x0 + delta * (w.shape[0] - 1)
         ylim = y0, y0 + delta * (w.shape[1] - 1)
         extent = xlim, ylim
-        interpolate.interp2(extent, w, (x, y), z, method='nearest',
+        interpolate.interp2(extent, w, (x, y), z, method=method,
             bound=True, mask=True, no_data_val=0)
     return z
 
@@ -65,6 +69,14 @@ def brocher_vp(f):
     f *= 1000.0
     return f
 
+def ely_vp(f):
+    """
+    V_p derived from V_s via Ely (2012).
+    """
+    import numpy as np
+    f = np.asarray(f)
+    f = 400.0 + 1.4 * f
+    return f
 
 def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version='11.9.0'):
     """
@@ -236,7 +248,7 @@ class Extraction():
     ---------------
     x, y: Coordinates arrays
     vm: 'vp', 'vs', 'tag', or Model object.
-    vs30: 'wills', 'wald', None, or Model object.
+    vs30: 'wills', 'wald', 'wills+wald', None, or Model object.
     topo: 'topo' or Model object.
     interpolation: 'nearest', or 'linear'.
     geographic: X Y coordinate type, True for geographic, False for UTM.
@@ -254,7 +266,7 @@ class Extraction():
     out: Property samples at coordinates (x, y, z)
     """
 
-    def __init__(self, x, y, vm, vs30='wills', topo='topo',
+    def __init__(self, x, y, vm, vs30='wills+wald', topo='topo',
         interpolation='nearest', geographic=True, **kwargs):
         import numpy as np
         x = np.asarray(x)
@@ -287,7 +299,7 @@ class Extraction():
                 lat = lat.astype(y.dtype)
             v0 = vs30_model(lon, lat, vs30)
             if vm.prop == 'vp':
-                v0 = brocher_vp(v0)
+                v0 = ely_vp(v0)
             vt = vm(x, y, z0 - zt, interpolation=interpolation)
             v0 = np.minimum(vt, v0) # XXX new feature
             if np.isnan(vt).any():
@@ -317,7 +329,7 @@ class Extraction():
             if min_depth < zt:
                 v0, vt = self.gtl
                 i = z < zt
-                out[i] = vm1d.vs30gtl(v0, vt, z, zt)[i]
+                out[i] = vm1d.v30gtl(v0, vt, z, zt)[i]
         return out
 
 
