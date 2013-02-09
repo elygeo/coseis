@@ -3,12 +3,13 @@ ALCF IBM Blue Gene/Q
 
 install location:
 vesta.alcf.anl.gov:/gpfs/vesta_scratch/projects/
+mira.alcf.anl.gov:/gpfs/mira-fs0/projects/
 
 .soft:
 PYTHONPATH += $HOME/coseis
 PATH += $HOME/coseis/bin
-PATH += /gpfs/vesta_home/gely/local/${ARCH##*-}/bin
-MANPATH += /gpfs/vesta_home/gely/local/${ARCH##*-}/man
+PATH += /home/gely/local/${ARCH##*-}/bin
+MANPATH += /home/gely/local/${ARCH##*-}/man
 +mpiwrapper-xl
 @default
 """
@@ -17,9 +18,13 @@ MANPATH += /gpfs/vesta_home/gely/local/${ARCH##*-}/man
 account = 'GroundMotion_esp'
 
 # machine properties
-maxnodes = 1024
 maxcores = 16
 maxram = 16384
+host_opts = {
+    'vesta': {'maxnodes': 1024,  'maxtime': 120},
+    'cetus': {'maxnodes': 1024,  'maxtime': 120},
+    'mira':  {'maxnodes': 49152, 'maxtime': 720},
+}
 
 # MPI
 build_ldflags = '-g -O3 -qsuppress=cmpmsg'
