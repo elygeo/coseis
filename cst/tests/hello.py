@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
 def make():
-    import subprocess
+    import os, subprocess
     import cst
     d = cst.util.configure()
-    m = open('Makefile.in').read().format(**d)
-    open('Makefile', 'w').write(m)
+    if d.force or not os.path.exists('Makefile'):
+        m = open('Makefile.in').read().format(**d)
+        open('Makefile', 'w').write(m)
     subprocess.check_call(['make'])
     return
 
