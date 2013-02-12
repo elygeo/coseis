@@ -384,3 +384,17 @@ def explore(faults=None, split=False, basemap=True):
     print "\nPress H in the figure window for help."
     mlab.show()
 
+
+def cubit_facet(fault):
+    """
+    Create CUBIT Facet File text representation
+    """
+    x, y, z = fault.x, fault.y, fault.x
+    j, k, l = fault.tri
+    out = '%s %s\n' % (x.size, j.size)
+    for i in range(x.size):
+        out += '%s %s %s %s\n' % (i, x[i], y[i], z[i])
+    for i in range(j.size):
+        out += '%s %s %s %s\n' % (i, j[i], k[i], l[i])
+    return out
+
