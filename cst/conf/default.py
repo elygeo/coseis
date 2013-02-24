@@ -110,7 +110,7 @@ echo "$( date ): {name} finished" >> {name}.out
 # detect machine from the hostname
 for m, h in [
     ('alcf_bgq', 'vestalac1.ftd.alcf.anl.gov'),
-    ('alcf_bgq', 'cetuslac1.ftd.alcf.anl.gov'),
+    ('alcf_bgq', 'cetuslac1.fst.alcf.anl.gov'),
     ('alcf_bgq', 'miralac1.fst.alcf.anl.gov'),
     ('alcf_bgp', 'surveyor.alcf.anl.gov'),
     ('alcf_bgp', 'challenger.alcf.anl.gov'),
