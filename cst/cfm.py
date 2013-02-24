@@ -299,10 +299,10 @@ def explore(faults=None, split=False, basemap=True):
 
     # DEM
     if basemap:
-        dem, extent = data.dem(extent, mesh=True)
-        x, y, z = dem
+        x, y, dem = data.dem(extent, mesh=True)
+        extent = (x.min(), x.max()), (y.min(), y.max())
         x, y = proj(x, y)
-        mlab.mesh(x, y, z, color=(1,1,1), opacity=0.3)
+        mlab.mesh(x, y, dem, color=(1,1,1), opacity=0.3)
 
     # base map
     if basemap:
@@ -313,7 +313,7 @@ def explore(faults=None, split=False, basemap=True):
             data.mapdata('borders', resolution, extent, delta=ddeg),
         ]
         x -= 360.0
-        z = interpolate.interp2(extent, dem[2], (x, y))
+        z = interpolate.interp2(extent, dem, (x, y))
         x, y = proj(x, y)
         i = np.isnan(z)
         x[i] = float('nan')
@@ -385,11 +385,14 @@ def explore(faults=None, split=False, basemap=True):
     mlab.show()
 
 
-def cubit_facet(fault):
+def cubit_facet(fault, geographic=False):
     """
     Create CUBIT Facet File text representation
     """
-    x, y, z = fault.x, fault.y, fault.x
+    if geographic:
+        x, y, z = fault.lon, fault.lat, fault.z
+    else:
+        x, y, z = fault.x, fault.y, fault.z
     j, k, l = fault.tri
     out = '%s %s\n' % (x.size, j.size)
     for i in range(x.size):

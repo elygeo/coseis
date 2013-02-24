@@ -126,6 +126,6 @@ for m, h in [
         break
 
 # clean up the namespace
-del(m, h)
-del(os, sys, pwd, socket, np, find)
+del(m, h, find)
+del(os, sys, pwd, socket, multiprocessing, np)
 
