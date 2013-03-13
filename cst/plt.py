@@ -167,7 +167,7 @@ def savefig(fig, fh=None, format=None, distill=False, **kwargs):
         fig.savefig(out, format=format, **kwargs)
         out.reset()
     if fh is None:
-        return(out)
+        return out
     else:
         with fh:
             fh.write(out.getvalue())

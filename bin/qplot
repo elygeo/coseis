@@ -23,10 +23,15 @@ def stats(f, msg=''):
     """
     Display statistic of a NumPy array f with optional message.
     """
-    i = ~np.isnan(f)
-    rmin = f[i].min().copy()
-    rmax = f[i].max().copy()
-    rmean = f[i].astype('d').mean()
+    if f.size > 0:
+        i = ~np.isnan(f)
+        rmin = f[i].min().copy()
+        rmax = f[i].max().copy()
+        rmean = f[i].astype('d').mean()
+    else:
+        rmin = float('nan')
+        rmax = float('nan')
+        rmean = float('nan')
     print('%12g %12g %12g  %s  %s' % (rmin, rmax, rmean, f.shape, msg))
     return
 
@@ -66,6 +71,7 @@ def plot(*argv):
         # read text file
         if filename.lower().endswith('.txt'):
             data = np.loadtxt(filename).T
+            shape = data.shape
 
         # read SAC file
         elif filename.lower().endswith('.sac'):

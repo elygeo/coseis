@@ -2,7 +2,7 @@
 """
 Material model extraction from CVM
 """
-import os, imp, shutil, subprocess
+import os, json, shutil, subprocess
 import numpy as np
 import pyproj
 import cst
@@ -23,14 +23,14 @@ label = 'ch'
 
 # moment tensor source
 eventid = 14383980
-mts = os.path.join('run', 'data', '%s.mts.py' % eventid)
-mts = imp.load_source('mts', mts)
+mts = os.path.join('run', 'data', '%s.mts.txt' % eventid)
+mts = json.load(mts)
 
 # mesh parameters
 rotate = None
 s, d = 1000.0, 0.5 * dx
 bounds = (-80 * s + d, 48 * s - d), (-58 * s + d, 54 * s - d), (0.0, 48 * s - dx)
-origin = mts.longitude, mts.latitude, mts.depth
+origin = mts['longitude'], mts['latitude'], mts['depth']
 
 # projection
 projection = dict(proj='tmerc', lon_0=origin[0], lat_0=origin[1])
@@ -106,6 +106,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     os.makedirs(path + 'hold')
 
     # save data
+    #json.dump(meta, open('meta.txt', 'w'))
     cst.util.save(path + 'meta.py', meta, header='# mesh parameters\n')
     np.savetxt(path + 'box.txt', np.array(box, 'f').T)
     x.astype('f').T.tofile(path + 'lon.bin')

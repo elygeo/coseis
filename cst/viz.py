@@ -2,50 +2,38 @@
 Visualization tools.
 """
 
-def distill_eps(fh, mode=None):
+def distill_eps(eps):
     """
     Distill EPS to PDF using Ghostscript.
     """
-    import subprocess, cStringIO
-    if type(fh) == str:
-        fh = cStringIO.StringIO(fh)
-    cmd = 'ps2pdf', '-dEPSCrop', '-dPDFSETTINGS=/prepress', '-', '-'
-    pid = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    fh = pid.communicate(fh.getvalue())[0]
-    if mode != 'str':
-        fh = cStringIO.StringIO(fh)
-        fh.reset()
-    return(fh)
+    from subprocess import Popen, PIPE
+    p = 'ps2pdf', '-dEPSCrop', '-dPDFSETTINGS=/prepress', '-', '-'
+    p = Popen(p, stdin=PIPE, stdout=PIPE).communicate(eps)[0]
+    return p
 
-def pdf2png(path, dpi=72, mode=None):
+def pdf2png(pdf, dpi=72):
     """
-    Rasterize a PDF file using Ghostscript.
+    Rasterize PDF to PNG using Ghostscript.
     """
-    import subprocess, cStringIO
-    cmd = 'gs', '-q', '-r%s' % dpi, '-dNOPAUSE', '-dBATCH', '-sDEVICE=pngalpha', '-sOutputFile=-', path
-    pid = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-    out = pid.communicate()[0]
-    if mode != 'str':
-        out = cStringIO.StringIO(out)
-        out.reset()
-    return(out)
+    from subprocess import Popen, PIPE
+    p = 'gs', '-q', '-r%s' % dpi, '-dNOPAUSE', '-dBATCH', '-sDEVICE=pngalpha', '-sOutputFile=-', '-'
+    p = Popen(p, stdin=PIPE, stdout=PIPE).communicate(pdf)[0]
+    return p
 
-def img2pdf(img, dpi=150, mode=None):
+def img2pdf(img, dpi=150):
     """
     Convert image array to PDF using PIL and ImageMagick.
     """
-    import subprocess, cStringIO
-    import Image
-    img = Image.fromarray(img)
-    s = cStringIO.StringIO()
-    img.save(s, format='png')
-    c = 'convert', '-density', str(dpi), 'png:-', 'pdf:-'
-    p = subprocess.Popen(c, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    s = p.communicate(s.getvalue())[0]
-    if mode != 'str':
-        s = cStringIO.StringIO(s)
-        s.reset()
-    return(s)
+    from subprocess import Popen, PIPE
+    import cStringIO, Image
+    p = cStringIO.StringIO()
+    #img = Image.fromarray(img)
+    #img.save(p, format='png')
+    Image.fromarray(img).save(p, format='png')
+    img = p.getvalue()
+    p = 'convert', '-density', str(dpi), 'png:-', 'pdf:-'
+    p = Popen(p, stdin=PIPE, stdout=PIPE).communicate(img)[0]
+    return p
 
 def pdf_merge(layers):
     """
@@ -64,7 +52,7 @@ def pdf_merge(layers):
     pdf.addPage(page)
     pdf.write(out)
     out.reset()
-    return(out)
+    return out
 
 def colormap(cmap, colorexp=1.0, nmod=0, modlim=0.5, upsample=True, invert=False):
     """

@@ -84,9 +84,9 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     # source
     prm.source = 'moment'
     prm.pulse = 'brune'
-    mts = os.path.join('run', 'data', '14383980.mts.py')
-    m = imp.load_source(mts)
-    d = m.double_couple_clvd
+    mts = os.path.join('run', 'data', '14383980.mts.txt')
+    mts = json.load(mts)
+    d = mts['double_couple_clvd']
     prm.source1 =  d['myy'],  d['mxx'],  d['mzz']
     prm.source2 = -d['mxz'], -d['myz'],  d['mxy']
 
@@ -158,7 +158,8 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     os.link(mesh + 'box.txt', path + 'box.txt')
     s = '\n'.join([
         open(mesh + 'meta.py').read(),
-        open(mts).read(),
+        '# source parameters',
+        util.dumps(mts),
         open(path + 'meta.py').read(),
     ])
     open(path + 'meta.py', 'w').write(s)

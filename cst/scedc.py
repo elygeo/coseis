@@ -146,7 +146,7 @@ class stp():
         return out
 
 
-def mts(eventid, path='scsn-mts-%s.py'):
+def mts(eventid):
     """
     Retrieve Moment Tensor Solution (MTS)
 
@@ -168,18 +168,10 @@ def mts(eventid, path='scsn-mts-%s.py'):
     source1 =  m['myy'],  m['mxx'],  m['mzz']
     source2 = -m['mxz'], -m['myz'],  m['mxy']
     """
-    import os, urllib
-    from . import util
+    import urllib
     url = 'http://www.data.scec.org/MomentTensor/solutions/%s/' % eventid
     url = 'http://www.data.scec.org/MomentTensor/showMT.php?evid=%s' % eventid
-    try:
-        path = path % eventid
-    except TypeError:
-        pass
-    if os.path.exists(path):
-        mts = {}
-        exec(open(path).read()) in mts
-        return mts
+
     print('Retrieving %s' % url)
     text = urllib.urlopen(url)
     mts = dict(
@@ -238,6 +230,5 @@ def mts(eventid, path='scsn-mts-%s.py'):
     mts['double_couple_clvd'] = clvd
     mts['double_couple'] = dc
     mts['depth'] *= 1000.0
-    util.save(path, mts, header='# SCSN moment tensor solution\n' )
     return mts
 

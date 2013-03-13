@@ -7,7 +7,9 @@ from . import parameters as parameters_default
 launch # silence pyflakes warning
 
 def parameters():
-    return storage(**parameters_default.__dict__)
+    d = parameters_default.__dict__
+    d = {k: d[k] for k in d if not k.startswith('_')}
+    return storage(**d)
 
 class get_slices:
     def __getitem__(self, item):
@@ -107,23 +109,37 @@ def stage(prm, **kwargs):
     """
     Stage job
     """
-    import os, shutil
+    import os, re, shutil
     from .. import util
 
     print('\nSORD: Support Operator Rupture Dynamics')
 
-    # parameters
+    # old-style parameters
     if type(prm) == dict:
+        import numpy
+        keep_types = (
+            [type(None), bool, str, unicode, int, long, float, tuple, list, dict] +
+            numpy.typeDict.values()
+        )
         print('Warning: using old-style parameters')
-        kwargs = util.prune(prm.copy(), '(^_)|(_$)|(^.$)|(^..$)')
-        kwargs.update(kwargs)
-        prm = parameters()
-        for k in kwargs.copy():
-            if k in prm:
-                prm[k] = kwargs[k]
-                del(kwargs[k])
+        grep = re.compile('(^_)|(_$)|(^.$)|(^..$)')
+        prm_ = parameters()
+        kwargs_ = {}
+        for k in prm:
+            if grep.search(k):
+                continue
+            if type(prm[k]) not in keep_types:
+                continue
+            if k in prm_:
+                prm_[k] = prm[k]
+            else:
+                kwargs_[k] = prm[k]
+        kwargs_.update(kwargs)
+        prm, kwargs = prm_, kwargs_
     else:
         prm = util.storage(**prm)
+
+    # prepare parameters
     prm = prepare_param(prm)
     job = util.configure(**kwargs)
 
@@ -165,7 +181,7 @@ def stage(prm, **kwargs):
     make(job)
 
     # check for previous run
-    if os.path.exists(path + 'meta.py'):
+    if os.path.exists(path + 'parameters.json'):
         raise Exception('Previous run found in %s' % path)
 
     # create run scripts 
@@ -177,13 +193,9 @@ def stage(prm, **kwargs):
     if prm.debug > 2:
         os.mkdir(path + 'debug')
 
-    # save iputput parameters
-    del(prm['itbuff'])
-    util.save(
-        path + 'parameters.py', prm,
-        expand = ['fieldio'],
-        header = '# SORD input parameters (auto-generated file).\n',
-    )
+    # save input parameters
+    f = util.dumps(prm, expand=['fieldio'])
+    open(path + 'parameters.json', 'w').write(f)
 
     # metadata
     xis = {}
@@ -208,23 +220,25 @@ def stage(prm, **kwargs):
                 shapes[k] = [1]
 
     # save metadata
-    meta = util.save(
-        None, job,
-        header = '# configuration\n',
-        keep = ['name', 'rundate', 'rundir', 'user', 'os_', 'dtype'],
-    )
-    meta += util.save(
-        None, prm,
-        header = '\n# model parameters\n',
-        expand = ['fieldio'],
-    )
-    meta += util.save(
-        None,
-        dict(shapes=shapes, deltas=deltas, xis=xis, indices=indices),
-        header = '\n# output dimensions\n',
-        expand = ['indices', 'shapes', 'deltas', 'xis'],
-    )
-    open(path + 'meta.py', 'w').write(meta)
+    m = [
+        ('# configuration', None),
+        ('name',    job.name),
+        ('rundate', job.rundate),
+        ('machine', job.machine),
+        ('host',    job.host),
+        ('rundir',  job.rundir),
+        ('dtype',   job.dtype),
+        ('# model parameters', None),
+    ] + sorted(i for i in prm.items() if i[0] != 'fieldio') + [
+        ('fieldio', prm.fieldio),
+        ('# output dimensions', None),
+        ('shapes',  shapes),
+        ('deltas',  deltas),
+        ('xis',     xis),
+        ('indices', indices),
+    ]
+    m = util.dumps(m, expand=['fieldio', 'shapes', 'deltas', 'xis', 'indices'])
+    open(path + 'meta.json', 'w').write(m)
 
     return job
 
@@ -486,6 +500,7 @@ def prepare_param(prm):
 
     # done
     prm.fieldio = fieldio
+    del(prm['itbuff'])
     return prm
 
 def test_fieldnames():

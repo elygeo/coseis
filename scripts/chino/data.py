@@ -2,7 +2,7 @@
 """
 Get event data
 """
-import os
+import os, json
 import cst
 
 # parameters
@@ -19,8 +19,12 @@ path = os.path.join('run', 'data')
 os.makedirs(path)
 
 # moment tensor
-f = os.path.join(path, '%s.mts.py')
-mts = cst.scedc.mts(event_id, f)
+f = os.path.join(path, '%s.mts.txt')
+if os.path.exists(f):
+    mts = json.load(f)
+else:
+    mts = cst.scedc.mts(event_id)
+    json.dump(mts, f)
 m = mts['double_couple_clvd']
 source1 =  m['myy'],  m['mxx'],  m['mzz']
 source2 = -m['mxz'], -m['myz'],  m['mxy']

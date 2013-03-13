@@ -62,7 +62,7 @@ def screenshot(fig, format=None, mag=None, aa_frames=8):
     if mag:
         fig.scene.set_size(size)
         fig.scene.render()
-    return(img)
+    return img
 
 class digital_clock():
     """

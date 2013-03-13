@@ -9,7 +9,7 @@ contains
 ! so call sub-function and allocate on the stack.
 subroutine read_parameters
 integer :: n
-if (master) inquire (file='parameters.py', size=n)
+if (master) inquire (file='parameters.json', size=n)
 call ibroadcast(n)
 call read_parameters1(n)
 end subroutine
@@ -28,7 +28,7 @@ character(n) :: str
 ! read with master process
 if (master) then
     print *, clock(), 'Read parameters'
-    open (1, file='parameters.py', recl=n, form='unformatted', access='direct', &
+    open (1, file='parameters.json', recl=n, form='unformatted', access='direct', &
         status='old')
     read (1, rec=1) str
     close (1)
@@ -51,11 +51,9 @@ if (j == -1) exit doline
 if (j == 0) cycle doline
 line = str(:j)
 
-! strip comments and punctuation
-i = scan(line, '#')
-if (i > 0) line(i:) = ' '
+! strip punctuation
 do
-    i = scan(line, "()[]{}'")
+    i = scan(line, ',"{}[]')
     if (i == 0) exit
     line(i:i) = ' '
 end do
@@ -138,6 +136,8 @@ end select
 ! error check
 if (ios /= 0) then
     if (master) write (0,*) 'bad input: ', trim(str(:j))
+    write(0, *) 1111, trim(line)
+    write(0, *) 2222, trim(str)
     stop
 end if
 

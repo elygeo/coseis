@@ -308,7 +308,7 @@ def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):
     u = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/%s.grd.gz'
     if not os.path.exists(f):
         u = u % region
-        print('Downloading %s' % u)
+        print('Retrieving %s' % u)
         z = urllib.urlopen(u).read()
         z = cStringIO.StringIO(z)
         z = gzip.GzipFile(fileobj=z).read()[19512:]
@@ -378,7 +378,7 @@ def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0
     url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhs/version2.2.0/gshhs+wdbii_2.2.0.zip'
     d = os.path.join(repo, 'gshhs')
     if not os.path.exists(d):
-        print('Downloading %s' % url)
+        print('Retrieving %s' % url)
         data = urllib.urlopen(url)
         data = cStringIO.StringIO(data.read())
         zipfile.ZipFile(data).extractall(repo)
@@ -547,9 +547,9 @@ def lsh_cat():
     return np.load(filename, mmap_mode='c')
 
 
-def cybershake(isrc, irup, islip, ihypo, name=None):
+def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
     """
-    CyberShake sources.
+    Fetch CyberShake SRF sources.
 
     Must have account on intensity.usc.edu with auto SSH authentication.
 
@@ -559,58 +559,76 @@ def cybershake(isrc, irup, islip, ihypo, name=None):
     irup: rupture ID
     islip: slip variation ID
     ihypo: hypocenter ID
-    name: optional name for the rupture
+
+    Returns
+    -------
+    fh: file handle for reading srf
     """
-    import os, subprocess
+    import os, gzip, json, cStringIO, subprocess
     import numpy as np
-    from . import source
 
-    # get reports
-    url = 'intensity.usc.edu:/home/scec-00/cybershk/reports/'
+    # locations
+    v0, v1 = version
+    path = os.path.join(repo, 'cybershake') + os.sep
+    host = 'intensity.usc.edu'
+    erf = '/home/scec-00/cybershk/reports/'
+    srf = '/home/rcf-104/CyberShake2007/ruptures/RuptureVariations_35_V%d_%d/%d/%d/%d_%d.txt'
+
+    # create directory
+    try:
+        os.mkdir(path)
+    except OSError:
+        pass
+
+    # segment name
     for f in 'erf35_source_rups.txt', 'erf35_sources.txt':
-        if not os.path.exists(f):
-            subprocess.check_call(['scp', url + f, f])
-    segments = dict(np.loadtxt(f, 'i,S64', delimiter='\t', skiprows=1))
+        g = path + f
+        if not os.path.exists(g):
+            print('Retrieving ' + f)
+            f = 'scp', host + ':' + erf + f, g
+            subprocess.check_call(f)
 
-    # get source files
-    url = 'intensity.usc.edu:/home/rcf-104/CyberShake2007/ruptures/RuptureVariations_35_V2_3/'
-    url = 'intensity.usc.edu:/home/rcf-104/CyberShake2007/ruptures/RuptureVariations_35_V3_2/'
-    mesh = '%s%d/%d/%d_%d.txt' % (url, isrc, irup, isrc, irup)
-    head = '%s%d/%d/%d_%d.txt.variation.output' % (url, isrc, irup, isrc, irup)
-    srf  = '%s%d/%d/%d_%d.txt.variation-s%04d-h%04d' % (url, isrc, irup, isrc, irup, islip, ihypo)
-    subprocess.check_call(['scp', head, 'head'])
-    subprocess.check_call(['scp', mesh, 'mesh'])
-    subprocess.check_call(['scp', srf, 'srf'])
+    # metadata
+    f = path + '%1d%1d-%03d-%03d.json' % (v0, v1, isrc, irup)
+    if os.path.exists(f):
+        meta = json.load(open(f))
+    else:
+        print('Retrieving ' + os.path.basename(f))
+        g = path + 'erf35_sources.txt'
+        g = np.loadtxt(g, 'i,S64', delimiter='\t', skiprows=1)
+        g = dict(g)[isrc]
+        h = srf % (v0, v1, isrc, irup, isrc, irup)
+        h = 'ssh', host, 'head -2 %s %s.variation.output' % (h, h)
+        h = subprocess.Popen(h, stdout=subprocess.PIPE).communicate()[0].split()
+        meta = {
+            'segment': g,
+            'isrc': isrc,
+            'irup': irup,
+            'nslip': int(h[18]),
+            'nhypo': int(h[20]),
+            'magnitude': float(h[8]),
+            'probability': float(h[5]),
+        }
+        json.dump(meta, open(f, 'w'), indent=4, sort_keys=True)
+    if ihypo == None:
+        return meta
+    meta.update({
+        'islip': islip,
+        'ihypo': ihypo,
+    })
 
-    # extract SRF file
-    src = source.srf('srf')
-
-    # update metadata
-    shape = src.plane[0]['shape']
-    v = open('head').next().split()
-    src.nslip = int(v[6])
-    src.nhypo = int(v[8])
-    with open('mesh', 'r') as fh:
-        src.probability = float(fh.next().split()[-1])
-        src.magnitude = float(fh.next().split()[-1])
-    src.segment = segments[isrc].replace(';', ' ')
-    src.event = name
-    src.isrc = isrc
-    src.irup = irup
-    src.islip = islip
-    src.ihypo = ihypo
-    if not name:
-        src.name = src.segment
-
-    # extract trace
-    x = src.lon.reshape(shape[::-1]).T
-    y = src.lat.reshape(shape[::-1]).T
-    src.trace = np.array([x[:,0], y[:,0]])
-
-    # clean up
-    subprocess.check_call(['gzip', 'srf'])
-    os.remove('mesh')
-    os.remove('head')
-    return src
-
+    # fetch SRF
+    f = path + '%1d%1d-%03d-%03d-%02d-%02d.srf.gz' % (v0, v1, isrc, irup, islip, ihypo)
+    if os.path.exists(f):
+        g = gzip.open(f)
+    else:
+        print('Retrieving ' + os.path.basename(f))
+        g = srf + '.variation-s%04d-h%04d'
+        g = g % (v0, v1, isrc, irup, isrc, irup, islip, ihypo)
+        g = 'ssh', host, 'gzip -c ' + g
+        g = subprocess.Popen(g, stdout=subprocess.PIPE).communicate()[0]
+        open(f, 'wb').write(g)
+        g = cStringIO.StringIO(g)
+        g = gzip.GzipFile(fileobj=g)
+    return g, meta
 

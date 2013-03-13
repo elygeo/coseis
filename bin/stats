@@ -60,17 +60,22 @@ for filename in args:
         fh = open(filename, 'rb')
 
     # compute stats
-    rmin =  np.inf
-    rmax = -np.inf
-    rsum = 0.0
-    i = 0
-    while i < n:
-        b = min(n - i, block)
-        r = np.fromfile(fh, dtype=dtype, count=b)
-        rmin = min(rmin, r.min())
-        rmax = max(rmax, r.max())
-        rsum += r.astype('d').sum()
-        i += b
-    rmean = rsum / n
+    if n == 0:
+        rmin = float('nan')
+        rmax = float('nan')
+        rmean = float('nan')
+    else:
+        rmin =  np.inf
+        rmax = -np.inf
+        rsum = 0.0
+        i = 0
+        while i < n:
+            b = min(n - i, block)
+            r = np.fromfile(fh, dtype=dtype, count=b)
+            rmin = min(rmin, r.min())
+            rmax = max(rmax, r.max())
+            rsum += r.astype('d').sum()
+            i += b
+        rmean = rsum / n
     print('%12g %12g %12g  %s  %s' % (rmin, rmax, rmean, list(shape), filename))
 

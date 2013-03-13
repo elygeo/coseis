@@ -235,7 +235,7 @@ def rotation(lon, lat, projection, eps=100.0):
     y = y[1] - y[0]
     s = 1.0 / np.sqrt(x * x + y * y)
     mat = np.array([s * x, s * y])
-    theta = 180.0 / math.pi * math.atan2(mat[0], mat[1])
+    theta = 180.0 / math.pi * np.arctan2(mat[0], mat[1])
     theta = 0.5 * theta.sum(0) - 45.0
     return mat, theta
 

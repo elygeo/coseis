@@ -8,6 +8,7 @@ mira.alcf.anl.gov:/gpfs/mira-fs0/projects/
 .soft:
 PYTHONPATH += $HOME/coseis
 PATH += $HOME/coseis/bin
+PATH += /home/gely/local/${ARCH##*-}/epd/bin
 PATH += /home/gely/local/${ARCH##*-}/bin
 MANPATH += /home/gely/local/${ARCH##*-}/man
 +mpiwrapper-xl

@@ -127,19 +127,22 @@ def read(faults=None, extent=None, version='CFM4-socal-primary'):
     extent: Return None if outside range (xmin, xmax), (ymin, ymax).
     version: CFM version name
 
-    Return object attributes
-    ------------------------
+    Returns
+    -------
+    
+    data (dict):
+        x, y, z: Vertex Cartesian coordinates
+        lon, lat: vertex geographic coordinate
+        tri: List of N x 3 array of vertex indices
+        stk: Fault strike
+        dip: Fault dip
 
-    name: Fault name
-    x, y, z: Vertex Cartesian coordinates
-    x0, y0, z0: Center of mass Cartesian coordinates
-    lon, lat: vertex geographic coordinate
-    lon0, lat0: Center of mass geographic coordinates
-    extent: (min_lon, max_lon), (min_lat, max_lat)
-    tri: List of N x 3 array of vertex indices
-    stk: Fault strike
-    dip: Fault dip
-    area: Total surface area
+    meta (dict):
+        name: Fault name
+        x0, y0, z0: Center of mass Cartesian coordinates
+        lon0, lat0: Center of mass geographic coordinates
+        extent: (min_lon, max_lon), (min_lat, max_lat)
+        area: Total surface area
     """
     import os, math
     import numpy as np
@@ -208,22 +211,27 @@ def read(faults=None, extent=None, version='CFM4-socal-primary'):
 
     # data object
     x, y, z, lon, lat = vtx
-    class obj:
-        def __init__(self, **kwarg):
-            self.__dict__.update(**kwarg)
-    obj = obj(
-        name = name,
-        lon = lon, lon0 = lon0,
-        lat = lat, lat0 = lat0,
-        extent = extent,
-        x = x, x0 = x0,
-        y = y, y0 = y0,
-        z = z, z0 = z0,
+    data = dict(
+        x = x,
+        y = y,
+        z = z,
+        lon = lon,
+        lat = lat,
         tri = tri,
+    )
+    meta = dict(
+        x0 = x0,
+        y0 = y0,
+        z0 = z0,
+        lon0 = lon0,
+        lat0 = lat0,
+        extent = extent,
         stk = stk,
         dip = dip,
+        area = area
+        name = name,
     )
-    return obj
+    return data, meta
 
 
 def search(cat, patterns, split=False):
@@ -299,7 +307,7 @@ def explore(faults=None, split=False, basemap=True):
 
     # DEM
     if basemap:
-        x, y, dem = data.dem(extent, mesh=True)
+        x, y, dem = data_m.dem(extent, mesh=True)
         extent = (x.min(), x.max()), (y.min(), y.max())
         x, y = proj(x, y)
         mlab.mesh(x, y, dem, color=(1,1,1), opacity=0.3)
@@ -327,15 +335,15 @@ def explore(faults=None, split=False, basemap=True):
     coords = []
     for f in faults:
         print('    ' + repr(f))
-        f = read([f])
-        x, y = proj(f.lon, f.lat)
-        z, t = f.z, f.tri.T
+        data_, meta = read([f])
+        x, y = proj(data_['lon'], data_['lat'])
+        z, t = data_['z'], data_['tri'].T
         s = mlab.triangular_mesh(x, y, z, t, representation='surface', color=color_bg)
-        x, y = proj(f.lon0, f.lat0)
-        z = f.z0
+        x, y = proj(meta['lon0'], meta['lat0'])
+        z = meta['z0']
         a = s.actor.actor
         coords += [[x, y, z, a]]
-        names[a] = f.name
+        names[a] = meta['name']
 
     # handle key press
     def on_key_press(obj, event, current=[None]):
@@ -385,15 +393,15 @@ def explore(faults=None, split=False, basemap=True):
     mlab.show()
 
 
-def cubit_facet(fault, geographic=False):
+def cubit_facet(data, geographic=False):
     """
     Create CUBIT Facet File text representation
     """
     if geographic:
-        x, y, z = fault.lon, fault.lat, fault.z
+        x, y, z = data['lon'], data['lat'], data['z']
     else:
-        x, y, z = fault.x, fault.y, fault.z
-    j, k, l = fault.tri
+        x, y, z = data['x'], data['y'], data['z']
+    j, k, l = data['tri']
     out = '%s %s\n' % (x.size, j.size)
     for i in range(x.size):
         out += '%s %s %s %s\n' % (i, x[i], y[i], z[i])

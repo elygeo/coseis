@@ -48,108 +48,38 @@ class storage(dict):
         return self[key]
 
 
-import numpy
-prune_types_default = (
-    [type(None), bool, str, unicode, int, long, float, tuple, list, dict] +
-    numpy.typeDict.values()
-)
-del(numpy)
-
-def prune(d, pattern=None, types=None):
-    """
-    Delete dictionary keys with specified name pattern or types
-
-    Parameters
-    ----------
-    d: dict of parameters
-    pattern: regular expression of parameter names to prune
-        default = '(^_)|(_$)|(^.$)|(^..$)'
-    types: list of parameters types to keep
-        default = Numpy types + [NoneType, bool, str, int, lone, float, tuple, list, dict]
-        Functions, classes, and modules are pruned by default.
-
-    >>> prune({'aa': 0, 'aa_': 0, '_aa': 0, 'a_a': 0, 'b_b': prune})
-    {'aa': 0, 'aa_': 0, 'a_a': 0}
-    """
-    import re
-    if pattern is None:
-        pattern = '^_'
-    if types is None:
-        types = prune_types_default
-    grep = re.compile(pattern)
-    for k in d.keys():
-        if grep.search(k) or type(d[k]) not in types:
-            del(d[k])
-    return d
-
-
-def save(fh, d, expand=None, keep=None, header='', prune_pattern=None,
-    prune_types=None, ext_threshold=None, ext_raw=False):
-    """
-    Write variables from a dict into a Python source file.
-    """
-    import os
-    import numpy as np
-    if fh is not None:
-        if isinstance(fh, basestring):
-            fh = open(os.path.expanduser(fh), 'w')
+def save(*args, **kwargs):
+    raise Exception('util.save() has been removed. Use util.dumps() instead.') 
+    
+def dumps(obj, expand=None):
+    import json
+    s = []
+    if isinstance(obj, dict):
+        obj = sorted(obj.items())
+    assert(type(obj) == list)
     if expand is None:
         expand = []
-    if prune_types is None:
-        prune_types = prune_types_default + [np.ndarray]
-    prune(d, prune_pattern, prune_types)
-    n = ext_threshold
-    if n == None:
-        n = np.get_printoptions()['threshold']
-    out = ''
-    if '__doc__' in d:
-        out = '"""' + __doc__ + '"""'
-    has_array = False
-    for k in sorted(d):
-        if k not in expand and (keep is None or k in keep):
-            if type(d[k]) == np.ndarray and fh is not None:
-                has_array = True
-                if d[k].size > n:
-                    f = os.path.dirname(fh.name)
-                    if ext_raw:
-                        f = os.path.join(f, k + '.bin')
-                        d[k].tofile(f)
-                        m = k, k, d[k].dtype, d[k].shape
-                        out += "%s = memmap('%s.bin', %s, mode='c', shape=%s)\n" % m
-                    else:
-                        f = os.path.join(f, k + '.npy')
-                        np.save(f, d[k])
-                        out += "%s = load('%s.npy', mmap_mode='c')\n" % (k, k)
-            if isinstance(d[k], basestring) and '\n' in d[k]:
-                out += k + ' = """' + d[k] + '"""\n'
-            else:
-                out += '%s = %r\n' % (k, d[k])
-    if has_array:
-        out = header + 'from numpy import array, load, float32, memmap\n' + out
-    else:
-        out = header + out
-    for k in expand:
-        if k in d:
-            if type(d[k]) is tuple:
-                out += k + ' = (\n'
-                for item in d[k]:
-                    out += '    %r,\n' % (item,)
-                out += ')\n'
-            elif type(d[k]) is list:
-                out += k + ' = [\n'
-                for item in d[k]:
-                    out += '    %r,\n' % (item,)
-                out += ']\n'
-            elif type(d[k]) is dict:
-                out += k + ' = {\n'
-                for item in sorted(d[k]):
-                    out += '    %r: %r,\n' % (item, d[k][item])
-                out += '}\n'
-            else:
-                raise Exception('Cannot expand %s type %s' % (k, type(d[k])))
-    if fh is not None:
-        fh.write(out)
-    return out
+    for kv in obj:
+        k, v = kv
+        if k not in expand:
+            s += ['"%s": %s' % (k, json.dumps(v))]
+        elif type(v) in (list, tuple):
+            w = []
+            for i in v:
+                w += ['    %s' % json.dumps(i)]
+            w = ',\n'.join(w)
+            s += ['"%s": [\n%s\n]' % (k, w)]
+        elif type(v) is dict:
+            w = []
+            for i in sorted(v):
+                w += ['    "%s": %s' % (i, json.dumps(v[i]))]
+            w = ',\n'.join(w)
+            s += ['"%s": {\n%s\n}' % (k, w)]
+        else:
+            raise Exception('Cannot expand %s type %s' % (k, type(v)))
+    s = ',\n'.join(s)
+    s = '{\n' + s + '\n}\n'
+    return s
 
 
 def configure(*args, **kwargs):
@@ -354,7 +284,7 @@ def skeleton(job=None, **kwargs):
             job[k] = kwargs[k]
 
     # test for previous runs 
-    f = os.path.join(job.rundir, job.name + '.conf.py')
+    f = os.path.join(job.rundir, job.name + '.conf.json')
     if not job.force and os.path.exists(f):
         raise Exception('Existing job found. Use --force to overwrite')
     if not os.path.isdir(job.rundir):
@@ -368,7 +298,7 @@ def skeleton(job=None, **kwargs):
 
     # save configuration
     del(job['options'], job['script'])
-    save(f, job)
+    open(f, 'w').write(dumps(job))
 
     return job
 
@@ -405,9 +335,9 @@ def launch(job=None, **kwargs):
             raise Exception('Submit failed')
         d = re.search(job.submit_pattern, out).groupdict()
         job.update(d)
-        save(job.name + '.conf.py', job)
+        open(job.name + '.conf.json', 'w').write(dumps(job))
     else:
-        save(job.name + '.conf.py', job)
+        open(job.name + '.conf.json', 'w').write(dumps(job))
         for c in job.pre, job.launch, job.post:
             if c:
                 print(c)

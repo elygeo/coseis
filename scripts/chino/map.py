@@ -2,7 +2,7 @@
 """
 Map plot
 """
-import os, imp
+import os, json
 import numpy as np
 import matplotlib.pyplot as plt
 import pyproj
@@ -11,9 +11,9 @@ import cst
 # parameters
 eventid = 14383980
 bounds = (-80000.0, 48000.0), (-58000.0, 54000.0)
-mts = os.path.join('run', 'data', '%s.mts.py' % eventid)
-mts = imp.load_source('mts', mts)
-origin = mts.longitude, mts.latitude, mts.depth
+mts = os.path.join('run', 'data', '%s.mts.txt' % eventid)
+mts = json.load(mts)
+origin = mts['longitude'], mts['latitude'], mts['depth']
 proj = pyproj.Proj(proj='tmerc', lon_0=origin[0], lat_0=origin[1])
 
 # plot defaults
@@ -81,7 +81,7 @@ for surface in [
     ax.plot(x, y, 'k-', lw=1.0)
 
     # source
-    x0, y0 = proj(mts.longitude, mts.latitude)
+    x0, y0 = proj(mts['longitude'], mts['latitude'])
     f = os.path.join('run', 'data', 'beachball.txt')
     x, y = np.loadtxt(f).T * 5000.0
     x += x0

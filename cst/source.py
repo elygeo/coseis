@@ -50,30 +50,18 @@ def mw(moment, units='mks'):
     return m
 
 
-def _open(fh, mode='r'):
-    """
-    Open a regular or compressed file if not already opened.
-    """
-    if isinstance(fh, basestring):
-        import os, gzip
-        fh = os.path.expanduser(fh)
-        if fh.endswith('.gz'):
-            fh = gzip.open(fh, mode)
-        else:
-            fh = open(fh, mode)
-    return fh
-
-
 class srf():
     """
     Utilities for Graves Standard Rupture Format (SRF).
 
     SRF is documented at http://epicenter.usc.edu/cmeportal/docs/srf4.pdf
     """
-    def __init__(self, filename):
+   
+    def __init__(self, fh, meta=None):
         """
         Read SRF file.
         """
+        import json
         import numpy as np
 
         # mks units
@@ -81,184 +69,202 @@ class srf():
         u_cm = 0.01
         u_cm2 = 0.0001
 
-        # open file
-        with _open(filename) as fh:
+        # data fields
+        data2i = 'nt1', 'nt2', 'nt3'
+        data2f = (
+            'lon', 'lat', 'dep', 'stk', 'dip', 'rake', 'area',
+            't0', 'dt', 'slip1', 'slip2', 'slip3',
+        )
 
-            # header block
-            self.version = fh.next().split()[0]
-            k = fh.next().split()
-            if k[0] == 'PLANE':
-                self.plane = []
-                for i in range(int(k[1])):
-                    k = fh.next().split() + fh.next().split()
-                    if len(k) != 11:
-                        raise Exception('error reading %s' % filename)
-                    seg = {
-                        'topcenter': (float(k[0]), float(k[1]), float(k[8])),
-                        'shape': (int(k[2]), int(k[3])),
-                        'length': (float(k[4]) * u_km, float(k[5]) * u_km),
-                        'strike': float(k[6]),
-                        'dip': float(k[7]),
-                        'hypocenter': (float(k[9]) * u_km, float(k[10]) * u_km),
-                    }
-                    x, y = seg['length']
-                    j, k = seg['shape']
-                    seg['area'] = x * y
-                    seg['delta'] = x / j, y / k
-                    self.plane += [seg]
-                k = fh.next().split()
-            if k[0] != 'POINTS':
-                raise Exception('error reading %s' % filename)
-            self.nsource = int(k[1])
+        # open Numpy/JSON format
+        if isinstance(fh, basestring):
+            self.data = np.load(fh + '.npz')
+            self.meta = json.load(open(fh + '.json'))
+            self.meta.update(meta)
+            return
 
-            # data block
-            n = self.nsource
-            self.lon = np.empty(n, 'f')
-            self.lat = np.empty(n, 'f')
-            self.dep = np.empty(n, 'f')
-            self.stk = np.empty(n, 'f')
-            self.dip = np.empty(n, 'f')
-            self.rake = np.empty(n, 'f')
-            self.area = np.empty(n, 'f')
-            self.t0 = np.empty(n, 'f')
-            self.dt = np.empty(n, 'f')
-            self.slip1 = np.empty(n, 'f')
-            self.slip2 = np.empty(n, 'f')
-            self.slip3 = np.empty(n, 'f')
-            self.nt1 = np.empty(n, 'i')
-            self.nt2 = np.empty(n, 'i')
-            self.nt3 = np.empty(n, 'i')
-            sv1 = []
-            sv2 = []
-            sv3 = []
-            for i in range(n):
-                k = fh.next().split() + fh.next().split()
-                if len(k) != 15:
-                    raise Exception('error reading %s %s' % (filename, i))
-                self.lon[i] = float(k[0])
-                self.lat[i] = float(k[1])
-                self.dep[i] = float(k[2]) * u_km
-                self.stk[i] = float(k[3])
-                self.dip[i] = float(k[4])
-                self.rake[i] = float(k[8])
-                self.area[i] = float(k[5]) * u_cm2
-                self.t0[i] = float(k[6])
-                self.dt[i] = float(k[7])
-                self.slip1[i] = float(k[9]) * u_cm
-                self.slip2[i] = float(k[11]) * u_cm
-                self.slip3[i] = float(k[13]) * u_cm
-                self.nt1[i] = int(k[10])
-                self.nt2[i] = int(k[12])
-                self.nt3[i] = int(k[14])
-                sv = []
-                n = np.cumsum([self.nt1[i], self.nt2[i], self.nt3[i]])
-                while len(sv) < n[-1]:
-                    sv += fh.next().split()
-                if len(sv) != n[-1]:
-                    raise Exception('error reading %s %s' % (filename, i))
-                sv1 += [float(f) * u_cm for f in sv[:n[0]]]
-                sv2 += [float(f) * u_cm for f in sv[n[0]:n[1]]]
-                sv3 += [float(f) * u_cm for f in sv[n[1]:]]
-            self.sv1 = sv1 = np.array(sv1, 'f')
-            self.sv2 = sv2 = np.array(sv2, 'f')
-            self.sv3 = sv3 = np.array(sv3, 'f')
+        # header block
+        meta1 = meta
+        meta = {}
+        meta['version'] = fh.next().split()[0]
+        s = fh.next().split()
+        if s[0] == 'PLANE':
+            plane = []
+            for i in range(int(s[1])):
+                s = fh.next().split() + fh.next().split()
+                if len(s) != 11:
+                    raise Exception('error reading %s' % fh.name)
+                j, k = int(s[2]), int(s[3])
+                x, y = float(s[4]) * u_km, float(s[5]) * u_km
+                seg = {
+                    'shape': [j, k],
+                    'length': [x, y],
+                    'area': x * y,
+                    'delta': [x / j, y / k],
+                    'topcenter': [float(s[0]), float(s[1]), float(s[8])],
+                    'strike': float(s[6]),
+                    'dip': float(s[7]),
+                    'hypocenter': [float(s[9]) * u_km, float(s[10]) * u_km],
+                }
+                plane += [seg]
+            s = fh.next().split()
+            meta['plane'] = plane
+        if s[0] != 'POINTS':
+            raise Exception('error reading %s' % fh.name)
+        meta['nsource'] = n = int(s[1])
+
+        # data block
+        data = {}
+        for k in data2f:
+            data[k] = np.empty(n, 'f')
+        for k in data2i:
+            data[k] = np.empty(n, 'i')
+        sv1, sv2, sv3 = [], [], []
+        for i in range(n):
+            k = fh.next().split() + fh.next().split()
+            if len(k) != 15:
+                raise Exception('error reading %s %s' % (fh.name, i))
+            data['lon'][i] = float(k[0])
+            data['lat'][i] = float(k[1])
+            data['dep'][i] = float(k[2]) * u_km
+            data['stk'][i] = float(k[3])
+            data['dip'][i] = float(k[4])
+            data['rake'][i] = float(k[8])
+            data['area'][i] = float(k[5]) * u_cm2
+            data['t0'][i] = float(k[6])
+            data['dt'][i] = float(k[7])
+            data['slip1'][i] = float(k[9]) * u_cm
+            data['slip2'][i] = float(k[11]) * u_cm
+            data['slip3'][i] = float(k[13]) * u_cm
+            data['nt1'][i] = nt1 = int(k[10])
+            data['nt2'][i] = nt2 = int(k[12])
+            data['nt3'][i] = nt3 = int(k[14])
+            sv = []
+            n = np.cumsum([nt1, nt2, nt3])
+            while len(sv) < n[-1]:
+                sv += fh.next().split()
+            if len(sv) != n[-1]:
+                raise Exception('error reading %s %s' % (fh.name, i))
+            sv1 += [float(f) * u_cm for f in sv[:n[0]]]
+            sv2 += [float(f) * u_cm for f in sv[n[0]:n[1]]]
+            sv3 += [float(f) * u_cm for f in sv[n[1]:]]
+
+        # slip velocity arrays
+        data['sv1'] = sv1 = np.array(sv1, 'f')
+        data['sv2'] = sv2 = np.array(sv2, 'f')
+        data['sv3'] = sv3 = np.array(sv3, 'f')
+
+        # reshape array (only handles a single plane for now)
+        if len(meta['plane']) == 1:
+            n = meta['plane'][0]['shape']
+            for k in data2f + data2i:
+                data[k] = data[k].reshape(n[::-1]).T
 
         # useful meta data
-        i1 = (self.nt1 > 0).sum()
-        i2 = (self.nt2 > 0).sum()
-        i3 = (self.nt3 > 0).sum()
-        self.nsource_nonzero = i1 + i2 + i3
-        i = np.argmin(self.t0)
-        self.hypocenter = self.lon.flat[i], self.lat.flat[i], self.dep.flat[i]
-        self.area_total = self.area.sum()
-        self.potency = np.sqrt(
-            (self.area * self.slip1).sum() ** 2 +
-            (self.area * self.slip2).sum() ** 2 +
-            (self.area * self.slip3).sum() ** 2)
-        self.displacement = self.potency / self.area_total
+        i1 = (data['nt1'] > 0).sum()
+        i2 = (data['nt2'] > 0).sum()
+        i3 = (data['nt3'] > 0).sum()
+        meta['nsource_nonzero'] = i1 + i2 + i3
+        i = np.argmin(data['t0'])
+        meta['hypocenter'] = [
+            float(data['lon'].flat[i]),
+            float(data['lat'].flat[i]),
+            float(data['dep'].flat[i]),
+        ]
+        meta['area'] = a = float(data['area'].sum(dtype='d'))
+        meta['potency'] = p = float(np.sqrt(
+            (data['area'] * data['slip1']).sum(dtype='d') ** 2 +
+            (data['area'] * data['slip2']).sum(dtype='d') ** 2 +
+            (data['area'] * data['slip3']).sum(dtype='d') ** 2
+        ))
+        meta['displacement'] = p / a
+
+        # finished
+        self.data = data
+        self.meta = meta
+        if meta1 != None:
+            self.meta.update(meta1)
+
         return
 
 
-    def write_srf(self, filename):
+    def write(self, path):
+        import json, numpy
+        f = path + '.json'
+        g = path + '.npz'
+        json.dump(self.meta, open(f, 'w'), indent=4, sort_keys=True)
+        numpy.savez_compressed(g, **self.data)
+        return
+
+
+    def write_srf(self, fh):
         import numpy as np
+
+        meta = self.meta
+        data = self.data
 
         # mks units
         u_km = 0.001
         u_cm = 100
         u_cm2 = 10000
 
-        # open file
-        with _open(filename, 'w') as fh:
-
-            # header block
-            fh.write('%s\n' % self.version)
-            if hasattr(self, 'plane'):
-                for i, seg in enumerate(self.plane):
-                    fh.write('PLANE %s\n%s %s %s %s %s %s\n%s %s %s %s %s\n' % (
-                        i + 1,
-                        seg['topcenter'][0],
-                        seg['topcenter'][1],
-                        seg['shape'][0],
-                        seg['shape'][1],
-                        seg['length'][0] * u_km,
-                        seg['length'][1] * u_km,
-                        seg['strike'],
-                        seg['dip'],
-                        seg['topcenter'][2],
-                        seg['hypocenter'][0] * u_km,
-                        seg['hypocenter'][1] * u_km,
-                    ))
-
-            # data block
-            fh.write(('POINTS %s\n' % self.nsource))
-            i1 = 0
-            i2 = 0
-            i3 = 0
-            for i in range(self.nsource):
-                fh.write('%s %s %s %s %s %s %s %s\n%s %s %s %s %s %s %s\n' % (
-                    self.lon[i],
-                    self.lat[i],
-                    self.dep[i] * u_km,
-                    self.stk[i],
-                    self.dip[i],
-                    self.area[i] * u_cm2,
-                    self.t0[i],
-                    self.dt[i],
-                    self.rake[i],
-                    self.slip1[i] * u_cm,
-                    self.nt1[i],
-                    self.slip2[i] * u_cm,
-                    self.nt2[i],
-                    self.slip3[i] * u_cm,
-                    self.nt3[i],
+        # header block
+        fh.write('%s\n' % meta['version'])
+        if 'plane' in meta:
+            for i, seg in enumerate(meta['plane']):
+                fh.write('PLANE %s\n%s %s %s %s %s %s\n%s %s %s %s %s\n' % (
+                    i + 1,
+                    seg['topcenter'][0],
+                    seg['topcenter'][1],
+                    seg['shape'][0],
+                    seg['shape'][1],
+                    seg['length'][0] * u_km,
+                    seg['length'][1] * u_km,
+                    seg['strike'],
+                    seg['dip'],
+                    seg['topcenter'][2],
+                    seg['hypocenter'][0] * u_km,
+                    seg['hypocenter'][1] * u_km,
                 ))
-                n1 = self.nt1[i]
-                n2 = self.nt2[i]
-                n3 = self.nt3[i]
-                s1 = self.sv1[i1:i1+n1] * u_cm
-                s2 = self.sv2[i2:i2+n2] * u_cm
-                s3 = self.sv3[i3:i3+n3] * u_cm
-                s = np.concatenate([s1, s2, s3])
-                i = s.size // 6 * 6
-                np.savetxt(fh, s[:i].reshape([-1,6]), '%13.5e', '')
-                np.savetxt(fh, s[i:].reshape([1,-1]), '%13.5e', '')
-                i1 += n1
-                i2 += n2
-                i3 += n3
+
+        # data block
+        n = meta['nsource']
+        fh.write(('POINTS %s\n' % n))
+        i1 = 0
+        i2 = 0
+        i3 = 0
+        for i in range(n):
+            fh.write('%s %s %s %s %s %s %s %s\n%s %s %s %s %s %s %s\n' % (
+                data['lon'][i],
+                data['lat'][i],
+                data['dep'][i] * u_km,
+                data['stk'][i],
+                data['dip'][i],
+                data['area'][i] * u_cm2,
+                data['t0'][i],
+                data['dt'][i],
+                data['rake'][i],
+                data['slip1'][i] * u_cm,
+                data['nt1'][i],
+                data['slip2'][i] * u_cm,
+                data['nt2'][i],
+                data['slip3'][i] * u_cm,
+                data['nt3'][i],
+            ))
+            n1 = data['nt1'][i]
+            n2 = data['nt2'][i]
+            n3 = data['nt3'][i]
+            s1 = data['sv1'][i1:i1+n1] * u_cm
+            s2 = data['sv2'][i2:i2+n2] * u_cm
+            s3 = data['sv3'][i3:i3+n3] * u_cm
+            s = np.concatenate([s1, s2, s3])
+            i = s.size // 6 * 6
+            np.savetxt(fh, s[:i].reshape([-1,6]), '%13.5e', '')
+            np.savetxt(fh, s[i:].reshape([1,-1]), '%13.5e', '')
+            i1 += n1
+            i2 += n2
+            i3 += n3
         return
-
-
-    def write_py(self, path):
-        """
-        Save SRF as a Python source file.
-        """
-        from . import util
-        util.save(path, self,
-            expand=['plane'],
-            header='# source parameters\nfrom numpy import array, load, float32\n',
-        )
-        return
-
 
     def write_sord(self, path='source', delta=(1,1,1), proj=None, dbytes=4):
         """
@@ -274,6 +280,9 @@ class srf():
         import os
         from . import coord
 
+        meta = self.meta
+        data = self.data
+
         # setup
         i_ = 'i%s' % dbytes
         f_ = 'f%s' % dbytes
@@ -281,23 +290,23 @@ class srf():
         os.mkdir(path)
 
         # time
-        i1 = self.nt1 > 0
-        i2 = self.nt2 > 0
-        i3 = self.nt3 > 0
+        i1 = data['nt1'] > 0
+        i2 = data['nt2'] > 0
+        i3 = data['nt3'] > 0
         with open(path + 'nt.bin', 'wb') as f1:
          with open(path + 'dt.bin', 'wb') as f2:
           with open(path + 't0.bin', 'wb') as f3:
-            self.nt1[i1].astype(i_).tofile(f1)
-            self.nt2[i2].astype(i_).tofile(f1)
-            self.nt3[i3].astype(i_).tofile(f1)
+            data['nt1'][i1].astype(i_).tofile(f1)
+            data['nt2'][i2].astype(i_).tofile(f1)
+            data['nt3'][i3].astype(i_).tofile(f1)
             for i in i1, i2, i3:
-                self.dt[i].astype(f_).tofile(f2)
-                self.t0[i].astype(f_).tofile(f3)
+                data['dt'][i].astype(f_).tofile(f2)
+                data['t0'][i].astype(f_).tofile(f3)
 
         # coordinates
-        x = self.lon
-        y = self.lat
-        z = self.dep
+        x = data['lon']
+        y = data['lat']
+        z = data['dep']
         if proj:
             rot = coord.rotation(x, y, proj)[1]
             x, y = proj(x, y)
@@ -316,10 +325,10 @@ class srf():
         del(x, y, z)
 
         # fault local coordinate system
-        s1, s2, n = coord.slip_vectors(self.stk + rot, self.dip, self.rake)
-        p1 = self.area * coord.potency_tensor(n, s1)
-        p2 = self.area * coord.potency_tensor(n, s2)
-        p3 = self.area * coord.potency_tensor(n, n)
+        s1, s2, n = coord.slip_vectors(data['stk'] + rot, data['dip'], data['rake'])
+        p1 = data['area'] * coord.potency_tensor(n, s1)
+        p2 = data['area'] * coord.potency_tensor(n, s2)
+        p3 = data['area'] * coord.potency_tensor(n, n)
         del(s1, s2, n)
 
         # tensor components
@@ -344,23 +353,23 @@ class srf():
         i2 = 0
         i3 = 0
         with open(path + 'history.bin', 'wb') as fh:
-            for i in range(self.nsource):
-                n = self.nt1[i]
-                s = self.sv1[i1:i1+n].cumsum() * self.dt[i]
+            n = meta['nsource']
+            for i in range(n):
+                n = data['nt1'][i]
+                s = data['sv1'][i1:i1+n].cumsum() * data['dt'][i]
                 s.astype(f_).tofile(fh)
                 i1 += n
-            for i in range(self.nsource):
-                n = self.nt2[i]
-                s = self.sv2[i2:i2+n].cumsum() * self.dt[i]
+            for i in range(n):
+                n = data['nt2'][i]
+                s = data['sv2'][i2:i2+n].cumsum() * data['dt'][i]
                 s.astype(f_).tofile(fh)
                 i2 += n
-            for i in range(self.nsource):
-                n = self.nt3[i]
-                s = self.sv3[i3:i3+n].cumsum() * self.dt[i]
+            for i in range(n):
+                n = data['nt3'][i]
+                s = data['sv3'][i3:i3+n].cumsum() * data['dt'][i]
                 s.astype(f_).tofile(fh)
                 i3 += n
         return
-
 
     def write_awp(self, filename, t, mu, lam=0.0, delta=1.0, proj=None,
         binary=True, interp='linear'):
@@ -380,10 +389,12 @@ class srf():
         if type(delta) not in (tuple, list):
             delta = delta, delta, delta
 
+        data = self.data
+
         # coordinates
-        x = self.lon
-        y = self.lat
-        z = self.dep
+        x = data['lon']
+        y = data['lat']
+        z = data['dep']
         if proj:
             rot = coord.rotation(x, y, proj)[1]
             x, y = proj(x, y)
@@ -395,10 +406,11 @@ class srf():
         del(x, y, z)
 
         # moment tensor components
-        s1, s2, n = coord.slip_vectors(self.stk + rot, self.dip, self.rake)
-        m1 = mu * self.area * coord.potency_tensor(n, s1) * 2.0
-        m2 = mu * self.area * coord.potency_tensor(n, s2) * 2.0
-        m3 = lam * self.area * coord.potency_tensor(n, n) * 2.0
+        stk, dip, rake = data['stk'], data['dip'], data['rake']
+        s1, s2, n = coord.slip_vectors(stk + rot, dip, rake)
+        m1 = mu * data['area'] * coord.potency_tensor(n, s1) * 2.0
+        m2 = mu * data['area'] * coord.potency_tensor(n, s2) * 2.0
+        m3 = lam * data['area'] * coord.potency_tensor(n, n) * 2.0
         del(s1, s2, n)
 
         # write file
@@ -406,17 +418,17 @@ class srf():
         i2 = 0
         i3 = 0
         s = np.zeros_like
-        with _open(filename, 'wb') as fh:
-            for i in range(self.dt.size):
-                n1 = self.nt1[i]
-                n2 = self.nt2[i]
-                n3 = self.nt3[i]
-                s1 = self.sv1[i1:i1+n1]
-                s2 = self.sv2[i2:i2+n2]
-                s3 = self.sv3[i3:i3+n3]
-                t1 = self.t0[i], self.t0[i] + self.dt[i] * (n1 - 1)
-                t2 = self.t0[i], self.t0[i] + self.dt[i] * (n2 - 1)
-                t3 = self.t0[i], self.t0[i] + self.dt[i] * (n3 - 1)
+        with open(filename, 'wb') as fh:
+            for i in range(data['dt'].size):
+                n1 = data['nt1'][i]
+                n2 = data['nt2'][i]
+                n3 = data['nt3'][i]
+                s1 = data['sv1'][i1:i1+n1]
+                s2 = data['sv2'][i2:i2+n2]
+                s3 = data['sv3'][i3:i3+n3]
+                t1 = data['t0'][i], data['t0'][i] + data['dt'][i] * (n1 - 1)
+                t2 = data['t0'][i], data['t0'][i] + data['dt'][i] * (n2 - 1)
+                t3 = data['t0'][i], data['t0'][i] + data['dt'][i] * (n3 - 1)
                 s1 = interpolate.interp(t1, s1, t, s(t), interp, bound=True)
                 s2 = interpolate.interp(t2, s2, t, s(t), interp, bound=True)
                 s3 = interpolate.interp(t3, s3, t, s(t), interp, bound=True)
@@ -439,7 +451,6 @@ class srf():
                 i3 += n3
         return
 
-
     def write_coulomb(self, path, proj, scut=0):
         """
         Write Coulomb input file.
@@ -448,47 +459,121 @@ class srf():
         import numpy as np
         from . import coord
 
+        meta = self.meta
+        data = self.data
+
         # output location
         path = os.path.expanduser(path)
 
         # slip components
-        s1, s2  = self.slip1, self.slip2
-        s = np.sin(math.pi / 180.0 * self.rake)
-        c = np.cos(math.pi / 180.0 * self.rake)
+        s1, s2  = data['slip1'], data['slip2']
+        s = np.sin(math.pi / 180.0 * data['rake'])
+        c = np.cos(math.pi / 180.0 * data['rake'])
         r1 = -c * s1 + s * s2
         r2 =  s * s1 + c * s2
 
         # coordinates
-        x, y, z = self.lon, self.lat, self.dep
+        x, y, z = data['lon'], data['lat'], data['dep']
         rot = coord.rotation(x, y, proj)[1]
         x, y = proj(x, y)
         x *= 0.001
         y *= 0.001
         z *= 0.001
-        delta = 0.0005 * self.plane[0]['delta'][0]
-        dx = delta * np.sin(math.pi / 180.0 * (self.stk + rot))
-        dy = delta * np.cos(math.pi / 180.0 * (self.stk + rot))
-        dz = delta * np.sin(math.pi / 180.0 * self.dip)
+        delta = 0.0005 * meta['plane'][0]['delta'][0]
+        dx = delta * np.sin(math.pi / 180.0 * (data['stk'] + rot))
+        dy = delta * np.cos(math.pi / 180.0 * (data['stk'] + rot))
+        dz = delta * np.sin(math.pi / 180.0 * data['dip'])
         x1, x2 = x - dx, x + dx
         y1, y2 = y - dy, y + dy
         z1, z2 = z - dz, z + dz
 
         # source file
         i = (s1**2 + s2**2) > (np.sign(scut) * scut**2)
-        c = np.array([x1[i], y1[i], x2[i], y2[i], r1[i], r2[i], self.dip[i], z1[i], z2[i]]).T
+        c = np.array([x1[i], y1[i], x2[i], y2[i], r1[i], r2[i], data['dip'][i], z1[i], z2[i]]).T
         with open(path + 'source.inp', 'w') as fh:
-            fh.write(coulomb_header % self.__dict__)
+            fh.write(coulomb_header.format(**meta))
             np.savetxt(fh, c, coulomb_fmt)
             fh.write(coulomb_footer)
 
         # receiver file
         s1.fill(0.0)
-        c = np.array([x1, y1, x2, y2, s1, s1, self.dip, z1, z2]).T
+        c = np.array([x1, y1, x2, y2, s1, s1, data['dip'], z1, z2]).T
         with open(path + 'receiver.inp', 'w') as fh:
-            fh.write(coulomb_header % self.__dict__)
+            fh.write(coulomb_header.format(**meta))
             np.savetxt(fh, c, coulomb_fmt)
             fh.write(coulomb_footer)
         return
+
+
+    def plot(self, clim=[0, 10], scale=0.1, cmap='wbgr'):
+        import numpy as np
+        from matplotlib import pyplot
+        from . import coord
+        from . import plt
+
+        # extract data
+        slip = self.data['slip1']
+        trup = self.data['t0']
+        x, y = self.meta['plane'][0]['length']
+        delta = self.meta['plane'][0]['delta']
+        strike = self.meta['plane'][0]['strike']
+
+        # dimensions
+        x *= 0.001
+        y *= 0.001
+        extent = 0, x, 0, y
+        axis   = 0, x, y, 0
+
+        # setup figure
+        tic = 0.005 * pyplot.rcParams['font.size']
+        x = 6 * tic + scale * x
+        y = 8 * tic + scale * y
+        axes = 4 * tic / x,  4 * tic / y,  (x - 6 * tic) / x,  (y - 8 * tic) / y
+        tic /= scale
+        fig = pyplot.figure(None, [x, y], 100, 'w')
+        ax = fig.add_axes(axes)
+
+        # slip image
+        cmap = plt.colormap(cmap)
+        im = ax.imshow(
+            slip.T,
+            cmap = cmap,
+            extent = extent,
+            origin = 'lower',
+            interpolation = 'nearest',
+        )
+        im.set_clim(*clim)
+
+        # rupture contours
+        m, n = trup.shape
+        x, y = 0.5 + np.mgrid[0:m,0:n]
+        x *= 0.001 * delta[0]
+        y *= 0.001 * delta[1]
+        c = range(int(trup.max() + 1))
+        ax.contour(x, y, trup, c, colors='k')
+
+        # direction labels
+        a = coord.compass(strike + 180.0)
+        b = coord.compass(strike)
+        ax.text(0,       -tic, a, va='baseline', ha='left')
+        ax.text(axis[1], -tic, b, va='baseline', ha='right')
+
+        # length scales
+        ax.axis('image')
+        ax.axis(axis)
+        x = ax.get_xlim()
+        y = ax.get_ylim()[0] + 2 * tic
+        plt.lengthscale(ax, x, [y, y], 2 * tic, '%g km', backgroundcolor='w')
+        x = -2 * tic
+        y = ax.get_ylim()
+        plt.lengthscale(ax, [x, x], y, 2 * tic, '%g km', backgroundcolor='w')
+
+        # ticks
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+        return fig
+
 
 coulomb_fmt = '  1' + 4*' %10.4f' + ' 100' + 5*' %10.4f' + '    Fault 1'
 
