@@ -10,7 +10,7 @@ def read(path):
     """
     import json, numpy
     meta = json.load(open(path + '.json'))
-    data = np.load(path + '.npz')
+    data = numpy.load(path + '.npz')
     return meta, data
 
 
@@ -29,7 +29,6 @@ def read_srf(fh, meta=None):
     """
     Read SRF text format.
     """
-    import json
     import numpy as np
 
     # mks units
@@ -142,7 +141,7 @@ def read_srf(fh, meta=None):
     ))
     meta['displacement'] = p / a
     if meta1 != None:
-        self.meta.update(meta1)
+        meta.update(meta1)
 
     return meta, data
 
@@ -168,6 +167,7 @@ def write_srf(fh, srf):
     u_cm2 = 10000
 
     # header block
+    meta, data = srf
     fh.write('%s\n' % meta['version'])
     if 'plane' in meta:
         for i, seg in enumerate(meta['plane']):
@@ -253,8 +253,8 @@ def write_sord(path, srf, delta=(1,1,1), proj=None, dbytes=4):
     i2 = data['nt2'] > 0
     i3 = data['nt3'] > 0
     with open(path + 'nt.bin', 'wb') as f1:
-        with open(path + 'dt.bin', 'wb') as f2:
-        with open(path + 't0.bin', 'wb') as f3:
+     with open(path + 'dt.bin', 'wb') as f2:
+      with open(path + 't0.bin', 'wb') as f3:
         data['nt1'][i1].astype(i_).tofile(f1)
         data['nt2'][i2].astype(i_).tofile(f1)
         data['nt3'][i3].astype(i_).tofile(f1)
@@ -275,8 +275,8 @@ def write_sord(path, srf, delta=(1,1,1), proj=None, dbytes=4):
     y = 1.0 + y / delta[1]
     z = 1.0 + z / delta[2]
     with open(path + 'xi1.bin', 'wb') as f1:
-        with open(path + 'xi2.bin', 'wb') as f2:
-        with open(path + 'xi3.bin', 'wb') as f3:
+     with open(path + 'xi2.bin', 'wb') as f2:
+      with open(path + 'xi3.bin', 'wb') as f3:
         for i in i1, i2, i3:
             x[i].astype(f_).tofile(f1)
             y[i].astype(f_).tofile(f2)
@@ -292,15 +292,15 @@ def write_sord(path, srf, delta=(1,1,1), proj=None, dbytes=4):
 
     # tensor components
     with open(path + 'w11.bin', 'wb') as f11:
-        with open(path + 'w23.bin', 'wb') as f22:
-        with open(path + 'w33.bin', 'wb') as f33:
+     with open(path + 'w23.bin', 'wb') as f22:
+      with open(path + 'w33.bin', 'wb') as f33:
         for p, i in (p1, i1), (p2, i2), (p3, i3):
             p[0,0,i].astype(f_).tofile(f11)
             p[0,1,i].astype(f_).tofile(f22)
             p[0,2,i].astype(f_).tofile(f33)
     with open(path + 'w23.bin', 'wb') as f23:
-        with open(path + 'w31.bin', 'wb') as f31:
-        with open(path + 'w12.bin', 'wb') as f12:
+     with open(path + 'w31.bin', 'wb') as f31:
+      with open(path + 'w12.bin', 'wb') as f12:
         for p, i in (p1, i1), (p2, i2), (p3, i3):
             p[1,0,i].astype(f_).tofile(f23)
             p[1,1,i].astype(f_).tofile(f31)
@@ -413,11 +413,11 @@ def write_awp(path, srf, t, mu, lam=0.0, delta=1.0, proj=None,
             i3 += n3
     return
 
+
 def plot(meta, srf, key='slip1', clim=[0, 10], scale=0.1, cmap='wbgr'):
     """
     Plot fault surface for simple plane geometry only.
     """
-
     import numpy as np
     from matplotlib import pyplot
     from . import coord
@@ -499,7 +499,7 @@ def write_coulomb(path, srf, proj, scut=0):
     proj: PyProj map projection instance
     scut: slip-rate below which values are not output
     """
-    import os, math
+    import math
     import numpy as np
     from . import coord
 
@@ -542,7 +542,6 @@ def write_coulomb(path, srf, proj, scut=0):
         np.savetxt(fh, c, coulomb_fmt)
         fh.write(coulomb_footer)
     return
-
 
 coulomb_fmt = '  1' + 4*' %10.4f' + ' 100' + 5*' %10.4f' + '    Fault 1'
 
