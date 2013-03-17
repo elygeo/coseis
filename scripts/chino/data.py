@@ -24,7 +24,8 @@ if os.path.exists(f):
     mts = json.load(f)
 else:
     mts = cst.scedc.mts(event_id)
-    json.dump(mts, f)
+    f = open(f, 'w')
+    json.dump(mts, f, indent=4, sort_keys=True)
 m = mts['double_couple_clvd']
 source1 =  m['myy'],  m['mxx'],  m['mzz']
 source2 = -m['mxz'], -m['myz'],  m['mxy']

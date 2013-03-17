@@ -16,18 +16,17 @@ def catalog(version='CFM4-socal-primary'):
     the fault name and number of segments. The CFM database is downloaded if not
     already present.
     """
-    import os, urllib, zipfile
+    import os, urllib, zipfile, json
     import numpy as np
     from . import gocad
 
-    fault_file = os.path.join(repo, 'cfm4', 'fault-list.txt')
+    fault_file = os.path.join(repo, 'cfm4', 'fault-list.json')
     path = os.path.join(repo, 'cfm4', version)
     npy = os.path.join(path, '%s-%04d-%s.npy')
     url = 'http://structure.harvard.edu/cfm/download/vdo/SCEC_VDO.jar'
-    dtype = [('name', 'S64'), ('nseg', 'i')]
 
     if os.path.exists(fault_file):
-        cat = dict(np.loadtxt(fault_file, dtype))
+        cat = json.load(open(fault_file))
     else:
         f = os.path.join(repo, 'scec-vdo.jar')
         if not os.path.exists(f):
@@ -51,8 +50,8 @@ def catalog(version='CFM4-socal-primary'):
                 x = xyz[:,i]
                 np.save(npy % (key, k, 'xyz'), x)
                 np.save(npy % (key, k, 'tri'), t)
-        f = np.array(sorted(cat.items()), dtype)
-        np.savetxt(fault_file, f, '%s %s')
+        f = open(fault_file, 'w')
+        json.dump(cat, f, indent=0, sort_keys=True)
     return cat
 
 
@@ -129,20 +128,20 @@ def read(faults=None, extent=None, version='CFM4-socal-primary'):
 
     Returns
     -------
-    
-    data (dict):
-        x, y, z: Vertex Cartesian coordinates
-        lon, lat: vertex geographic coordinate
-        tri: List of N x 3 array of vertex indices
-        stk: Fault strike
-        dip: Fault dip
 
     meta (dict):
         name: Fault name
-        x0, y0, z0: Center of mass Cartesian coordinates
-        lon0, lat0: Center of mass geographic coordinates
+        center [lon, lat, z]: Center of mass geographic coordinates
+        center_utm [x, y, z]: Center of mass Cartesian coordinates
         extent: (min_lon, max_lon), (min_lat, max_lat)
         area: Total surface area
+    
+    data (dict):
+        x, y, z: Vertex Cartesian coordinates
+        lon, lat: Vertex geographic coordinate
+        tri: List of N x 3 array of vertex indices
+        stk: Fault strike
+        dip: Fault dip
     """
     import os, math
     import numpy as np
@@ -195,21 +194,30 @@ def read(faults=None, extent=None, version='CFM4-socal-primary'):
 
     # properties
     x, y, z, lon, lat = vtx
-    ctr, nrm, area = tsurf_plane((x, y, z), tri)
+    center_utm, nrm, area = tsurf_plane((x, y, z), tri)
     x, y, z = nrm
-    x0, y0, z0 = ctr
+    x0, y0, z0 = center_utm
     r = math.sqrt(x * x + y * y) / z
     dip = math.atan(r) / math.pi * 180.0
     x = x0, x0 - x, x0 + x
     y = y0, y0 - y, y0 + y
     x, y = proj(x, y, inverse=True)
-    lon0, lat0 = x[0], y[0]
-    x = 0.5 * (x[2] - x[1]) * math.cos(lat0 / 180.0 * math.pi)
+    center = x[0], y[0], z0
+    x = 0.5 * (x[2] - x[1]) * math.cos(center[1] / 180.0 * math.pi)
     y = 0.5 * (y[2] - y[1])
     stk = (math.atan2(-y, x) / math.pi * 180.0) % 360.0
     extent = (lon.min(), lon.max()), (lat.min(), lat.max())
 
     # data object
+    meta = dict(
+        center_utm = center_utm,
+        center = center,
+        extent = extent,
+        stk = stk,
+        dip = dip,
+        area = area,
+        name = name,
+    )
     x, y, z, lon, lat = vtx
     data = dict(
         x = x,
@@ -219,19 +227,7 @@ def read(faults=None, extent=None, version='CFM4-socal-primary'):
         lat = lat,
         tri = tri,
     )
-    meta = dict(
-        x0 = x0,
-        y0 = y0,
-        z0 = z0,
-        lon0 = lon0,
-        lat0 = lat0,
-        extent = extent,
-        stk = stk,
-        dip = dip,
-        area = area
-        name = name,
-    )
-    return data, meta
+    return meta, data
 
 
 def search(cat, patterns, split=False):
@@ -281,6 +277,7 @@ def explore(faults=None, split=False, basemap=True):
     Save a screen-shot                 S
     Help                             h ?
     """
+    import os
     import numpy as np
     import pyproj
     from enthought.mayavi import mlab
@@ -305,27 +302,37 @@ def explore(faults=None, split=False, basemap=True):
     fig.name = fig_name
     fig.scene.disable_render = True
 
-    # DEM
     if basemap:
-        x, y, dem = data_m.dem(extent, mesh=True)
-        extent = (x.min(), x.max()), (y.min(), y.max())
-        x, y = proj(x, y)
-        mlab.mesh(x, y, dem, color=(1,1,1), opacity=0.3)
 
-    # base map
-    if basemap:
-        ddeg = 0.5 / 60.0
-        x, y = np.c_[
-            data.mapdata('coastlines', resolution, extent, 10.0, delta=ddeg),
-            [float('nan'), float('nan')],
-            data.mapdata('borders', resolution, extent, delta=ddeg),
-        ]
-        x -= 360.0
-        z = interpolate.interp2(extent, dem, (x, y))
-        x, y = proj(x, y)
-        i = np.isnan(z)
-        x[i] = float('nan')
-        y[i] = float('nan')
+        # DEM
+        f = os.path.join(repo, 'cfm4', 'dem.npy')
+        if os.path.exists(f):
+            x, y, z = np.load(f)
+        else:
+            x, y, z = data.dem(extent, mesh=True)
+            extent = (x.min(), x.max()), (y.min(), y.max())
+            x, y = proj(x, y)
+            np.save(f, [x, y, z])
+        mlab.mesh(x, y, z, color=(1,1,1), opacity=0.3)
+
+        # base map
+        f = os.path.join(repo, 'cfm4', 'mapdata.npy')
+        if os.path.exists(f):
+            x, y, z = np.load(f)
+        else:
+            ddeg = 0.5 / 60.0
+            x, y = np.c_[
+                data.mapdata('coastlines', resolution, extent, 10.0, delta=ddeg),
+                [float('nan'), float('nan')],
+                data.mapdata('borders', resolution, extent, delta=ddeg),
+            ]
+            x -= 360.0
+            z = interpolate.interp2(extent, z, (x, y))
+            x, y = proj(x, y)
+            i = np.isnan(z)
+            x[i] = float('nan')
+            y[i] = float('nan')
+            np.save(f, [x, y, z])
         mlab.plot3d(x, y, z, color=(0,0,0), line_width=1, tube_radius=None)
 
     # fault surfaces
@@ -335,12 +342,12 @@ def explore(faults=None, split=False, basemap=True):
     coords = []
     for f in faults:
         print('    ' + repr(f))
-        data_, meta = read([f])
+        meta, data_ = read([f])
         x, y = proj(data_['lon'], data_['lat'])
         z, t = data_['z'], data_['tri'].T
         s = mlab.triangular_mesh(x, y, z, t, representation='surface', color=color_bg)
-        x, y = proj(meta['lon0'], meta['lat0'])
-        z = meta['z0']
+        x, y, z = meta['center']
+        x, y = proj(x, y)
         a = s.actor.actor
         coords += [[x, y, z, a]]
         names[a] = meta['name']
@@ -393,10 +400,39 @@ def explore(faults=None, split=False, basemap=True):
     mlab.show()
 
 
-def cubit_facet(data, geographic=False):
+def outline(surf, delta=0.001):
+    """
+    Find the outline in lon/lat for a tri surf.
+
+    A quick and dirty method that samples the tri surf onto a regular mesh, and
+    then contours the boundary of non-empty samples. Smaller values of delta give
+    finer results but take longer to compute.
+    """
+    import math
+    import numpy as np
+    from . import trinterp, plt
+    meta, data = surf
+    lat = meta['center'][1] * math.pi / 180.0
+    s = math.cos(lat)
+    dx, dy = s * delta, delta
+    xi, yi = meta['extent']
+    xi = np.arange(xi[0] - 0.1 * dx, xi[1] + 1.1 * dx, dx)
+    yi = np.arange(yi[0] - 0.1 * dy, yi[1] + 1.1 * dy, dy)
+    yi, xi = np.meshgrid(yi, xi)
+    x = data['lon']
+    y = data['lat']
+    t = data['tri']
+    z = np.ones_like(x)
+    zi = trinterp.trinterp((x, y), z, t, (xi, yi), no_data_val=-1)
+    c = plt.contour(xi, yi, zi, [0])[0]
+    return c
+
+
+def cubit_facet(surf, geographic=True):
     """
     Create CUBIT Facet File text representation
     """
+    data = surf[1]
     if geographic:
         x, y, z = data['lon'], data['lat'], data['z']
     else:

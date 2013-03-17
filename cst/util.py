@@ -48,9 +48,45 @@ class storage(dict):
         return self[key]
 
 
+def open_(fh, mode='r'):
+    """
+    Open a regular or compressed file if not already opened.
+    """
+    if isinstance(fh, basestring):
+        import os, gzip
+        fh = os.path.expanduser(fh)
+        if fh.endswith('.gz'):
+            fh = gzip.open(fh, mode)
+        else:
+            fh = open(fh, mode)
+    return fh
+
+
+def load_jnp(path):
+    """
+    Read JSON metadata and NumPy data pair.
+    """
+    import json, numpy
+    meta = json.load(open(path + '.json'))
+    data = numpy.load(path + '.npz')
+    return meta, data
+
+
+def dump_jnp(path, pair):
+    """
+    Write JSON metadata and NumPy data pair.
+    """
+    import json, numpy
+    meta, data = pair
+    json.dump(meta, open(path + '.json', 'w'), indent=4, sort_keys=True)
+    numpy.savez_compressed(path + '.npz', **data)
+    return
+
+
 def save(*args, **kwargs):
-    raise Exception('util.save() has been removed. Use util.dumps() instead.') 
+    raise Exception('util.save() is removed. json.dump() recommend alternative.') 
     
+
 def dumps(obj, expand=None):
     import json
     s = []

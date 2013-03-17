@@ -4,44 +4,25 @@ Utilities for Graves Standard Rupture Format (SRF).
 SRF is documented at http://epicenter.usc.edu/cmeportal/docs/srf4.pdf
 """
 
-def read(path):
+def read(fh):
     """
-    Write SRF binary format.
-    """
-    import json, numpy
-    meta = json.load(open(path + '.json'))
-    data = numpy.load(path + '.npz')
-    return meta, data
+    Read SRF file.
 
-
-def write(path, srf):
-    """
-    Write SRF binary format.
-    """
-    import json, numpy
-    meta, data = srf
-    json.dump(meta, open(path + '.json', 'w'), indent=4, sort_keys=True)
-    numpy.savez_compressed(path + '.npz', **data)
-    return
-
-
-def read_srf(fh, meta=None):
-    """
-    Read SRF text format.
+    Given file handle fh, return SRF metadata/data pair of dictionaries. The first
+    dict 'meta' contains scalars and metadata. The second dict 'data' contains
+    NumPy arrays.
     """
     import numpy as np
+    from .util import open_
+
+    fh = open_(fh)
 
     # mks units
     u_km = 1000
     u_cm = 0.01
     u_cm2 = 0.0001
 
-    # open file
-    if isinstance(fh, basestring):
-        fh = open(fh)
-
     # header block
-    meta1 = meta
     meta = {}
     meta['version'] = fh.next().split()[0]
     s = fh.next().split()
@@ -140,26 +121,18 @@ def read_srf(fh, meta=None):
         (data['area'] * data['slip3']).sum(dtype='d') ** 2
     ))
     meta['displacement'] = p / a
-    if meta1 != None:
-        meta.update(meta1)
 
     return meta, data
 
 
-def write_srf(fh, srf):
+def write(fh, srf):
     """
-    Write SRF text format.
-
-    Parameters
-    ----------
-    fh: file handle or file name path
-    srf: (meta, data) SRF dictionaries
+    Write SRF file.
     """
     import numpy as np
+    from .util import open_
 
-    # open file
-    if isinstance(fh, basestring):
-        fh = open(fh)
+    fh = open_(fh)
 
     # mks units
     u_km = 0.001
@@ -232,21 +205,18 @@ def write_sord(path, srf, delta=(1,1,1), proj=None, dbytes=4):
 
     Parameters
     ----------
-    path: file name path
+    path: file name root
     srf: (meta, data) SRF dictionaries
     delta: grid step size (dx, dy, dz)
     proj: function to project lon/lat to logical model coordinates
     dbytes: 4 or 8
     """
-    import os
     from . import coord
 
     # setup
     meta, data = srf
     i_ = 'i%s' % dbytes
     f_ = 'f%s' % dbytes
-    path = os.path.expanduser(path) + os.sep
-    os.mkdir(path)
 
     # time
     i1 = data['nt1'] > 0
@@ -331,14 +301,14 @@ def write_sord(path, srf, delta=(1,1,1), proj=None, dbytes=4):
     return
 
 
-def write_awp(path, srf, t, mu, lam=0.0, delta=1.0, proj=None,
+def write_awp(fh, srf, t, mu, lam=0.0, delta=1.0, proj=None,
     binary=True, interp='linear'):
     """
     Write ODC-AWP moment rate input file.
 
     Parameters
     ----------
-    path: file name on disk
+    fh: file handle
     srf: (meta, data) SRF dictionaries
     t: array of time values
     mu, lam: elastic moduli
@@ -349,14 +319,25 @@ def write_awp(path, srf, t, mu, lam=0.0, delta=1.0, proj=None,
     """
     import numpy as np
     from . import coord, interpolate
+    from .util import open_
+
+    fh = open_(fh)
+
+    # parameters
+    meta, data = srf
     if type(delta) not in (tuple, list):
         delta = delta, delta, delta
-
-    # coordinates
-    meta, data = srf
     x = data['lon']
     y = data['lat']
     z = data['dep']
+    dt = data['dt']
+    t0 = data['t0']
+    stk = data['stk']
+    dip = data['dip']
+    rake = data['rake']
+    area = data['area']
+
+    # coordinates
     if proj:
         rot = coord.rotation(x, y, proj)[1]
         x, y = proj(x, y)
@@ -368,53 +349,51 @@ def write_awp(path, srf, t, mu, lam=0.0, delta=1.0, proj=None,
     del(x, y, z)
 
     # moment tensor components
-    stk, dip, rake = data['stk'], data['dip'], data['rake']
     s1, s2, n = coord.slip_vectors(stk + rot, dip, rake)
-    m1 = mu * data['area'] * coord.potency_tensor(n, s1) * 2.0
-    m2 = mu * data['area'] * coord.potency_tensor(n, s2) * 2.0
-    m3 = lam * data['area'] * coord.potency_tensor(n, n) * 2.0
+    m1 = mu * area * coord.potency_tensor(n, s1) * 2.0
+    m2 = mu * area * coord.potency_tensor(n, s2) * 2.0
+    m3 = lam * area * coord.potency_tensor(n, n) * 2.0
     del(s1, s2, n)
 
     # write file
+    s = np.zeros_like
     i1 = 0
     i2 = 0
     i3 = 0
-    s = np.zeros_like
-    with open(path, 'wb') as fh:
-        for i in range(data['dt'].size):
-            n1 = data['nt1'][i]
-            n2 = data['nt2'][i]
-            n3 = data['nt3'][i]
-            s1 = data['sv1'][i1:i1+n1]
-            s2 = data['sv2'][i2:i2+n2]
-            s3 = data['sv3'][i3:i3+n3]
-            t1 = data['t0'][i], data['t0'][i] + data['dt'][i] * (n1 - 1)
-            t2 = data['t0'][i], data['t0'][i] + data['dt'][i] * (n2 - 1)
-            t3 = data['t0'][i], data['t0'][i] + data['dt'][i] * (n3 - 1)
-            s1 = interpolate.interp(t1, s1, t, s(t), interp, bound=True)
-            s2 = interpolate.interp(t2, s2, t, s(t), interp, bound=True)
-            s3 = interpolate.interp(t3, s3, t, s(t), interp, bound=True)
-            ii = np.array([[jj[i], kk[i], ll[i]]], 'i')
-            mm = np.array([
-                m1[0,0,i] * s1 + m2[0,0,i] * s2 + m3[0,0,i] * s3,
-                m1[0,1,i] * s1 + m2[0,1,i] * s2 + m3[0,1,i] * s3,
-                m1[0,2,i] * s1 + m2[0,2,i] * s2 + m3[0,2,i] * s3,
-                m1[1,1,i] * s1 + m2[1,1,i] * s2 + m3[1,1,i] * s3,
-                m1[1,0,i] * s1 + m2[1,0,i] * s2 + m3[1,0,i] * s3,
-                m1[1,2,i] * s1 + m2[1,2,i] * s2 + m3[1,2,i] * s3,
-            ])
-            if binary:
-                mm.astype('f').tofile(fh)
-            else:
-                np.savetxt(fh, ii, '%d')
-                np.savetxt(fh, mm.T, '%14.6e')
-            i1 += n1
-            i2 += n2
-            i3 += n3
+    for i in range(dt.size):
+        n1 = data['nt1'][i]
+        n2 = data['nt2'][i]
+        n3 = data['nt3'][i]
+        s1 = data['sv1'][i1:i1+n1]
+        s2 = data['sv2'][i2:i2+n2]
+        s3 = data['sv3'][i3:i3+n3]
+        t1 = t0[i], t0[i] + dt[i] * (n1 - 1)
+        t2 = t0[i], t0[i] + dt[i] * (n2 - 1)
+        t3 = t0[i], t0[i] + dt[i] * (n3 - 1)
+        s1 = interpolate.interp(t1, s1, t, s(t), interp, bound=True)
+        s2 = interpolate.interp(t2, s2, t, s(t), interp, bound=True)
+        s3 = interpolate.interp(t3, s3, t, s(t), interp, bound=True)
+        ii = np.array([[jj[i], kk[i], ll[i]]], 'i')
+        mm = np.array([
+            m1[0,0,i] * s1 + m2[0,0,i] * s2 + m3[0,0,i] * s3,
+            m1[0,1,i] * s1 + m2[0,1,i] * s2 + m3[0,1,i] * s3,
+            m1[0,2,i] * s1 + m2[0,2,i] * s2 + m3[0,2,i] * s3,
+            m1[1,1,i] * s1 + m2[1,1,i] * s2 + m3[1,1,i] * s3,
+            m1[1,0,i] * s1 + m2[1,0,i] * s2 + m3[1,0,i] * s3,
+            m1[1,2,i] * s1 + m2[1,2,i] * s2 + m3[1,2,i] * s3,
+        ])
+        if binary:
+            mm.astype('f').tofile(fh)
+        else:
+            np.savetxt(fh, ii, '%d')
+            np.savetxt(fh, mm.T, '%14.6e')
+        i1 += n1
+        i2 += n2
+        i3 += n3
     return
 
 
-def plot(meta, srf, key='slip1', clim=[0, 10], scale=0.1, cmap='wbgr'):
+def plot(srf, key='slip1', clim=[0, 10], scale=0.1, cmap='wbgr'):
     """
     Plot fault surface for simple plane geometry only.
     """
@@ -542,6 +521,7 @@ def write_coulomb(path, srf, proj, scut=0):
         np.savetxt(fh, c, coulomb_fmt)
         fh.write(coulomb_footer)
     return
+
 
 coulomb_fmt = '  1' + 4*' %10.4f' + ' 100' + 5*' %10.4f' + '    Fault 1'
 

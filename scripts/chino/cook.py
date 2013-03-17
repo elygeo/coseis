@@ -4,10 +4,10 @@ Decimate surface output and compute PGV, PGD
 """
 import os
 import numpy as np
-import meta
 
 # metatdata
 path = 'hold/'
+meta = json.load('meta.json')
 dt = meta.deltas[path + 'full-v1.bin'][-1]
 nfull = meta.shapes[path + 'full-v1.bin']
 nhist = meta.shapes[path + 'hist-v1.bin']

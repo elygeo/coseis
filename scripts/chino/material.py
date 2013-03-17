@@ -84,31 +84,32 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
 
     # metadata
     mesh_id = '%s%04.f%s' % (label, dx, cvm[-1])
-    meta = dict(
-        cvm = cvm,
-        mesh_id = mesh_id,
-        delta = delta,
-        shape = shape,
-        ntop = ntop,
-        npml = npml,
-        bounds = bounds,
-        corners = corners,
-        extent = extent,
-        origin = origin,
-        projection = projection,
-        transform = transform,
-        rotate = rotate,
-        dtype = np.dtype('f').str,
-    )
+    meta = {
+        '#': 'mesh parameters',
+        'cvm': cvm,
+        'mesh_id': mesh_id,
+        'delta': delta,
+        'shape': shape,
+        'ntop': ntop,
+        'npml': npml,
+        'bounds': bounds,
+        'corners': corners,
+        'extent': extent,
+        'origin': origin,
+        'projection': projection,
+        'transform': transform,
+        'rotate': rotate,
+    }
 
     # create run directory
     path = os.path.join('run', 'mesh', mesh_id) + os.sep
     os.makedirs(path + 'hold')
 
     # save data
-    #json.dump(meta, open('meta.txt', 'w'))
-    cst.util.save(path + 'meta.py', meta, header='# mesh parameters\n')
-    np.savetxt(path + 'box.txt', np.array(box, 'f').T)
+    f = open(path + 'meta.json', 'w')
+    json.dump(meta, f, indent=4, sort_keys=True)
+    np.save(path + 'box.npy', box)
+    np.save(path + 'mesh.npy', [x, y, z])
     x.astype('f').T.tofile(path + 'lon.bin')
     y.astype('f').T.tofile(path + 'lat.bin')
     z.astype('f').T.tofile(path + 'topo.bin')

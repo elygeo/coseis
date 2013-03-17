@@ -296,9 +296,12 @@ def trinterp(x, f, t, xi, fi=None, no_data_val=float('nan')):
         A01 = x[i2] - x[i0]
         A10 = y[i1] - y[i0]
         A11 = y[i2] - y[i0]
+        d = A00 * A11 - A01 * A10
+        if d == 0.0:
+            continue
+        d = 1.0 / d
         b0 = xi - x[i0]
         b1 = yi - y[i0]
-        d  = 1.0 / (A00 * A11 - A01 * A10)
         l1 = d * A11 * b0 - d * A01 * b1
         l2 = d * A00 * b1 - d * A10 * b0
         l0 = 1.0 - l1 - l2

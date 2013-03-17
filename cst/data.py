@@ -475,7 +475,7 @@ def engdahl_cat():
     import os, urllib
     import numpy as np
     filename = os.path.join(repo, 'engdahl-centennial-cat.npy')
-    url = 'http://earthquake.usgs.gov/research/data/centennial.cat'
+    url = 'http://earthquake.usgs.gov/research/data/centennial_Y2K.CAT'
     d = [
         6, ('icat',   'S6'),
         1, ('asol',   'S1'),
@@ -562,10 +562,11 @@ def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
 
     Returns
     -------
-    fh: file handle for reading srf
+    srf: (metadata, data) SRF dictionaries
     """
     import os, gzip, json, cStringIO, subprocess
     import numpy as np
+    from . import srf as srflib
 
     # locations
     v0, v1 = version
@@ -630,5 +631,7 @@ def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
         open(f, 'wb').write(g)
         g = cStringIO.StringIO(g)
         g = gzip.GzipFile(fileobj=g)
-    return g, meta
+    m, data = srflib.read(g)
+    m.update(meta)
+    return m, data
 

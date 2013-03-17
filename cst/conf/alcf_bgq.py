@@ -2,7 +2,6 @@
 ALCF IBM Blue Gene/Q
 
 install location:
-vesta.alcf.anl.gov:/gpfs/vesta_scratch/projects/
 mira.alcf.anl.gov:/gpfs/mira-fs0/projects/
 
 .soft:

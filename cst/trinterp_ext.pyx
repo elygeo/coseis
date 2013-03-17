@@ -9,7 +9,7 @@ Triangular mesh interpolation
 import numpy as np
 cimport numpy as np
 
-def trinterp(x, f, t, xi, fi=None):
+def trinterp(x, f, t, xi, fi=None, no_data_val=float('nan')):
     """
     Definition: cst.trinterp.trinterp(x, f, t, xi, fi=None)
 
@@ -51,7 +51,7 @@ def trinterp(x, f, t, xi, fi=None):
     # output array
     if fi == None:
         fi_ = np.empty_like(xi_)
-        fi_.fill(float('nan'))
+        fi_.fill(no_data_val)
     else:
         if fi.dtpe.char != 'd':
             raise ValueError('`fi` must be type double')
@@ -79,7 +79,18 @@ def trinterp(x, f, t, xi, fi=None):
             A01 = x_[i2] - x_[i0]
             A10 = y_[i1] - y_[i0]
             A11 = y_[i2] - y_[i0]
-            d = 1.0 / (A00 * A11 - A01 * A10)
+            d = A00 * A11 - A01 * A10
+
+            # if zero area triangle, move to the next one
+            if d == 0.0:
+                print('Degenerate triange: %s of %s' % (k, n))
+                if j % 2:
+                    k = (n + k - j - 1) % n
+                else:
+                    k = (n + k + j + 1) % n
+                continue
+
+            d = 1.0 / d
             b0 = xi_[i] - x_[i0]
             b1 = yi_[i] - y_[i0]
             l1 = d * A11 * b0 - d * A01 * b1

@@ -15,9 +15,8 @@ if target == []:
     print(doc)
 elif target == ['sord']:
     cst.sord.make()
-elif target == ['test']:
-    cst.tests.test_suite.test()
-elif target == ['build_all']:
+elif target == ['build']:
+    cst.tests.hello.make()
     cst.sord.make()
     cst.cvms.build()
     cst.cvmh.cvmh_voxet()
