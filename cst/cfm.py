@@ -122,7 +122,7 @@ def read(faults=None, extent=None, version='CFM4-socal-primary'):
     Parameters
     ----------
 
-    faults: List of faults names, and (optionally) segment indices.
+    faults: List of faults names, optionally with segment indices.
     extent: Return None if outside range (xmin, xmax), (ymin, ymax).
     version: CFM version name
 
@@ -148,7 +148,7 @@ def read(faults=None, extent=None, version='CFM4-socal-primary'):
     import pyproj
 
     # prep
-    nseg = catalog(version=version)
+    cat = catalog(version=version)
     proj = pyproj.Proj(**projection)
     path = os.path.join(repo, 'cfm4', version)
     npy = os.path.join(path, '%s-%04d-%s.npy')
@@ -160,14 +160,13 @@ def read(faults=None, extent=None, version='CFM4-socal-primary'):
     name = []
     if isinstance(faults, basestring):
         faults = [faults]
-    for f in faults:
-        if type(f) in (list, tuple):
-            f, segs = f
-            if type(segs) is int:
-                segs = [segs]
+    for fs in faults:
+        f, s = (fs + ':').split(':')[:2]
+        if s:
+            s = (int(i) for i in s.split(','))
         else:
-            segs = range(nseg[f])
-        for i in segs:
+            s = range(cat[f])
+        for i in s:
             x, y, z = np.load(npy % (f, i, 'xyz'))
             lon, lat = proj(x, y, inverse=True)
             if extent:
@@ -183,7 +182,7 @@ def read(faults=None, extent=None, version='CFM4-socal-primary'):
             t = np.load(npy % (f, i, 'tri'))
             tri.append(t + n)
             n += x.size
-        name.append('%s%s' % (f, segs))
+        name.append(fs)
 
     # combine segments
     if len(vtx) == 0:
@@ -230,30 +229,23 @@ def read(faults=None, extent=None, version='CFM4-socal-primary'):
     return meta, data
 
 
-def search(cat, patterns, split=False):
-    """
-    Search a catalog for a list of string patterns.
-    Non-string patterns are passed through.
-    """
+def search(cat, patterns):
     if not patterns:
         match = sorted(cat)
     elif isinstance(patterns, basestring):
-        p = patterns.lower()
-        match = sorted(k for k in cat if p in k.lower())
-        if split:
-            match = [(k, i) for k in match for i in range(cat[k])]
-    else:
-        match = []
-        for p in patterns:
-            if isinstance(p, basestring):
-                p = p.lower()
-                m = (k for k in cat if p in k.lower())
-                if split:
-                    m = ((k, i) for k in m for i in range(cat[k]))
-                match.extend(m)
-            else:
-                match.append(p)
-        match = sorted(match)
+        patterns = [patterns]
+    match = []
+    for p in patterns:
+        f, s = (p + ':').split(':')[:2]
+        if f[0] == '*':
+            f = f[1:].lower()
+            fs = (k + ':' + s for k in cat if f in k.lower())
+        else:
+            fs = [k + ':' + s]
+            if p not in cat:
+                raise Exception('Not found in catalog: ' + p)
+        match.extend(fs)
+    match = sorted(match)
     return match
 
 
@@ -275,6 +267,8 @@ def explore(faults=None, split=False, basemap=True):
     Reset the view                Delete
     Toggle stereo view                 3
     Save a screen-shot                 S
+    Info on selected fault             I
+    Focus on selected fault            0
     Help                             h ?
     """
     import os
@@ -297,7 +291,7 @@ def explore(faults=None, split=False, basemap=True):
 
     # setup figure
     fig_name = 'CFMX: Community Fault Model Explorer'
-    print '\n%s\n' % fig_name
+    print('\n%s\n' % fig_name)
     fig = mlab.figure(bgcolor=(1,1,1), fgcolor=(0,0,0), size=(1280, 720))
     fig.name = fig_name
     fig.scene.disable_render = True
@@ -336,52 +330,68 @@ def explore(faults=None, split=False, basemap=True):
         mlab.plot3d(x, y, z, color=(0,0,0), line_width=1, tube_radius=None)
 
     # fault surfaces
-    faults = search(catalog(), faults, split)
-    print '\nReading %s fault surfaces:\n' % len(faults)
-    names = {}
+    cat = catalog()
+    faults = search(cat, faults)
+    print('\nReading %s fault surfaces:\n' % len(faults))
+    meta = {}
     coords = []
-    for f in faults:
-        print('    ' + repr(f))
-        meta, data_ = read([f])
-        x, y = proj(data_['lon'], data_['lat'])
-        z, t = data_['z'], data_['tri'].T
-        s = mlab.triangular_mesh(x, y, z, t, representation='surface', color=color_bg)
-        x, y, z = meta['center']
-        x, y = proj(x, y)
-        a = s.actor.actor
-        coords += [[x, y, z, a]]
-        names[a] = meta['name']
+    for fs in faults:
+        print(fs)
+        f, s = fs.split(':')
+        if split:
+            if s:
+                fss = ('%s:%s' % (f, i) for i in s.split(','))
+            else:
+                fss = ('%s:%s' % (f, i) for i in range(cat[f]))
+        else:
+            fss = [fs]
+        for fs in fss:
+            m, d = read(fs)
+            x, y = proj(d['lon'], d['lat'])
+            z, t = d['z'], d['tri'].T
+            s = mlab.triangular_mesh(x, y, z, t, representation='surface', color=color_bg)
+            x, y, z = m['center']
+            x, y = proj(x, y)
+            a = s.actor.actor
+            meta[a] = m
+            coords += [[x, y, z, a]]
 
     # handle key press
     def on_key_press(obj, event, current=[None]):
         k = obj.GetKeyCode()
         fig.scene.disable_render = True
-        if k in '[]':
+        if k in '[]{}':
+            import pprint
             m = fig.scene.camera.view_transform_matrix.to_array()
             mx, my, mz, mt = m[0]
             actors = [(mx*x + my*y + mz*z + mt, a) for x, y, z, a in coords]
             actors = [a for r, a in sorted(actors)]
             if current[0]:
-                d = {'[': -1, ']': 1}[k]
+                d = {'[': -1, ']': 1, '{': -1, '}': 1}[k]
                 i = (actors.index(current[0]) + d) % len(actors)
                 current[0].property.opacity = opacity
                 current[0].property.color = color_bg
             else:
                 i = len(actors) // 2
-                for a in names.keys():
+                for a in meta.keys():
                     a.property.opacity = opacity
                     a.property.color = color_bg
             a = actors[i]
             a.property.opacity = 1.0
             a.property.color = color_hl
-            fig.name = names[a]
+            fig.name = meta[a]['name']
+            print(pprint.pformat(meta[a]) + '\n')
+            if k in '{}':
+                x, y, z = meta[a]['center']
+                x, y = proj(x, y)
+                mlab.view(focalpoint=[x, y, z])
             current[0] = a
         elif k == '\\' and current[0]:
             current[0] = None
             fig.name = fig_name
-            for a in names.keys():
+            for a in meta.keys():
                 a.property.opacity = 1.0
-                a.property.color = color_hl
+                a.property.color = color_bg
         elif ord(k) == 8: # delete key
             mlab.view(view_azimuth, view_elevation)
             fig.scene.camera.view_angle = view_angle
