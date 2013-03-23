@@ -52,31 +52,93 @@ def catalog(version='CFM4-socal-primary'):
                 np.save(npy % (key, k, 'tri'), t)
         f = open(fault_file, 'w')
         json.dump(cat, f, indent=0, sort_keys=True)
+
     return cat
 
 
-def tsurf_plane(xyz, tri):
+def search(cat, patterns):
+    """
+    Search the CFM catalog for a list of faults. If the fault name
+    begins with '*', the is a search pattern.
+    """
+    if not patterns:
+        match = sorted(cat)
+    elif isinstance(patterns, basestring):
+        patterns = [patterns]
+    match = []
+    for p in patterns:
+        f, s = (p + ':').split(':')[:2]
+        if f[0] == '*':
+            f = f[1:].lower()
+            fs = (k + ':' + s for k in cat if f in k.lower())
+        else:
+            fs = [k + ':' + s]
+            if p not in cat:
+                raise Exception('Not found in catalog: ' + p)
+        match.extend(fs)
+    match = sorted(match)
+
+    return match
+
+
+def read(faults=None, version='CFM4-socal-primary'):
+    """
+    Read CFM triangulated surface data for a given list of fault
+    names, returning three objects:
+    vtx: 3 x M array of vertex Cartesian coordinates
+    tri: N x 3 array of vertex indices
+    name: Common prefix of the fault names
+    """
+    import os
+    import numpy as np
+
+    # prep
+    cat = catalog(version=version)
+    path = os.path.join(repo, 'cfm4', version)
+    npy = os.path.join(path, '%s-%04d-%s.npy')
+
+    # read faults
+    n = 0
+    vtx = []
+    tri = []
+    name = []
+    if isinstance(faults, basestring):
+        faults = [faults]
+    for fs in faults:
+        f, s = (fs + ':').split(':')[:2]
+        if s:
+            s = (int(i) for i in s.split(','))
+        else:
+            s = range(cat[f])
+        for i in s:
+            x, y, z = np.load(npy % (f, i, 'xyz'))
+            vtx.append([x, y, z])
+            t = np.load(npy % (f, i, 'tri'))
+            tri.append(t + n)
+            n += x.size
+        name.append(fs)
+
+    # combine segments
+    if len(vtx) == 0:
+        return
+    vtx = np.hstack(vtx)
+    tri = np.hstack(tri)
+    name = os.path.commonprefix(name)
+
+    return vtx, tri, name
+
+
+def tsurf_plane(vtx, tri):
     """
     Find the center of mass, best-fit plane, and total surface area of a
     triangulated surface.
-
-    Parameters
-    ----------
-    xyz: vertex coordinates (x, y, z)
-    tri: triangle indices (j, k, l)
-
-    Returns
-    -------
-    center: center of mass (x, y, z)
-    normal: mean unit surface normal (nx, ny, nz)
-    area: total surface area
     """
     import math
     import numpy as np
     import scipy.optimize
 
     # area normals
-    x, y, z = xyz
+    x, y, z = vtx
     j, k, l = tri
     ux = x[k] - x[j]
     uy = y[k] - y[j]
@@ -97,13 +159,15 @@ def tsurf_plane(xyz, tri):
     z = d * ((z[j] + z[k] + z[l]) * a).sum()
     center = x, y, z
 
-    # best fit plane
+    # plane misfit function
     def misfit(plane):
         phi, theta = plane
         x = math.cos(theta) * math.cos(phi)
         y = math.cos(theta) * math.sin(phi)
         z = math.sin(theta)
         return -abs(x * wx + y * wy + z * wz).sum()
+
+    # best fit plane
     phi, theta = scipy.optimize.fmin(misfit, (0.0, 0.0), disp=False)
     x = math.cos(theta) * math.cos(phi)
     y = math.cos(theta) * math.sin(phi)
@@ -111,91 +175,27 @@ def tsurf_plane(xyz, tri):
     if z < 0.0:
         x, y, z = -x, -y, -z
     normal = x, y, z
+
     return center, normal, area
 
 
-def read(faults=None, extent=None, version='CFM4-socal-primary'):
+def geometry(vtx, tri):
     """
-    Read CFM triangulated surface data and compute various geometrical properties.
-    Data is returned as a single object with attributes.
-
-    Parameters
-    ----------
-
-    faults: List of faults names, optionally with segment indices.
-    extent: Return None if outside range (xmin, xmax), (ymin, ymax).
-    version: CFM version name
-
-    Returns
-    -------
-
-    meta (dict):
-        name: Fault name
-        center [lon, lat, z]: Center of mass geographic coordinates
-        center_utm [x, y, z]: Center of mass Cartesian coordinates
-        extent: (min_lon, max_lon), (min_lat, max_lat)
-        area: Total surface area
-    
-    data (dict):
-        x, y, z: Vertex Cartesian coordinates
-        lon, lat: Vertex geographic coordinate
-        tri: List of N x 3 array of vertex indices
-        stk: Fault strike
-        dip: Fault dip
+    Compute various geometrical properties:
+    center_utm: [x, y, z] center of mass Cartesian coordinates
+    center: [lon, lat, z] center of mass geographic coordinates
+    extent: [[min_lon, max_lon], [min_lat, max_lat]]
+    stk: Fault strike
+    dip: Fault dip
+    area: Total surface area
     """
-    import os, math
-    import numpy as np
+    import math
     import pyproj
 
-    # prep
-    cat = catalog(version=version)
     proj = pyproj.Proj(**projection)
-    path = os.path.join(repo, 'cfm4', version)
-    npy = os.path.join(path, '%s-%04d-%s.npy')
-
-    # read faults
-    n = 0
-    vtx = []
-    tri = []
-    name = []
-    if isinstance(faults, basestring):
-        faults = [faults]
-    for fs in faults:
-        f, s = (fs + ':').split(':')[:2]
-        if s:
-            s = (int(i) for i in s.split(','))
-        else:
-            s = range(cat[f])
-        for i in s:
-            x, y, z = np.load(npy % (f, i, 'xyz'))
-            lon, lat = proj(x, y, inverse=True)
-            if extent:
-                xlim, ylim = extent
-                if (
-                    lon.max() < xlim[0] or
-                    lon.min() > xlim[1] or
-                    lat.max() < ylim[0] or
-                    lat.min() > ylim[1]
-                ):
-                    continue
-            vtx.append([x, y, z, lon, lat])
-            t = np.load(npy % (f, i, 'tri'))
-            tri.append(t + n)
-            n += x.size
-        name.append(fs)
-
-    # combine segments
-    if len(vtx) == 0:
-        return
-    vtx = np.hstack(vtx)
-    tri = np.hstack(tri)
-    name = os.path.commonprefix(name)
-
-    # properties
-    x, y, z, lon, lat = vtx
-    center_utm, nrm, area = tsurf_plane((x, y, z), tri)
+    ctr, nrm, area = tsurf_plane(vtx, tri)
+    x0, y0, z0 = ctr
     x, y, z = nrm
-    x0, y0, z0 = center_utm
     r = math.sqrt(x * x + y * y) / z
     dip = math.atan(r) / math.pi * 180.0
     x = x0, x0 - x, x0 + x
@@ -205,51 +205,71 @@ def read(faults=None, extent=None, version='CFM4-socal-primary'):
     x = 0.5 * (x[2] - x[1]) * math.cos(center[1] / 180.0 * math.pi)
     y = 0.5 * (y[2] - y[1])
     stk = (math.atan2(-y, x) / math.pi * 180.0) % 360.0
-    extent = (lon.min(), lon.max()), (lat.min(), lat.max())
+    x, y = vtx[:2]
+    x, y = proj(x], y, inverse=True)
+    extent = (x.min(), x.max()), (y.min(), y.max())
 
-    # data object
-    meta = dict(
-        center_utm = center_utm,
-        center = center,
-        extent = extent,
-        stk = stk,
-        dip = dip,
-        area = area,
-        name = name,
-    )
-    x, y, z, lon, lat = vtx
-    data = dict(
-        x = x,
-        y = y,
-        z = z,
-        lon = lon,
-        lat = lat,
-        tri = tri,
-    )
-    return meta, data
+    # metadata dictionary
+    meta = {
+        'center_utm': ctr,
+        'center': center,
+        'extent': extent,
+        'stk': stk,
+        'dip': dip,
+        'area': area,
+    }
+
+    return meta
 
 
-def search(cat, patterns):
-    if not patterns:
-        match = sorted(cat)
-    elif isinstance(patterns, basestring):
-        patterns = [patterns]
-    match = []
-    for p in patterns:
-        f, s = (p + ':').split(':')[:2]
-        if f[0] == '*':
-            f = f[1:].lower()
-            fs = (k + ':' + s for k in cat if f in k.lower())
-        else:
-            fs = [k + ':' + s]
-            if p not in cat:
-                raise Exception('Not found in catalog: ' + p)
-        match.extend(fs)
-    match = sorted(match)
-    return match
+def outline(vtx, tri, delta=100, geographic=True):
+    """
+    Find the outline of a tri surf. A quick and dirty method that samples the tri
+    surf onto a regular mesh, and then contours the boundary of non-empty samples.
+    Smaller values of delta give finer results but take longer to compute.
+    """
+    import numpy as np
+    from . import trinterp, plt
+
+    d = delta / 10
+    x, y = vtx
+    xi = np.arange(x.min() - d, x.max() + d + delta, delta)
+    yi = np.arange(y.min() - d, y.max() + d + delta, delta)
+    yi, xi = np.meshgrid(yi, xi)
+    z = np.ones_like(x)
+    zi = trinterp.trinterp((x, y), z, tri, (xi, yi), no_data_val=-1)
+    x, y = plt.contour(xi, yi, zi, [0])[0]
+
+    if geographic:
+        import pyproj
+        proj = pyproj.Proj(**projection)
+        x, y = proj(x, y, inverse=True)
+
+    return x, y
 
 
-def explore(faults=None, split=False, basemap=True):
+def cubit_facet(vtx, tri, geographic=True):
+    """
+    Create CUBIT Facet File text representation
+    """
+    x, y, z = vtx
+    j, k, l = tri
+
+    if geographic:
+        import pyproj
+        proj = pyproj.Proj(**projection)
+        x, y = proj(x, y, inverse=True)
+
+    out = '%s %s\n' % (x.size, j.size)
+    for i in range(x.size):
+        out += '%s %s %s %s\n' % (i, x[i], y[i], z[i])
+    for i in range(j.size):
+        out += '%s %s %s %s\n' % (i, j[i], k[i], l[i])
+
+    return out
+
+
+def explore(faults=None, split=False):
     """
     CFMX: Community Fault Model Explorer
     ====================================
@@ -260,6 +280,7 @@ def explore(faults=None, split=False, basemap=True):
     -----------------
 
     Fault selection                  [ ]
+    Fault selection with focus       { }
     Reset fault selection              \\
     Rotate the view               Arrows
     Pan the view            Shift-Arrows
@@ -268,7 +289,6 @@ def explore(faults=None, split=False, basemap=True):
     Toggle stereo view                 3
     Save a screen-shot                 S
     Info on selected fault             I
-    Focus on selected fault            0
     Help                             h ?
     """
     import os
@@ -278,7 +298,7 @@ def explore(faults=None, split=False, basemap=True):
     from . import data, interpolate
 
     # parameters
-    proj = pyproj.Proj(proj='tmerc', lon_0=-118.0, lat_0=34.5)
+    proj = pyproj.Proj(**projection)
     extent = (-122.0, -114.0), (31.5, 37.5)
     resolution = 'high'
     view_azimuth = -90
@@ -296,45 +316,41 @@ def explore(faults=None, split=False, basemap=True):
     fig.name = fig_name
     fig.scene.disable_render = True
 
-    if basemap:
+    # DEM
+    f = os.path.join(repo, 'cfm4', 'dem.npy')
+    if os.path.exists(f):
+        x, y, z = np.load(f)
+    else:
+        x, y, z = data.dem(extent, mesh=True)
+        extent = (x.min(), x.max()), (y.min(), y.max())
+        x, y = proj(x, y)
+        np.save(f, [x, y, z])
+    mlab.mesh(x, y, z, color=(1,1,1), opacity=0.3)
 
-        # DEM
-        f = os.path.join(repo, 'cfm4', 'dem.npy')
-        if os.path.exists(f):
-            x, y, z = np.load(f)
-        else:
-            x, y, z = data.dem(extent, mesh=True)
-            extent = (x.min(), x.max()), (y.min(), y.max())
-            x, y = proj(x, y)
-            np.save(f, [x, y, z])
-        mlab.mesh(x, y, z, color=(1,1,1), opacity=0.3)
-
-        # base map
-        f = os.path.join(repo, 'cfm4', 'mapdata.npy')
-        if os.path.exists(f):
-            x, y, z = np.load(f)
-        else:
-            ddeg = 0.5 / 60.0
-            x, y = np.c_[
-                data.mapdata('coastlines', resolution, extent, 10.0, delta=ddeg),
-                [float('nan'), float('nan')],
-                data.mapdata('borders', resolution, extent, delta=ddeg),
-            ]
-            x -= 360.0
-            z = interpolate.interp2(extent, z, (x, y))
-            x, y = proj(x, y)
-            i = np.isnan(z)
-            x[i] = float('nan')
-            y[i] = float('nan')
-            np.save(f, [x, y, z])
-        mlab.plot3d(x, y, z, color=(0,0,0), line_width=1, tube_radius=None)
+    # base map
+    f = os.path.join(repo, 'cfm4', 'mapdata.npy')
+    if os.path.exists(f):
+        x, y, z = np.load(f)
+    else:
+        ddeg = 0.5 / 60.0
+        x, y = np.c_[
+            data.mapdata('coastlines', resolution, extent, 10.0, delta=ddeg),
+            [float('nan'), float('nan')],
+            data.mapdata('borders', resolution, extent, delta=ddeg),
+        ]
+        x -= 360.0
+        z = interpolate.interp2(extent, z, (x, y))
+        x, y = proj(x, y)
+        i = np.isnan(z)
+        x[i] = float('nan')
+        y[i] = float('nan')
+        np.save(f, [x, y, z])
+    mlab.plot3d(x, y, z, color=(0,0,0), line_width=1, tube_radius=None)
 
     # fault surfaces
     cat = catalog()
     faults = search(cat, faults)
     print('\nReading %s fault surfaces:\n' % len(faults))
-    meta = {}
-    coords = []
     for fs in faults:
         print(fs)
         f, s = fs.split(':')
@@ -346,26 +362,21 @@ def explore(faults=None, split=False, basemap=True):
         else:
             fss = [fs]
         for fs in fss:
-            m, d = read(fs)
-            x, y = proj(d['lon'], d['lat'])
-            z, t = d['z'], d['tri'].T
-            s = mlab.triangular_mesh(x, y, z, t, representation='surface', color=color_bg)
-            x, y, z = m['center']
-            x, y = proj(x, y)
+            vtx, tri, name = read(fs)
+            x, y, z = vtx
+            s = mlab.triangular_mesh(
+                x, y, z, tri.T,
+                representation = 'surface',
+                color = color_bg,
+            )
             a = s.actor.actor
-            meta[a] = m
-            coords += [[x, y, z, a]]
+            names[a] = name
 
     # handle key press
     def on_key_press(obj, event, current=[None]):
         k = obj.GetKeyCode()
         fig.scene.disable_render = True
         if k in '[]{}':
-            import pprint
-            m = fig.scene.camera.view_transform_matrix.to_array()
-            mx, my, mz, mt = m[0]
-            actors = [(mx*x + my*y + mz*z + mt, a) for x, y, z, a in coords]
-            actors = [a for r, a in sorted(actors)]
             if current[0]:
                 d = {'[': -1, ']': 1, '{': -1, '}': 1}[k]
                 i = (actors.index(current[0]) + d) % len(actors)
@@ -373,25 +384,24 @@ def explore(faults=None, split=False, basemap=True):
                 current[0].property.color = color_bg
             else:
                 i = len(actors) // 2
-                for a in meta.keys():
-                    a.property.opacity = opacity
-                    a.property.color = color_bg
             a = actors[i]
             a.property.opacity = 1.0
             a.property.color = color_hl
-            fig.name = meta[a]['name']
-            print(pprint.pformat(meta[a]) + '\n')
+            fig.name = names[a]
             if k in '{}':
                 x, y, z = meta[a]['center']
                 x, y = proj(x, y)
                 mlab.view(focalpoint=[x, y, z])
             current[0] = a
         elif k == '\\' and current[0]:
-            current[0] = None
+            a = current[0] = None
+            a.property.opacity = 1.0
+            a.property.color = color_bg
             fig.name = fig_name
-            for a in meta.keys():
-                a.property.opacity = 1.0
-                a.property.color = color_bg
+        elif k == 'i':
+            import pprint
+            m = meta[current[0]]
+            print(pprint.pformat(m) + '\n')
         elif ord(k) == 8: # delete key
             mlab.view(view_azimuth, view_elevation)
             fig.scene.camera.view_angle = view_angle
@@ -409,49 +419,4 @@ def explore(faults=None, split=False, basemap=True):
     print "\nPress H in the figure window for help."
     mlab.show()
 
-
-def outline(surf, delta=0.001):
-    """
-    Find the outline in lon/lat for a tri surf.
-
-    A quick and dirty method that samples the tri surf onto a regular mesh, and
-    then contours the boundary of non-empty samples. Smaller values of delta give
-    finer results but take longer to compute.
-    """
-    import math
-    import numpy as np
-    from . import trinterp, plt
-    meta, data = surf
-    lat = meta['center'][1] * math.pi / 180.0
-    s = math.cos(lat)
-    dx, dy = s * delta, delta
-    xi, yi = meta['extent']
-    xi = np.arange(xi[0] - 0.1 * dx, xi[1] + 1.1 * dx, dx)
-    yi = np.arange(yi[0] - 0.1 * dy, yi[1] + 1.1 * dy, dy)
-    yi, xi = np.meshgrid(yi, xi)
-    x = data['lon']
-    y = data['lat']
-    t = data['tri']
-    z = np.ones_like(x)
-    zi = trinterp.trinterp((x, y), z, t, (xi, yi), no_data_val=-1)
-    c = plt.contour(xi, yi, zi, [0])[0]
-    return c
-
-
-def cubit_facet(surf, geographic=True):
-    """
-    Create CUBIT Facet File text representation
-    """
-    data = surf[1]
-    if geographic:
-        x, y, z = data['lon'], data['lat'], data['z']
-    else:
-        x, y, z = data['x'], data['y'], data['z']
-    j, k, l = data['tri']
-    out = '%s %s\n' % (x.size, j.size)
-    for i in range(x.size):
-        out += '%s %s %s %s\n' % (i, x[i], y[i], z[i])
-    for i in range(j.size):
-        out += '%s %s %s %s\n' % (i, j[i], k[i], l[i])
-    return out
 
