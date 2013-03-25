@@ -56,32 +56,34 @@ def catalog(version='CFM4-socal-primary'):
     return cat
 
 
-def search(cat, patterns):
+def search(cat, items):
     """
-    Search the CFM catalog for a list of faults. If the fault name
-    begins with '*', the is a search pattern.
+    Search a catalog for a list of items. If the item string starts with '*', it is
+    patterned matched. Any part of the item string starting with ':' is ignored.
     """
-    if not patterns:
-        match = sorted(cat)
-    elif isinstance(patterns, basestring):
-        patterns = [patterns]
+    if isinstance(items, basestring):
+        items = [items]
     match = []
-    for p in patterns:
-        f, s = (p + ':').split(':')[:2]
-        if f[0] == '*':
-            f = f[1:].lower()
-            fs = (k + ':' + s for k in cat if f in k.lower())
+    for a in items:
+        if ':' in a:
+            i = a.index(':')
+            a, b = a[:i], a[i:]
         else:
-            fs = [k + ':' + s]
-            if p not in cat:
-                raise Exception('Not found in catalog: ' + p)
-        match.extend(fs)
+            b = ''
+        if a[0] == '*':
+            a = a[1:].lower()
+            ab = (i + b for i in cat if a in i.lower())
+        else:
+            if a not in cat:
+                raise Exception('Not found in catalog: ' + a)
+            ab = [a + b]
+        match.extend(ab)
     match = sorted(match)
 
     return match
 
 
-def read(faults=None, version='CFM4-socal-primary'):
+def read(faults, version='CFM4-socal-primary'):
     """
     Read CFM triangulated surface data for a given list of fault
     names, returning three objects:
@@ -152,11 +154,11 @@ def tsurf_plane(vtx, tri):
 
     # center of mass
     a = 0.5 * np.sqrt(wx * wx + wy * wy + wz * wz)
-    area = a.sum()
+    area = float(a.sum())
     d = 1.0 / (3.0 * area)
-    x = d * ((x[j] + x[k] + x[l]) * a).sum()
-    y = d * ((y[j] + y[k] + y[l]) * a).sum()
-    z = d * ((z[j] + z[k] + z[l]) * a).sum()
+    x = d * float(((x[j] + x[k] + x[l]) * a).sum())
+    y = d * float(((y[j] + y[k] + y[l]) * a).sum())
+    z = d * float(((z[j] + z[k] + z[l]) * a).sum())
     center = x, y, z
 
     # plane misfit function
@@ -184,7 +186,6 @@ def geometry(vtx, tri):
     Compute various geometrical properties:
     center_utm: [x, y, z] center of mass Cartesian coordinates
     center: [lon, lat, z] center of mass geographic coordinates
-    extent: [[min_lon, max_lon], [min_lat, max_lat]]
     stk: Fault strike
     dip: Fault dip
     area: Total surface area
@@ -205,15 +206,11 @@ def geometry(vtx, tri):
     x = 0.5 * (x[2] - x[1]) * math.cos(center[1] / 180.0 * math.pi)
     y = 0.5 * (y[2] - y[1])
     stk = (math.atan2(-y, x) / math.pi * 180.0) % 360.0
-    x, y = vtx[:2]
-    x, y = proj(x], y, inverse=True)
-    extent = (x.min(), x.max()), (y.min(), y.max())
 
-    # metadata dictionary
+    # data dictionary
     meta = {
         'center_utm': ctr,
         'center': center,
-        'extent': extent,
         'stk': stk,
         'dip': dip,
         'area': area,
@@ -304,8 +301,6 @@ def explore(faults=None, split=False):
     view_azimuth = -90
     view_elevation = 45
     view_angle = 15
-    opacity = 0.3
-    opacity = 1.0
     color_bg = 1.0, 1.0, 0.0
     color_hl = 1.0, 0.0, 0.0
 
@@ -349,12 +344,16 @@ def explore(faults=None, split=False):
 
     # fault surfaces
     cat = catalog()
-    faults = search(cat, faults)
+    if not faults:
+        faults = sorted(cat)
+    else:
+        faults = search(cat, faults)
+    surfs = []
     print('\nReading %s fault surfaces:\n' % len(faults))
     for fs in faults:
         print(fs)
-        f, s = fs.split(':')
         if split:
+            f, s = (fs + ':').split(':')[:2]
             if s:
                 fss = ('%s:%s' % (f, i) for i in s.split(','))
             else:
@@ -369,39 +368,42 @@ def explore(faults=None, split=False):
                 representation = 'surface',
                 color = color_bg,
             )
-            a = s.actor.actor
-            names[a] = name
+            p = s.actor.actor.property
+            surfs.append((p, name, vtx, tri))
 
     # handle key press
-    def on_key_press(obj, event, current=[None]):
+    def on_key_press(obj, event, save=[None]):
+        i = save[0]
         k = obj.GetKeyCode()
         fig.scene.disable_render = True
         if k in '[]{}':
-            if current[0]:
-                d = {'[': -1, ']': 1, '{': -1, '}': 1}[k]
-                i = (actors.index(current[0]) + d) % len(actors)
-                current[0].property.opacity = opacity
-                current[0].property.color = color_bg
+            if i == None:
+                i = 0
             else:
-                i = len(actors) // 2
-            a = actors[i]
-            a.property.opacity = 1.0
-            a.property.color = color_hl
-            fig.name = names[a]
+                p = surfs[i][0]
+                p.color = color_bg
+                d = {'[': -1, ']': 1, '{': -1, '}': 1}[k]
+                i = (i + d) % len(surfs)
+            p, name, vtx = surfs[i][:3]
+            p.color = color_hl
+            fig.name = name
             if k in '{}':
-                x, y, z = meta[a]['center']
-                x, y = proj(x, y)
+                x, y, z = vtx
+                x = 0.5 * (x.min() + x.max())
+                y = 0.5 * (y.min() + y.max())
+                z = 0.5 * (z.min() + z.max())
                 mlab.view(focalpoint=[x, y, z])
-            current[0] = a
-        elif k == '\\' and current[0]:
-            a = current[0] = None
-            a.property.opacity = 1.0
-            a.property.color = color_bg
+        elif k == '\\' and i != None:
+            p = surfs[i][0]
+            p.color = color_bg
             fig.name = fig_name
+            i = None
         elif k == 'i':
-            import pprint
-            m = meta[current[0]]
-            print(pprint.pformat(m) + '\n')
+            import json
+            name, vtx, tri = surfs[i][1:]
+            m = geometry(vtx, tri)
+            m = json.dumps(m, indent=4, sort_keys=True)
+            print('\n' + name + ' ' + m)
         elif ord(k) == 8: # delete key
             mlab.view(view_azimuth, view_elevation)
             fig.scene.camera.view_angle = view_angle
@@ -409,6 +411,7 @@ def explore(faults=None, split=False):
             from .cfm import explore
             print explore.__doc__
         fig.scene.disable_render = False
+        save[0] = i
         return
 
     # finish up
@@ -418,5 +421,6 @@ def explore(faults=None, split=False):
     fig.scene.disable_render = False
     print "\nPress H in the figure window for help."
     mlab.show()
+    return
 
 
