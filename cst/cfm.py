@@ -10,6 +10,7 @@ del(os)
 # projection: UTM zone 11, NAD 1927 datum (implies Clark 1866 geoid)
 projection = dict(proj='utm', zone=11, datum='NAD27')
 
+
 def catalog(version='CFM4-socal-primary'):
     """
     Return a dictionary of available faults. The dictionary key:value pair is
@@ -56,11 +57,12 @@ def catalog(version='CFM4-socal-primary'):
     return cat
 
 
-def search(cat, items):
+def search(cat, items, split=1, maxsplit=3):
     """
     Search a catalog for a list of items. If the item string starts with '*', it is
     patterned matched. Any part of the item string starting with ':' is ignored.
     """
+    import os
     if isinstance(items, basestring):
         items = [items]
     match = []
@@ -78,18 +80,26 @@ def search(cat, items):
                 raise Exception('Not found in catalog: ' + a)
             ab = [a + b]
         match.extend(ab)
-    match = sorted(match)
-
-    return match
+    n = os.path.commonprefix(match).count('-') + split
+    if n > maxsplit:
+        groups = [(i, [i]) for i in sorted(match)]
+    else:
+        groups = {}
+        for a in match:
+            k = '-'.join(a.split('-', n)[:n])
+            if k not in groups:
+                groups[k] = []
+            groups[k].append(a)
+        groups = sorted(groups.items())
+    return groups
 
 
 def read(faults, version='CFM4-socal-primary'):
     """
     Read CFM triangulated surface data for a given list of fault
-    names, returning three objects:
+    names, returning:
     vtx: 3 x M array of vertex Cartesian coordinates
-    tri: N x 3 array of vertex indices
-    name: Common prefix of the fault names
+    tri: 3 x N array of vertex indices
     """
     import os
     import numpy as np
@@ -103,7 +113,6 @@ def read(faults, version='CFM4-socal-primary'):
     n = 0
     vtx = []
     tri = []
-    name = []
     if isinstance(faults, basestring):
         faults = [faults]
     for fs in faults:
@@ -118,16 +127,14 @@ def read(faults, version='CFM4-socal-primary'):
             t = np.load(npy % (f, i, 'tri'))
             tri.append(t + n)
             n += x.size
-        name.append(fs)
 
     # combine segments
     if len(vtx) == 0:
         return
     vtx = np.hstack(vtx)
     tri = np.hstack(tri)
-    name = os.path.commonprefix(name)
 
-    return vtx, tri, name
+    return vtx, tri
 
 
 def tsurf_plane(vtx, tri):
@@ -209,8 +216,8 @@ def geometry(vtx, tri):
 
     # data dictionary
     meta = {
-        'center_utm': ctr,
-        'center': center,
+        'centroid_utm': ctr,
+        'centroid': center,
         'stk': stk,
         'dip': dip,
         'area': area,
@@ -266,7 +273,7 @@ def cubit_facet(vtx, tri, geographic=True):
     return out
 
 
-def explore(faults=None, split=False):
+def explore(faults=[], split=1):
     """
     CFMX: Community Fault Model Explorer
     ====================================
@@ -293,7 +300,7 @@ def explore(faults=None, split=False):
     import pyproj
     from enthought.mayavi import mlab
     from . import data, interpolate
-
+    
     # parameters
     proj = pyproj.Proj(**projection)
     extent = (-122.0, -114.0), (31.5, 37.5)
@@ -342,26 +349,28 @@ def explore(faults=None, split=False):
         np.save(f, [x, y, z])
     mlab.plot3d(x, y, z, color=(0,0,0), line_width=1, tube_radius=None)
 
-    # fault surfaces
+    # search and group faults
     cat = catalog()
-    if not faults:
-        faults = sorted(cat)
-    else:
-        faults = search(cat, faults)
+    faults = search(cat, faults, split)
+    split_segs = split > 0 and len(faults) == 1 and len(faults[0][1]) == 1
+
+    # read fault surfaces
     surfs = []
     print('\nReading %s fault surfaces:\n' % len(faults))
-    for fs in faults:
-        print(fs)
-        if split:
-            f, s = (fs + ':').split(':')[:2]
+    for name, fs in faults:
+        if split_segs:
+            f, s = (fs[0] + ':').split(':')[:2]
             if s:
-                fss = ('%s:%s' % (f, i) for i in s.split(','))
+                fs = ['%s:%s' % (f, i) for i in s.split(',')]
             else:
-                fss = ('%s:%s' % (f, i) for i in range(cat[f]))
+                fs = ['%s:%s' % (f, i) for i in range(cat[f])]
         else:
-            fss = [fs]
-        for fs in fss:
-            vtx, tri, name = read(fs)
+            fs = [fs]
+        for f in fs:
+            if split_segs:
+                name = f
+            print(name)
+            vtx, tri = read(f)
             x, y, z = vtx
             s = mlab.triangular_mesh(
                 x, y, z, tri.T,
@@ -386,7 +395,7 @@ def explore(faults=None, split=False):
                 i = (i + d) % len(surfs)
             p, name, vtx = surfs[i][:3]
             p.color = color_hl
-            fig.name = name
+            fig.name = 'CFMX: ' + name
             if k in '{}':
                 x, y, z = vtx
                 x = 0.5 * (x.min() + x.max())
@@ -398,12 +407,21 @@ def explore(faults=None, split=False):
             p.color = color_bg
             fig.name = fig_name
             i = None
-        elif k == 'i':
-            import json
+        elif k == 'i' and i != None:
             name, vtx, tri = surfs[i][1:]
             m = geometry(vtx, tri)
-            m = json.dumps(m, indent=4, sort_keys=True)
-            print('\n' + name + ' ' + m)
+            a = 0.000001 * m['area']
+            lon, lat = m['centroid'][:2]
+            x, y, z = m['centroid_utm']
+            print('\n' + name)
+            print('Surface area:  %10d km^2' % a)
+            print('Elev minimum:  %10d m' % vtx[2].min())
+            print('Elev maximum:  %10d m' % vtx[2].max())
+            print('Elev centroid: %10d m' % z)
+            print('Lon centroid:  %10.5f deg' % lon)
+            print('Lat centroid:  %10.5f deg' % lat)
+            print('Strike avg:    %10.5f deg' % m['stk'])
+            print('Dip avg:       %10.5f deg' % m['dip'])
         elif ord(k) == 8: # delete key
             mlab.view(view_azimuth, view_elevation)
             fig.scene.camera.view_angle = view_angle
