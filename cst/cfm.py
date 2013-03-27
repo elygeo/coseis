@@ -57,7 +57,7 @@ def catalog(version='CFM4-socal-primary'):
     return cat
 
 
-def search(cat, items, split=1, maxsplit=3):
+def search(cat, items, split=1, maxsplit=4):
     """
     Search a catalog for a list of items. If the item string starts with '*', it is
     patterned matched. Any part of the item string starting with ':' is ignored.
@@ -81,7 +81,7 @@ def search(cat, items, split=1, maxsplit=3):
             ab = [a + b]
         match.extend(ab)
     n = os.path.commonprefix(match).count('-') + split
-    if n > maxsplit:
+    if n >= maxsplit:
         groups = [(i, [i]) for i in sorted(match)]
     else:
         groups = {}
