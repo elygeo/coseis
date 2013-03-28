@@ -320,15 +320,14 @@ def explore(prefix, faults, cat=None):
     -----------------
 
     Fault selection                  [ ]
-    Fault selection with focus       { }
-    Reset fault selection              \\
+    Fault selection and view         { }
+    Clear fault selection              \\
     Rotate the view               Arrows
     Pan the view            Shift-Arrows
     Zoom the view                    - =
-    Reset the view                Delete
+    Reset view                         0
     Toggle stereo view                 3
     Save a screen-shot                 S
-    Info on selected fault             I
     Help                             h ?
     """
 
@@ -445,39 +444,32 @@ def explore(prefix, faults, cat=None):
 
     # handle key press
     def on_key_press(obj, event, save=[0]):
-        i = save[0]
         k = obj.GetKeyCode()
+        isurf = save[0]
         fig.scene.disable_render = True
         if k in '[]{}':
-            c, s, p = surfs[i]
+            c, s, p = surfs[isurf]
             if p.color == color_bg:
                 p.color = color_hl
             else:
                 p.color = color_bg
                 d = {'[': -1, ']': 1, '{': -1, '}': 1}[k]
-                i = (i + d) % len(surfs)
-                c, s, p = surfs[i]
+                isurf = (isurf + d) % len(surfs)
+                c, s, p = surfs[isurf]
                 p.color = color_hl
             print('\n' + '\n'.join(s))
             if k in '{}':
                 mlab.view(focalpoint=c)
-        elif k in '|\\':
-            c, s, p = surfs[i]
-            if p.color == color_hl:
-                p.color = color_bg
-            else:
-                p.color = color_hl
-                print('\n' + '\n'.join(s))
-                if k == '|':
-                    mlab.view(focalpoint=c)
-        elif ord(k) == 8: # delete key
+        elif k == '\\':
+            surfs[isurf][-1].color = color_bg
+        elif k == '0':
             mlab.view(view_azimuth, view_elevation)
             fig.scene.camera.view_angle = view_angle
         elif k in '/?h':
             from .cfm import explore
             print explore.__doc__
         fig.scene.disable_render = False
-        save[0] = i
+        save[0] = isurf
         return
 
     # finish up
