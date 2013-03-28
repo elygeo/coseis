@@ -467,7 +467,7 @@ def explore(prefix, faults, cat=None):
                 p.color = color_bg
             else:
                 p.color = color_hl
-                print('\n' + s)
+                print('\n' + '\n'.join(s))
                 if k == '|':
                     mlab.view(focalpoint=c)
         elif ord(k) == 8: # delete key
