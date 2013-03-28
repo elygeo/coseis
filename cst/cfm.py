@@ -28,6 +28,7 @@ def catalog(version='CFM4-socal-primary'):
 
     if os.path.exists(fault_file):
         cat = json.load(open(fault_file))
+        cat = {str(k):v for k, v in cat.items()}
     else:
         f = os.path.join(repo, 'scec-vdo.jar')
         if not os.path.exists(f):
@@ -57,44 +58,71 @@ def catalog(version='CFM4-socal-primary'):
     return cat
 
 
-def search(cat, items, split=1, maxsplit=4):
-    """
-    Search a catalog for a list of items. If the item string starts with '*', it is
-    patterned matched. Any part of the item string starting with ':' is ignored.
-    """
+def tree(cat):
+    import pprint
+    tree = {}
+    for f, n in cat.items():
+        k = f.split('-', 3)
+        node = tree
+        for i in range(3):
+            if k[i] not in node:
+                node[k[i]] = {}
+            node = node[k[i]]
+        node[k[-1]] = n
+    pprint.pprint(tree)
+    return
+
+
+def search(cat, items, split=1, maxsplit=3):
     import os
-    if isinstance(items, basestring):
-        items = [items]
-    match = []
-    for a in items:
-        if ':' in a:
-            i = a.index(':')
-            a, b = a[:i], a[i:]
-        else:
-            b = ''
-        if a[0] == '*':
-            a = a[1:].lower()
-            ab = (i + b for i in cat if a in i.lower())
-        else:
-            if a not in cat:
-                raise Exception('Not found in catalog: ' + a)
-            ab = [a + b]
-        match.extend(ab)
-    n = os.path.commonprefix(match).count('-') + split
-    if n >= maxsplit:
-        groups = [(i, [i]) for i in sorted(match)]
+
+    # search the catalog
+    if items == []:
+        match = sorted(cat)
+        prefix = []
+        n = 0
     else:
-        groups = {}
-        for a in match:
-            k = '-'.join(a.split('-', n)[:n])
-            if k not in groups:
-                groups[k] = []
+        match = set()
+        if isinstance(items, basestring):
+            items = [items]
+        for a in items:
+            b = a.split(':')[0].lower()
+            for c in cat:
+                if b in c.lower():
+                    match.add(c)
+        match = sorted(match)
+        if len(match) == 1:
+            return match[0].split('-'), match[0]
+        prefix = os.path.commonprefix(match).split('-')[:-1]
+        n = len(prefix)
+        
+    # split into groups
+    n += split
+    if n == 0:
+        return prefix, [('', match)]
+    elif n > maxsplit:
+        return prefix, match
+    groups = {}
+    for a in match:
+        k = '-'.join(a.split('-', n)[:n])
+        if k not in groups:
+            groups[k] = [a]
+        else:
             groups[k].append(a)
-        groups = sorted(groups.items())
-    return groups
+    groups = groups.items()
+
+    # use fault names for single length groups
+    n = 1
+    for i, s in enumerate(groups):
+        n = max(len(s[1]), n)
+    if n == 1:
+        for i, s in enumerate(groups):
+            groups[i] = s[1][0]
+
+    return prefix, groups
 
 
-def read(faults, version='CFM4-socal-primary'):
+def read(faults, cat=None, version='CFM4-socal-primary'):
     """
     Read CFM triangulated surface data for a given list of fault
     names, returning:
@@ -105,12 +133,12 @@ def read(faults, version='CFM4-socal-primary'):
     import numpy as np
 
     # prep
-    cat = catalog(version=version)
+    if cat == None:
+        cat = catalog(version=version)
     path = os.path.join(repo, 'cfm4', version)
     npy = os.path.join(path, '%s-%04d-%s.npy')
 
     # read faults
-    n = 0
     vtx = []
     tri = []
     if isinstance(faults, basestring):
@@ -122,18 +150,26 @@ def read(faults, version='CFM4-socal-primary'):
         else:
             s = range(cat[f])
         for i in s:
-            x, y, z = np.load(npy % (f, i, 'xyz'))
-            vtx.append([x, y, z])
-            t = np.load(npy % (f, i, 'tri'))
-            tri.append(t + n)
-            n += x.size
-
-    # combine segments
+            vtx.append(np.load(npy % (f, i, 'xyz')))
+            tri.append(np.load(npy % (f, i, 'tri')))
     if len(vtx) == 0:
         return
+    vtx, tri = tsurf_merge(vtx, tri)
+
+    return vtx, tri
+
+
+def tsurf_merge(vtx, tri):
+    """
+    Merge list of multiple triangulated surfaces
+    """
+    import numpy as np
+    n = 0
+    for i in range(len(vtx)):
+        tri[i] += n
+        n += vtx[i][0].size
     vtx = np.hstack(vtx)
     tri = np.hstack(tri)
-
     return vtx, tri
 
 
@@ -273,7 +309,7 @@ def cubit_facet(vtx, tri, geographic=True):
     return out
 
 
-def explore(faults=[], split=1):
+def explore(prefix, faults, cat=None):
     """
     CFMX: Community Fault Model Explorer
     ====================================
@@ -295,13 +331,18 @@ def explore(faults=[], split=1):
     Info on selected fault             I
     Help                             h ?
     """
+
+    # faults
+    single_fault = isinstance(faults, basestring)
+    if not faults:
+        print('No faults found')
+        return
+
+    # parameters
     import os
     import numpy as np
-    import pyproj
-    from enthought.mayavi import mlab
     from . import data, interpolate
-    
-    # parameters
+    import pyproj
     proj = pyproj.Proj(**projection)
     extent = (-122.0, -114.0), (31.5, 37.5)
     resolution = 'high'
@@ -312,11 +353,18 @@ def explore(faults=[], split=1):
     color_hl = 1.0, 0.0, 0.0
 
     # setup figure
-    fig_name = 'CFMX: Community Fault Model Explorer'
-    print('\n%s\n' % fig_name)
+    from enthought.mayavi import mlab
+    s = 'SCEC Community Fault Model'
+    if prefix:
+        s = [s] + [fault_names[i][k] for i, k in enumerate(prefix[:3])]
+        if single_fault:
+            s += [prefix[3].replace('_', ' ')]
+        s = ', '.join(s)
+    print('\n%s\n' % s)
     fig = mlab.figure(bgcolor=(1,1,1), fgcolor=(0,0,0), size=(1280, 720))
-    fig.name = fig_name
+    fig.name = s
     fig.scene.disable_render = True
+    #text_handle = mlab.text(0.01, 0.01, 'Here is \nsome text\nyay.')
 
     # DEM
     f = os.path.join(repo, 'cfm4', 'dem.npy')
@@ -349,79 +397,79 @@ def explore(faults=[], split=1):
         np.save(f, [x, y, z])
     mlab.plot3d(x, y, z, color=(0,0,0), line_width=1, tube_radius=None)
 
-    # search and group faults
-    cat = catalog()
-    faults = search(cat, faults, split)
-    split_segs = split > 0 and len(faults) == 1 and len(faults[0][1]) == 1
-
     # read fault surfaces
-    surfs = []
-    print('\nReading %s fault surfaces:\n' % len(faults))
-    for name, fs in faults:
-        if split_segs:
-            f, s = (fs[0] + ':').split(':')[:2]
-            if s:
-                fs = ['%s:%s' % (f, i) for i in s.split(',')]
-            else:
-                fs = ['%s:%s' % (f, i) for i in range(cat[f])]
+    if single_fault:
+        f, s = (faults + ':').split(':')[:2]
+        if s:
+            faults = ['%s:%s' % (f, i) for i in s.split(',')]
         else:
-            fs = [fs]
-        for f in fs:
-            if split_segs:
-                name = f
-            print(name)
-            vtx, tri = read(f)
-            x, y, z = vtx
-            s = mlab.triangular_mesh(
-                x, y, z, tri.T,
-                representation = 'surface',
-                color = color_bg,
-            )
-            p = s.actor.actor.property
-            surfs.append((p, name, vtx, tri))
+            faults = ['%s:%s' % (f, i) for i in range(cat[f])]
+    surfs = []
+    for ifault, f in enumerate(faults):
+        if isinstance(f, basestring):
+            name = f
+        else:
+            name, f = f
+        print(name)
+        vtx, tri = read(f, cat)
+        m = geometry(vtx, tri)
+        a = m['area'] * 0.000001
+        c = m['centroid']
+        u = m['centroid_utm']
+        x, y, z = vtx
+        s = [
+            'Mean Strike:   %10.5f deg' % m['stk'],
+            'Mean Dip:      %10.5f deg' % m['dip'],
+            'Centroid Lon:  %10.5f deg' % c[0],
+            'Centroid Lat:  %10.5f deg' % c[1],
+            'Centroid Elev: %10d m'     % c[2],
+            'Min Elevation: %10d m'     % z.min(),
+            'Max Elevation: %10d m'     % z.max(),
+            'Surface Area:  %10d km^2'  % a,
+        ]
+        k = name.split('-', 3)
+        s += [fault_names[i][a] for i, a in enumerate(k[:3])]
+        if k[3:]:
+            s += [k[3].replace('_', ' ')]
+        s += [name]
+        p = mlab.triangular_mesh(
+            x, y, z, tri.T,
+            representation = 'surface',
+            color = color_bg,
+        ).actor.actor.property
+        if single_fault:
+            surfs.append((ifault, u, s, p))
+        else:
+            surfs.append((c[0], u, s, p))
+    surfs = [i[1:] for i in sorted(surfs)]
 
     # handle key press
-    def on_key_press(obj, event, save=[None]):
+    def on_key_press(obj, event, save=[0]):
         i = save[0]
         k = obj.GetKeyCode()
         fig.scene.disable_render = True
         if k in '[]{}':
-            if i == None:
-                i = 0
+            c, s, p = surfs[i]
+            if p.color == color_bg:
+                p.color = color_hl
             else:
-                p = surfs[i][0]
                 p.color = color_bg
                 d = {'[': -1, ']': 1, '{': -1, '}': 1}[k]
                 i = (i + d) % len(surfs)
-            p, name, vtx = surfs[i][:3]
-            p.color = color_hl
-            fig.name = 'CFMX: ' + name
+                c, s, p = surfs[i]
+                p.color = color_hl
+            print('\n' + '\n'.join(s))
             if k in '{}':
-                x, y, z = vtx
-                x = 0.5 * (x.min() + x.max())
-                y = 0.5 * (y.min() + y.max())
-                z = 0.5 * (z.min() + z.max())
-                mlab.view(focalpoint=[x, y, z])
-        elif k == '\\' and i != None:
-            p = surfs[i][0]
-            p.color = color_bg
-            fig.name = fig_name
-            i = None
-        elif k == 'i' and i != None:
-            name, vtx, tri = surfs[i][1:]
-            m = geometry(vtx, tri)
-            a = 0.000001 * m['area']
-            lon, lat = m['centroid'][:2]
-            x, y, z = m['centroid_utm']
-            print('\n' + name)
-            print('Surface area:  %10d km^2' % a)
-            print('Elev minimum:  %10d m' % vtx[2].min())
-            print('Elev maximum:  %10d m' % vtx[2].max())
-            print('Elev centroid: %10d m' % z)
-            print('Lon centroid:  %10.5f deg' % lon)
-            print('Lat centroid:  %10.5f deg' % lat)
-            print('Strike avg:    %10.5f deg' % m['stk'])
-            print('Dip avg:       %10.5f deg' % m['dip'])
+                mlab.view(focalpoint=c)
+        elif k in '|\\':
+            c, s, p = surfs[i]
+            if p.color == color_hl:
+                p.color = color_bg
+            else:
+                p.color = color_hl
+                print('\n' + s)
+                if k == '|':
+                    mlab.view(focalpoint=c)
         elif ord(k) == 8: # delete key
             mlab.view(view_azimuth, view_elevation)
             fig.scene.camera.view_angle = view_angle
@@ -441,4 +489,192 @@ def explore(faults=[], split=1):
     mlab.show()
     return
 
-
+fault_names = [{
+"BNRA": "Basin and Range Fault Area",
+"CRFA": "Coast Ranges Fault Area",
+"ETRA": "Eastern Transverse Ranges",
+"GRFS": "Garlock Fault System",
+"GVFA": "Great Valley Fault Area",
+"MJVA": "Mojave Fault Area",
+"OCBA": "Offshore Continental Borderland",
+"OCCA": "Offshore Central California",
+"PNRA": "Peninsular Ranges",
+"SAFS": "San Andreas Fault System",
+"SALT": "Salton Trough Fault Area",
+"SNFA": "Sierra Nevada Fault Area",
+"WTRA": "Western Tranverse Ranges"
+}, {
+"AHTC": "Ash Hill-Tank Canyon fault system",
+"BBFS": "Big Bear fault system",
+"BCFZ": "Blue Cut fault zone",
+"BMFZ": "Black Mountain fault zone",
+"BPPM": "Big Pine-Pine Mountain fault system",
+"BRSZ": "Brawley Seismic Zone",
+"BWFZ": "Blackwater fault zone",
+"CBFZ": "Coronado Bank fault zone",
+"CEPS": "Compton-Lower Elysian Park fault system",
+"CHFZ": "Calico-Hildalgo fault zone",
+"CIFS": "Channel Islands fault system",
+"CLFZ": "Cleghorn fault zone",
+"CPFZ": "Cerro Prieto fault zone",
+"CREC": "Camp Rock-Emerson-Copper Mtn fault zone",
+"CRFS": "Cross fault",
+"CRSF": "Cross fault",
+"CSTL": "Coastal faults",
+"ELSZ": "Elsinore-Laguna Salada fault zone",
+"GLPS": "Goldstone Lake-Paradise fault system",
+"GMFS": "Granite Mountains fault system",
+"GRFZ": "Garlock fault zone",
+"HMFZ": "Hunter Mountain fault zone",
+"HPFZ": "Harper Lake fault zone",
+"HSFZ": "Hosgri fault zone",
+"HSLZ": "Helendale-South Lockhart fault zone",
+"HVFZ": "Homestead Valley fault zone",
+"IBFS": "Inner Borderland fault system",
+"IMFZ": "Imperial fault zone",
+"JVFZ": "Johnson Valley fault zone",
+"LDWZ": "Ludlow fault zone",
+"LILZ": "Lake Isabella Lineament zone",
+"LLFZ": "Little Lake fault zone",
+"LSBM": "Little San Bernardino Mtns fault system",
+"MHFZ": "Mecca Hills-Hidden Springs fault system",
+"MNXZ": "Manix fault zone",
+"MRFS": "Mission Ridge fault system",
+"NAFZ": "Nacimiento fault zone",
+"NBJD": "Northern Baja Detachments?",
+"NCFS": "North Channel fault system",
+"NDVZ": "Northern Death Valley fault zone",
+"NFTS": "North Frontal thrust system",
+"NIFZ": "Newport-Inglewood fault zone",
+"NIRC": "Newport-Inglewood-Rose Canyon fault zone",
+"NULL": "undefined",
+"ORFZ": "Oak Ridge fault zone",
+"OSMS": "Oceanside-San Mateo fault system",
+"OWFZ": "Owens Valley fault zone",
+"PBFZ": "Pisgah-Bullion fault zone",
+"PLFZ": "Pleito fault zone",
+"PMFZ": "Pinto Mountain fault zone",
+"PMVZ": "Panamint Valley fault zone",
+"PVFZ": "Palos Verdes fault zone",
+"SAFZ": "San Andreas fault zone",
+"SBCF": "Santa Barbara Channel faults",
+"SBTS": "Southern Boundary Thrust system",
+"SCCR": "Santa Cruz-Catalina Ridge fault zone",
+"SCFZ": "South Cuyama fault zone",
+"SDTZ": "San Diego Trough fault zone",
+"SDVZ": "Southern Death Valley fault zone",
+"SFFS": "Southern Frontal fault system",
+"SFNS": "San Fernando fault system",
+"SGFZ": "San Gabriel fault zone",
+"SGMF": "San Gabriel Mountain faults",
+"SGRP": "San Gorgonio Pass fault system",
+"SJFZ": "San Jacinto fault zone",
+"SJMZ": "San Juan-Morales fault zone",
+"SLCZ": "Sisar-Lion Canyon fault zone",
+"SMFZ": "Sierra Madre fault zone",
+"SNFZ": "Southern Sierra Nevada fault zone",
+"SOCZ": "San Onofre-Carlsbad fault zone",
+"SPBZ": "San Pedro Basin fault zone",
+"SSFZ": "Santa Susana fault zone",
+"SSRZ": "Simi-Santa Rosa fault zone",
+"SYFZ": "Santa Ynez fault zone",
+"TDRS": "Temblor-Diablo Range fault system",
+"TMFZ": "Tiefort Mountains fault zone",
+"WWFZ": "White Wolf fault zone"
+}, {
+"1857": "1857 rupture",
+"1872": "1872 rupture",
+"1992": "1992 rupture",
+"ALCM": "Agua Caliente-Laguna Mts.?",
+"ANCP": "Anacapa",
+"ANZA": "Anza",
+"AGCL": "Agua Caliente",
+"ASHH": "Ash Hill",
+"BRMT": "Burnt Mountain",
+"BRSZ": "Brawley Seismic Zone",
+"CDVD": "Canada-David",
+"CHNH": "Chino Hills",
+"CHNO": "Chino",
+"CLCZ": "Cholame-Carrizo",
+"CMGF": "Cucamonga fault",
+"CNTR": "Central",
+"COAL": "Coalinga",
+"COAV": "Coachella",
+"CRCT": "Cerro-Centinela",
+"CRPR": "Cerro Prieto basin",
+"CSPC": "Clamshell-Sawpit Canyon",
+"CYMT": "Coyote Mountain",
+"CYTC": "Coyote Creek",
+"EAST": "Eastern",
+"EMCP": "El_Mayor-Cucapah",
+"EMRS": "Emerson",
+"EMTB": "East Montebello",
+"EQVS": "Earthquake Valley",
+"ERPK": "Eureka Peak",
+"GLDS": "Goldstone Lake",
+"GLIV": "Glen Ivy",
+"HMVS": "Homestead Valley",
+"HTSP": "Hot Springs",
+"IMPV": "Imperial Valley",
+"INDP": "Independence",
+"JNSV": "Johnson Valley",
+"JULN": "Julian",
+"KTLM": "Kettleman Hills",
+"LABS": "Los Angeles Basin",
+"LCKV": "Lockwood Valley",
+"LGSD": "Laguna Salada",
+"LSBM": "Little San Bernardino Mtns",
+"LSTH": "Lost Hills",
+"LVLK": "Lavic Lake",
+"MCHS": "Mecca Hills-Hidden Springs",
+"MJVS": "Mojave",
+"MRLS": "Morales",
+"MSNH": "Mission Hills",
+"MULT": "multiple",
+"NCPP": "North Channel-Pitas Point",
+"NE": "Northeast",
+"NTEW": "Northeast-Northwest",
+"NWPT": "Newport",
+"OCNS": "Oceanside",
+"OFFS": "Offshore",
+"PARK": "Parkfield",
+"PHLS": "Peralta Hills",
+"PLMS": "Palomas",
+"PMTS": "Pine Mountain",
+"PPMC": "Pitas Point-Mid-Channel trend",
+"PPT": "Pitas Point",
+"PPTV": "Pitas Point-Ventura",
+"PRDS": "Paradise",
+"RDMT": "Red Mountain",
+"RDNC": "Redondo Canyon",
+"RSCN": "Rose Canyon",
+"SANC": "San Antonio Canyon",
+"SBMT": "San Bernardino Mountains",
+"SBRN": "San Bernardino",
+"SCVA": "Santa Clarita Valley",
+"SFNV": "San Fernando Valley",
+"SGPS": "San Gorgonio Pass",
+"SGV": "San Gabriel Valley",
+"SJCV": "San Jacinto-Claremont",
+"SJMT": "San Jacinto Mts",
+"SJSH": "San Jose Hills",
+"SLTS": "Salton Sea",
+"SMMT": "Santa Monica Mountains",
+"SMNB": "Santa Monica basin",
+"SNCZ": "Santa Cruz",
+"SNRS": "Santa Rosa",
+"SPDB": "San Pedro basin",
+"SQJH": "San Joaquin Hills",
+"SSHS": "Superstition Hills",
+"SSMT": "Superstition Mountain",
+"STEW": "Southeast-Southwest",
+"TANK": "Tank Canyon",
+"TMBK": "Thirty Mile Bank",
+"TMCL": "Temecula",
+"USAF": "Upper Santa Ana Valley",
+"USAV": "Upper Santa Ana Valley",
+"VNTB": "Ventura basin",
+"VRDM": "Verdugo Mountains",
+"WEST": "Western",
+"WHIT": "Whittier"
+}]

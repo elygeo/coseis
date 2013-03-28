@@ -2,12 +2,14 @@
 #!/usr/bin/env ipython --gui=wx -i --
 import sys, getopt
 import cst
-opts, faults = getopt.getopt(sys.argv[1:], 's:')
+
+cat = cst.cfm.catalog()
+opts, argv = getopt.getopt(sys.argv[1:], 's:')
 opts = dict(opts)
-if faults == []:
-    faults = '*'
 if '-s' in opts:
-    cst.cfm.explore(faults, int(opts['-s']))
+    split = int(opts['-s'])
+    prefix, faults = cst.cfm.search(cat, argv, split)
 else:
-    cst.cfm.explore(faults)
+    prefix, faults = cst.cfm.search(cat, argv)
+cst.cfm.explore(prefix, faults, cat)
 
