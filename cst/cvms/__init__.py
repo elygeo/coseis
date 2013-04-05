@@ -184,6 +184,6 @@ def extract(lon, lat, dep, prop=['rho', 'vp', 'vs'], **kwargs):
     os.unlink(path + job.file_rho)
     os.unlink(path + job.file_vp)
     os.unlink(path + job.file_vs)
-    os.unlink(path + job.name + '.conf.py')
+    os.unlink(path + job.name + '.conf.json')
     return np.array(out)
 

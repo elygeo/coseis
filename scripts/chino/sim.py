@@ -2,7 +2,7 @@
 """
 SORD simulation
 """
-import os, imp, shutil
+import os, imp, json, shutil
 import numpy as np
 import pyproj
 import cst
@@ -85,14 +85,14 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     prm.source = 'moment'
     prm.pulse = 'brune'
     mts = os.path.join('run', 'data', '14383980.mts.txt')
-    mts = json.load(mts)
+    mts = json.load(open(mts))
     d = mts['double_couple_clvd']
     prm.source1 =  d['myy'],  d['mxx'],  d['mzz']
     prm.source2 = -d['mxz'], -d['myz'],  d['mxy']
 
     # scaling law: fcorner = (dsigma / moment) ^ 1/3 * 0.42 * Vs,
     # dsigma = 4 MPa, Vs = 3900 m/s, tau = 0.5 / (pi * fcorner)
-    prm.tau = 6e-7 * m.moment ** (1.0 / 3.0) # ~0.32, fcorner = 0.5Hz
+    prm.tau = 6e-7 * mts['moment'] ** (1.0 / 3.0) # ~0.32, fcorner = 0.5Hz
 
     # hypocenter location at x/y center
     x, y, z = hypo
@@ -159,7 +159,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     s = '\n'.join([
         open(mesh + 'meta.py').read(),
         '# source parameters',
-        util.dumps(mts),
+        json.dumps(mts),
         open(path + 'meta.py').read(),
     ])
     open(path + 'meta.py', 'w').write(s)

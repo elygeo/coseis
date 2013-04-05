@@ -21,15 +21,10 @@ def catalog(version='CFM4-socal-primary'):
     import numpy as np
     from . import gocad
 
-    fault_file = os.path.join(repo, 'cfm4', 'fault-list.json')
-    path = os.path.join(repo, 'cfm4', version)
-    npy = os.path.join(path, '%s-%04d-%s.npy')
     url = 'http://structure.harvard.edu/cfm/download/vdo/SCEC_VDO.jar'
+    path = os.path.join(repo, 'cfm4', version) + os.sep
 
-    if os.path.exists(fault_file):
-        cat = json.load(open(fault_file))
-        cat = {str(k):v for k, v in cat.items()}
-    else:
+    if not os.path.exists(path):
         f = os.path.join(repo, 'scec-vdo.jar')
         if not os.path.exists(f):
             print('Downloading %s' % url)
@@ -37,48 +32,47 @@ def catalog(version='CFM4-socal-primary'):
         zp = zipfile.ZipFile(f)
         src = os.path.join('data', 'Faults', version)
         os.makedirs(path)
-        cat = {}
         for f in zp.namelist():
             base, key = os.path.split(f)
             if base != src or not key.endswith('.ts'):
                 continue
             key = key[:-3]
-            data = zp.read(f)
-            xyz, tri = gocad.tsurf(data)[0][2:4]
-            cat[key] = len(tri)
-            for k, t in enumerate(tri):
-                i, j = np.unique(t, return_inverse=True)
-                t = np.arange(t.size)[j].reshape(t.shape)
-                x = xyz[:,i]
-                np.save(npy % (key, k, 'xyz'), x)
-                np.save(npy % (key, k, 'tri'), t)
-        f = open(fault_file, 'w')
-        json.dump(cat, f, indent=0, sort_keys=True)
+            tsurf = gocad.tsurf(zp.read(f))
+            if len(tsurf) > 1:
+                raise Exception('Not expecting more than 1 tsurf')
+            meta, data = tsurf[0]
+            np.savez(path + key + '.npz', **data)
+            #if 'dip' in meta and 'alphas' in meta['dip']:
+            #    del(meta['dip']['alphas'])
+            #f = open(path + key + '.json', 'w')
+            #json.dump(meta, f, indent=4, sort_keys=True)
+    cat = sorted(i[:-4] for i in os.listdir(path) if i.endswith('.npz'))
 
     return cat
 
 
-def tree(cat):
+def tree():
     import pprint
     tree = {}
-    for f, n in cat.items():
+    for f, n in catalog():
         k = f.split('-', 3)
         node = tree
         for i in range(3):
             if k[i] not in node:
                 node[k[i]] = {}
             node = node[k[i]]
-        node[k[-1]] = n
+        node[k[-1]] = ''
     pprint.pprint(tree)
     return
 
 
-def search(cat, items, split=1, maxsplit=3):
+def search(items, split=1, maxsplit=3):
     import os
 
     # search the catalog
+    cat = catalog()
     if items == []:
-        match = sorted(cat)
+        match = cat
         prefix = []
         n = 0
     else:
@@ -87,6 +81,8 @@ def search(cat, items, split=1, maxsplit=3):
             items = [items]
         for a in items:
             b = a.split(':')[0].lower()
+            if b.endswith('.npz'):
+                b = b[:-4]
             for c in cat:
                 if b in c.lower():
                     match.add(c)
@@ -122,54 +118,46 @@ def search(cat, items, split=1, maxsplit=3):
     return prefix, groups
 
 
-def read(faults, cat=None, version='CFM4-socal-primary'):
+def read(fault, version='CFM4-socal-primary'):
     """
-    Read CFM triangulated surface data for a given list of fault
-    names, returning:
-    vtx: 3 x M array of vertex Cartesian coordinates
-    tri: 3 x N array of vertex indices
+    Read triangulated surface data.
     """
     import os
     import numpy as np
-
-    # prep
-    if cat == None:
-        cat = catalog(version=version)
-    path = os.path.join(repo, 'cfm4', version)
-    npy = os.path.join(path, '%s-%04d-%s.npy')
-
-    # read faults
-    vtx = []
-    tri = []
-    if isinstance(faults, basestring):
-        faults = [faults]
-    for fs in faults:
-        f, s = (fs + ':').split(':')[:2]
-        if s:
-            s = (int(i) for i in s.split(','))
-        else:
-            s = range(cat[f])
-        for i in s:
-            vtx.append(np.load(npy % (f, i, 'xyz')))
-            tri.append(np.load(npy % (f, i, 'tri')))
-    if len(vtx) == 0:
-        return
-    vtx, tri = tsurf_merge(vtx, tri)
-
-    return vtx, tri
+    path = os.path.join(repo, 'cfm4', version) + os.sep
+    f, i = (fault + ':').split(':')[:2]
+    d = np.load(path + f + '.npz')
+    x = d['vtx']
+    t = d['tri']
+    b = d['border']
+    s = d['bstone']
+    d.close()
+    if i:
+        t = [t[int(j)] for j in i.split(',')]
+    return x, t, b, s
 
 
-def tsurf_merge(vtx, tri):
+def tsurf_merge(tsurfs, cull=False):
     """
-    Merge list of multiple triangulated surfaces
+    Merge multiple triangulated surfaces
+    TODO: border and bstone merge
     """
     import numpy as np
     n = 0
-    for i in range(len(vtx)):
-        tri[i] += n
-        n += vtx[i][0].size
-    vtx = np.hstack(vtx)
-    tri = np.hstack(tri)
+    vtx = []
+    tri = []
+    for x, t, b, s in tsurfs:
+        t = np.vstack(t)
+        if cull:
+            i, j = np.unique(t, return_inverse=True)
+            t = np.arange(t.size)[j].reshape(t.shape)
+            x = x[i]
+        t += n
+        n += x.shape[0]
+        vtx.append(x)
+        tri.append(t)
+    vtx = np.vstack(vtx).T
+    tri = np.vstack(tri).T
     return vtx, tri
 
 
@@ -227,9 +215,9 @@ def tsurf_plane(vtx, tri):
 def geometry(vtx, tri):
     """
     Compute various geometrical properties:
-    center_utm: [x, y, z] center of mass Cartesian coordinates
-    center: [lon, lat, z] center of mass geographic coordinates
-    stk: Fault strike
+    centroid_utm: [x, y, z] center of mass Cartesian coordinates
+    centroid: [lon, lat, z] center of mass geographic coordinates
+    strike: Fault strike
     dip: Fault dip
     area: Total surface area
     """
@@ -237,29 +225,105 @@ def geometry(vtx, tri):
     import pyproj
 
     proj = pyproj.Proj(**projection)
-    ctr, nrm, area = tsurf_plane(vtx, tri)
-    x0, y0, z0 = ctr
-    x, y, z = nrm
+    centroid_utm, normal, area = tsurf_plane(vtx, tri)
+    x0, y0, z0 = centroid_utm
+    x, y, z = normal
     r = math.sqrt(x * x + y * y) / z
     dip = math.atan(r) / math.pi * 180.0
     x = x0, x0 - x, x0 + x
     y = y0, y0 - y, y0 + y
     x, y = proj(x, y, inverse=True)
-    center = x[0], y[0], z0
-    x = 0.5 * (x[2] - x[1]) * math.cos(center[1] / 180.0 * math.pi)
+    centroid = x[0], y[0], z0
+    x = 0.5 * (x[2] - x[1]) * math.cos(y[0] / 180.0 * math.pi)
     y = 0.5 * (y[2] - y[1])
-    stk = (math.atan2(-y, x) / math.pi * 180.0) % 360.0
+    strike = (math.atan2(-y, x) / math.pi * 180.0) % 360.0
 
     # data dictionary
     meta = {
-        'centroid_utm': ctr,
-        'centroid': center,
-        'stk': stk,
+        'centroid_utm': centroid_utm,
+        'centroid': centroid,
+        'strike': strike,
         'dip': dip,
         'area': area,
     }
 
     return meta
+
+
+def quad_mesh(vtx, tri, delta, drape=False, clean_top=False):
+    """
+    Quadrilateral mesh from triangular mesh.
+
+    Coordinate transform:
+
+          | a -b 0 |
+    M =   | b  a c |
+          | 0  0 d |
+
+          |  a b -bc/d     |
+    1/M = | -b a -ac/d     | / (aa + bb)
+          |  0 0 (aa+bb)/d |   
+    """
+    import math
+    import numpy as np
+    from . import data, trinterp
+
+    # remove topography
+    x, y, z = vtx
+    del(vtx)
+    if drape:
+        import pyproj
+        proj = pyproj.Proj(**projection)
+        lon, lat = proj(x, y, inverse=True)
+        z = data.dem([lon, lat]) - z
+        del(lon, lat)
+
+    # get plane orientation
+    centroid, normal = tsurf_plane([x, y, z], tri)[:2]
+    if normal[2] > 0.9:
+        raise Exception('Near-flat tsurf not meshable')
+
+    # Cartesian to logical coordinates
+    x = x - centroid[0]
+    y = y - centroid[1]
+    r = 1.0 / delta
+    a = r * normal[1]
+    b = r * normal[0]
+    c = r * normal[2]
+    d = r / (1.0 - normal[2])
+    xi = a * x - b * y
+    yi = b * x + a * y + c * z
+    zi = d * z
+
+    # quad mesh
+    x = math.ceil(xi.min()), math.floor(xi.max())
+    z = math.ceil(zi.min()), math.floor(zi.max())
+    x = np.arange(x[0], x[1] + 1)
+    z = np.arange(z[0], z[1] + 1)
+    z, x = np.meshgrid(z, x)
+    y = trinterp.trinterp([xi, zi], yi, tri, [x, z])
+    del(xi, yi, zi, tri)
+    mask = np.isnan(y)
+    y[mask] = y[~mask].mean()
+
+    # cleanup surface trace 
+    if clean_top:
+        y[:,0] = 2.0 * y[:,1] - y[:,2]
+
+    # logical to Cartesian coordinates
+    r = delta / (normal[0] ** 2 + normal[1] ** 2)
+    a  = r * normal[1]
+    b  = r * normal[0]
+    ac = r * normal[1] * normal[2] * (1.0 - normal[2])
+    bc = r * normal[0] * normal[2] * (1.0 - normal[2])
+    d  = delta * (1.0 - normal[2])
+    xi =  a * x + b * y - bc * z
+    yi = -b * x + a * y - ac * z
+    zi =  d * z
+    xi += centroid[0]
+    yi += centroid[1]
+
+    return xi, yi, zi, mask
 
 
 def outline(vtx, tri, delta=100, geographic=True):
@@ -272,7 +336,7 @@ def outline(vtx, tri, delta=100, geographic=True):
     from . import trinterp, plt
 
     d = delta / 10
-    x, y = vtx
+    x, y = vtx[:2]
     xi = np.arange(x.min() - d, x.max() + d + delta, delta)
     yi = np.arange(y.min() - d, y.max() + d + delta, delta)
     yi, xi = np.meshgrid(yi, xi)
@@ -309,7 +373,7 @@ def cubit_facet(vtx, tri, geographic=True):
     return out
 
 
-def explore(prefix, faults, cat=None):
+def explore(prefix, faults):
     """
     CFMX: Community Fault Model Explorer
     ====================================
@@ -330,19 +394,11 @@ def explore(prefix, faults, cat=None):
     Save a screen-shot                 S
     Help                             h ?
     """
-
-    # faults
-    single_fault = isinstance(faults, basestring)
-    if not faults:
-        print('No faults found')
-        return
-
-    # parameters
     import os
     import numpy as np
     from . import data, interpolate
-    import pyproj
-    proj = pyproj.Proj(**projection)
+
+    # parameters
     extent = (-122.0, -114.0), (31.5, 37.5)
     resolution = 'high'
     view_azimuth = -90
@@ -350,6 +406,16 @@ def explore(prefix, faults, cat=None):
     view_angle = 15
     color_bg = 1.0, 1.0, 0.0
     color_hl = 1.0, 0.0, 0.0
+
+    # check
+    if not faults:
+        print('No faults found')
+        return
+    single_fault = isinstance(faults, basestring)
+
+    # projection
+    import pyproj
+    proj = pyproj.Proj(**projection)
 
     # setup figure
     from enthought.mayavi import mlab
@@ -363,7 +429,6 @@ def explore(prefix, faults, cat=None):
     fig = mlab.figure(bgcolor=(1,1,1), fgcolor=(0,0,0), size=(1280, 720))
     fig.name = s
     fig.scene.disable_render = True
-    #text_handle = mlab.text(0.01, 0.01, 'Here is \nsome text\nyay.')
 
     # DEM
     f = os.path.join(repo, 'cfm4', 'dem.npy')
@@ -395,29 +460,43 @@ def explore(prefix, faults, cat=None):
         y[i] = float('nan')
         np.save(f, [x, y, z])
     mlab.plot3d(x, y, z, color=(0,0,0), line_width=1, tube_radius=None)
+    mlab.view(view_azimuth, view_elevation)
+    fig.scene.camera.view_angle = view_angle
+    fig.scene.disable_render = False
+    fig.scene.disable_render = True
 
     # read fault surfaces
+    tsurfs = []
     if single_fault:
         f, s = (faults + ':').split(':')[:2]
+        x, t = read(f)[:2]
         if s:
-            faults = ['%s:%s' % (f, i) for i in s.split(',')]
+            for i in s.split(','):
+                tsurfs.append(('%s:%s' % (f, i), x.T, t[int(i)].T))
         else:
-            faults = ['%s:%s' % (f, i) for i in range(cat[f])]
+            for i, j in enumerate(t):
+                tsurfs.append(('%s:%s' % (f, i), x.T, j.T))
+    else:
+        for f in faults:
+            if isinstance(f, basestring):
+                x, t = tsurf_merge(read(f))
+            else:
+                f, s = f
+                x, t = tsurf_merge(read(i) for i in s)
+            tsurfs.append((f, x, t))
+
+    # plot fault surfaces
     surfs = []
-    for ifault, f in enumerate(faults):
-        if isinstance(f, basestring):
-            name = f
-        else:
-            name, f = f
+    for isurf, f in enumerate(tsurfs):
+        name, vtx, tri = f
         print(name)
-        vtx, tri = read(f, cat)
         m = geometry(vtx, tri)
         a = m['area'] * 0.000001
         c = m['centroid']
         u = m['centroid_utm']
         x, y, z = vtx
         s = [
-            'Mean Strike:   %10.5f deg' % m['stk'],
+            'Mean Strike:   %10.5f deg' % m['strike'],
             'Mean Dip:      %10.5f deg' % m['dip'],
             'Centroid Lon:  %10.5f deg' % c[0],
             'Centroid Lat:  %10.5f deg' % c[1],
@@ -437,7 +516,7 @@ def explore(prefix, faults, cat=None):
             color = color_bg,
         ).actor.actor.property
         if single_fault:
-            surfs.append((ifault, u, s, p))
+            surfs.append((isurf, u, s, p))
         else:
             surfs.append((c[0], u, s, p))
     surfs = [i[1:] for i in sorted(surfs)]

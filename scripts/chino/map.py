@@ -11,8 +11,8 @@ import cst
 # parameters
 eventid = 14383980
 bounds = (-80000.0, 48000.0), (-58000.0, 54000.0)
-mts = os.path.join('run', 'data', '%s.mts.txt' % eventid)
-mts = json.load(mts)
+mts = os.path.join('run', 'data', '%s.mts.json' % eventid)
+mts = json.load(open(mts))
 origin = mts['longitude'], mts['latitude'], mts['depth']
 proj = pyproj.Proj(proj='tmerc', lon_0=origin[0], lat_0=origin[1])
 
@@ -32,7 +32,7 @@ for surface in [
 ]:
 
     # setup plot
-    fig = plt.figure(None, inches, 100, None)
+    fig = plt.figure(None, inches, 100)
     fig.clf()
     ax = fig.add_axes([0.01, 0.01, 0.98, 0.98])
     axis = bounds[0] + bounds[1]
@@ -50,46 +50,35 @@ for surface in [
 
     else:
 
-        # CVM-S basins
-        f = os.path.join('run', 'data', 'basins-cvms.txt')
-        x, y = proj(*np.loadtxt(f).T)
-        i = x == 1e30
-        x[i], y[i] = float('nan'), float('nan')
-        h = ax.plot(x, y, '-r')
-        h[0].set_dashes((2,1))
-
-        # CVM-H basins
-        f = os.path.join('run', 'data', 'basins-cvmh.txt')
-        x, y = proj(*np.loadtxt(f).T)
-        i = x == 1e30
-        x[i], y[i] = float('nan'), float('nan')
-        h = ax.plot(x, y, '-b')
-        h[0].set_dashes((2,1))
+        # basins
+        for f, color in ('basins-cvms', 'r'), ('basins-cvmh', 'b'):
+            f = os.path.join('run', 'data', f + '.npy')
+            x, y = np.load(f)
+            i = np.isnan(x)
+            x, y = proj(x, y)
+            x[i] = y[i] = float('nan')
+            h = ax.plot(x, y, '-' + color)
+            h[0].set_dashes((2,1))
 
     # topography
-    f = os.path.join('run', 'data', 'mountains.txt')
-    x, y = proj(*np.loadtxt(f).T)
-    i = x == 1e30
-    x[i], y[i] = float('nan'), float('nan')
-    ax.plot(x, y, '-k')
-
-    # coastlines and boarders
-    f = os.path.join('run', 'data', 'coastlines.txt')
-    x, y = proj(*np.loadtxt(f).T)
-    i = x == 1e30
-    x[i], y[i] = float('nan'), float('nan')
-    ax.plot(x, y, 'k-', lw=1.0)
+    for f, lw in ('mountains', 0.5), ('coastlines', 1.0):
+        f = os.path.join('run', 'data', f + '.npy')
+        x, y = np.load(f)
+        i = np.isnan(x)
+        x, y = proj(x, y)
+        x[i] = y[i] = float('nan')
+        ax.plot(x, y, '-k', lw=lw)
 
     # source
     x0, y0 = proj(mts['longitude'], mts['latitude'])
-    f = os.path.join('run', 'data', 'beachball.txt')
-    x, y = np.loadtxt(f).T * 5000.0
-    x += x0
-    y += y0
-    i = np.isnan(x).nonzero()[0]
-    ax.fill(x[:i[0]-1], y[:i[0]-1], 'w')
-    ax.fill(x[i[0]+1:i[1]-1], y[i[0]+1:i[1]-1], 'k')
-    ax.fill(x[i[1]+1:], y[i[1]+1:], 'k')
+    f = os.path.join('run', 'data', 'beachball.npy')
+    x, y = np.load(f) * 5000.0
+    i, j = np.isnan(x).nonzero()[0]
+    x = x[:i-1], x[i+1:j-1], x[j+1:]
+    y = y[:i-1], y[i+1:j-1], y[j+1:]
+    ax.fill(x0 + x[0], y0 + y[0], 'w')
+    ax.fill(x0 + x[1], y0 + y[1], 'k')
+    ax.fill(x0 + x[2], y0 + y[2], 'k')
 
     # stations
     sta = os.path.join('run', 'data', 'station-list.txt')
@@ -117,13 +106,9 @@ for surface in [
     cst.plt.compass_rose(ax, x, y, 2000.0)
 
     # save figure
-    fig.canvas.draw()
-    f = os.path.join('run', 'plot')
-    if not os.path.isdir(f):
-        os.mkdir(f)
     f = os.path.join('run', 'plot', 'map%s.pdf' % surface)
+    g = os.path.join('run', 'www', 'map%s.png' % surface)
     fig.savefig(f, transparent=True)
-    f = os.path.join('run', 'plot', 'map%s.png' % surface)
-    fig.savefig(f)
+    fig.savefig(g)
     fig.show()
 

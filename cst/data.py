@@ -247,8 +247,9 @@ def dem(coords, scale=1.0, downsample=0, mesh=False):
     x, y = np.asarray(coords)
     sample = x.size > 2 or y.size > 2
     if sample:
-        xlim = x.min(), x.max()
-        ylim = y.min(), y.max()
+        i = ~(np.isnan(x) | np.isnan(y))
+        xlim = x[i].min(), x[i].max()
+        ylim = y[i].min(), y[i].max()
     else:
         xlim, ylim = coords
     if downsample > 0:

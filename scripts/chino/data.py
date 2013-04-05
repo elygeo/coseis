@@ -16,12 +16,13 @@ stations = [
 
 # data directory
 path = os.path.join('run', 'data')
-os.makedirs(path)
+if not os.path.exists(path):
+    os.makedirs(path)
 
 # moment tensor
-f = os.path.join(path, '%s.mts.txt')
+f = os.path.join(path, '%s.mts.json' % event_id)
 if os.path.exists(f):
-    mts = json.load(f)
+    mts = json.load(open(f))
 else:
     mts = cst.scedc.mts(event_id)
     f = open(f, 'w')

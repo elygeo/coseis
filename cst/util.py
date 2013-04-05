@@ -62,27 +62,6 @@ def open_(fh, mode='r'):
     return fh
 
 
-def load_jnp(path):
-    """
-    Read JSON metadata and NumPy data pair.
-    """
-    import json, numpy
-    meta = json.load(open(path + '.json'))
-    data = numpy.load(path + '.npz')
-    return meta, data
-
-
-def dump_jnp(path, pair):
-    """
-    Write JSON metadata and NumPy data pair.
-    """
-    import json, numpy
-    meta, data = pair
-    json.dump(meta, open(path + '.json', 'w'), indent=4, sort_keys=True)
-    numpy.savez_compressed(path + '.npz', **data)
-    return
-
-
 def save(*args, **kwargs):
     raise Exception('util.save() is removed. json.dump() recommend alternative.') 
     

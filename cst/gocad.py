@@ -117,31 +117,33 @@ def tsurf(buff):
         if len(f) == 0 or line.startswith('#'):
             continue
         elif line.startswith('GOCAD TSurf'):
-            hdr, phdr, tface, vrtx, trgl, border, bstone = None, {}, [], [], [], [], []
+            meta0, meta, tri, x, t, b, s = None, {}, [], [], [], [], []
         elif f[0] in ('VRTX', 'PVRTX'):
-            vrtx += [[float(f[2]), float(f[3]), float(f[4])]]
+            x.append([float(f[2]), float(f[3]), float(f[4])])
         elif f[0] in ('ATOM', 'PATOM'):
             i = int(f[2]) - 1
-            vrtx += [vrtx[i]]
+            x.append(x[i])
         elif f[0] == 'TRGL':
-            trgl += [[int(f[1]) - 1, int(f[2]) - 1, int(f[3]) - 1]]
+            t.append([int(f[1]) - 1, int(f[2]) - 1, int(f[3]) - 1])
         elif f[0] == 'BORDER':
-            border += [[int(f[2]) - 1, int(f[3]) - 1]]
+            b.append([int(f[2]) - 1, int(f[3]) - 1])
         elif f[0] == 'BSTONE':
-            bstone += [int(f[1]) - 1]
+            s.append(int(f[1]) - 1)
         elif f[0] == 'TFACE':
-            if trgl != []:
-                tface += [np.array(trgl, 'i').T]
-            trgl = []
+            if t != []:
+                tri.append(np.array(t, 'i'))
+            t = []
         elif f[0] == 'END':
-            vrtx   = np.array(vrtx, 'f').T
-            border = np.array(border, 'i').T
-            bstone = np.array(bstone, 'i').T
-            tface += [np.array(trgl, 'i').T]
-            tsurf += [[hdr, phdr, vrtx, tface, border, bstone]]
+            tri.append(np.array(t, 'i'))
+            x = np.array(x, 'f')
+            b = np.array(b, 'i')
+            s = np.array(s, 'i')
+            data = {'vtx': x, 'tri': tri, 'border': b, 'bstone': s}
+            meta.update(meta0)
+            tsurf.append([meta, data])
         elif f[0] == 'PROPERTY_CLASS_HEADER':
-            phdr[f[1]], counter = header(buff, counter)
+            meta[f[1]], counter = header(buff, counter)
         elif f[0] == 'HEADER':
-            hdr, counter = header(buff, counter)
+            meta0, counter = header(buff, counter)
     return tsurf
 

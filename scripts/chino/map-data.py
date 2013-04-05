@@ -11,8 +11,8 @@ import cst
 # parameters
 eventid = 14383980
 bounds = (-80000.0, 48000.0), (-58000.0, 54000.0)
-mts = os.path.join('run', 'data', '%s.mts.txt' % eventid)
-mts = json.load(mts)
+mts = os.path.join('run', 'data', '%s.mts.json' % eventid)
+mts = json.load(open(mts))
 origin = mts['longitude'], mts['latitude'], mts['depth']
 proj = pyproj.Proj(proj='tmerc', lon_0=origin[0], lat_0=origin[1])
 
@@ -32,20 +32,20 @@ for c in b.get_paths():
     p += c.to_polygons() + [[[float('nan'), float('nan')]]]
 del p[-1]
 b = np.concatenate(p) * 0.005
-f = os.path.join('run', 'data', 'beachball.txt')
-np.savetxt(f, b)
+f = os.path.join('run', 'data', 'beachball.npy')
+np.save(f, b.astype('f').T)
 
 # coastlines and boarders
 x, y = cst.data.mapdata('coastlines', 'high', extent, 10.0)
 x -= 360.0
-f = os.path.join('run', 'data', 'coastlines.txt')
-np.savetxt(f, np.array([x, y]).T)
+f = os.path.join('run', 'data', 'coastlines.npy')
+np.save(f, np.array([x, y], 'f'))
 
 # topography
 xx, yy, zz = cst.data.dem(extent, mesh=True)
 x, y = cst.plt.contour(xx, yy, zz, [1000])[0]
-f = os.path.join('run', 'data', 'mountains.txt')
-np.savetxt(f, np.array([x, y]).T)
+f = os.path.join('run', 'data', 'mountains.npy')
+np.save(f, np.array([x, y], 'f'))
 
 # surface
 zz.fill(0.0)
@@ -65,6 +65,6 @@ for cvm, vv in [
 ]:
     v = 2500,
     x, y = cst.plt.contour(xx, yy, vv[0], v)[0]
-    f = os.path.join('run', 'data', 'basins-%s.txt' % cvm)
-    np.savetxt(f, np.array([x, y]).T)
+    f = os.path.join('run', 'data', 'basins-%s.npy' % cvm)
+    np.save(f, np.array([x, y], 'f'))
 

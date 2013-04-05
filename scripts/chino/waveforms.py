@@ -224,10 +224,12 @@ for igroup, group in enumerate(station_groups):
     # finish figure
     fig.canvas.draw()
     if lfilter[0]:
-        f = os.path.join('run', 'plot', 'waveform-%.0f-%s' % (1.0 / lfilter[0][1], igroup))
+        f = g = 'waveform-%.0f-%s' % (1.0 / lfilter[0][1], igroup)
     else:
-        f = os.path.join('run', 'plot', 'waveform-raw-%s' % igroup)
-    fig.savefig(f + '.pdf', transparent=True)
-    fig.savefig(f + '.png', dpi=100)
+        f = g = 'waveform-raw-%s' % igroup
+    f = os.path.join('run', 'plot', f + '.pdf')
+    g = os.path.join('run', 'www',  g + '.png')
+    fig.savefig(f, transparent=True)
+    fig.savefig(g, dpi=100)
     fig.show()
 

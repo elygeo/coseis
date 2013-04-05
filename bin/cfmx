@@ -3,13 +3,12 @@
 import sys, getopt
 import cst
 
-cat = cst.cfm.catalog()
 opts, argv = getopt.getopt(sys.argv[1:], 's:')
 opts = dict(opts)
 if '-s' in opts:
     split = int(opts['-s'])
-    prefix, faults = cst.cfm.search(cat, argv, split)
+    prefix, faults = cst.cfm.search(argv, split)
 else:
-    prefix, faults = cst.cfm.search(cat, argv)
-cst.cfm.explore(prefix, faults, cat)
+    prefix, faults = cst.cfm.search(argv)
+cst.cfm.explore(prefix, faults)
 
