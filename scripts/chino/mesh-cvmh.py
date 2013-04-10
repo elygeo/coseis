@@ -2,16 +2,18 @@
 """
 Mesh generation
 """
-import os
+import os, json
 import numpy as np
-import cst, meta
+import cst
 
 # metedata
-dtype = meta.dtype
-shape = meta.shape
-delta = meta.delta
-npml = meta.npml
-ntop = meta.ntop
+meta = open('meta.json')
+meta = json.load(meta)
+dtype = meta['dtype']
+shape = meta['shape']
+delta = meta['delta']
+npml = meta['npml']
+ntop = meta['ntop']
 hold = 'hold' + os.sep
 
 # variant
@@ -23,9 +25,9 @@ else:
 # read data
 dep = np.arange(shape[2]) * delta[2]
 n = shape[:2]
-x = np.fromfile('x.bin', dtype).reshape(n[::-1]).T
-y = np.fromfile('y.bin', dtype).reshape(n[::-1]).T
-z = np.fromfile('topo.bin', dtype).reshape(n[::-1]).T
+x = np.load('x.npy')
+y = np.load('y.npy')
+z = np.load('topo.npy')
 
 # demean topography
 z0 = z.mean()

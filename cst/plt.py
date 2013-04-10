@@ -29,8 +29,6 @@ def text(ax, x, y, s, edgecolor=None, edgealpha=0.1, edgewidth=0.75, npmb=16, **
             phi = 2.0 * math.pi * (i + 0.5) / npmb
             x_ = x + dx * math.cos(phi)
             y_ = y + dy * math.sin(phi)
-            #x_ = x + dx * np.maximum(-m, np.minimum(m, np.cos(phi)))
-            #y_ = y + dy * np.maximum(-m, np.minimum(m, np.sin(phi)))
             h += [ax.text(x_, y_, s, **kwargs)]
     return h
 
@@ -49,32 +47,49 @@ def colormap(*args, **kwargs):
     cmap = LinearSegmentedColormap('cmap', cmap, n)
     return cmap
 
-def colorbar(fig, cmap, ticks, title=None, rect=None, contours=None, ticklabels=None, **kwargs):
+def colorbar(fig, cmap, ticks, title=None, rect=None, contours=None,
+    ticklabels=None, edgecolor=None, **kwargs):
     """
     Matplotlib enhanced colorbar.
     """
     import numpy as np
-    if len(ticks) == 2:
-        ticks = ticks[0], 0.5 * (ticks[0] + ticks[1]), ticks[1]
+    import matplotlib.pyplot as plt
     if rect is None:
         rect = 0.25, 0.08, 0.5, 0.02
     ax = fig.add_axes(rect)
-    v = ticks[0], ticks[-1], -0.5, 0.5
-    x = np.linspace(v[0], v[1], 1001)
+    if len(ticks) == 2:
+        ticks = ticks[0], 0.5 * (ticks[0] + ticks[1]), ticks[1]
+    x1, x2 = ticks[0], ticks[-1]
+    y1, y2 = -0.5, 0.5
+    extent = x1, x2, y1, y2
+    x = np.linspace(x1, x2, 1001)
     if contours:
-        ax.contourf(x, v[2:], [x, x], contours, cmap=cmap, **kwargs)
-        ax.contourf(x, v[2:], [x, x], contours, cmap=cmap, **kwargs)
+        ax.contourf(x, [y1, y2], [x, x], contours, cmap=cmap, **kwargs)
+        ax.contourf(x, [y1, y2], [x, x], contours, cmap=cmap, **kwargs)
     else:
-        ax.imshow([x.T], cmap=cmap, extent=v, **kwargs)
+        ax.imshow([x.T], cmap=cmap, extent=extent, **kwargs)
+    x, y = x2 - x1, y2 - y1
+    c = plt.rcParams['axes.edgecolor']
+    lw = plt.rcParams['axes.linewidth'] * 2
+    ec = edgecolor
+    if ec:
+        r = plt.Rectangle([x1, y1], x, y, fc='none', lw=lw, ec=ec,
+            alpha=0.4, clip_on=False)
+        ax.add_patch(r)
+    r = plt.Rectangle([x1, y1], x, y, fc='none', lw=lw, ec=c)
+    ax.add_patch(r)
+    ax.axis('off')
     ax.axis('tight')
-    ax.axis(v)
-    ax.tick_params(length=0)
-    ax.set_xticks(ticks)
-    ax.set_yticks([])
-    if ticklabels:
-        ax.set_xticklabels(ticklabels)
+    ax.axis(extent)
+    if ticklabels is None:
+        ticklabels = ticks
+    for i, x in enumerate(ticks):
+        s = '%s' % ticklabels[i]
+        text(ax, x, -1, s, ha='center', va='top', edgecolor=ec)
     if title:
-        ax.set_title(title)
+        x = 0.5 * (x1 + x2)
+        text(ax, x, 1, title, ha='center', va='baseline', edgecolor=ec)
+
     return ax
 
 def lengthscale(ax, x, y, w=None, label='%s', style='k-', **kwargs):

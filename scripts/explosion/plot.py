@@ -2,7 +2,7 @@
 """
 Explosion test plot
 """
-import os, imp, glob
+import os, json, glob
 import numpy as np
 import matplotlib.pyplot as plt
 import cst
@@ -17,15 +17,15 @@ rho, vp, vs = 2670.0, 6000.0, 3464.0
 for path in glob.glob(runs):
 
     # metadata
-    meta = os.path.join(path, 'meta.py')
-    meta = imp.load_source('meta', meta)
-    dtype = meta.dtype
-    shape = meta.shape
-    delta = meta.delta
-    ihypo = meta.ihypo
-    tau = meta.tau
-    source = meta.source
-    source1 = meta.source1
+    meta = os.path.join(path, 'meta.json')
+    meta = json.load(open(meta))
+    dtype = meta['dtype']
+    shape = meta['shape']
+    delta = meta['delta']
+    ihypo = meta['ihypo']
+    tau = meta['tau']
+    source = meta['source']
+    source1 = meta['source1']
 
     # loop over stations
     for sta in stations:

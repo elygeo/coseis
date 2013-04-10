@@ -2,7 +2,7 @@
 """
 SORD simulation
 """
-import os, imp, json, shutil
+import os, json, shutil
 import numpy as np
 import pyproj
 import cst
@@ -40,15 +40,16 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
 
     # mesh metadata
     mesh = os.path.join('run', 'mesh', mesh) + os.sep
-    meta = imp.load_source(mesh + 'meta.py')
-    dtype = meta.dtype
-    delta = meta.delta
-    shape = meta.shape
-    hypo = meta.origin
-    prm.npml = meta.npml
+    meta = open(mesh + 'meta.json')
+    meta = json.load(meta)
+    dtype = meta['dtype']
+    delta = meta['delta']
+    shape = meta['shape']
+    hypo = meta['origin']
+    prm.npml = meta['npml']
 
     # translate projection to lower left origin
-    x, y = meta.bounds[:2]
+    x, y = meta['bounds'][:2]
     proj = pyproj.Proj(**meta.projection)
     proj = cst.coord.Transform(proj, translate=(-x[0], -y[0]))
 
@@ -157,19 +158,19 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     # save metadata
     os.link(mesh + 'box.txt', path + 'box.txt')
     s = '\n'.join([
-        open(mesh + 'meta.py').read(),
+        open(mesh + 'meta.json').read(),
         '# source parameters',
         json.dumps(mts),
-        open(path + 'meta.py').read(),
+        open(path + 'meta.json').read(),
     ])
-    open(path + 'meta.py', 'w').write(s)
+    open(path + 'meta.json', 'w').write(s)
 
     # save decimated mesh
     if surf_out:
         n = shape[:2]
-        for f in 'lon.bin', 'lat.bin', 'topo.bin':
-            s = np.fromfile(mesh + f, dtype).reshape(n[::-1])
-            s[::ns,::ns].tofile(path + f)
+        for f in 'lon.npy', 'lat.npy', 'topo.npy':
+            s = np.load(mesh + f)
+            np.save(path + f, s[::ns,::ns])
 
     # link input files
     h = mesh + 'hold' + os.sep
@@ -181,8 +182,9 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
 
     # post-process to compute pgv, pga
     if surf_out:
-        meta = imp.load_source('meta', path + 'meta.py')
-        x, y, t = meta.shapes['hold/full-v1.bin']
+        meta = open(path + 'meta.json')
+        meta = json.load(meta)
+        x, y, t = meta['shapes']['hold/full-v1.bin']
         m = x * y * t // 60000000
         shutil.copy2('cook.py', path)
         cst.util.launch(

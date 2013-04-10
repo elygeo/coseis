@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-import imp
+import json
 import numpy as np
 import matplotlib.pyplot as plt
 path = 'run/'
-meta = imp.load_source('meta', path + 'meta.py')
-n  = meta.shape[1], meta.shape[0]
+meta = json.load(open(path + 'meta.json'))
+n  = meta['shape'][1], meta['shape'][0]
 vx = np.fromfile(path + 'vx.bin', meta.dtype).reshape(n)
 vy = np.fromfile(path + 'vy.bin', meta.dtype).reshape(n)
 vm = np.sqrt(vx * vx + vy * vy)

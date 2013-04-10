@@ -17,7 +17,7 @@ def catalog(version='CFM4-socal-primary'):
     the fault name and number of segments. The CFM database is downloaded if not
     already present.
     """
-    import os, urllib, zipfile, json
+    import os, urllib, zipfile
     import numpy as np
     from . import gocad
 
@@ -40,12 +40,8 @@ def catalog(version='CFM4-socal-primary'):
             tsurf = gocad.tsurf(zp.read(f))
             if len(tsurf) > 1:
                 raise Exception('Not expecting more than 1 tsurf')
-            meta, data = tsurf[0]
+            data = tsurf[0][1]
             np.savez(path + key + '.npz', **data)
-            #if 'dip' in meta and 'alphas' in meta['dip']:
-            #    del(meta['dip']['alphas'])
-            #f = open(path + key + '.json', 'w')
-            #json.dump(meta, f, indent=4, sort_keys=True)
     cat = sorted(i[:-4] for i in os.listdir(path) if i.endswith('.npz'))
 
     return cat
@@ -137,7 +133,7 @@ def read(fault, version='CFM4-socal-primary'):
     return x, t, b, s
 
 
-def tsurf_merge(tsurfs, cull=False):
+def tsurf_merge(tsurfs, cull=True):
     """
     Merge multiple triangulated surfaces
     TODO: border and bstone merge
@@ -225,23 +221,26 @@ def geometry(vtx, tri):
     import pyproj
 
     proj = pyproj.Proj(**projection)
-    centroid_utm, normal, area = tsurf_plane(vtx, tri)
-    x0, y0, z0 = centroid_utm
+    centroid, normal, area = tsurf_plane(vtx, tri)
+    x0, y0, z0 = centroid
     x, y, z = normal
     r = math.sqrt(x * x + y * y) / z
     dip = math.atan(r) / math.pi * 180.0
     x = x0, x0 - x, x0 + x
     y = y0, y0 - y, y0 + y
     x, y = proj(x, y, inverse=True)
-    centroid = x[0], y[0], z0
-    x = 0.5 * (x[2] - x[1]) * math.cos(y[0] / 180.0 * math.pi)
+    lon, lat = x[0], y[0]
+    x = 0.5 * (x[2] - x[1]) * math.cos(lat / 180.0 * math.pi)
     y = 0.5 * (y[2] - y[1])
     strike = (math.atan2(-y, x) / math.pi * 180.0) % 360.0
 
     # data dictionary
     meta = {
-        'centroid_utm': centroid_utm,
-        'centroid': centroid,
+        'centroid_lat': lat,
+        'centroid_lon': lon,
+        'centroid_x': x0,
+        'centroid_y': y0,
+        'centroid_z': z0,
         'strike': strike,
         'dip': dip,
         'area': area,

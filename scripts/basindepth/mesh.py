@@ -33,9 +33,9 @@ meta = dict(
 # save data
 path = os.path.join('run', 'mesh') + os.sep
 os.makedirs(path + 'hold')
-cst.util.save(path + 'meta.py', meta)
-np.save(path + 'lon.bin', x)
-np.save(path + 'lat.bin', y)
+json.dump(open(path + 'meta.json', 'w'), meta)
+np.save(path + 'lon.npy', x)
+np.save(path + 'lat.npy', y)
 
 # write input files
 path = os.path.join('run', 'mesh', 'hold') + os.sep

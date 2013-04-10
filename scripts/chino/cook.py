@@ -14,7 +14,7 @@ nhist = meta.shapes[path + 'hist-v1.bin']
 ifull = meta.indices[path + 'full-v1.bin']
 ihist = meta.indices[path + 'hist-v1.bin']
 isnap = meta.indices[path + 'snap-v1.bin']
-dtype = meta.dtype
+dtype = meta['dtype']
 
 # decimation intervals
 xdec = ihist[0][2] / ifull[0][2]
@@ -80,10 +80,10 @@ with f1, f2, f3, s1, s2, s3, h1, h2, h3:
             v3.T.tofile(s3)
 
 # save pgv, pgd
-np.sqrt(pgv).astype(dtype).T.tofile('pgv.bin')
-np.sqrt(pgd).astype(dtype).T.tofile('pgd.bin')
-np.sqrt(pgvh).astype(dtype).T.tofile('pgvh.bin')
-np.sqrt(pgdh).astype(dtype).T.tofile('pgdh.bin')
+np.save('pgv.npy', np.sqrt(pgv))
+np.save('pgd.npy', np.sqrt(pgd))
+np.save('pgvh.npy', np.sqrt(pgvh))
+np.save('pgdh.npy', np.sqrt(pgdh))
 
 # free memory
 del(v1, v2, v3, u1, u2, u3, pgv, pgd, pgvh, pgdh)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import os, imp
+import os, json
 import numpy as np
 import pyproj
 import matplotlib.pyplot as plt
@@ -37,11 +37,11 @@ def spectrum(x):
 path = os.path.join('run', 'sim')
 sims = 'ch0100sf', 'ch0100hf', 'ch0100gf'
 sims = 'ch0050sf', 'ch0050hf', 'ch0050gf'
-meta = os.path.join(path, sims[0], 'meta.py')
-meta = imp.load_source('meta', meta)
-duration0 = meta.shape[-1] * meta.delta[-1]
-proj = pyproj.Proj(**meta.projection)
-t0 = obspy.core.utcdatetime.UTCDateTime(meta.origin_time)
+meta = os.path.join(path, sims[0], 'meta.json')
+meta = json.load(open(meta))
+duration0 = meta['shape'][-1] * meta['delta'][-1]
+proj = pyproj.Proj(**meta['projection'])
+t0 = obspy.core.utcdatetime.UTCDateTime(meta['origin_time'])
 
 # stations
 f = os.path.join('run', 'data', 'station-list.txt')
@@ -116,7 +116,7 @@ for igroup, group in enumerate(station_groups):
         cvm = group[1][ista]
         name, x, y, z = sta['f0'], sta['f2'], sta['f1'], sta['f3']
         x, y = proj(x, y)
-        z -= meta.depth
+        z -= meta['depth']
         spread = 0.00002 * (x * x + y * y + z * z) ** 0.5
         spread = 0.004 * (x * x + y * y) ** 0.25
         print(name)
@@ -129,7 +129,8 @@ for igroup, group in enumerate(station_groups):
         for ichan in range(3):
 
             # data
-            f = '.'.join([str(meta.event_id), name, chan + 'ENZ'[ichan], 'sac'])
+            f = str(meta['event_id'])
+            f = '.'.join([f, name, chan + 'ENZ'[ichan], 'sac'])
             f = os.path.join('run', 'data', f)
             st = obspy.core.read(f)
             tr = st[0]
@@ -186,13 +187,13 @@ for igroup, group in enumerate(station_groups):
 
             # synthetics
             for isim, id_ in enumerate(sims):
-                dt = meta.delta[-1]
+                dt = meta['delta'][-1]
                 f = os.path.join(path, id_, 'out', name + '-v%s.bin' % (ichan + 1))
                 v = np.fromfile(f, meta.dtype) * vscale
                 #v = replace(v, dt)
                 v = filt(v, dt)
                 vspec = spectrum(v)
-                n = min(v.size, int(duration / meta.delta[-1]))
+                n = min(v.size, int(duration / meta['delta'][-1]))
                 v = v[:n]
                 t = dt * np.arange(n)
                 vmax = np.abs(v).max()

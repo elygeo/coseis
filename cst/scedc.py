@@ -182,6 +182,7 @@ def mts(eventid):
     clvd = {}
     dc   = {}
     for line in text.readlines():
+        print line
         line = line.strip()
         if not line:
             continue

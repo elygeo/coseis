@@ -108,11 +108,10 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     # save data
     f = open(path + 'meta.json', 'w')
     json.dump(meta, f, indent=4, sort_keys=True)
-    np.save(path + 'box.npy', box)
-    np.save(path + 'mesh.npy', [x, y, z])
-    x.astype('f').T.tofile(path + 'lon.bin')
-    y.astype('f').T.tofile(path + 'lat.bin')
-    z.astype('f').T.tofile(path + 'topo.bin')
+    np.save(path + 'box.npy', box.astype('f'))
+    np.save(path + 'lon.npy', x.astype('f'))
+    np.save(path + 'lat.npy', y.astype('f'))
+    np.save(path + 'topo.npy', z.astype('f'))
 
     # cvm-s
     if cvm == 'cvms':
@@ -162,8 +161,8 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         shutil.copy2('mesh-cvmh.py', path)
         proj_cvmh = pyproj.Proj(**cst.cvmh.projection)
         x_, y_ = proj_cvmh(x, y)
-        x_.astype('f').T.tofile(path + 'x.bin')
-        y_.astype('f').T.tofile(path + 'y.bin')
+        np.save(path + 'x.npy', x_.astype('f'))
+        np.save(path + 'y.npy', y_.astype('f'))
         cst.util.launch(
             rundir = path,
             nthread = 1,
