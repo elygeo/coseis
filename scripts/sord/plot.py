@@ -3,10 +3,13 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 path = 'run/'
-meta = json.load(open(path + 'meta.json'))
-n  = meta['shape'][1], meta['shape'][0]
-vx = np.fromfile(path + 'vx.bin', meta.dtype).reshape(n)
-vy = np.fromfile(path + 'vy.bin', meta.dtype).reshape(n)
+meta = open(path + 'meta.json')
+meta = json.load(meta)
+dtype = meta['dtype']
+shape = meta['shape']
+n  = shape[1], shape[0]
+vx = np.fromfile(path + 'vx.bin', dtype).reshape(n)
+vy = np.fromfile(path + 'vy.bin', dtype).reshape(n)
 vm = np.sqrt(vx * vx + vy * vy)
 fig = plt.figure(figsize=(3,3))
 ax = plt.gca()

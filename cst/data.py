@@ -377,6 +377,7 @@ def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0
     import numpy as np
 
     url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhs/version2.2.0/gshhs+wdbii_2.2.0.zip'
+    url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhg/latest/gshhg-bin-2.2.2.zip'
     d = os.path.join(repo, 'gshhs')
     if not os.path.exists(d):
         print('Retrieving %s' % url)

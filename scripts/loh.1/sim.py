@@ -18,8 +18,8 @@ nthread = 4; prm.nproc3 = 1, 1, 1
 
 # dimensions
 x, y, z, t = 8000.0, 10000.0, 6000.0, 9.0
-prm.delta = 50.0, 50.0, 50.0, 0.004
 prm.delta = 100.0, 100.0, 100.0, 0.008
+prm.delta = 50.0, 50.0, 50.0, 0.004
 prm.shape = (
     int(x / prm.delta[0] + 20.5),
     int(y / prm.delta[1] + 20.5),

@@ -2,19 +2,19 @@
 """
 LOH.1 - Plot FK/SOM comparison.
 """
-import os, imp
+import os, json
 import numpy as np
 import matplotlib.pyplot as plt
 import cst
 
 # parameters
 path = 'run' + os.sep
-meta = os.path.join(path, 'meta.py')
-meta = imp.load_source('meta', meta)
-dt = meta.delta[-1]
-nt = meta.shape[-1]
-tau = meta.tau
-dtype = meta.dtype
+meta = os.path.join(path, 'meta.json')
+meta = json.load(open(meta))
+dt = meta['delta'][-1]
+nt = meta['shape'][-1]
+tau = meta['tau']
+dtype = meta['dtype']
 sigma = dt * 22.5
 
 # setup figure
