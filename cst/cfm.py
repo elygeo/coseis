@@ -133,28 +133,45 @@ def read(fault, version='CFM4-socal-primary'):
     return x, t, b, s
 
 
-def tsurf_merge(tsurfs, cull=True):
+def tsurf_merge(tsurfs, tol=-1.0, cull=True):
     """
     Merge multiple triangulated surfaces
-    TODO: border and bstone merge
+
+    tol (float): remove triangles with area below tolerance.
+    cull (bool): remove vertices not contained in any triangles.
     """
     import numpy as np
     n = 0
-    vtx = []
-    tri = []
-    for x, t, b, s in tsurfs:
-        t = np.vstack(t)
+    vtx_ = []
+    tri_ = []
+    for vtx, tri, b, s in tsurfs:
+        tri = np.vstack(tri)
+        if tol >= 0.0:
+            x, y, z = vtx
+            j, k, l = tri
+            ux = x[k] - x[j]
+            uy = y[k] - y[j]
+            uz = z[k] - z[j]
+            vx = x[l] - x[j]
+            vy = y[l] - y[j]
+            vz = z[l] - z[j]
+            wx = uy * vz - uz * vy
+            wy = uz * vx - ux * vz
+            wz = ux * vy - uy * vx
+            r = wx * wx + wy * wy + wz * wz
+            i = r > tol * tol
+            tri = tri[i]
         if cull:
-            i, j = np.unique(t, return_inverse=True)
-            t = np.arange(t.size)[j].reshape(t.shape)
-            x = x[i]
-        t += n
-        n += x.shape[0]
-        vtx.append(x)
-        tri.append(t)
-    vtx = np.vstack(vtx).T
-    tri = np.vstack(tri).T
-    return vtx, tri
+            i, j = np.unique(tri, return_inverse=True)
+            tri = np.arange(tri.size)[j].reshape(tri.shape)
+            vtx = vtx[i]
+        tri += n
+        n += vtx.shape[0]
+        vtx_.append(vtx)
+        tri_.append(tri)
+    vtx_ = np.vstack(vtx_).T
+    tri_ = np.vstack(tri_).T
+    return vtx_, tri_
 
 
 def tsurf_plane(vtx, tri):
