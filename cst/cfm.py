@@ -147,8 +147,8 @@ def tsurf_merge(tsurfs, tol=-1.0, cull=True):
     for vtx, tri, b, s in tsurfs:
         tri = np.vstack(tri)
         if tol >= 0.0:
-            x, y, z = vtx
-            j, k, l = tri
+            x, y, z = vtx.T
+            j, k, l = tri.T
             ux = x[k] - x[j]
             uy = y[k] - y[j]
             uz = z[k] - z[j]
@@ -228,8 +228,11 @@ def tsurf_plane(vtx, tri):
 def geometry(vtx, tri):
     """
     Compute various geometrical properties:
-    centroid_utm: [x, y, z] center of mass Cartesian coordinates
-    centroid: [lon, lat, z] center of mass geographic coordinates
+    centroid_lat: center of mass latitude
+    centroid_lon: center of mass longitude
+    centroid_x: UTM X meters
+    centroid_y: UTM Y meters
+    centroid_z: Depth meters
     strike: Fault strike
     dip: Fault dip
     area: Total surface area
@@ -507,19 +510,16 @@ def explore(prefix, faults):
         name, vtx, tri = f
         print(name)
         m = geometry(vtx, tri)
-        a = m['area'] * 0.000001
-        c = m['centroid']
-        u = m['centroid_utm']
         x, y, z = vtx
         s = [
             'Mean Strike:   %10.5f deg' % m['strike'],
             'Mean Dip:      %10.5f deg' % m['dip'],
-            'Centroid Lon:  %10.5f deg' % c[0],
-            'Centroid Lat:  %10.5f deg' % c[1],
-            'Centroid Elev: %10d m'     % c[2],
+            'Centroid Lon:  %10.5f deg' % m['centroid_lon'],
+            'Centroid Lat:  %10.5f deg' % m['centroid_lat'],
+            'Centroid Elev: %10d m'     % m['centroid_z'],
             'Min Elevation: %10d m'     % z.min(),
             'Max Elevation: %10d m'     % z.max(),
-            'Surface Area:  %10d km^2'  % a,
+            'Surface Area:  %10d km^2'  % (m['area'] * 0.000001),
         ]
         k = name.split('-', 3)
         s += [fault_names[i][a] for i, a in enumerate(k[:3])]
@@ -531,10 +531,12 @@ def explore(prefix, faults):
             representation = 'surface',
             color = color_bg,
         ).actor.actor.property
+        i = m['centroid_lon']
+        u = m['centroid_x'], m['centroid_y'], m['centroid_z']
         if single_fault:
             surfs.append((isurf, u, s, p))
         else:
-            surfs.append((c[0], u, s, p))
+            surfs.append((i, u, s, p))
     surfs = [i[1:] for i in sorted(surfs)]
 
     # handle key press
