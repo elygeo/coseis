@@ -17,7 +17,7 @@ def trinterp(x, f, t, xi, fi=None, no_data_val=float('nan')):
   
     Parameters
     ----------
-    x:  shape (2, M) array of vertex coordinates.
+    x:  shape (3, M) array of vertex coordinates.
     f:  shape (M) array of function values at the vertices.
     t:  shape (3, N) array of vertex indices for the triangles.
     xi: shape (2, ...) array of coordinates for the interpolation points.

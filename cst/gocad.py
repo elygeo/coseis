@@ -1,5 +1,7 @@
 """
 GOCAD data tools.
+
+paulbourke.net/dataformats/gocad/gocad.pdf
 """
 
 def header(buff, counter=0, casters=None):
