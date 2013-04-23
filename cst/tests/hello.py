@@ -3,11 +3,15 @@
 def make():
     import os, subprocess
     import cst
-    d = cst.util.configure()
-    if d.force or not os.path.exists('Makefile'):
-        m = open('Makefile.in').read().format(**d)
+    path = os.path.dirname(__file__)
+    cwd = os.getcwd()
+    os.chdir(path)
+    cfg = cst.util.configure()
+    if cfg['force'] or not os.path.exists('Makefile'):
+        m = open('Makefile.in').read().format(**cfg)
         open('Makefile', 'w').write(m)
     subprocess.check_call(['make'])
+    os.chdir(cwd)
     return
 
 def test(argv=[]):

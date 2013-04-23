@@ -27,7 +27,21 @@ def configure(**kwargs):
     assert job.version in ('2.2', '3.0', '4.0')
     return job
 
-def build(job=None, **kwargs):
+def download(version):
+    """
+    Download CVMS data
+    """
+    import os
+    from .. import repo
+    u = 'http://earth.usc.edu/~gely/cvm-data/%s.tgz' % version
+    f = os.path.basename(u)
+    f = os.path.join(repo, f)
+    if not os.path.exists(f):
+        print('Downloading %s' % u)
+        urllib.urlretrieve(u, f)
+    return f
+
+def make(job=None, **kwargs):
     """
     Build CVM-S code.
     """
@@ -42,6 +56,7 @@ def build(job=None, **kwargs):
         mode = 'mpi'
     else:
         mode = 'bin'
+    f = download(ver)
 
     # build directory
     cwd = os.getcwd()
@@ -51,20 +66,12 @@ def build(job=None, **kwargs):
         os.mkdir(d)
     os.chdir(d)
 
-    # download source code
-    u = 'http://earth.usc.edu/~gely/cvm-data/%s.tgz' % ver
-    f = os.path.basename(u)
-    if not os.path.exists(f):
-        print('Downloading %s' % u)
-        urllib.urlretrieve(u, f)
-
     # unpack and patch files
     if os.path.exists(ver):
         os.chdir(ver)
     else:
         os.mkdir(ver)
         os.chdir(ver)
-        f = os.path.join('..', f)
         tarfile.open(f, 'r:gz').extractall()
         f = os.path.join('..', '..', ver + '.patch')
         subprocess.check_call(['patch', '-p1', '-i', f])
@@ -78,7 +85,7 @@ def build(job=None, **kwargs):
     f = os.path.join('..', '..', 'Makefile.in')
     f = open(f).read().format(mode=mode, **job)
     open('Makefile', 'w').write(f)
-    subprocess.check_call(['make'])
+    subprocess.check_call(['make', '-j', '2'])
 
     # finished
     os.chdir(cwd)
@@ -105,7 +112,7 @@ def stage(**kwargs):
             (job.nsample, p, n))
 
     # build code
-    build(job)
+    make(job)
 
     # create run directory
     if os.path.exists(job.rundir):

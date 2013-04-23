@@ -13,12 +13,13 @@ if target == []:
     del(cfg['doc'])
     pprint.pprint(cfg)
     print(doc)
-elif target == ['sord']:
-    cst.sord.make()
 elif target == ['build']:
+    cst.interpolate.build()
+    cst.signal.build()
     cst.tests.hello.make()
     cst.sord.make()
-    cst.cvms.build()
+elif target == ['data']:
+    cst.cvms.make()
     cst.cvmh.cvmh_voxet()
     cst.cfm.catalog()
     cst.data.mapdata()
@@ -26,9 +27,6 @@ elif target == ['build']:
     cst.data.globe30()
     cst.data.lsh_cat()
     cst.data.engdahl_cat()
-    import cst.rspectra
-    import cst.trinterp
-    cst
 elif target[0] == 'clean':
     subprocess.call(['git', 'clean', '-x'] + target[1:])
 else:

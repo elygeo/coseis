@@ -174,11 +174,11 @@ def mts(eventid):
 
     print('Retrieving %s' % url)
     text = urllib.urlopen(url)
-    mts = dict(
-        url = url,
-        mts_units = 'Newton-meters',
-        mts_coordinates ='(x, y, z) = (north, east, down)',
-    )
+    mts = {
+        'url': url,
+        'mts_units': 'Newton-meters',
+        'mts_coordinates': '(x, y, z) = (north, east, down)',
+    }
     clvd = {}
     dc   = {}
     for line in text.readlines():
@@ -212,19 +212,19 @@ def mts(eventid):
         elif k in ('mxx', 'myy', 'mzz', 'myz', 'mxz', 'mxy'):
             tensor[k] = scale * float(f[1])
         elif k in ('t', 'n', 'p'):
-            mts[k+'_axis'] = dict(
-                value = float(f[1]),
-                plunge = float(f[2]),
-                azimuth = float(f[3]),
-            )
+            mts[k+'_axis'] = {
+                'value': float(f[1]),
+                'plunge': float(f[2]),
+                'azimuth': float(f[3]),
+            }
         elif k == 'mo':
             mts['moment'] = 1e-7 * float(f[1].split()[0] )
         elif k in ('np1', 'np2'):
-            mts[k] = dict(
-                strike = float(f[1] ),
-                rake = float(f[2] ),
-                dip = float(f[3] ),
-            )
+            mts[k] = {
+                'strike': float(f[1] ),
+                'rake': float(f[2] ),
+                'dip': float(f[3] ),
+            }
         elif k == 'moment_magnitude' and '=' in line:
             mts[k] = float(f[1] )
             break

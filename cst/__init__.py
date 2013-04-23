@@ -2,6 +2,19 @@
 Computational Seismology Tools
 """
 
+# data repository
+import os
+repo = os.path.dirname(__file__)
+repo = os.path.join(repo, 'data')
+if not os.path.exists(repo):
+    f = os.path.dirname(__file__)
+    f = os.path.join(f, '..', '..', 'coseis-data')
+    if os.path.exists(f):
+        os.symlink('../../coseis-data', repo)
+    else:
+        os.mkdir(repo)
+del(os)
+
 # components
 from . import conf, util, viz, plt, mlab
 from . import interpolate, coord, signal, source, srf, egmm, waveform, kostrov

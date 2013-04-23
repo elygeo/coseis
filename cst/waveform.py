@@ -25,7 +25,7 @@ def csmip_vol2(filename, max_year=2050):
     time = '%04d/%02d/%02dT%s' % (y, m, d, t)
     lon = ss[j+5][29:36]
     lat = ss[j+5][20:26]
-    data = dict(time=time, lon=lon, lat=lat)
+    data = {'time': time, 'lon': lon, 'lat': lat}
 
     # loop over channels
     while j < len(ss):

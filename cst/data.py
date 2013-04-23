@@ -7,16 +7,7 @@ Data retrieval and processing tools.
 # ftp://hazards.cr.usgs.gov/maps/qfault/
 # http://earthquake.usgs.gov/hazards/qfaults/KML/Quaternaryall.zip
 
-# data repository location
-import os
-repo = os.path.join(os.path.dirname(__file__), 'data')
-if not os.path.exists(repo):
-    f = os.path.join(os.path.dirname(__file__), '..', '..', 'coseis-data')
-    if os.path.exists(f):
-        os.symlink('../../coseis-data', repo)
-    else:
-        os.mkdir(repo)
-del(os)
+from . import repo
 
 def upsample(f):
     """

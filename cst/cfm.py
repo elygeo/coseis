@@ -2,13 +2,10 @@
 SCEC Community Fault Model (CFM) tools.
 """
 
-# data repository location
-import os
-repo = os.path.join(os.path.dirname(__file__), 'data')
-del(os)
-
 # projection: UTM zone 11, NAD 1927 datum (implies Clark 1866 geoid)
-projection = dict(proj='utm', zone=11, datum='NAD27')
+projection = {'proj': 'utm', 'zone': 11, 'datum': 'NAD27'}
+
+from . import repo
 
 
 def catalog(version='CFM4-socal-primary'):

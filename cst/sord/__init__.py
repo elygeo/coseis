@@ -102,7 +102,7 @@ def make(job=None, **kwargs):
     import os, subprocess
     configure(job, **kwargs)
     p = os.path.dirname(__file__)
-    subprocess.check_call(['make', '-j', '2', '-C', p])
+    subprocess.check_call(['make', '-j', '4', '-C', p])
     return
 
 def stage(prm, **kwargs):
@@ -439,9 +439,9 @@ def prepare_param(prm):
 
         # error check
         for field in fields:
-            if field not in fieldnames.all:
+            if field not in fieldnames.all_:
                 raise Exception('Error: unknown field: %r' % line)
-            if field not in fieldnames.input and 'w' not in mode:
+            if field not in fieldnames.input_ and 'w' not in mode:
                 raise Exception('Error: field is ouput only: %r' % line)
             if (field in fieldnames.cell) != (fields[0] in fieldnames.cell):
                 raise Exception('Error: cannot mix node and cell i/o: %r' % line)

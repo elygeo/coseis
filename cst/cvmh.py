@@ -2,13 +2,10 @@
 SCEC Community Velocity Model (CVM-H) tools.
 """
 
-# data repository location
-import os
-repo = os.path.join(os.path.dirname(__file__), 'data')
-del(os)
+from . import repo
 
 # parameters
-projection = dict(proj='utm', zone=11, datum='NAD27', ellps='clrk66')
+projection = {'proj': 'utm', 'zone': 11, 'datum': 'NAD27', 'ellps': 'clrk66'}
 extent = (131000.0, 828000.0), (3431000.0, 4058000.0), (-200000.0, 4900.0)
 prop2d = {'topo': '1', 'base': '2', 'moho': '3'}
 prop3d = {'vp': '1', 'vs': '3', 'tag': '2'}
@@ -19,7 +16,7 @@ voxet3d = {
 }
 
 def vs30_model(x, y, version='wills+wald', method='nearest'):
-    import os, urllib, subprocess
+    import os, urllib, gzip, cStringIO
     import numpy as np
     from . import data, interpolate
     if version not in ['wills', 'wald', 'wills+wald']:
@@ -37,8 +34,10 @@ def vs30_model(x, y, version='wills+wald', method='nearest'):
         f = os.path.join(repo, 'vs30-wills-cvmh.npy')
         if not os.path.exists(f):
             print('Downloading %s' % u)
-            urllib.urlretrieve(u, f)
-            subprocess.check_call(['gunzip', f])
+            d = urllib.urlopen(u)
+            d = cStringIO.StringIO(d.read())
+            d = gzip.GzipFile(fileobj=d).read()
+            open(f, 'w').write(d)
         w = np.load(f, mmap_mode='c')
         xlim = x0, x0 + delta * (w.shape[0] - 1)
         ylim = y0, y0 + delta * (w.shape[1] - 1)

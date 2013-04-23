@@ -2,6 +2,21 @@
 Interpolation tools.
 """
 
+# extensions
+def build():
+    try:
+        from . import interpolate_ext
+        interpolate_ext
+    except ImportError:
+        from . import util
+        util.build_cext('interpolate_ext')
+try:
+    from .interpolate_ext import trinterp
+    trinterp
+except ImportError:
+    pass
+
+
 def interp(xlim, f, xi, fi=None, method='nearest', bound=False, mask=False, no_data_val='nan'):
     """
     1D piecewise interpolation of function values specified on regular grid.
@@ -258,11 +273,9 @@ def interp3(xlim, f, xi, fi=None, method='nearest', bound=False, mask=False, no_
     return fi
 
 
-def trinterp(x, f, t, xi, fi=None, no_data_val=float('nan')):
+def trinterp_np(x, f, t, xi, fi=None, no_data_val=float('nan')):
     """
     2D linear interpolation of function values specified on triangular mesh.
-
-    **NOTE** A faster compiled version here: cst.interpolate.trinterp
 
     Parameters
     ----------
@@ -274,6 +287,8 @@ def trinterp(x, f, t, xi, fi=None, no_data_val=float('nan')):
     Returns
     -------
     fi: Array of interpolated values, same shape as `xi[0]`.
+
+    Note: This is the NumPy version. The Cython version is faster.
     """
     import numpy as np
 
@@ -315,7 +330,6 @@ def trinterp(x, f, t, xi, fi=None, no_data_val=float('nan')):
         fi[i] = f[i0] * l0[i] + f[i1] * l1[i] + f[i2] * l2[i]
 
     return fi
-
 
 def ibilinear(xx, yy, xi, yi):
     """

@@ -2,6 +2,21 @@
 Signal processing tools.
 """
 
+# extensions
+def build():
+    try:
+        from . import signal_ext
+        signal_ext
+    except ImportError:
+        from . import util
+        util.build_fext('signal_ext')
+try:
+    from .signal_ext import rspectra
+    rspectra
+except ImportError:
+    pass
+
+
 def time_function(pulse, t, tau=1.0):
     """
     Pulse time function with specified bandwidth.

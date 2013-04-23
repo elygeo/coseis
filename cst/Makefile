@@ -1,6 +1,6 @@
 # Coseis Makefile
 
-trinterp_ext.c : trinterp_ext.pyx
+interpolate_ext.c : interpolate_ext.pyx
 
 clean :
 	rm -rf build *.so *.pyc

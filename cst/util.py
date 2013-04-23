@@ -15,6 +15,37 @@ def f90modules(path):
     return list(mods), list(deps)
 
 
+def build_cext(name):
+    """
+    Build C extension.
+    """
+    import os
+    from distutils.core import setup, Extension
+    import numpy as np
+    cwd = os.getcwd()
+    os.chdir(os.path.dirname(__file__))
+    incl = [np.get_include()]
+    ext = [Extension(name, [name + '.c'], include_dirs=incl)]
+    setup(ext_modules=ext, script_args=['build_ext', '--inplace'])
+    os.chdir(cwd)
+    return
+
+
+def build_fext(name):
+    """
+    Build Fortran extension.
+    """
+    import os, shlex
+    from numpy.distutils.core import setup, Extension
+    fopt = shlex.split(configure().f2py_flags)
+    cwd = os.getcwd()
+    os.chdir(os.path.dirname(__file__))
+    ext = [Extension(name, [name + '.f90'], f2py_options=fopt)]
+    setup(ext_modules=ext, script_args=['build_ext', '--inplace'])
+    os.chdir(cwd)
+    return
+
+
 def archive(path):
     import os, gzip, cStringIO
     try:
@@ -116,18 +147,18 @@ def configure(*args, **kwargs):
         job[k] = kwargs[k]
 
     # merge machine parameters
-    if job.machine:
-        m = conf.__name__ + '.' + job.machine
+    if job['machine']:
+        m = conf.__name__ + '.' + job['machine']
         __import__(m)
         m = sys.modules[m]
-        job.doc = m.__doc__
+        job['doc'] = m.__doc__
         for k in dir(m):
             if k[0] != '_':
                 job[k] = getattr(m, k)
         if not hasattr(m, 'script'):
             f = os.path.splitext(m.__file__)[0] + '.sh'
             try:
-                job.script = open(f).read()
+                job['script'] = open(f).read()
             except IOError:
                 pass
 
@@ -136,9 +167,9 @@ def configure(*args, **kwargs):
         job[k] = kwargs[k]
 
     # command line parameters
-    if job.options:
-        short, long = zip(*job.options)[:2]
-        opts = getopt.getopt(job.argv, ''.join(short), long)[0]
+    if job['options']:
+        short, long = zip(*job['options'])[:2]
+        opts = getopt.getopt(job['argv'], ''.join(short), long)[0]
         short = [s.rstrip(':') for s in short]
         long = [l.rstrip('=') for l in long]
         for opt, val in opts:
@@ -147,23 +178,23 @@ def configure(*args, **kwargs):
                 i = long.index(key)
             else:
                 i = short.index(key)
-            opt, key, cast = job.options[i][1:]
+            opt, key, cast = job['options'][i][1:]
             if opt[-1] in ':=':
                 job[key] = type(cast)(val)
             else:
                 job[key] = cast
 
     # host configuration:
-    for h, o in job.host_opts.items():
-        if h in job.host:
+    for h, o in job['host_opts'].items():
+        if h in job['host']:
             for k, v in o.items():
                 job[k] = v
 
     # notification
-    if job.nproc > job.notify_threshold:
-        job.notify = job.notify.format(email=job.email)
+    if job['nproc'] > job['notify_threshold']:
+        job['notify'] = job['notify'].format(email=job['email'])
     else:
-        job.notify = ''
+        job['notify'] = ''
 
     return job
 
@@ -182,96 +213,96 @@ def prepare(job=None, **kwargs):
             job[k] = kwargs[k]
 
     # misc
-    job.update(dict(
-        jobid = '',
-        rundate = time.strftime('%Y %b %d'),
-    ))
+    job.update({
+        'jobid': '',
+        'rundate': time.strftime('%Y %b %d'),
+    })
 
     # number of processes
-    if not job.build_mpi:
-        job.nproc = 1
+    if not job['build_mpi']:
+        job['nproc'] = 1
 
     # queue options
-    opts = job.queue_opts
+    opts = job['queue_opts']
     if opts == []:
-        opts = [(job.queue, {})]
-    elif job.queue:
-        opts = [d for d in opts if d[0] == job.queue]
+        opts = [(job['queue'], {})]
+    elif job['queue']:
+        opts = [d for d in opts if d[0] == job['queue']]
         if len(opts) == 0:
-            raise Exception('Error: unknown queue: %s' % job.queue)
+            raise Exception('Error: unknown queue: %s' % job['queue'])
 
     # loop over queue configurations
     for q, d in opts:
-        job.queue = q
+        job['queue'] = q
         job.update(d)
 
         # additional job parameters
-        job.update(dict(
-            nodes = 1,
-            cores = job.nproc,
-            ppn = job.nproc,
-            totalcores = job.nproc,
-            ram = 0,
-            walltime = '',
-        ))
+        job.update({
+            'nodes': 1,
+            'cores': job['nproc'],
+            'ppn': job['nproc'],
+            'totalcores': job['nproc'],
+            'ram': 0,
+            'walltime': '',
+        })
 
         # MPI parallelization
-        r = job.ppn_range
+        r = job['ppn_range']
         if not r:
-            r = range(1, job.maxcores + 1)
-        job.nodes = min(job.maxnodes, (job.nproc - 1) // r[-1] + 1)
-        job.ppn = (job.nproc - 1) // job.nodes + 1
+            r = range(1, job['maxcores'] + 1)
+        job['nodes'] = min(job['maxnodes'], (job['nproc'] - 1) // r[-1] + 1)
+        job['ppn'] = (job['nproc'] - 1) // job['nodes'] + 1
         for i in r:
-            if i >= job.ppn:
+            if i >= job['ppn']:
                 break
-        job.ppn = i
-        job.totalcores = job.nodes * job.maxcores
+        job['ppn'] = i
+        job['totalcores'] = job['nodes'] * job['maxcores']
 
         # memory
-        if not job.pmem:
-            job.pmem = job.maxram / job.ppn
-        job.ram = job.pmem * job.ppn
+        if not job['pmem']:
+            job['pmem'] = job['maxram'] / job['ppn']
+        job['ram'] = job['pmem'] * job['ppn']
 
         # SU estimate and wall time limit
-        if job.maxtime:
-            job.minutes = min(job.minutes, job.maxtime)
-        job.walltime = '%d:%02d:00' % (job.minutes // 60, job.minutes % 60)
-        sus = job.minutes // 60 * job.totalcores + 1
+        if job['maxtime']:
+            job['minutes'] = min(job['minutes'], job['maxtime'])
+        job['walltime'] = '%d:%02d:00' % (job['minutes'] // 60, job['minutes'] % 60)
+        sus = job['minutes'] // 60 * job['totalcores'] + 1
 
         # if resources exceeded, try another queue
-        if job.ppn_range and job.ppn > job.ppn_range[-1]:
+        if job['ppn_range'] and job['ppn'] > job['ppn_range'][-1]:
             continue
-        if job.maxtime and job.minutes >= job.maxtime:
+        if job['maxtime'] and job['minutes'] >= job['maxtime']:
             continue
         break
 
     # messages
-    print('Nodes: %s' % job.nodes)
-    print('Procs per node: %s' % job.ppn)
-    print('Threads per node: %s' % job.nthread)
-    print('RAM per node: %sMb' % job.ram)
+    print('Nodes: %s' % job['nodes'])
+    print('Procs per node: %s' % job['ppn'])
+    print('Threads per node: %s' % job['nthread'])
+    print('RAM per node: %sMb' % job['ram'])
     print('SUs: %s' % sus)
-    print('Time: ' + job.walltime)
+    print('Time: ' + job['walltime'])
 
     # warnings
-    if job.ram and job.ram > job.maxram:
-        print('Warning: exceeding available RAM per node (%sMb)' % job.maxram)
-    if job.maxtime and job.minutes == job.maxtime:
-        print('Warning: exceeding maximum time limit (%02d:00)' % job.maxtime)
+    if job['ram'] and job['ram'] > job['maxram']:
+        print('Warning: exceeding available RAM per node (%sMb)' % job['maxram'])
+    if job['maxtime'] and job['minutes'] == job['maxtime']:
+        print('Warning: exceeding maximum time limit (%02d:00)' % job['maxtime'])
 
     # directories
-    print('Run directory: ' + job.rundir)
-    job.rundir = os.path.realpath(os.path.expanduser(job.rundir))
-    job.iodir = os.path.expanduser(job.iodir)
+    print('Run directory: ' + job['rundir'])
+    job['rundir'] = os.path.realpath(os.path.expanduser(job['rundir']))
+    job['iodir'] = os.path.expanduser(job['iodir'])
 
     # launch commands
-    job.command = job.command.format(**job)
-    job.launch = job.launch.format(**job)
-    job.script = job.script.format(**job)
-    if job.depend:
-        job.submit = job.submit2.format(**job)
+    job['command'] = job['command'].format(**job)
+    job['launch'] = job['launch'].format(**job)
+    job['script'] = job['script'].format(**job)
+    if job['depend']:
+        job['submit'] = job['submit2'].format(**job)
     else:
-        job.submit = job.submit.format(**job)
+        job['submit'] = job['submit'].format(**job)
     del(job['submit2'])
 
     return job
@@ -299,16 +330,16 @@ def skeleton(job=None, **kwargs):
             job[k] = kwargs[k]
 
     # test for previous runs 
-    f = os.path.join(job.rundir, job.name + '.conf.json')
-    if not job.force and os.path.exists(f):
+    f = os.path.join(job['rundir'], job['name'] + '.conf.json')
+    if not job['force'] and os.path.exists(f):
         raise Exception('Existing job found. Use --force to overwrite')
-    if not os.path.isdir(job.rundir):
-        raise Exception(rundir_error % job.rundir)
+    if not os.path.isdir(job['rundir']):
+        raise Exception(rundir_error % job['rundir'])
 
     # create submit script
-    if job.submit:
-        g = os.path.join(job.rundir, job.name + '.sh')
-        open(g, 'w').write(job.script)
+    if job['submit']:
+        g = os.path.join(job['rundir'], job['name'] + '.sh')
+        open(g, 'w').write(job['script'])
         os.chmod(g, 0755)
 
     # save configuration
@@ -332,28 +363,28 @@ def launch(job=None, **kwargs):
             job[k] = kwargs[k]
 
     # launch command
-    if not job.run:
+    if not job['run']:
         return job
 
     # run directory
     cwd = os.getcwd()
-    os.chdir(job.rundir)
+    os.chdir(job['rundir'])
 
     # launch
-    if job.run == 'submit':
-        print(job.submit)
-        c = shlex.split(job.submit)
+    if job['run'] == 'submit':
+        print(job['submit'])
+        c = shlex.split(job['submit'])
         p = subprocess.Popen(c, stdout=subprocess.PIPE)
         out = p.communicate()[0]
         print(out)
         if p.returncode:
             raise Exception('Submit failed')
-        d = re.search(job.submit_pattern, out).groupdict()
+        d = re.search(job['submit_pattern'], out).groupdict()
         job.update(d)
-        open(job.name + '.conf.json', 'w').write(dumps(job))
+        open(job['name'] + '.conf.json', 'w').write(dumps(job))
     else:
-        open(job.name + '.conf.json', 'w').write(dumps(job))
-        for c in job.pre, job.launch, job.post:
+        open(job['name'] + '.conf.json', 'w').write(dumps(job))
+        for c in job['pre'], job['launch'], job['post']:
             if c:
                 print(c)
                 if '\n' in c or ';' in c or '|' in c:

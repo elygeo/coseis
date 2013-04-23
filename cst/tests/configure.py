@@ -10,13 +10,13 @@ def test(argv=[]):
     machines = ['default'] + os.listdir(p)
     d = 'run/configure'
     os.makedirs(d)
-    kwargs = dict(
-        rundir = d,
-        run = 'exec',
-        argv = argv,
-        command = 'COMMAND',
-        force = True,
-    )
+    kwargs = {
+        'rundir': d,
+        'run': 'exec',
+        'argv': argv,
+        'command': 'COMMAND',
+        'force': True,
+    }
     for machine in machines:
         if not machine.endswith('.py'):
             continue
@@ -30,7 +30,7 @@ def test(argv=[]):
         job = cst.util.prepare(job)
         job = cst.util.skeleton(job)
         if 0:
-            print(job.doc)
+            print(job['doc'])
             del(job['doc'])
             pprint.pprint(job)
             reload(cst.conf.cvms)
