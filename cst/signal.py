@@ -2,16 +2,16 @@
 Signal processing tools.
 """
 
-# extensions
+# response spectra extension
 def build():
     try:
-        from . import signal_ext
-        signal_ext
+        from . import rspectra
+        rspectra
     except ImportError:
         from . import util
-        util.build_fext('signal_ext')
+        util.build_fext('rspectra')
 try:
-    from .signal_ext import rspectra
+    from .rspectra import rspectra
     rspectra
 except ImportError:
     pass

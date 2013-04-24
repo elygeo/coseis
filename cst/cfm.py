@@ -412,7 +412,7 @@ def explore(prefix, faults):
     """
     import os
     import numpy as np
-    from . import data, interpolate
+    from . import data, interp
 
     # parameters
     extent = (-122.0, -114.0), (31.5, 37.5)
@@ -469,7 +469,7 @@ def explore(prefix, faults):
             data.mapdata('borders', resolution, extent, delta=ddeg),
         ]
         x -= 360.0
-        z = interpolate.interp2(extent, z, (x, y))
+        z = interp.interp2(extent, z, (x, y))
         x, y = proj(x, y)
         i = np.isnan(z)
         x[i] = float('nan')

@@ -18,7 +18,7 @@ voxet3d = {
 def vs30_model(x, y, version='wills+wald', method='nearest'):
     import os, urllib, gzip, cStringIO
     import numpy as np
-    from . import data, interpolate
+    from . import data, interp
     if version not in ['wills', 'wald', 'wills+wald']:
         raise Exception()
     if 'wald' in version:
@@ -42,7 +42,7 @@ def vs30_model(x, y, version='wills+wald', method='nearest'):
         xlim = x0, x0 + delta * (w.shape[0] - 1)
         ylim = y0, y0 + delta * (w.shape[1] - 1)
         extent = xlim, ylim
-        interpolate.interp2(extent, w, (x, y), z, method=method,
+        interp.interp2(extent, w, (x, y), z, method=method,
             bound=True, mask=True, no_data_val=0)
     return z
 
@@ -226,16 +226,16 @@ class Model():
         return
     def __call__(self, x, y, z=None, out=None, interpolation='nearest'):
         import numpy as np
-        from . import interpolate
+        from . import interp
         if out is None:
             out = np.empty_like(x)
             out.fill(float('nan'))
         for extent, bound, data in self.voxet:
             if z is None:
                 data = data.reshape(data.shape[:2])
-                interpolate.interp2(extent[:2], data, (x, y), out, interpolation, bound)
+                interp.interp2(extent[:2], data, (x, y), out, interpolation, bound)
             else:
-                interpolate.interp3(extent, data, (x, y, z), out, interpolation, bound)
+                interp.interp3(extent, data, (x, y, z), out, interpolation, bound)
         return out
 
 

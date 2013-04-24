@@ -14,7 +14,7 @@ if target == []:
     pprint.pprint(cfg)
     print(doc)
 elif target == ['build']:
-    cst.interpolate.build()
+    cst.interp.build()
     cst.signal.build()
     cst.tests.hello.make()
     cst.sord.make()

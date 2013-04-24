@@ -2,22 +2,22 @@
 Interpolation tools.
 """
 
-# extensions
+# C extensions
 def build():
     try:
-        from . import interpolate_ext
-        interpolate_ext
+        from . import interp_
+        interp_
     except ImportError:
         from . import util
-        util.build_cext('interpolate_ext')
+        util.build_cext('interp_')
 try:
-    from .interpolate_ext import trinterp
+    from .interp_ import trinterp
     trinterp
 except ImportError:
     pass
 
 
-def interp(xlim, f, xi, fi=None, method='nearest', bound=False, mask=False, no_data_val='nan'):
+def interp1(xlim, f, xi, fi=None, method='nearest', bound=False, mask=False, no_data_val='nan'):
     """
     1D piecewise interpolation of function values specified on regular grid.
 

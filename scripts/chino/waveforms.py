@@ -189,7 +189,7 @@ for igroup, group in enumerate(station_groups):
             for isim, id_ in enumerate(sims):
                 dt = meta['delta'][-1]
                 f = os.path.join(path, id_, 'out', name + '-v%s.bin' % (ichan + 1))
-                v = np.fromfile(f, meta.dtype) * vscale
+                v = np.fromfile(f, meta['dtype']) * vscale
                 #v = replace(v, dt)
                 v = filt(v, dt)
                 vspec = spectrum(v)

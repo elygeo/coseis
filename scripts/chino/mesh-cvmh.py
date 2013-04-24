@@ -17,7 +17,7 @@ ntop = meta['ntop']
 hold = 'hold' + os.sep
 
 # variant
-if meta.cvm == 'cvmg':
+if meta['cvm'] == 'cvmg':
     vs30 = 'wills'
 else:
     vs30 = None

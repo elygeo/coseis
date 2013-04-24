@@ -234,7 +234,7 @@ def dem(coords, scale=1.0, downsample=0, mesh=False):
     """
     import math
     import numpy as np
-    from . import interpolate
+    from . import interp
     x, y = np.asarray(coords)
     sample = x.size > 2 or y.size > 2
     if sample:
@@ -276,7 +276,7 @@ def dem(coords, scale=1.0, downsample=0, mesh=False):
             res *= 2
     z = z * scale # always do this to convert to float
     if sample:
-        return interpolate.interp2(extent, z, (x, y))
+        return interp.interp2(extent, z, (x, y))
     elif mesh:
         delta = 1.0 / res
         n = z.shape
@@ -295,7 +295,7 @@ def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):
     """
     import os, math, gzip, urllib, cStringIO
     import numpy as np
-    from . import interpolate
+    from . import interp
     f = os.path.join(repo, 'vs30-wald-%s.npy') % region.lower().replace('_', '-')
     u = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/%s.grd.gz'
     if not os.path.exists(f):
@@ -327,7 +327,7 @@ def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):
     extent = xlim, ylim
     z = np.load(f, mmap_mode='c')[j0:j1+1,k0:k1+1]
     if sample:
-        z = interpolate.interp2(extent, z, (x, y), method=method)
+        z = interp.interp2(extent, z, (x, y), method=method)
         return z
     elif mesh:
         n = z.shape

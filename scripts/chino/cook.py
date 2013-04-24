@@ -8,12 +8,12 @@ import numpy as np
 # metatdata
 path = 'hold/'
 meta = json.load(open('meta.json'))
-dt = meta.deltas[path + 'full-v1.bin'][-1]
-nfull = meta.shapes[path + 'full-v1.bin']
-nhist = meta.shapes[path + 'hist-v1.bin']
-ifull = meta.indices[path + 'full-v1.bin']
-ihist = meta.indices[path + 'hist-v1.bin']
-isnap = meta.indices[path + 'snap-v1.bin']
+dt = meta['deltas'][path + 'full-v1.bin'][-1]
+nfull = meta['shapes'][path + 'full-v1.bin']
+nhist = meta['shapes'][path + 'hist-v1.bin']
+ifull = meta['indices'][path + 'full-v1.bin']
+ihist = meta['indices'][path + 'hist-v1.bin']
+isnap = meta['indices'][path + 'snap-v1.bin']
 dtype = meta['dtype']
 
 # decimation intervals

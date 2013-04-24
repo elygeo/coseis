@@ -1,6 +1,6 @@
 # Coseis Makefile
 
-interpolate_ext.c : interpolate_ext.pyx
+interp_.c : interp_.pyx
 
 clean :
 	rm -rf build *.so *.pyc
