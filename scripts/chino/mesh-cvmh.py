@@ -73,7 +73,7 @@ except OSError:
     pass
 else:
     with os.fdopen(fd, 'wb') as fh:
-        vm = cst.cvmh.Extraction(x, y, 'vp', vs30)
+        vm = cst.cvmh.Extraction(x, y, 'vp', vs30, geographic=False)
         vmin, vmax = np.inf, -np.inf
         for i in range(dep.size):
             zz = w[i] * z - dep[i]
@@ -90,7 +90,7 @@ except OSError:
     pass
 else:
     with os.fdopen(fd, 'wb') as fh:
-        vm = cst.cvmh.Extraction(x, y, 'vp', vs30)
+        vm = cst.cvmh.Extraction(x, y, 'vp', vs30, geographic=False)
         vmin, vmax = np.inf, -np.inf
         for i in range(dep.size):
             zz = w[i] * z - dep[i]
@@ -107,7 +107,7 @@ except OSError:
     pass
 else:
     with os.fdopen(fd, 'wb') as fh:
-        vm = cst.cvmh.Extraction(x, y, 'vs', vs30)
+        vm = cst.cvmh.Extraction(x, y, 'vs', vs30, geographic=False)
         vmin, vmax = np.inf, -np.inf
         for i in range(dep.size):
             zz = w[i] * z - dep[i]

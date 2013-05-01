@@ -221,8 +221,8 @@ class Model():
             self.voxet = [cvmh_voxet(prop, version=version)]
         else:
             self.voxet = []
-            for vox in voxet:
-                self.voxet += [cvmh_voxet(prop, vox, no_data_value, version)]
+            for i in voxet:
+                self.voxet += [cvmh_voxet(prop, i, no_data_value, version)]
         return
     def __call__(self, x, y, z=None, out=None, interpolation='nearest'):
         import numpy as np
