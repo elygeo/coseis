@@ -119,12 +119,14 @@ def tsurf(buff):
         if len(f) == 0 or line.startswith('#'):
             continue
         elif line.startswith('GOCAD TSurf'):
-            meta0, meta, tri, x, t, b, s = None, {}, [], [], [], [], []
+            meta0, meta, tri, x, t, b, s, a = None, {}, [], [], [], [], [], []
         elif f[0] in ('VRTX', 'PVRTX'):
             x.append([float(f[2]), float(f[3]), float(f[4])])
         elif f[0] in ('ATOM', 'PATOM'):
             i = int(f[2]) - 1
-            x.append(x[i])
+            a.append([len(x), i])
+            #x.append(x[i])
+            x.append([float('nan'), float('nan'), float('nan')])
         elif f[0] == 'TRGL':
             t.append([int(f[1]) - 1, int(f[2]) - 1, int(f[3]) - 1])
         elif f[0] == 'BORDER':
@@ -140,6 +142,10 @@ def tsurf(buff):
             x = np.array(x, 'f')
             b = np.array(b, 'i')
             s = np.array(s, 'i')
+            for i, j in a:
+                tri[tri==i] = j
+                b[b==i] = j
+                s[s==i] = j
             data = {'vtx': x, 'tri': tri, 'border': b, 'bstone': s}
             meta.update(meta0)
             tsurf.append([meta, data])

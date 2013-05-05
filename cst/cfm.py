@@ -84,7 +84,7 @@ def search(items, split=1, maxsplit=3):
             return match[0].split('-'), match[0]
         prefix = os.path.commonprefix(match).split('-')[:-1]
         n = len(prefix)
-        
+
     # split into groups
     n += split
     if n == 0:
@@ -130,45 +130,62 @@ def read(fault, version='CFM4-socal-primary'):
     return x, t, b, s
 
 
-def tsurf_merge(tsurfs, tol=-1.0, cull=True):
+def tsurf_merge(tsurfs, fuse=-1.0, cull=-1.0, clean=True):
     """
     Merge multiple triangulated surfaces
 
-    tol (float): remove triangles with area below tolerance.
-    cull (bool): remove vertices not contained in any triangles.
+    fuse (float): separation tolerance for combining vertices.
+    cull (float): area tolerance for triangle removal.
+    clean (bool): remove unused vertices.
     """
     import numpy as np
+
+    # merge surfaces
     n = 0
-    vtx_ = []
-    tri_ = []
-    for vtx, tri, b, s in tsurfs:
-        tri = np.vstack(tri)
-        if tol >= 0.0:
-            x, y, z = vtx.T
-            j, k, l = tri.T
-            ux = x[k] - x[j]
-            uy = y[k] - y[j]
-            uz = z[k] - z[j]
-            vx = x[l] - x[j]
-            vy = y[l] - y[j]
-            vz = z[l] - z[j]
-            wx = uy * vz - uz * vy
-            wy = uz * vx - ux * vz
-            wz = ux * vy - uy * vx
-            r = wx * wx + wy * wy + wz * wz
-            i = r > tol * tol
-            tri = tri[i]
-        if cull:
-            i, j = np.unique(tri, return_inverse=True)
-            tri = np.arange(tri.size)[j].reshape(tri.shape)
-            vtx = vtx[i]
-        tri += n
-        n += vtx.shape[0]
-        vtx_.append(vtx)
-        tri_.append(tri)
-    vtx_ = np.vstack(vtx_).T
-    tri_ = np.vstack(tri_).T
-    return vtx_, tri_
+    vtx, tri = [], []
+    for x, t, b, s in tsurfs:
+        t = np.vstack(t) + n
+        n += x.shape[0]
+        vtx.append(x)
+        tri.append(t)
+    vtx = np.vstack(vtx)
+    tri = np.vstack(tri)
+
+    # merge nearby points
+    if fuse >= 0.0:
+        n = len(vtx)
+        tol = fuse * fuse
+        for j in range(n):
+            print 11111, n, j
+            for k in range(j + 1, n):
+                d = vtx[j] - vtx[k]
+                if (d * d).sum() < tol:
+                    tri[tri==k] = j
+                    
+    # remove small triangles 
+    if cull >= 0.0:
+        x, y, z = vtx.T
+        j, k, l = tri.T
+        ux = x[k] - x[j]
+        uy = y[k] - y[j]
+        uz = z[k] - z[j]
+        vx = x[l] - x[j]
+        vy = y[l] - y[j]
+        vz = z[l] - z[j]
+        wx = uy * vz - uz * vy
+        wy = uz * vx - ux * vz
+        wz = ux * vy - uy * vx
+        r = wx * wx + wy * wy + wz * wz
+        i = r > cull * cull
+        tri = tri[i]
+
+    # remove unused points
+    if clean:
+        i, j = np.unique(tri, return_inverse=True)
+        tri = np.arange(tri.size)[j].reshape(tri.shape)
+        vtx = vtx[i]
+
+    return vtx.T, tri.T
 
 
 def tsurf_plane(vtx, tri):
@@ -278,7 +295,7 @@ def quad_mesh(vtx, tri, delta, drape=False, clean_top=False):
 
           |  a b -bc/d     |
     1/M = | -b a -ac/d     | / (aa + bb)
-          |  0 0 (aa+bb)/d |   
+          |  0 0 (aa+bb)/d |
     """
     import math
     import numpy as np
@@ -322,7 +339,7 @@ def quad_mesh(vtx, tri, delta, drape=False, clean_top=False):
     mask = np.isnan(y)
     y[mask] = y[~mask].mean()
 
-    # cleanup surface trace 
+    # cleanup surface trace
     if clean_top:
         y[:,0] = 2.0 * y[:,1] - y[:,2]
 
@@ -342,30 +359,46 @@ def quad_mesh(vtx, tri, delta, drape=False, clean_top=False):
     return xi, yi, zi, mask
 
 
-def outline(vtx, tri, delta=100, geographic=True):
+def boundary(tri):
     """
-    Find the outline of a tri surf. A quick and dirty method that samples the tri
-    surf onto a regular mesh, and then contours the boundary of non-empty samples.
-    Smaller values of delta give finer results but take longer to compute.
+    Find the boundary polygons of a triangulation.
     """
-    import numpy as np
-    from . import trinterp, plt
 
-    d = delta / 10
-    x, y = vtx[:2]
-    xi = np.arange(x.min() - d, x.max() + d + delta, delta)
-    yi = np.arange(y.min() - d, y.max() + d + delta, delta)
-    yi, xi = np.meshgrid(yi, xi)
-    z = np.ones_like(x)
-    zi = trinterp.trinterp((x, y), z, tri, (xi, yi), no_data_val=-1)
-    x, y = plt.contour(xi, yi, zi, [0])[0]
+    # create node tree for the triangles
+    surf = {i: set() for i in set(tri.flat)}
+    for j, k, l in tri.T:
+        surf[j] |= set([k, l])
+        surf[k] |= set([l, j])
+        surf[l] |= set([j, k])
+    del(tri)
 
-    if geographic:
-        import pyproj
-        proj = pyproj.Proj(**projection)
-        x, y = proj(x, y, inverse=True)
+    # adjacent boundary nodes have exactly one mutual neighbor
+    edge = {}
+    for i in surf:
+        for j in surf[i]:
+            if len(surf[i] & surf[j]) == 1:
+                if i not in edge:
+                    edge[i] = set()
+                edge[i].add(j)
+    del(surf)
 
-    return x, y
+    # connect edge segments to form polygons
+    line = []
+    while edge:
+        j = sorted(edge)[0]
+        l = [j]
+        while edge[j]:
+            i = j
+            j = sorted(edge[i])[0]
+            l.append(j)
+            edge[j].remove(i)
+            edge[i].remove(j)
+            if not edge[i]:
+                edge.pop(i)
+        edge.pop(j)
+        line.append(l)
+
+    return line
 
 
 def cubit_facet(vtx, tri, geographic=True):
