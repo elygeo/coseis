@@ -153,14 +153,14 @@ def tsurf_merge(tsurfs, fuse=-1.0, cull=-1.0, clean=True):
 
     # merge nearby points
     if fuse >= 0.0:
-        n = len(vtx)
         tol = fuse * fuse
+        n = len(vtx)
         for j in range(n):
-            print 11111, n, j
-            for k in range(j + 1, n):
-                d = vtx[j] - vtx[k]
-                if (d * d).sum() < tol:
-                    tri[tri==k] = j
+            x = vtx[j,0] - vtx[j+1:,0]
+            y = vtx[j,1] - vtx[j+1:,1]
+            z = vtx[j,2] - vtx[j+1:,2]
+            for i in (x * x + y * y + z * z < tol).nonzero()[0]:
+                tri[tri==(j + 1 + i)] = j
                     
     # remove small triangles 
     if cull >= 0.0:
