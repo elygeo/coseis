@@ -181,6 +181,7 @@ def tsurf_merge(tsurfs, fuse=-1.0, cull=-1.0, clean=True):
 
     # remove unused points
     if clean:
+        tri.sort()
         i, j = np.unique(tri, return_inverse=True)
         tri = np.arange(tri.size)[j].reshape(tri.shape)
         vtx = vtx[i]
@@ -402,11 +403,29 @@ def tsurf_edges(tri):
     return line
 
 
-def line_simplify(vtx, indices, area=None, nkeep=3):
+def line_simplify(vtx, indices, area=None, nkeep=None):
     """
-    Remove detail from a line or polygon.
+    Remove detail from a line or polygon beginning with the least significant
+    vertices using Visvalingam's algorithm. Vertex significance is determined by
+    the triangle area formed by a point and it's neighbors.
+
+    Parameters:
+    vtx: vertex coordinates.
+    indices: indices of vtx for the line or polygon.
+    area: maximum triangle area for vertex removal.
+    nkeep: minimum number of vertices to keep.
+
+    If the first and last indices match, then the line is assumed to be a closed
+    polygon. If neither area nor nkeep are given, then half of the indices are
+    removed. If both area and nkeep are given, priority is given to case that
+    retains more detail.
     """
     import numpy as np
+    if nkeep == None:
+        if area:
+            nkeep = 3
+        else:
+            nkeep = max(3, len(indices) // 2)
     x, y = vtx[:2]
     polygon = indices[0] == indices[-1]
     if polygon:
