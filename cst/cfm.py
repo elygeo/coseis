@@ -161,8 +161,8 @@ def tsurf_merge(tsurfs, fuse=-1.0, cull=-1.0, clean=True):
             z = vtx[j,2] - vtx[j+1:,2]
             for i in (x * x + y * y + z * z < tol).nonzero()[0]:
                 tri[tri==(j + 1 + i)] = j
-                    
-    # remove small triangles 
+
+    # remove small triangles
     if cull >= 0.0:
         x, y, z = vtx.T
         j, k, l = tri.T
@@ -359,12 +359,12 @@ def quad_mesh(vtx, tri, delta, drape=False, clean_top=False):
     return xi, yi, zi, mask
 
 
-def boundary(tri):
+def tsurf_edges(tri):
     """
     Find the boundary polygons of a triangulation.
     """
 
-    # create node tree for the triangles
+    # triangle list -> triangle node tree
     surf = {i: set() for i in set(tri.flat)}
     for j, k, l in tri.T:
         surf[j] |= set([k, l])
@@ -372,7 +372,8 @@ def boundary(tri):
         surf[l] |= set([j, k])
     del(tri)
 
-    # adjacent boundary nodes have exactly one mutual neighbor
+    # triangle node tree -> edge node tree
+    # boundary segments occur only once
     edge = {}
     for i in surf:
         for j in surf[i]:
@@ -382,7 +383,7 @@ def boundary(tri):
                 edge[i].add(j)
     del(surf)
 
-    # connect edge segments to form polygons
+    # edge node tree -> edge list
     line = []
     while edge:
         j = sorted(edge)[0]
@@ -399,6 +400,38 @@ def boundary(tri):
         line.append(l)
 
     return line
+
+
+def line_simplify(vtx, indices, area=None, nkeep=3):
+    """
+    Remove detail from a line or polygon.
+    """
+    import numpy as np
+    x, y = vtx[:2]
+    polygon = indices[0] == indices[-1]
+    if polygon:
+        j = list(indices[:-1])
+    else:
+        j = list(indices)
+    del(vtx, indices)
+    while len(j) >= nkeep:
+        k = j[1:] + j[:1]
+        l = j[-1:] + j[:-1]
+        a =  ((x[k] - x[j]) * (y[l] - y[j]))
+        a -= ((y[k] - y[j]) * (x[l] - x[j]))
+        a = a * a
+        if polygon:
+            i = np.argmin(a)
+        else:
+            i = np.argmin(a[1:-1]) + 1
+        if area and a[i] > area:
+            break
+        j.pop(i)
+    if len(j) == 2:
+        j = []
+    elif polygon:
+        j = j + j[:1]
+    return j
 
 
 def cubit_facet(vtx, tri, geographic=True):
