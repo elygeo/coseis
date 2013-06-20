@@ -219,15 +219,15 @@ for igroup, group in enumerate(station_groups):
 
         # finish separate
         if fig1:
-            f = os.path.join('run', 'plot', name.lower().replace('.', '-') + '.pdf')
+            f = os.path.join('run', 'plot', name.replace('.', '-') + '.pdf')
             fig1.savefig(f, transparate=True)
 
     # finish figure
     fig.canvas.draw()
     if lfilter[0]:
-        f = g = 'waveform-%.0f-%s' % (1.0 / lfilter[0][1], igroup)
+        f = g = 'Waveform-%.0f-%s' % (1.0 / lfilter[0][1], igroup)
     else:
-        f = g = 'waveform-raw-%s' % igroup
+        f = g = 'Waveform-Raw-%s' % igroup
     f = os.path.join('run', 'plot', f + '.pdf')
     g = os.path.join('run', 'www',  g + '.png')
     fig.savefig(f, transparent=True)

@@ -151,17 +151,6 @@ def tsurf_merge(tsurfs, fuse=-1.0, cull=-1.0, clean=True):
     vtx = np.vstack(vtx)
     tri = np.vstack(tri)
 
-    # merge nearby points
-    if fuse >= 0.0:
-        tol = fuse * fuse
-        n = len(vtx)
-        for j in range(n):
-            x = vtx[j,0] - vtx[j+1:,0]
-            y = vtx[j,1] - vtx[j+1:,1]
-            z = vtx[j,2] - vtx[j+1:,2]
-            for i in (x * x + y * y + z * z < tol).nonzero()[0]:
-                tri[tri==(j + 1 + i)] = j
-
     # remove small triangles
     if cull >= 0.0:
         x, y, z = vtx.T
@@ -179,14 +168,69 @@ def tsurf_merge(tsurfs, fuse=-1.0, cull=-1.0, clean=True):
         i = r > cull * cull
         tri = tri[i]
 
-    # remove unused points
+    # merge nearby points
+    if fuse >= 0.0:
+        tol = fuse * fuse
+        i, j = np.unique(tri, return_inverse=True)
+        tri = np.arange(tri.size)[j].reshape(tri.shape)
+        vtx = vtx[i]
+        for j in range(len(i)):
+            x = vtx[j,0] - vtx[j+1:,0]
+            y = vtx[j,1] - vtx[j+1:,1]
+            z = vtx[j,2] - vtx[j+1:,2]
+            for k in (x * x + y * y + z * z < tol).nonzero()[0]:
+                tri[tri==(j + 1 + k)] = j
+
+    # remove unused vertices
     if clean:
-        tri.sort()
         i, j = np.unique(tri, return_inverse=True)
         tri = np.arange(tri.size)[j].reshape(tri.shape)
         vtx = vtx[i]
 
     return vtx.T, tri.T
+
+
+def tsurf_edges(tri):
+    """
+    Find the boundary polygons of a triangulation.
+    """
+
+    # triangle list -> triangle node tree
+    surf = {i: set() for i in set(tri.flat)}
+    for j, k, l in tri.T:
+        surf[j] |= set([k, l])
+        surf[k] |= set([l, j])
+        surf[l] |= set([j, k])
+    del(tri)
+
+    # triangle node tree -> edge node tree
+    # boundary segments occur only once
+    edge = {}
+    for i in surf:
+        for j in surf[i]:
+            if len(surf[i] & surf[j]) == 1:
+                if i not in edge:
+                    edge[i] = set()
+                edge[i].add(j)
+    del(surf)
+
+    # edge node tree -> edge list
+    line = []
+    while edge:
+        j = sorted(edge)[0]
+        l = [j]
+        while edge[j]:
+            i = j
+            j = sorted(edge[i])[0]
+            l.append(j)
+            edge[j].remove(i)
+            edge[i].remove(j)
+            if not edge[i]:
+                edge.pop(i)
+        edge.pop(j)
+        line.append(l)
+
+    return line
 
 
 def tsurf_plane(vtx, tri):
@@ -358,49 +402,6 @@ def quad_mesh(vtx, tri, delta, drape=False, clean_top=False):
     yi += centroid[1]
 
     return xi, yi, zi, mask
-
-
-def tsurf_edges(tri):
-    """
-    Find the boundary polygons of a triangulation.
-    """
-
-    # triangle list -> triangle node tree
-    surf = {i: set() for i in set(tri.flat)}
-    for j, k, l in tri.T:
-        surf[j] |= set([k, l])
-        surf[k] |= set([l, j])
-        surf[l] |= set([j, k])
-    del(tri)
-
-    # triangle node tree -> edge node tree
-    # boundary segments occur only once
-    edge = {}
-    for i in surf:
-        for j in surf[i]:
-            if len(surf[i] & surf[j]) == 1:
-                if i not in edge:
-                    edge[i] = set()
-                edge[i].add(j)
-    del(surf)
-
-    # edge node tree -> edge list
-    line = []
-    while edge:
-        j = sorted(edge)[0]
-        l = [j]
-        while edge[j]:
-            i = j
-            j = sorted(edge[i])[0]
-            l.append(j)
-            edge[j].remove(i)
-            edge[i].remove(j)
-            if not edge[i]:
-                edge.pop(i)
-        edge.pop(j)
-        line.append(l)
-
-    return line
 
 
 def line_simplify(vtx, indices, area=None, nkeep=None):
