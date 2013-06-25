@@ -30,30 +30,17 @@ host_opts = {
 }
 
 # TAU
-build_cc = 'tau_cc.sh'
-build_fc = 'tau_f90.sh'
-build_libs = ''
 launch = 'cobalt-mpirun -mode vn -verbose 2 -np {nproc} -env "TAU_METRICS=BGPTIMERS" {command}'
 
 # MPI
-build_ldflags = '-g -O3 -qsuppress=cmpmsg'
 ppn_range = [1, 2, 4]
 nthread = 1
 launch = 'cobalt-mpirun -mode vn -verbose 2 -np {nproc} {command}'
 
 # MPI + OpenMP
-build_ldflags = '-g -O3 -qsuppress=cmpmsg -qsmp=omp'
 ppn_range = [1]
 nthread = 4
 launch = 'cobalt-mpirun -mode smp -verbose 2 -np {nproc} -env OMP_NUM_THREADS={nthread} {command}'
-
-# HPM
-build_cc = 'mpixlc_r'
-build_fc = 'mpixlf2003_r'
-build_libs = '/home/morozov/lib/libmpihpm.a'
-build_cflags = build_ldflags + ' -qlist -qreport'
-build_fflags = build_ldflags + ' -qlist -qreport -qrealsize=8'
-build_fflags = build_ldflags + ' -qlist -qreport'
 
 # job submission
 notify = '-M {email}'

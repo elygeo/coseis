@@ -31,11 +31,6 @@ def configure(job=None, force=False, **kwargs):
     # makefile
     if force or not os.path.exists('Makefile'):
 
-        # configure
-        if job == None:
-            job = util.configure(options=[], **kwargs)
-        mode = {True: 'mpi', False: 'serial'}[job.build_mpi]
-
         # source files
         sources = [
             'globals.f90',
@@ -48,7 +43,8 @@ def configure(job=None, force=False, **kwargs):
             'utilities.f90',
             'arrays.f90',
             'fortran_io.f90',
-            'collective_%s.f90' % mode,
+            'collective_serial.f90',
+            'collective_mpi.f90',
             'field_io_mod.f90',
             'parameters.f90',
             'statistics.f90',
@@ -80,14 +76,22 @@ def configure(job=None, force=False, **kwargs):
                 rules += [o + ' : ' + d + '\n	$(FC) $(FFLAGS) -c $<']
             else:
                 raise Exception
-            objects.append(o)
+            if 'collective' not in o:
+                objects.append(o)
         objects = ' \\\n        '.join(objects)
         rules = '	\n\n'.join(rules)
 
         # makefile
-        m = open('Makefile.in').read()
-        m = m.format(objects=objects, rules=rules, mode=mode, **job)
-        m = '# Auto-generated file. Will be overwritten.\n\n' + m
+        if job == None:
+            job = util.configure(options=[], **kwargs)
+        p = 'conf' + os.path.sep
+        try:
+            local = open(p + job.machine + '.mk').read()
+        except:
+            local = open(p + 'GCC.mk').read()
+        m = open(p + 'base.mk').read()
+        m = m.format(local=local, objects=objects, rules=rules)
+        m = '# This Makefile is auto-generated and will be overwritten.\n\n' + m
         open('Makefile', 'w').write(m)
 
     # finished

@@ -118,7 +118,7 @@ case default
         do
             i = scan(line, '/')
             if (i == 0) exit
-            str(i:i) = '#'
+            line(i:i) = '#'
         end do
         io%ib = -1
         read (line, *, iostat=ios) io%mode, io%nc, io%pulse, &
@@ -136,8 +136,6 @@ end select
 ! error check
 if (ios /= 0) then
     if (master) write (0,*) 'bad input: ', trim(str(:j))
-    write(0, *) 1111, trim(line)
-    write(0, *) 2222, trim(str)
     stop
 end if
 

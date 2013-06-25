@@ -60,34 +60,9 @@ options = [
     ('f', 'force',       'force', True),
 ]
 
-# search for files in PATH
-def find(*files):
-    import os
-    path = os.environ['PATH'].split(':')
-    for f in files:
-        for p in path:
-            if os.path.isfile(os.path.join(p, f)):
-                return f
-
-# default compiler: GNU
-f2py_flags = ''
-build_cc = find('mpicc', 'gcc')
-build_fc = find('mpif90', 'gfortran')
-build_ld = build_fc
-build_mpi = 'mpi' in build_cc
-build_libs = ''
-build_ldflags = '-g -O3 -Wall -fopenmp -fbounds-check -ffpe-trap=invalid,zero,overflow'
-build_ldflags = '-g -O3 -Wall -fopenmp -pg'
-build_ldflags = '-g -O3 -Wall -fopenmp'
-build_cflags = build_ldflags + ' -pedantic'
-build_fflags = build_ldflags + ' -fimplicit-none -fdefault-real-8'
-build_fflags = build_ldflags + ' -fimplicit-none'
-
 # default scheduler: PBS
-if build_mpi:
-    launch = 'mpiexec -np {nproc} {command}'
-else:
-    launch = '{command}'
+#launch = 'mpiexec -np {nproc} {command}'
+launch = '{command}'
 notify_threshold = 4096
 notify = '-m abe'
 submit_flags = ''
@@ -109,23 +84,23 @@ echo "$( date ): {name} finished" >> {name}.out
 
 # detect machine from the hostname
 for m, h in [
-    ('alcf_bgq', 'vestalac1.ftd.alcf.anl.gov'),
-    ('alcf_bgq', 'cetuslac1.fst.alcf.anl.gov'),
-    ('alcf_bgq', 'miralac1.fst.alcf.anl.gov'),
-    ('alcf_bgp', 'surveyor.alcf.anl.gov'),
-    ('alcf_bgp', 'challenger.alcf.anl.gov'),
-    ('alcf_bgp', 'intreplid.alcf.anl.gov'),
-    ('wat2q',    'grotius.watson.ibm.com'),
-    ('usc_hpc',  'hpc-login1.usc.edu'),
-    ('usc_hpc',  'hpc-login2-l.usc.edu'),
-    ('nics_kraken', 'kraken'),
-    ('airy', 'airy'),
+    ('ALCF-BGQ',    'vestalac1.ftd.alcf.anl.gov'),
+    ('ALCF-BGQ',    'cetuslac1.fst.alcf.anl.gov'),
+    ('ALCF-BGQ',    'miralac1.fst.alcf.anl.gov'),
+    ('ALCF-BGP',    'surveyor.alcf.anl.gov'),
+    ('ALCF-BGP',    'challenger.alcf.anl.gov'),
+    ('ALCF-BGP',    'intreplid.alcf.anl.gov'),
+    ('IBM-Wat2Q',   'grotius.watson.ibm.com'),
+    ('NICS-Kraken', 'kraken'),
+    ('USC-HPC',     'hpc-login1.usc.edu'),
+    ('USC-HPC',     'hpc-login2-l.usc.edu'),
+    ('Airy',        'airy'),
 ]:
     if h in host:
         machine = m
         break
 
 # clean up the namespace
-del(m, h, find)
 del(os, sys, pwd, socket, multiprocessing, np)
+del(m, h)
 

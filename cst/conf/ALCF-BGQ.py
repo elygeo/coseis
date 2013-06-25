@@ -27,27 +27,14 @@ host_opts = {
 }
 
 # MPI
-build_ldflags = '-g -O3 -qsuppress=cmpmsg'
-build_libs = '-lSPI_upci_cnk /home/morozov/HPM/lib/libmpihpm.a /bgsys/drivers/ppcfloor/bgpm/lib/libbgpm.a'
 ppn_range = [1, 2, 4, 8, 16, 32]
 nthread = 1
 launch = 'runjob --exe {command} -n {nproc} -p {ppn} --verbose=INFO --block $COBALT_PARTNAME ${{COBALT_CORNER:+--corner}} $COBALT_CORNER ${{COBALT_SHAPE:+--shape}} $COBALT_SHAPE --envs BG_SHAREDMEMSIZE=32MB PAMID_VERBOSE=1 VPROF_PROFILE=yes\n'
 
 # MPI + OpenMP
-build_ldflags = '-g -O0 -qsmp=omp:noauto -qsuppress=cmpmsg -qfloat=nofold'
-build_ldflags = '-g -O3 -qsmp=omp:noauto -qsuppress=cmpmsg'
-build_libs = '-lSPI_upci_cnk /home/morozov/HPM/lib/libmpihpm_smp.a /bgsys/drivers/ppcfloor/bgpm/lib/libbgpm.a'
 ppn_range = [1]
 nthread = 32
 launch = 'runjob --exe {command} -n {nproc} -p {ppn} --verbose=INFO --block $COBALT_PARTNAME ${{COBALT_CORNER:+--corner}} $COBALT_CORNER ${{COBALT_SHAPE:+--shape}} $COBALT_SHAPE --envs BG_SHAREDMEMSIZE=32MB PAMID_VERBOSE=1 VPROF_PROFILE=yes OMP_NUM_THREADS={nthread}\n'
-
-# compilers
-build_cc = 'mpixlc_r'
-build_fc = 'mpixlf2003_r'
-build_ld = 'mpixlf2003_r'
-build_fflags = build_ldflags + ' -qlist -qreport -qrealsize=8'
-build_fflags = build_ldflags + ' -qlist -qreport'
-build_cflags = build_ldflags + ' -qlist -qreport'
 
 # job submission
 notify = '-M {email}'

@@ -22,7 +22,6 @@ power = range(6)     # Challenger
 prm = cst.sord.parameters()
 prm.oplevel = 5
 prm.oplevel = 6
-prm.itcheck = 9999
 prm.itstats = 9999
 prm.itio = 128
 prm.gridnoise = 0.1

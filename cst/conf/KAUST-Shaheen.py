@@ -10,7 +10,6 @@ maxcores = 4
 maxram = 4096
 ppn_range = [1, 2, 4]
 nthread = 1
-build_ldflags = '-g -O5 -qarch=450d -qtune=450 -qsuppress=cmpmsg'
 
 account = 'k68'
 queue = 'default'
