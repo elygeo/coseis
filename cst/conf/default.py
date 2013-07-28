@@ -30,6 +30,7 @@ dtype = np.dtype('f').str # Numpy data type
 
 # machine specific
 python = 'python'
+f2py_flags = ''
 machine = ''
 account = ''
 host = os.uname()
