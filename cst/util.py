@@ -218,10 +218,6 @@ def prepare(job=None, **kwargs):
         'rundate': time.strftime('%Y %b %d'),
     })
 
-    # number of processes
-    if not job['build_mpi']:
-        job['nproc'] = 1
-
     # queue options
     opts = job['queue_opts']
     if opts == []:

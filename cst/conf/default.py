@@ -62,8 +62,8 @@ options = [
 ]
 
 # default scheduler: PBS
-#launch = 'mpiexec -np {nproc} {command}'
-launch = '{command}'
+#launch = '{command}'
+launch = 'mpiexec -np {nproc} {command}'
 notify_threshold = 4096
 notify = '-m abe'
 submit_flags = ''

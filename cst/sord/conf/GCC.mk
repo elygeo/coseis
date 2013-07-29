@@ -1,7 +1,7 @@
 # GNU Compiler Collection
 
 ifeq ($(MODE), mpi)
-    CC = mpigcc
+    CC = mpicc
     FC = mpif90 
     LD = mpif90
 else
