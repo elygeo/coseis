@@ -1,0 +1,153 @@
+# Options
+MACHINE = {machine}
+MODE = serial
+OMP = 1
+DEBUG =    
+PROFILE =
+REAL8 =
+
+sord.x: {objects} \
+	collective_$(MODE).o
+	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+clean:
+	rm -f *.o *.mod *.x *.lst *.pyc
+
+distclean: clean
+	rm Makefile
+
+collective.mod: collective_$(MODE).o
+	@true   
+
+{rules}
+
+%.mod: %.o
+	@true
+
+# Default: # GNU Compiler Collection
+ifeq ($(MODE), mpi)
+    CC = mpicc
+    FC = mpif90 
+    LD = mpif90
+else
+    CC = gcc
+    FC = gfortran 
+    LD = gfortran
+endif
+CFLAGS = $(LDFLAGS) -pedantic
+FFLAGS = $(LDFLAGS) -fimplicit-none
+LDFLAGS = -g -O3 -Wall
+ifdef REAL8
+    FFLAGS += -fdefault-real-8
+endif
+ifdef OMP
+    LDFLAGS += -fopenmp
+endif
+ifdef PROFILE
+    LDFLAGS += -pg
+endif
+ifdef DEBUG
+    LDFLAGS += -fbounds-check -ffpe-trap=invalid,zero,overflow
+endif
+
+# ALCF IBM Blue Gene/P
+ifeq ($(MACHINE), ALCF-BGP)
+    MODE = mpi
+    ifdef TAU
+        CC = tau_cc.sh
+        FC = tau_f90.sh
+        LD = tau_f90.sh
+        LIBS =
+    else
+        CC = mpixlc_r
+        FC = mpixlf2003_r
+        LD = mpixlf2003_r
+        LIBS = /home/morozov/lib/libmpihpm.a
+    endif
+    CFLAGS = $(LDFLAGS) -qlist -qreport
+    FFLAGS = $(LDFLAGS) -qlist -qreport
+    LDFLAGS = -g -O3 -qsuppress=cmpmsg
+    ifdef REAL8
+        FFLAGS += -qrealsize=8
+    endif
+    ifdef OMP
+        LDFLAGS += -qsmp=omp
+    endif
+endif
+
+# ALCF IBM Blue Gene/Q
+ifeq ($(MACHINE), ALCF-BGQ)
+    MODE = mpi
+    CC = mpixlc_r
+    FC = mpixlf2003_r
+    LD = mpixlf2003_r
+    CLFAGS = $(LDFLAGS) -qlist -qreport
+    FFLAGS = $(LDFLAGS) -qlist -qreport
+    LDFLAGS = -g -O3 -qsuppress=cmpmsg
+    LIBS = -lSPI_upci_cnk
+    ifdef OMP
+        LDFLAGS += -qsmp=omp:noauto
+        LIBS += /home/morozov/HPM/lib/libmpihpm_smp.a
+    else
+        LIBS += /home/morozov/HPM/lib/libmpihpm.a
+    endif
+    LIBS += /bgsys/drivers/ppcfloor/bgpm/lib/libbgpm.a
+    ifdef REAL8
+        FFLAGS += -qrealsize=9
+    endif
+endif
+
+# Wat2Q IBM Blue Gene/Q
+ifeq ($(MACHINE), IBM-Wat2Q)
+    MODE = mpi
+    CC = /bgsys/drivers/ppcfloor/comm/xl/bin/mpixlcc_r
+    FC = /bgsys/drivers/ppcfloor/comm/xl/bin/mpixlf2003_r
+    LD = /bgsys/drivers/ppcfloor/comm/xl/bin/mpixlf2003_r
+    CFLAGS = $(LDFLAGS) -qlist -qreport
+    FFLAGS = $(LDFLAGS) -qlist -qreport
+    LDFLAGS = -g -O3 -qsuppress=cmpmsg
+    LIBS = -lSPI_upci_cnk /bgsys/drivers/ppcfloor/bgpm/lib/libbgpm.a
+    ifdef REAL8
+        FFLAGS += -qrealsize=8
+    endif
+    ifdef OMP
+        LDFLAGS += -qsmp=omp:noauto
+    endif
+endif
+
+# KAUST Shaheen: IBM Blue Gene/P
+ifeq ($(MACHINE), KAUST-Shaheen)
+    MODE = mpi
+    CC = *FIXME*
+    FC = *FIXME*
+    LD = *FIXME*
+    CLFAGS = $(LDFLAGS)
+    FFLAGS = $(LDFLAGS)
+    LDFLAGS = -g -O5 -qarch=450d -qtune=450 -qsuppress=cmpmsg
+    LIBS =
+endif
+
+# NICS Kraken: Cray XT5
+ifeq ($(MACHINE), NICS-Kraken)
+    MODE = mpi
+    CC = cc
+    FC = ftn
+    LD = ftn
+    CFLAGS = $(LDFLAGS)
+    FFLAGS = $(LDFLAGS) -Mdclchk
+    LDFLAGS = -fast
+    LIBS =
+    ifdef REAL8
+        FFLAGS += -Mr8
+    endif
+    ifdef OMP
+        LDFLAGS += -mp
+    endif
+    ifdef DEBUG
+        LDFLAGS += -g -Ktrap=fp -Mbounds -Mchkptr
+    endif
+    ifdef PROFILE
+        LDFLAGS += -g -pg -Mprof=func
+    endif
+endif
+

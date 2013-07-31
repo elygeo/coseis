@@ -84,14 +84,8 @@ def configure(job=None, force=False, **kwargs):
         # makefile
         if job == None:
             job = util.configure(options=[], **kwargs)
-        p = 'conf' + os.path.sep
-        try:
-            local = open(p + job.machine + '.mk').read()
-        except:
-            local = open(p + 'GCC.mk').read()
-        m = open(p + 'base.mk').read()
-        m = m.format(local=local, objects=objects, rules=rules)
-        m = '# This Makefile is auto-generated and will be overwritten.\n\n' + m
+        m = open('Makefile.in').read()
+        m = m.format(machine=job['machine'], objects=objects, rules=rules)
         open('Makefile', 'w').write(m)
 
     # finished
@@ -150,8 +144,8 @@ def stage(prm, **kwargs):
     # partition for parallelization
     nx, ny, nz = prm.shape[:3]
     j, k, l = prm.nproc3
-    if not job.build_mpi:
-        j, k, l = 1, 1, 1
+    #if not job.build_mpi:
+    #    j, k, l = 1, 1, 1
     nl = [
         (nx - 1) // j + 1,
         (ny - 1) // k + 1,

@@ -56,9 +56,9 @@ nstripe = -2
 # command line options
 argv = sys.argv[1:]
 options = [
-    ('i', 'interactive', 'run',  'exec'),
-    ('q', 'queue',       'run',  'submit'),
-    ('f', 'force',       'force', True),
+    ['i', 'interactive', 'run',  'exec'],
+    ['q', 'queue',       'run',  'submit'],
+    ['f', 'force',       'force', True],
 ]
 
 # default scheduler: PBS
@@ -85,17 +85,17 @@ echo "$( date ): {name} finished" >> {name}.out
 
 # detect machine from the hostname
 for m, h in [
-    ('ALCF-BGQ',    'vestalac1.ftd.alcf.anl.gov'),
-    ('ALCF-BGQ',    'cetuslac1.fst.alcf.anl.gov'),
-    ('ALCF-BGQ',    'miralac1.fst.alcf.anl.gov'),
-    ('ALCF-BGP',    'surveyor.alcf.anl.gov'),
-    ('ALCF-BGP',    'challenger.alcf.anl.gov'),
-    ('ALCF-BGP',    'intreplid.alcf.anl.gov'),
-    ('IBM-Wat2Q',   'grotius.watson.ibm.com'),
-    ('NICS-Kraken', 'kraken'),
-    ('USC-HPC',     'hpc-login1.usc.edu'),
-    ('USC-HPC',     'hpc-login2-l.usc.edu'),
-    ('Airy',        'airy'),
+    ['ALCF-BGQ',    'vestalac1.ftd.alcf.anl.gov'],
+    ['ALCF-BGQ',    'cetuslac1.fst.alcf.anl.gov'],
+    ['ALCF-BGQ',    'miralac1.fst.alcf.anl.gov'],
+    ['ALCF-BGP',    'surveyor.alcf.anl.gov'],
+    ['ALCF-BGP',    'challenger.alcf.anl.gov'],
+    ['ALCF-BGP',    'intreplid.alcf.anl.gov'],
+    ['IBM-Wat2Q',   'grotius.watson.ibm.com'],
+    ['NICS-Kraken', 'kraken'],
+    ['USC-HPC',     'hpc-login1.usc.edu'],
+    ['USC-HPC',     'hpc-login2-l.usc.edu'],
+    ['Airy',        'airy'],
 ]:
     if h in host:
         machine = m
