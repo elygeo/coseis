@@ -1,0 +1,6 @@
+#!/usr/bin/env python
+import sys, yaml, json
+
+for f in sys.argv[1:]:
+    d = yaml.load(open(f))
+    print(json.dumps(d, indent=4, sort_keys=True))

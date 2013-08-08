@@ -7,15 +7,17 @@ PROFILE =
 REAL8 =
 
 # Rules
-sord.x: {objects} \
-	collective_$(MODE).o
-	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
+all: sord.x parameters.json fieldnames.json
 
 clean:
 	rm -f *.o *.mod *.x *.lst *.pyc
 
 distclean: clean
 	rm Makefile
+
+sord.x: {objects} \
+	collective_$(MODE).o
+	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 collective.mod: collective_$(MODE).o
 	@true   
@@ -24,6 +26,9 @@ collective.mod: collective_$(MODE).o
 
 %.mod: %.o
 	@true
+
+%.json: %.yaml
+	yaml2json $< > $@
 
 # Default: # GNU Compiler Collection
 ifeq ($(MODE), mpi)

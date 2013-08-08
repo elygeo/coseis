@@ -249,11 +249,11 @@ email = 'your.email&#64;address.here'
 <p>To run the test suite interactively:</p>
 <pre class="literal-block">
 cd cst/tests
-python test_runner.py -i
+python test_runner.py --run=exec
 </pre>
 <p>Or, submit a job for batch processing:</p>
 <pre class="literal-block">
-python test_runner.py -q
+python test_runner.py --run=submit
 </pre>
 <p>After completion, a report is printed to the screen (or saved in
 run/test_suite/test_suite.output):</p>

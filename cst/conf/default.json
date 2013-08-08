@@ -80,5 +80,6 @@
     "submit": "qsub {notify} {submit_flags} \"{name}.sh\"", 
     "submit2": "qsub {notify} -W depend=\"afterok:{depend}\" {submit_flags} \"{name}.sh\"", 
     "submit_flags": "", 
-    "submit_pattern": "(?P<jobid>\\d+\\S*)\\D*$"
+    "submit_pattern": "(?P<jobid>\\d+\\S*)\\D*$", 
+    "verbose": 1
 }

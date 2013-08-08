@@ -89,8 +89,8 @@ For a simple example consider the above test,
 The first thing to do is import the ``cst`` module and instantiate a parameter
 object from ``cst.sord.parameters()``.  The parameter object contains all of
 the simulation settings and then passed to ``cst.sord.run()``.  A complete list
-of possible SORD parameters and default values are specified in `parameters.py
-<../cst/sord/parameters.py>`_.
+of possible SORD parameters and default values are specified in `parameters.yaml
+<../cst/sord/parameters.yaml>`__.
 
 Running jobs
 ------------
@@ -106,7 +106,7 @@ Field I/O
 ---------
 
 Multidimensional field arrays can be accessed for input and output through the
-``fieldio`` list.  The `fieldnames.py <../cst/sord/fieldnames.py>`_ file
+``fieldio`` list.  The `fieldnames.yaml <../cst/sord/fieldnames.yaml>`_ file
 specifies the list of available field variables, which are categorized in four
 ways: (1) static vs. dynamic, (2) settable vs. output only, (3) node vs. cell
 registration, and (4) volume vs. fault surface.  For example, density ``rho``
@@ -135,7 +135,7 @@ and -1.5 for the last cell.  Empty brackets ``[]`` are shorthand for the entire
 Each member of the ``fieldio`` list contains a mode, a field name, and slice
 indices, followed by mode dependent parameters.  The following I/O modes are
 available, where ``'f'`` is the field variable name (from the list
-fieldnames.py_), and ``[]`` are the slice indices::
+fieldnames.yaml_), and ``[]`` are the slice indices::
 
     ('=',   'f', [], val),             # Set f to value
     ('+',   'f', [], val),             # Add value to f
@@ -160,7 +160,7 @@ large) 3D material and mesh coordinate files.
 
 All input modes may use '+' instead of '=' to add to, rather than replace,
 preexisting values.  For a list of available time functions, see the
-``time_function`` subroutine in `util.f90 <../cst/sord/src/util.f90>`_.  The
+``time_function`` subroutine in `util.f90 <../cst/sord/src/util.f90>`__.  The
 routine can be easily modified to add new time functions.  Time functions can
 be offset in time with the ``tm0`` initial time parameter.
 
@@ -259,8 +259,7 @@ example to put the rupture surface along the far z boundary::
     shape = 41, 41, 22, 100
     bc2 = 0, 0, -2
 
-Alternatively, put the rupture surface along the near z boundary
-::
+Alternatively, put the rupture surface along the near z boundary::
 
     ihypo = 21, 21, 1.5
     shape = 41, 41, 22, 100

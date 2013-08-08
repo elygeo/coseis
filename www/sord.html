@@ -193,7 +193,7 @@ td {
 </ul>
 </div>
 <div class="section" id="summary">
-<h3>Summary</h3>
+<h1>Summary</h1>
 <p>The Support Operator Rupture Dynamics (SORD) code simulates spontaneous rupture
 within a 3D isotropic viscoelastic solid.  Wave motions are computed on a
 logically rectangular hexahedral mesh, using the generalized finite difference
@@ -211,7 +211,7 @@ variety of Fortran 95 compilers, MPI implementations, and operating systems
 (Linux, Mac OS X, IBM AIX, SUN Solaris).</p>
 </div>
 <div class="section" id="publications">
-<h3>Publications</h3>
+<h1>Publications</h1>
 <p>The first two papers give (for wave propagation and spontaneous rupture,
 respectively) the formulation, numerical algorithm, and verification of the
 SORD method. The third paper presents an application to simulating earthquakes
@@ -233,9 +233,9 @@ heterogeneous media</a>,
 </ol>
 </div>
 <div class="section" id="user-guide">
-<h3>User Guide</h3>
+<h1>User Guide</h1>
 <div class="section" id="quick-test">
-<h4>Quick test</h4>
+<h2>Quick test</h2>
 <p>Run a simple point source explosion test and plot a 2D slice of particle
 velocity:</p>
 <pre class="literal-block">
@@ -249,7 +249,7 @@ python plot.py
 </blockquote>
 </div>
 <div class="section" id="scripting-with-python">
-<h4>Scripting with Python</h4>
+<h2>Scripting with Python</h2>
 <p>For a simple example consider the above test,
 <a class="reference external" href="../scripts/sord/sim.py">sim.py</a>:</p>
 <pre class="literal-block">
@@ -275,16 +275,17 @@ prm.source2 = 0.0, 0.0, 0.0                 # source shear components
 prm.pulse = 'integral_brune'                # source time function
 prm.tau = 6 * prm.delta[3]                  # source characteristic time
 os.mkdir('run')                             # create run directory
+os.chidir('run')                            # switch to run directory
 cst.sord.run(prm)                           # launch SORD job
 
 </pre>
 <p>The first thing to do is import the <tt class="docutils literal">cst</tt> module and instantiate a parameter
 object from <tt class="docutils literal">cst.sord.parameters()</tt>.  The parameter object contains all of
 the simulation settings and then passed to <tt class="docutils literal">cst.sord.run()</tt>.  A complete list
-of possible SORD parameters and default values are specified in <a class="reference external" href="../cst/sord/parameters.py">parameters.py</a>.</p>
+of possible SORD parameters and default values are specified in <a class="reference external" href="../cst/sord/parameters.yaml">parameters.yaml</a>.</p>
 </div>
 <div class="section" id="running-jobs">
-<h4>Running jobs</h4>
+<h2>Running jobs</h2>
 <p>The <tt class="docutils literal">cst.sord.run()</tt> function does four tasks: (1) configure job parameters
 (2) compile the source code if necessary (3) populate the run directory with
 necessary executable, input, and metadata files, and (4) launch the job
@@ -293,9 +294,9 @@ skipped, giving the user an opportunity to inspect the run directory prior to
 launching the job.</p>
 </div>
 <div class="section" id="field-i-o">
-<h4>Field I/O</h4>
+<h2>Field I/O</h2>
 <p>Multidimensional field arrays can be accessed for input and output through the
-<tt class="docutils literal">fieldio</tt> list.  The <a class="reference external" href="../cst/sord/fieldnames.py">fieldnames.py</a> file
+<tt class="docutils literal">fieldio</tt> list.  The <a class="reference external" href="../cst/sord/fieldnames.yaml">fieldnames.yaml</a> file
 specifies the list of available field variables, which are categorized in four
 ways: (1) static vs. dynamic, (2) settable vs. output only, (3) node vs. cell
 registration, and (4) volume vs. fault surface.  For example, density <tt class="docutils literal">rho</tt>
@@ -323,7 +324,7 @@ s_[:,:,:,-1]        # Full 3D volume, last time step
 <p>Each member of the <tt class="docutils literal">fieldio</tt> list contains a mode, a field name, and slice
 indices, followed by mode dependent parameters.  The following I/O modes are
 available, where <tt class="docutils literal">'f'</tt> is the field variable name (from the list
-<a class="reference external" href="../cst/sord/fieldnames.py">fieldnames.py</a>), and <tt class="docutils literal">[]</tt> are the slice indices:</p>
+<a class="reference external" href="../cst/sord/fieldnames.yaml">fieldnames.yaml</a>), and <tt class="docutils literal">[]</tt> are the slice indices:</p>
 <pre class="literal-block">
 ('=',   'f', [], val),             # Set f to value
 ('+',   'f', [], val),             # Add value to f
@@ -351,7 +352,7 @@ routine can be easily modified to add new time functions.  Time functions can
 be offset in time with the <tt class="docutils literal">tm0</tt> initial time parameter.</p>
 </div>
 <div class="section" id="boundary-conditions">
-<h4>Boundary Conditions</h4>
+<h2>Boundary Conditions</h2>
 <p>Boundary conditions for the six faces of the model domain are specified by the
 parameters <tt class="docutils literal">bc1</tt> (near-size, x, y, and z faces) and <tt class="docutils literal">bc2</tt> (far-side, x, y,
 and x faces).  The symmetry boundary conditions can be used to reduce
@@ -409,7 +410,7 @@ bc2 = 10, 10, -1
 </pre>
 </div>
 <div class="section" id="defining-the-fault-rupture-surface">
-<h4>Defining the fault rupture surface</h4>
+<h2>Defining the fault rupture surface</h2>
 <p>Fault rupture always follows a surface of the (possibly non-planar) logical
 mesh.  The orientation of the fault plane is defined by the <tt class="docutils literal">faultnormal</tt>
 parameter.  This can be either 1, 2, or 3 corresponding to surfaces normal to
@@ -440,7 +441,7 @@ example to put the rupture surface along the far z boundary:</p>
 shape = 41, 41, 22, 100
 bc2 = 0, 0, -2
 </pre>
-<p>Alternatively, put the rupture surface along the near z boundary</p>
+<p>Alternatively, put the rupture surface along the near z boundary:</p>
 <pre class="literal-block">
 ihypo = 21, 21, 1.5
 shape = 41, 41, 22, 100
@@ -460,7 +461,7 @@ bc2 = -1, 1, -2
 </div>
 </div>
 <div class="section" id="memory-usage-and-scaling">
-<h3>Memory Usage and Scaling</h3>
+<h1>Memory Usage and Scaling</h1>
 <p>For rectilinear meshes, 23 single precision (four-byte) memory variables are
 required per mesh point.  Curvilinear meshes have two options with a trade-off
 in memory usage vs. floating-point operations.  Stored operators require 44

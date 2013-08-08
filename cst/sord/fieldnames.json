@@ -1,0 +1,420 @@
+{
+    "a1": [
+        "a_x", 
+        "Acceleration", 
+        "<"
+    ], 
+    "a2": [
+        "a_y", 
+        "Acceleration", 
+        "<"
+    ], 
+    "a3": [
+        "a_z", 
+        "Acceleration", 
+        "<"
+    ], 
+    "am2": [
+        "|a|", 
+        "Acceleration magnitude", 
+        ""
+    ], 
+    "c1": [
+        "x", 
+        "Cell coordinate", 
+        "c0"
+    ], 
+    "c2": [
+        "y", 
+        "Cell coordinate", 
+        "c0"
+    ], 
+    "c3": [
+        "z", 
+        "Cell coordinate", 
+        "c0"
+    ], 
+    "co": [
+        "co", 
+        "Cohesion", 
+        "<f0"
+    ], 
+    "dc": [
+        "D_c", 
+        "Slip weakening distance", 
+        "<f0"
+    ], 
+    "e11": [
+        "e_{xx}", 
+        "Strain", 
+        "<c"
+    ], 
+    "e12": [
+        "e_{xy}", 
+        "Strain", 
+        "<c"
+    ], 
+    "e22": [
+        "e_{yy}", 
+        "Strain", 
+        "<c"
+    ], 
+    "e23": [
+        "e_{yz}", 
+        "Strain", 
+        "<c"
+    ], 
+    "e31": [
+        "e_{zx}", 
+        "Strain", 
+        "<c"
+    ], 
+    "e33": [
+        "e_{zz}", 
+        "Strain", 
+        "<c"
+    ], 
+    "f1": [
+        "f_x", 
+        "Force", 
+        "<"
+    ], 
+    "f2": [
+        "f_y", 
+        "Force", 
+        "<"
+    ], 
+    "f3": [
+        "f_z", 
+        "Force", 
+        "<"
+    ], 
+    "fr": [
+        "\\tau_c", 
+        "Friction", 
+        "f"
+    ], 
+    "gam": [
+        "\\gamma", 
+        "Viscosity", 
+        "<c0"
+    ], 
+    "lam": [
+        "\\lambda", 
+        "Elastic modulus", 
+        "c0"
+    ], 
+    "mu": [
+        "\\mu", 
+        "Elastic modulus", 
+        "c0"
+    ], 
+    "mud": [
+        "\\mu_d", 
+        "Dynamic friction coefficient", 
+        "<f0"
+    ], 
+    "mus": [
+        "\\mu_s", 
+        "Static friction coefficient", 
+        "<f0"
+    ], 
+    "nhat1": [
+        "n_x", 
+        "Fault surface normal", 
+        "f0"
+    ], 
+    "nhat2": [
+        "n_y", 
+        "Fault surface normal", 
+        "f0"
+    ], 
+    "nhat3": [
+        "n_z", 
+        "Fault surface normal", 
+        "f0"
+    ], 
+    "nu": [
+        "\\nu", 
+        "Poisson ratio", 
+        "c0"
+    ], 
+    "psv": [
+        "|\\dot s|_{peak}", 
+        "Peak slip velocity", 
+        "f"
+    ], 
+    "rho": [
+        "\\rho", 
+        "Density", 
+        "<c0"
+    ], 
+    "s11": [
+        "\\sigma_{xx}", 
+        "Pre-stress", 
+        "<f0"
+    ], 
+    "s12": [
+        "\\sigma_{xy}", 
+        "Pre-stress", 
+        "<f0"
+    ], 
+    "s22": [
+        "\\sigma_{yy}", 
+        "Pre-stress", 
+        "<f0"
+    ], 
+    "s23": [
+        "\\sigma_{yz}", 
+        "Pre-stress", 
+        "<f0"
+    ], 
+    "s31": [
+        "\\sigma_{zx}", 
+        "Pre-stress", 
+        "<f0"
+    ], 
+    "s33": [
+        "\\sigma_{zz}", 
+        "Pre-stress", 
+        "<f0"
+    ], 
+    "sa1": [
+        "\\ddot s_x", 
+        "Slip acceleration", 
+        "f"
+    ], 
+    "sa2": [
+        "\\ddot s_y", 
+        "Slip acceleration", 
+        "f"
+    ], 
+    "sa3": [
+        "\\ddot s_z", 
+        "Slip acceleration", 
+        "f"
+    ], 
+    "sam": [
+        "|\\ddot s|", 
+        "Slip acceleration magnitude", 
+        "f"
+    ], 
+    "sl": [
+        "\\ell", 
+        "Slip path length", 
+        "f"
+    ], 
+    "su1": [
+        "s_x", 
+        "Slip", 
+        "f"
+    ], 
+    "su2": [
+        "s_y", 
+        "Slip", 
+        "f"
+    ], 
+    "su3": [
+        "s_z", 
+        "Slip", 
+        "f"
+    ], 
+    "sum": [
+        "|s|", 
+        "Slip magnitude", 
+        "f"
+    ], 
+    "sv1": [
+        "\\dot s_x", 
+        "Slip velocity", 
+        "f"
+    ], 
+    "sv2": [
+        "\\dot s_y", 
+        "Slip velocity", 
+        "f"
+    ], 
+    "sv3": [
+        "\\dot s_z", 
+        "Slip velocity", 
+        "f"
+    ], 
+    "svm": [
+        "|\\dot s|", 
+        "Slip velocity magnitude", 
+        "f"
+    ], 
+    "t1": [
+        "\\tau_x", 
+        "Traction", 
+        "f"
+    ], 
+    "t2": [
+        "\\tau_y", 
+        "Traction", 
+        "f"
+    ], 
+    "t3": [
+        "\\tau_z", 
+        "Traction", 
+        "f"
+    ], 
+    "tarr": [
+        "t_{arrest}", 
+        "Arrest time", 
+        "f"
+    ], 
+    "td": [
+        "\\tau_d", 
+        "Pre-traction", 
+        "dip component", 
+        "<f0"
+    ], 
+    "tn": [
+        "\\tau_n", 
+        "Pre-traction", 
+        "normal component", 
+        "<f0"
+    ], 
+    "tnm": [
+        "\\tau^n", 
+        "Normal traction", 
+        "f"
+    ], 
+    "trup": [
+        "t_{rupture}", 
+        "Rupture time", 
+        "f"
+    ], 
+    "ts": [
+        "\\tau_s", 
+        "Pre-traction", 
+        "strike component", 
+        "<f0"
+    ], 
+    "ts1": [
+        "\\tau^s_x", 
+        "Shear traction", 
+        "f"
+    ], 
+    "ts2": [
+        "\\tau^s_y", 
+        "Shear traction", 
+        "f"
+    ], 
+    "ts3": [
+        "\\tau^s_z", 
+        "Shear traction", 
+        "f"
+    ], 
+    "tsm": [
+        "|\\tau^s|", 
+        "Shear traction magnitude", 
+        "f"
+    ], 
+    "u1": [
+        "u_x", 
+        "Displacement", 
+        "<"
+    ], 
+    "u2": [
+        "u_y", 
+        "Displacement", 
+        "<"
+    ], 
+    "u3": [
+        "u_z", 
+        "Displacement", 
+        "<"
+    ], 
+    "um2": [
+        "|u|", 
+        "Displacement magnitude", 
+        ""
+    ], 
+    "v1": [
+        "v_x", 
+        "Velocity", 
+        "<"
+    ], 
+    "v2": [
+        "v_y", 
+        "Velocity", 
+        "<"
+    ], 
+    "v3": [
+        "v_z", 
+        "Velocity", 
+        "<"
+    ], 
+    "vc": [
+        "V^C", 
+        "Cell volume", 
+        "c0"
+    ], 
+    "vm2": [
+        "|v|", 
+        "Velocity magnitude", 
+        ""
+    ], 
+    "vp": [
+        "V_p", 
+        "P-wave velocity", 
+        "<c0"
+    ], 
+    "vs": [
+        "V_s", 
+        "S-wave velocity", 
+        "<c0"
+    ], 
+    "w11": [
+        "\\sigma_{xx}", 
+        "Stress", 
+        "<c"
+    ], 
+    "w12": [
+        "\\sigma_{xy}", 
+        "Stress", 
+        "<c"
+    ], 
+    "w22": [
+        "\\sigma_{yy}", 
+        "Stress", 
+        "<c"
+    ], 
+    "w23": [
+        "\\sigma_{yz}", 
+        "Stress", 
+        "<c"
+    ], 
+    "w31": [
+        "\\sigma_{zx}", 
+        "Stress", 
+        "<c"
+    ], 
+    "w33": [
+        "\\sigma_{zz}", 
+        "Stress", 
+        "<c"
+    ], 
+    "wm2": [
+        "||\\sigma||_F", 
+        "Stress Frobenius norm", 
+        "c"
+    ], 
+    "x1": [
+        "x", 
+        "Node coordinate", 
+        "<0"
+    ], 
+    "x2": [
+        "y", 
+        "Node coordinate", 
+        "<0"
+    ], 
+    "x3": [
+        "z", 
+        "Node coordinate", 
+        "<0"
+    ]
+}

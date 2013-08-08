@@ -2,19 +2,6 @@
 Miscellaneous tools.
 """
 
-def f90modules(path):
-    mods = set()
-    deps = set()
-    for line in open(path):
-        tok = line.split()
-        if tok:
-            if tok[0] == 'module':
-                mods.update(tok[1:])
-            elif tok[0] == 'use':
-                deps.update(tok[1:])
-    return list(mods), list(deps)
-
-
 def build_cext(name):
     """
     Build C extension.
@@ -80,54 +67,6 @@ class storage(dict):
         return self[key]
 
 
-def open_(fh, mode='r'):
-    """
-    Open a regular or compressed file if not already opened.
-    """
-    if isinstance(fh, basestring):
-        import os, gzip
-        fh = os.path.expanduser(fh)
-        if fh.endswith('.gz'):
-            fh = gzip.open(fh, mode)
-        else:
-            fh = open(fh, mode)
-    return fh
-
-
-def save(*args, **kwargs):
-    raise Exception('util.save() is removed. json.dump() recommend alternative.') 
-    
-
-def dumps(obj, expand=None):
-    import json
-    s = []
-    if isinstance(obj, dict):
-        obj = sorted(obj.items())
-    assert(type(obj) == list)
-    if expand is None:
-        expand = []
-    for kv in obj:
-        k, v = kv
-        if k not in expand:
-            s += ['"%s": %s' % (k, json.dumps(v))]
-        elif type(v) in (list, tuple):
-            w = []
-            for i in v:
-                w += ['    %s' % json.dumps(i)]
-            w = ',\n'.join(w)
-            s += ['"%s": [\n%s\n]' % (k, w)]
-        elif type(v) is dict:
-            w = []
-            for i in sorted(v):
-                w += ['    "%s": %s' % (i, json.dumps(v[i]))]
-            w = ',\n'.join(w)
-            s += ['"%s": {\n%s\n}' % (k, w)]
-        else:
-            raise Exception('Cannot expand %s type %s' % (k, type(v)))
-    s = ',\n'.join(s)
-    s = '{\n' + s + '\n}\n'
-    return s
-
 def configure(**kwargs):
     import os, sys, json, pwd, socket, multiprocessing
     import numpy as np
@@ -138,7 +77,7 @@ def configure(**kwargs):
     job = json.load(open(f))
     job['rundir'] = os.getcwd()
     job['dtype'] = np.dtype('f').str
-    job['argv'] = sys.argv
+    job['argv'] = sys.argv[1:]
     job = storage(**job)
     job['maxcores'] = multiprocessing.cpu_count()
 
@@ -184,9 +123,9 @@ def configure(**kwargs):
     # command line parameters
     for i in job['argv']:
         if not i.startswith('--'):
-            raise Exception
+            raise Exception('Bad argument ' + i)
         k, v = i[2:].split('=')
-        job[k] = json.load(v)
+        job[k] = json.loads(v)
 
     # notification
     if job['nproc'] > job['notify_threshold']:
@@ -271,21 +210,22 @@ def prepare(job=None, **kwargs):
         break
 
     # messages
-    print('Nodes: %s' % job['nodes'])
-    print('Procs per node: %s' % job['ppn'])
-    print('Threads per node: %s' % job['nthread'])
-    print('RAM per node: %sMb' % job['ram'])
-    print('SUs: %s' % sus)
-    print('Time: ' + job['walltime'])
+    if job['verbose'] > 1:
+        print('Nodes: %s' % job['nodes'])
+        print('Procs per node: %s' % job['ppn'])
+        print('Threads per node: %s' % job['nthread'])
+        print('RAM per node: %sMb' % job['ram'])
+        print('SUs: %s' % sus)
+        print('Time: ' + job['walltime'])
 
     # warnings
-    if job['ram'] and job['ram'] > job['maxram']:
-        print('Warning: exceeding available RAM per node (%sMb)' % job['maxram'])
-    if job['maxtime'] and job['minutes'] == job['maxtime']:
-        print('Warning: exceeding maximum time limit (%02d:00)' % job['maxtime'])
+    if job['verbose'] > 0:
+        if job['ram'] and job['ram'] > job['maxram']:
+            print('Warning: exceeding available RAM per node (%sMb)' % job['maxram'])
+        if job['maxtime'] and job['minutes'] == job['maxtime']:
+            print('Warning: exceeding maximum time limit (%02d:00)' % job['maxtime'])
 
     # directories
-    print('Run directory: ' + job['rundir'])
     job['rundir'] = os.path.realpath(os.path.expanduser(job['rundir']))
     job['iodir'] = os.path.expanduser(job['iodir'])
 
@@ -347,7 +287,7 @@ def launch(job=None, **kwargs):
     """
     Launch or submit job.
     """
-    import os, re, shlex, subprocess
+    import os, re, shlex, subprocess, json
 
     # prepare job
     if job is None:

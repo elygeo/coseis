@@ -4,6 +4,19 @@ Utilities for Graves Standard Rupture Format (SRF).
 SRF is documented at http://epicenter.usc.edu/cmeportal/docs/srf4.pdf
 """
 
+def open_(fh, mode='r'):
+    """
+    Open a regular or compressed file if not already opened.
+    """
+    if isinstance(fh, basestring):
+        import os, gzip
+        fh = os.path.expanduser(fh)
+        if fh.endswith('.gz'):
+            fh = gzip.open(fh, mode)
+        else:
+            fh = open(fh, mode)
+    return fh
+
 def read(fh):
     """
     Read SRF file.
@@ -13,7 +26,6 @@ def read(fh):
     NumPy arrays.
     """
     import numpy as np
-    from .util import open_
 
     fh = open_(fh)
 
@@ -130,7 +142,6 @@ def write(fh, srf):
     Write SRF file.
     """
     import numpy as np
-    from .util import open_
 
     fh = open_(fh)
 
@@ -319,7 +330,6 @@ def write_awp(fh, srf, t, mu, lam=0.0, delta=1.0, proj=None,
     """
     import numpy as np
     from . import coord, interp
-    from .util import open_
 
     fh = open_(fh)
 

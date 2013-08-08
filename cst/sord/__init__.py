@@ -2,19 +2,75 @@
 Support Operator Rupture Dynamics
 """
 from ..util import launch, storage
-from . import fieldnames
-from . import parameters as parameters_default
 launch # silence pyflakes warning
 
+def fieldnames():
+    import os, json
+    f = os.path.dirname(__file__)
+    f = os.path.join(f, 'fieldnames.json')
+    d = json.load(open(f))
+    return {
+        'dict': d,
+        'input':   [k for k in d if '<' in d[k][-1]],
+        'initial': [k for k in d if '0' in d[k][-1]],
+        'cell':    [k for k in d if 'c' in d[k][-1]],
+        'fault':   [k for k in d if 'f' in d[k][-1]],
+        'volume':  [k for k in d if 'f' not in d[k][-1]],
+    }
+
 def parameters():
-    d = parameters_default.__dict__
-    d = {k: d[k] for k in d if not k.startswith('_')}
+    import os, json
+    f = os.path.dirname(__file__)
+    f = os.path.join(f, 'parameters.json')
+    d = json.load(open(f))
     return storage(**d)
 
 class get_slices:
     def __getitem__(self, item):
         return item
 s_ = get_slices()
+
+def f90modules(path):
+    mods = set()
+    deps = set()
+    for line in open(path):
+        tok = line.split()
+        if tok:
+            if tok[0] == 'module':
+                mods.update(tok[1:])
+            elif tok[0] == 'use':
+                deps.update(tok[1:])
+    return list(mods), list(deps)
+
+def dumps(obj, expand=None):
+    import json
+    s = []
+    if isinstance(obj, dict):
+        obj = sorted(obj.items())
+    assert(type(obj) == list)
+    if expand is None:
+        expand = []
+    for kv in obj:
+        k, v = kv
+        if k not in expand:
+            s += ['"%s": %s' % (k, json.dumps(v))]
+        elif type(v) in (list, tuple):
+            w = []
+            for i in v:
+                w += ['    %s' % json.dumps(i)]
+            w = ',\n'.join(w)
+            s += ['"%s": [\n%s\n]' % (k, w)]
+        elif type(v) is dict:
+            w = []
+            for i in sorted(v):
+                w += ['    "%s": %s' % (i, json.dumps(v[i]))]
+            w = ',\n'.join(w)
+            s += ['"%s": {\n%s\n}' % (k, w)]
+        else:
+            raise Exception('Cannot expand %s type %s' % (k, type(v)))
+    s = ',\n'.join(s)
+    s = '{\n' + s + '\n}\n'
+    return s
 
 def configure(job=None, force=False, **kwargs):
     """
@@ -83,7 +139,7 @@ def configure(job=None, force=False, **kwargs):
 
         # makefile
         if job == None:
-            job = util.configure(options=[], **kwargs)
+            job = util.configure(**kwargs)
         m = open('Makefile.in').read()
         m = m.format(machine=job['machine'], objects=objects, rules=rules)
         open('Makefile', 'w').write(m)
@@ -192,7 +248,7 @@ def stage(prm, **kwargs):
         os.mkdir(path + 'debug')
 
     # save input parameters
-    f = util.dumps(prm, expand=['fieldio'])
+    f = dumps(prm, expand=['fieldio'])
     open(path + 'parameters.json', 'w').write(f)
 
     # metadata
@@ -235,7 +291,7 @@ def stage(prm, **kwargs):
         ('xis',     xis),
         ('indices', indices),
     ]
-    m = util.dumps(m, expand=['fieldio', 'shapes', 'deltas', 'xis', 'indices'])
+    m = dumps(m, expand=['fieldio', 'shapes', 'deltas', 'xis', 'indices'])
     open(path + 'meta.json', 'w').write(m)
 
     return job
@@ -436,21 +492,22 @@ def prepare_param(prm):
             fields = [fields]
 
         # error check
+        fn = fieldnames()
         for field in fields:
-            if field not in fieldnames.all_:
+            if field not in fn['dict']:
                 raise Exception('Error: unknown field: %r' % line)
-            if field not in fieldnames.input_ and 'w' not in mode:
+            if field not in fn['input'] and 'w' not in mode:
                 raise Exception('Error: field is ouput only: %r' % line)
-            if (field in fieldnames.cell) != (fields[0] in fieldnames.cell):
+            if (field in fn['cell']) != (fields[0] in fn['cell']):
                 raise Exception('Error: cannot mix node and cell i/o: %r' % line)
-            if field in fieldnames.fault:
-                if fields[0] not in fieldnames.fault:
+            if field in fn['fault']:
+                if fields[0] not in fn['fault']:
                     raise Exception('Error: cannot mix fault and non-fault i/o: %r' % line)
                 if prm.faultnormal == 0:
                     raise Exception('Error: field only for ruptures: %r' % line)
 
         # cell or node registration
-        if field in fieldnames.cell:
+        if field in fn['cell']:
             mode = mode.replace('c', 'C')
             base = 1.5
         else:
@@ -468,9 +525,9 @@ def prepare_param(prm):
         else:
             ii = (expand_slices(nn, ii[:3], base)
                  + expand_slices([nt], ii[3:], 1))
-        if field in fieldnames.initial:
+        if field in fn['initial']:
             ii[3] = 0, 0, 1
-        if field in fieldnames.fault:
+        if field in fn['fault']:
             i = abs(prm.faultnormal) - 1
             ii[i] = 2 * (irup,) + (1,)
 
@@ -500,10 +557,4 @@ def prepare_param(prm):
     prm.fieldio = fieldio
     del(prm['itbuff'])
     return prm
-
-def test_fieldnames():
-    f = fieldnames.all
-    for i in range(len(f)):
-        if f[i] in f[:i]:
-            print('Error: duplicate field: %r' % f[i])
 
