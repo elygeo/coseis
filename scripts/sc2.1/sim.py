@@ -70,5 +70,6 @@ d = os.path.join('run', 'sim', '%.0f' % dx)
 os.makedirs(d)
 for v in 'rho', 'vp', 'vs':
     os.link(mesh + v + '.bin', d + v + 'bin')
-cst.sord.run(prm, rundir=d)
+os.chdir(d)
+cst.sord.run(prm)
 

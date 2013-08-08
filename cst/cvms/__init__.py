@@ -31,7 +31,7 @@ def download(version):
     """
     Download CVMS data
     """
-    import os
+    import os, urllib
     from .. import repo
     u = 'http://earth.usc.edu/~gely/cvm-data/%s.tgz' % version
     f = os.path.basename(u)
@@ -45,45 +45,34 @@ def make(job=None, **kwargs):
     """
     Build CVM-S code.
     """
-    import os, urllib, tarfile, shutil, subprocess
+    import os, tarfile, shutil, subprocess
 
     # configure
     if job == None:
         job = configure(options=[], **kwargs)
     ver = 'cvms-' + job.version
-    job.rundir = os.path.join(job.rundir, ver)
-    if job.build_mpi:
-        mode = 'mpi'
-    else:
-        mode = 'bin'
-    f = download(ver)
+    tar = download(ver)
 
     # build directory
     cwd = os.getcwd()
-    d = os.path.dirname(__file__)
-    d = os.path.join(d, 'build')
-    if not os.path.exists(d):
-        os.mkdir(d)
-    os.chdir(d)
+    src = os.path.dirname(__file__) + os.sep
+    bld = os.path.join(src, 'build', ver)
 
     # unpack and patch files
-    if os.path.exists(ver):
-        os.chdir(ver)
+    if os.path.exists(bld):
+        os.chdir(bld)
     else:
-        os.mkdir(ver)
-        os.chdir(ver)
-        tarfile.open(f, 'r:gz').extractall()
-        f = os.path.join('..', '..', ver + '.patch')
-        subprocess.check_call(['patch', '-p1', '-i', f])
-        f = os.path.join('..', '..', 'io%s.f' % mode)
-        shutil.copy2(f, '.')
+        os.makedirs(bld)
+        os.chdir(bld)
+        tarfile.open(tar, 'r:gz').extractall()
+        shutil.copy2(src + ver + '.patch', '.')
+        shutil.copy2(src + 'iobin.f', '.')
+        shutil.copy2(src + 'iompi.f', '.')
 
     # build
-    f = os.path.join('..', '..', 'in.h.in')
-    f = open(f).read().format(**job)
+    f = open(src + 'in.h.in').read().format(max_samples=job['max_samples'])
     open('in.h', 'w').write(f)
-    f = os.path.join('..', '..', 'Makefile.in')
-    f = open(f).read().format(mode=mode, **job)
+    f = open(src + 'Makefile.in').read().format(machine=job['machine'], version=ver)
     open('Makefile', 'w').write(f)
     subprocess.check_call(['make', '-j', '2'])
 
@@ -115,6 +104,7 @@ def stage(**kwargs):
     make(job)
 
     # create run directory
+    FIXME
     if os.path.exists(job.rundir):
         f = os.path.join(job.rundir, 'cvms.x')
         if not os.path.exists(f):

@@ -1,0 +1,64 @@
+# CVMS Makefile
+
+cvms.x : io$(MODE).o version{version}.o
+	$(FC) $(FFLAGS) -o $@ $^
+
+clean :
+	rm -f *.o *.x *.lst *.pyc
+
+distclean : clean
+	rm Makefile
+
+# Options
+MACHINE = {machine}
+
+# Default: GNU Compiler Collection
+MODE = serial
+ifeq ($(MODE), mpi)
+    FC = mpif90 
+else
+    FC = gfortran 
+endif
+FFLAGS = $(LDFLAGS) -fimplicit-none
+LDFLAGS = -g -O3 -Wall
+
+# ALCF IBM Blue Gene/P
+ifeq ($(MACHINE), ALCF-BGP)
+    MODE = mpi
+    FC = mpixlf2003_r
+    FFLAGS = $(LDFLAGS) -g -O3 -qfixed
+    LDFLAGS = -g -O3 -qsuppress=cmpmsg
+endif
+
+# ALCF IBM Blue Gene/Q
+ifeq ($(MACHINE), ALCF-BGQ)
+    MODE = mpi
+    FC = mpixlf2003_r
+    FFLAGS = $(LDFLAGS) -g -O3 -qfixed
+    LDFLAGS = -g -O3 -qsuppress=cmpmsg
+endif
+
+# Wat2Q IBM Blue Gene/Q
+ifeq ($(MACHINE), IBM-Wat2Q)
+    MODE = mpi
+    FC = /bgsys/drivers/ppcfloor/comm/xl/bin/mpixlf2003_r
+    FFLAGS = $(LDFLAGS) -qlist -qreport
+    LDFLAGS = -g -O3 -qsuppress=cmpmsg
+endif
+
+# KAUST Shaheen: IBM Blue Gene/P
+ifeq ($(MACHINE), KAUST-Shaheen)
+    MODE = mpi
+    FC = *FIXME*
+    FFLAGS = $(LDFLAGS)
+    LDFLAGS = -g -O5 -qarch=450d -qtune=450 -qsuppress=cmpmsg
+endif
+
+# NICS Kraken: Cray XT5
+ifeq ($(MACHINE), NICS-Kraken)
+    MODE = mpi
+    FC = ftn
+    FFLAGS = $(LDFLAGS) -Mdclchk
+    LDFLAGS = -g -fast
+endif
+

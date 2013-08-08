@@ -5,6 +5,8 @@ CVMS Configuration
 # parameters
 version = '4.0'
 nsample = 0
+rundir = 'run'
+iodir = 'hold'
 file_lon = 'lon.bin'
 file_lat = 'lat.bin'
 file_dep = 'dep.bin'

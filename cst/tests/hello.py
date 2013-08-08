@@ -18,11 +18,12 @@ def test(argv=[]):
     import os, shutil
     import cst
     make()
-    d = 'run/hello-c'
+    cwd = os.getcwd()
+    d = os.paht.join(cwd, 'run', 'hello-c')
     os.makedirs(d)
     shutil.copy2('hello.c.x', d)
+    os.chdir(d)
     cst.util.launch(
-        rundir = d,
         run = 'exec',
         argv = argv,
         command = './hello.c.x',
@@ -31,11 +32,11 @@ def test(argv=[]):
         ppn_range = [2],
         minutes = 10,
     )
-    d = 'run/hello-f'
+    d = os.paht.join(cwd, 'run', 'hello-f')
     os.makedirs(d)
     shutil.copy2('hello.f.x', d)
+    os.chdir(d)
     cst.util.launch(
-        rundir = d,
         run = 'exec',
         argv = argv,
         command = './hello.f.x',

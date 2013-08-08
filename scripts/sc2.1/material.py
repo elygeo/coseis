@@ -49,13 +49,13 @@ os.makedirs(path)
 
 # save data
 shutil.copy2('mesh.py', path)
-cst.util.save(path + 'meta.py', meta)
-x.astype('f').T.tofile(path + 'lat.bin')
-y.astype('f').T.tofile(path + 'lon.bin')
+os.chdir(path)
+cst.util.save('meta.py', meta)
+x.astype('f').T.tofile('lat.bin')
+y.astype('f').T.tofile('lon.bin')
 
 # launch mesher
 job = cst.util.launch(
-    rundir = path,
     nproc = min(3, nproc),
     command = '{python} mesh.py',
     minutes = nsample // 120000000,
@@ -63,7 +63,6 @@ job = cst.util.launch(
 
 # launch CVM-S
 cst.cvms.launch(
-    rundir = os.path.join('run', 'cvms', '%.0f' % dx),
     iodir = os.path.join('..', 'mesh', '%.0f' % dx),
     nproc = nproc,
     depend = job.jobid,

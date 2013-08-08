@@ -1,10 +1,15 @@
-# Makefile
+# Options
 MACHINE = {machine}
 OMP = 1
-CC =
-FC =
 
+# Rules
 all: hello.c.x hello.f.x
+
+clean:
+	rm -rf *.pyc run hello.?.x hello.?.x.dSYM
+
+distclean : clean
+	rm Makefile
 
 hello.c.x : hello.c Makefile
 	$(CC) $(CFLAGS) -o $@ $< $(LIBS)
@@ -12,11 +17,16 @@ hello.c.x : hello.c Makefile
 hello.f.x : hello.f90 Makefile
 	$(FC) $(FFLAGS) -o $@ $< $(LIBS)
 
-clean:
-	rm -rf *.pyc run hello.?.x hello.?.x.dSYM
-
-distclean : clean
-	rm Makefile
+# Default: GNU Compiler Collection
+CC = mpicc
+FC = mpif90 
+CFLAGS = $(LDFLAGS) -pedantic
+FFLAGS = $(LDFLAGS) -fimplicit-none
+LDFLAGS = -g -O3 -Wall
+LIBS =
+ifdef OMP
+    LDFLAGS += -fopenmp
+endif
 
 # ALCF IBM Blue Gene/P
 ifeq ($(MACHINE), ALCF-BGP)
@@ -46,17 +56,5 @@ ifeq ($(MACHINE), ALCF-BGQ)
         LIBS += /home/morozov/HPM/lib/libmpihpm.a
     endif
     LIBS += /bgsys/drivers/ppcfloor/bgpm/lib/libbgpm.a
-endif
-
-# Default: GNU Compiler Collection
-ifndef CC
-    CC = mpicc
-    FC = mpif90 
-    CFLAGS = $(LDFLAGS) -pedantic
-    FFLAGS = $(LDFLAGS) -fimplicit-none
-    LDFLAGS = -g -O3 -Wall
-    ifdef OMP
-        LDFLAGS += -fopenmp
-    endif
 endif
 

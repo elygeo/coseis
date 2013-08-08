@@ -69,7 +69,8 @@ class storage(dict):
     def __setitem__(self, key, val):
         v = self[key]
         if val != None and v != None and type(val) != type(v):
-            raise TypeError(key, v, val)
+            if not isinstance(val, basestring) or not isinstance(v, basestring):
+                raise TypeError(key, v, val)
         dict.__setitem__(self, key, val)
         return
     def __setattr__(self, key, val):
@@ -127,20 +128,39 @@ def dumps(obj, expand=None):
     s = '{\n' + s + '\n}\n'
     return s
 
+def configure(**kwargs):
+    import os, sys, json, pwd, socket, multiprocessing
+    import numpy as np
 
-def configure(*args, **kwargs):
-    import os, sys, getopt
-    from . import conf
-
-    # modules
-    if args == ():
-        args = conf.default, conf.site
-    job = {'doc': args[0].__doc__}
-    for m in args:
-        for k in dir(m):
-            if k[0] != '_':
-                job[k] = getattr(m, k)
+    # defaults
+    path = os.path.join(os.path.dirname(__file__), 'conf') + os.sep
+    f = path + 'default.json'
+    job = json.load(open(f))
+    job['rundir'] = os.getcwd()
+    job['dtype'] = np.dtype('f').str
+    job['argv'] = sys.argv
     job = storage(**job)
+    job['maxcores'] = multiprocessing.cpu_count()
+
+    # host
+    h = os.uname()
+    g = socket.getfqdn()
+    job['host'] = ' '.join([h[0], h[4], h[1], g])
+
+    # email
+    try:
+        import configobj
+        f = os.path.join(os.path.expanduser('~'), '.gitconfig')
+        job['email'] = configobj.ConfigObj(f)['user']['email']
+    except:
+        job['email'] = pwd.getpwuid(os.geteuid())[0]
+
+    # guess machine
+    for m, h in job['host_map']:
+        if h in job['host']:
+            job['machine'] = m
+            break
+    del(job['host_map'])
 
     # merge key-word arguments, 1st pass
     for k in kwargs:
@@ -148,47 +168,25 @@ def configure(*args, **kwargs):
 
     # merge machine parameters
     if job['machine']:
-        m = conf.__name__ + '.' + job['machine']
-        __import__(m)
-        m = sys.modules[m]
-        job['doc'] = m.__doc__
-        for k in dir(m):
-            if k[0] != '_':
-                job[k] = getattr(m, k)
-        if not hasattr(m, 'script'):
-            f = os.path.splitext(m.__file__)[0] + '.sh'
-            try:
-                job['script'] = open(f).read()
-            except IOError:
-                pass
+        f = path + job['machine'] + '.json'
+        m = json.load(open(f))
+        for k in m:
+            job[k] = m[k]
+    for h, o in job['host_opts'].items():
+        if h in job['host']:
+            for k, v in o.items():
+                job[k] = v
 
     # key-word arguments, 2nd pass
     for k in kwargs:
         job[k] = kwargs[k]
 
     # command line parameters
-    if job['options']:
-        short, long = zip(*job['options'])[:2]
-        opts = getopt.getopt(job['argv'], ''.join(short), long)[0]
-        short = [s.rstrip(':') for s in short]
-        long = [l.rstrip('=') for l in long]
-        for opt, val in opts:
-            key = opt.lstrip('-')
-            if opt.startswith('--'):
-                i = long.index(key)
-            else:
-                i = short.index(key)
-            opt, key, cast = job['options'][i][1:]
-            if opt[-1] in ':=':
-                job[key] = type(cast)(val)
-            else:
-                job[key] = cast
-
-    # host configuration:
-    for h, o in job['host_opts'].items():
-        if h in job['host']:
-            for k, v in o.items():
-                job[k] = v
+    for i in job['argv']:
+        if not i.startswith('--'):
+            raise Exception
+        k, v = i[2:].split('=')
+        job[k] = json.load(v)
 
     # notification
     if job['nproc'] > job['notify_threshold']:
@@ -314,9 +312,9 @@ To manually create the run directory do:
 
 def skeleton(job=None, **kwargs):
     """
-    Create run directory
+    Create run files
     """
-    import os
+    import os, json
 
     # prepare job
     if job is None:
@@ -328,7 +326,7 @@ def skeleton(job=None, **kwargs):
     # test for previous runs 
     f = os.path.join(job['rundir'], job['name'] + '.conf.json')
     if not job['force'] and os.path.exists(f):
-        raise Exception('Existing job found. Use --force to overwrite')
+        raise Exception('Existing job found. Use --force=True to overwrite')
     if not os.path.isdir(job['rundir']):
         raise Exception(rundir_error % job['rundir'])
 
@@ -339,8 +337,8 @@ def skeleton(job=None, **kwargs):
         os.chmod(g, 0755)
 
     # save configuration
-    del(job['options'], job['script'])
-    open(f, 'w').write(dumps(job))
+    f = open(f, 'w')
+    json.dump(job, f, indent=4, sort_keys=True)
 
     return job
 
@@ -377,9 +375,11 @@ def launch(job=None, **kwargs):
             raise Exception('Submit failed')
         d = re.search(job['submit_pattern'], out).groupdict()
         job.update(d)
-        open(job['name'] + '.conf.json', 'w').write(dumps(job))
+        f = open(job['name'] + '.conf.json', 'w')
+        json.dump(job, f, indent=4, sort_keys=True)
     else:
-        open(job['name'] + '.conf.json', 'w').write(dumps(job))
+        f = open(job['name'] + '.conf.json', 'w')
+        json.dump(job, f, indent=4, sort_keys=True)
         for c in job['pre'], job['launch'], job['post']:
             if c:
                 print(c)

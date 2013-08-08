@@ -1,0 +1,15 @@
+{
+    "account": "TG-MCA03S012", 
+    "launch": "OMP_NUM_THREAD={nthread} aprun -d {nthread} -n {nproc} {command}\\n", 
+    "maxcores": 12, 
+    "maxnodes": 8192, 
+    "maxram": 16384, 
+    "maxtime": 1440, 
+    "nthread": 12, 
+    "ppn_range": [
+        1
+    ], 
+    "python": "/lustre/scratch/gely/local/bin/python", 
+    "rate": 1000000, 
+    "script": "#!/bin/bash\n#PBS -A {account}\n#PBS -N {name}\n#PBS -M {email}\n#PBS -l size={totalcores}\n#PBS -l walltime={walltime}\n#PBS -e {rundir}/{name}.err\n#PBS -o {rundir}/{name}.out\n#PBS -m n\n\ncd \"{rundir}\"\nenv >> \"{name}.env\"\n\nlfs setstripe -c 1 .\n[ {nstripe} -ge -1 -a -d {iodir} ] && lfs setstripe -c {nstripe} {iodir}\n\necho \"$( date ): {name} started\" >> \"{name}.out\"\n{pre}\n{launch}\n{post}\necho \"$( date ): {name} finished\" >> \"{name}.out\"\n"
+}

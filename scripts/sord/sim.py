@@ -20,4 +20,5 @@ prm.source2 = 0.0, 0.0, 0.0                 # source shear components
 prm.pulse = 'integral_brune'                # source time function
 prm.tau = 6 * prm.delta[3]                  # source characteristic time
 os.mkdir('run')                             # create run directory
+os.chidir('run')                            # switch to run directory
 cst.sord.run(prm)                           # launch SORD job

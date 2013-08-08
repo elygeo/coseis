@@ -57,8 +57,8 @@ x.astype('f').tofile(path + 'lon.bin')
 y.astype('f').tofile(path + 'lat.bin')
 
 # launch mesher
+os.chdir(path)
 job = cst.util.launch(
-    rundir = path,
     nthread = 1,
     nproc = 4,
     ppn_range = [4],
@@ -69,8 +69,7 @@ job = cst.util.launch(
 
 # launch cvms
 cst.cvms.launch(
-    rundir = os.path.join('run', 'cvms'),
-    iodir = os.path.join('..', 'mesh', 'hold'),
+    iodir = 'hold',
     nthread = 1,
     nproc = nproc,
     ppn_range = [],

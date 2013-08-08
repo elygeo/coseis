@@ -17,7 +17,7 @@ z, x = np.meshgrid(z_, x)
 z, y = np.meshgrid(z_, y)
 
 # cvms
-r, p, s = cst.cvms.extract(x, y, z, ['rho', 'vp', 'vs'], rundir='run/cvms')
+r, p, s = cst.cvms.extract(x, y, z, ['rho', 'vp', 'vs'])
 np.save(path + 'cvms-rho.npy', r.astype('f'))
 np.save(path + 'cvms-vp.npy',  p.astype('f'))
 np.save(path + 'cvms-vs.npy',  s.astype('f'))

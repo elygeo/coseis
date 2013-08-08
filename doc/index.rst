@@ -106,12 +106,12 @@ To run the test suite interactively:
 ::
 
     cd cst/tests
-    python test_runner.py -i
+    python test_runner.py --run=exec
 
 Or, submit a job for batch processing:
 ::
 
-    python test_runner.py -q
+    python test_runner.py --run=submit
 
 After completion, a report is printed to the screen (or saved in
 run/test_suite/test_suite.output)::

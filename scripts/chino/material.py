@@ -80,6 +80,7 @@ x, y = proj(x, y, inverse=True)
 z = cst.data.dem([x, y])
 
 # loop over cvm versions
+cwd = os.getcwd() + os.sep
 for cvm in 'cvms', 'cvmh', 'cvmg':
 
     # metadata
@@ -102,39 +103,42 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     }
 
     # create run directory
-    path = os.path.join('run', 'mesh', mesh_id) + os.sep
-    os.makedirs(path + 'hold')
+    path = os.path.join(cwd, 'run', 'mesh', mesh_id)
+    os.makedirs(path)
+    os.chdir(path)
+    os.mkdir('hold')
 
     # save data
-    f = open(path + 'meta.json', 'w')
+    f = open('meta.json', 'w')
     json.dump(meta, f, indent=4, sort_keys=True)
-    np.save(path + 'box.npy', box.astype('f'))
-    np.save(path + 'lon.npy', x.astype('f'))
-    np.save(path + 'lat.npy', y.astype('f'))
-    np.save(path + 'topo.npy', z.astype('f'))
+    np.save('box.npy', box.astype('f'))
+    np.save('lon.npy', x.astype('f'))
+    np.save('lat.npy', y.astype('f'))
+    np.save('topo.npy', z.astype('f'))
 
     # cvm-s
     if cvm == 'cvms':
 
         # build mesher
+        os.chdir(cwd)
         cfg = cst.util.configure()
         m = open('Makefile.in').read()
         m = m.format(
+            machine = cfg['machine'],
             nx = shape[0],
             ny = shape[1],
             nz = shape[2],
             delta = abs(delta[0]),
             ntop = ntop,
-            npml = npml,
-            **cfg
+            npml = npml
         )
         open('Makefile', 'w').write(m)
         subprocess.check_call(['make'])
 
         # launch mesher
-        shutil.copy2('mesh.py', path)
+        os.chdir(path)
+        shutil.copy2(cwd + 'mesh.py', '.')
         job0 = cst.util.launch(
-            rundir = path,
             nthread = 1,
             nproc = 4,
             ppn_range = [4],
@@ -145,8 +149,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
 
         # launch cvms
         job = cst.cvms.launch(
-            rundir = path,
-            iodir = path + 'hold',
+            iodir = 'hold',
             nproc = nproc,
             nstripe = nstripe,
             minutes = 30,
@@ -158,13 +161,12 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     else:
 
         # launch mesher + cvmh
-        shutil.copy2('mesh-cvmh.py', path)
+        shutil.copy2(cwd + 'mesh-cvmh.py', '.')
         proj_cvmh = pyproj.Proj(**cst.cvmh.projection)
         x_, y_ = proj_cvmh(x, y)
-        np.save(path + 'x.npy', x_.astype('f'))
-        np.save(path + 'y.npy', y_.astype('f'))
+        np.save('x.npy', x_.astype('f'))
+        np.save('y.npy', y_.astype('f'))
         cst.util.launch(
-            rundir = path,
             nthread = 1,
             nproc = 4,
             ppn_range = [4],

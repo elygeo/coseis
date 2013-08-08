@@ -39,11 +39,13 @@ prm.fieldio = [
     ('=s', 'v3', [(),(),(),1], 1.0),
 ]
 
+cwd = os.getcwd()
 for i in power[::-1]:
     n = 2 ** i
     prm.nproc3 = 2, n, n
     prm.shape = points, n * points, n * points, prm.itio
-    d = 'run/bench%s' % i
+    d = os.path.joing(cwd, 'run', 'bench%s' % i)
     os.makedirs(d)
-    cst.sord.run(prm, rundir=d, minutes=20)
+    os.chdir(d)
+    cst.sord.run(prm, minutes=20)
 

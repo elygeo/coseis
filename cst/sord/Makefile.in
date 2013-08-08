@@ -6,6 +6,7 @@ DEBUG =
 PROFILE =
 REAL8 =
 
+# Rules
 sord.x: {objects} \
 	collective_$(MODE).o
 	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)

@@ -63,6 +63,7 @@ prm.fieldio += [
 ]
 
 # loop over sources
+cwd = os.getcwd()
 for source, s in sources:
 
     # source properties
@@ -75,21 +76,23 @@ for source, s in sources:
     if 1:
         prm.nsource = 0
         prm.pulse = 'integral_brune'
-        p = os.path.join('run', 'point-' + source)
-        os.mkdir(p)
-        cst.sord.run(prm, rundir=p)
+        p = os.path.join(cwd, 'run', 'point-' + source)
+        os.makedirs(p)
+        os.chdir(p)
+        cst.sord.run(prm)
 
     # finite source
     if 0:
         prm.nsource = 1
         prm.pulse = 'none'
-        p = os.path.join('run', 'finite-' + source)
+        p = os.path.join(cwd, 'run', 'finite-' + source)
         q = os.path.join(p, 'source')
         os.makedirs(q)
+        os.chdir(p)
         d = prm.delta[-1]
         n = prm.shape[-1]
         t = d * np.arange(n)
         f = 1.0 - math.exp(-t / prm.tau) / prm.tau * (t + prm.tau)
         cst.source.write(f, n, d, 0.0, prm.ihypo, prm.source1, prm.source2, q)
-        cst.sord.run(prm, rundir=p)
+        cst.sord.run(prm)
 

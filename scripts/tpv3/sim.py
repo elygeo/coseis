@@ -40,6 +40,7 @@ prm.bc1 = 10, 10, 10
 prm.bc2 = -1, 1, -2
 
 # loop over multiple runs
+cwd = os.getcwd()
 for dx, np in runs:
 
     # model dimensions
@@ -109,7 +110,8 @@ for dx, np in runs:
         ]
 
     # run SORD
-    d = os.path.join('run', 'tpv3', '%03.0f' % dx)
+    d = os.path.join(cwd, 'run', 'tpv3', '%03.0f' % dx)
     os.makedirs(d)
-    cst.sord.run(prm, rundir=d)
+    os.chdir(d)
+    cst.sord.run(prm)
 

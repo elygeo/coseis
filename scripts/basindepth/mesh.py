@@ -2,7 +2,7 @@
 """
 Simple SoCal mesh generation and CVM-S extraction.
 """
-import os
+import os, json
 import numpy as np
 import cst
 

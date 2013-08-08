@@ -32,6 +32,7 @@ register = True
 register = False
 
 # cvm version
+cwd = os.getcwd()
 for cvm in 'cvms', 'cvmh', 'cvmg':
 
     # simulation name
@@ -39,7 +40,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     name = mesh + surf[0]
 
     # mesh metadata
-    mesh = os.path.join('run', 'mesh', mesh) + os.sep
+    mesh = os.path.join(cwd, 'run', 'mesh', mesh) + os.sep
     meta = open(mesh + 'meta.json')
     meta = json.load(meta)
     dtype = meta['dtype']
@@ -85,7 +86,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     # source
     prm.source = 'moment'
     prm.pulse = 'brune'
-    mts = os.path.join('run', 'data', '14383980.mts.txt')
+    mts = os.path.join(cwd, 'run', 'data', '14383980.mts.txt')
     mts = json.load(open(mts))
     d = mts['double_couple_clvd']
     prm.source1 =  d['myy'],  d['mxx'],  d['mzz']
@@ -110,7 +111,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         m = '=w'
     else:
         m = '=wi'
-    f = os.path.join('run', 'data', 'station-list.txt')
+    f = os.path.join(cwd, 'run', 'data', 'station-list.txt')
     for s in open(f).readlines():
         s, y, x = s.split()[:3]
         x, y = proj(float(x), float(y))
@@ -151,26 +152,27 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
             ]
 
     # run directory
-    path = os.path.join('run', 'sim', name) + os.sep
+    path = os.path.join(cwd, 'run', 'sim', name) + os.sep
     hold = os.path.join(path, 'hold') + os.sep
     os.makedirs(hold)
+    os.chdir(path)
 
     # save metadata
-    os.link(mesh + 'box.txt', path + 'box.txt')
+    os.link(mesh + 'box.txt', 'box.txt')
     s = '\n'.join([
         open(mesh + 'meta.json').read(),
         '# source parameters',
         json.dumps(mts),
-        open(path + 'meta.json').read(),
+        open('meta.json').read(),
     ])
-    open(path + 'meta.json', 'w').write(s)
+    open('meta.json', 'w').write(s)
 
     # save decimated mesh
     if surf_out:
         n = shape[:2]
         for f in 'lon.npy', 'lat.npy', 'topo.npy':
             s = np.load(mesh + f)
-            np.save(path + f, s[::ns,::ns])
+            np.save(f, s[::ns,::ns])
 
     # link input files
     h = mesh + 'hold' + os.sep
@@ -178,18 +180,18 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         os.link(h + f + '.bin', hold + f + '.bin')
 
     # run SORD
-    job = cst.sord.run(prm, rundir=path)
+    job = cst.sord.run(prm)
 
     # post-process to compute pgv, pga
     if surf_out:
-        meta = open(path + 'meta.json')
+        meta = open('meta.json')
         meta = json.load(meta)
         x, y, t = meta['shapes']['hold/full-v1.bin']
         m = x * y * t // 60000000
-        shutil.copy2('cook.py', path)
+        f = os.path.joing(cwd, 'cook.py')
+        shutil.copy2(f, path)
         cst.util.launch(
             depend = job.jobid,
-            rundir = path,
             run = job.run,
             name = 'cook',
             command = '{python} cook.py',
