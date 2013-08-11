@@ -6,7 +6,7 @@ SCEC Community Velocity Model, version 2.2 with double-couple point source.
 http://peer.berkeley.edu/lifelines/lifelines_pre_2006/lifelines_princ_invest_y-7.html#day
 http://www-rohan.sdsu.edu/~steveday/BASINS/Final_Report_1A02.pdf
 """
-import os, imp
+import os, json
 import cst
 prm = cst.sord.parameters()
 
@@ -18,9 +18,9 @@ dx = 500.0;  prm.nproc3 = 1, 1, 2
 
 # mesh metadata
 mesh = os.path.join('run', 'mesh', '%.0f' % dx) + os.sep
-meta = imp.load_source(mesh + 'meta.py')
-delta = meta.delta
-shape = meta.shape
+meta = json.load(open(mesh + 'meta.json'))
+delta = meta['delta']
+shape = meta['shape']
 
 # dimensions
 dt = dx / 16000.0

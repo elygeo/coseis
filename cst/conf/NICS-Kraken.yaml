@@ -24,11 +24,11 @@ script: |
     #PBS -M {email}
     #PBS -l size={totalcores}
     #PBS -l walltime={walltime}
-    #PBS -e {rundir}/{name}.err
-    #PBS -o {rundir}/{name}.out
+    #PBS -e {name}.err
+    #PBS -o {name}.out
     #PBS -m n
 
-    cd "{rundir}"
+    cd "$PBS_O_WORKDIR"
     env >> "{name}.env"
 
     lfs setstripe -c 1 .

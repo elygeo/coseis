@@ -106,10 +106,6 @@ for y, z in [
         p = p.replace('body-', 'body-0')
         prm.fieldio += [('=w', f, [j,k,l,()], p)]
 
-# run directory
-path = 'run' + os.sep
-os.mkdir(path)
-
 # pre-stress
 d = np.arange(prm.shape[1]) * alpha * prm.delta[1]
 x = d * 9.8 * -1147.16
@@ -118,9 +114,13 @@ z = d * 9.8 * -594.32
 k = int(13800.0 / prm.delta[1] + 1.5)
 x[k:] = y[k:]
 z[k:] = y[k:]
-x.astype('f').tofile(path + 's11.bin')
-y.astype('f').tofile(path + 's22.bin')
-z.astype('f').tofile(path + 's33.bin')
+
+# run directory
+os.mkdir('run')
+os.chdir('run')
+x.astype('f').tofile('s11.bin')
+y.astype('f').tofile('s22.bin')
+z.astype('f').tofile('s33.bin')
 
 # run SORD
 cst.sord.run(prm)

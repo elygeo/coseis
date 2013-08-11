@@ -2,16 +2,16 @@
 """
 Prepare output for uploading to the SCEC Code Validation Workshop website.
 """
-import os, imp
+import os, json
 import numpy as np
 
 # parameters
 path = 'run' + os.sep
-meta = imp.load_source('meta', path + 'meta.py')
-meta.dx = meta.delta[0]
-meta.dt = meta.delta[3]
-meta.nt = meta.shape[3]
-dtype = meta.dtype
+meta = json.load(open(path + 'meta.json'))
+meta.dx = meta['delta'][0]
+meta.dt = meta['delta'][3]
+meta.nt = meta['shape'][3]
+dtype = meta['dtype']
 t = np.arange(meta.nt) * meta.dt
 
 # output directory
@@ -56,10 +56,10 @@ t h-disp h-vel v-disp v-vel n-disp n-vel
 """
 
 # fault stations
-for sta in meta.deltas:
+for sta in meta['deltas']:
     if sta.startswith('fault') and sta.endswith('su1.bin'):
         sta = sta[:-8]
-        meta.sta = sta
+        meta['sta'] = sta
         f = path + sta + '-%s.bin'
         su1 = np.fromfile(f % 'su1', dtype)
         y   = np.fromfile(f % 'su2', dtype)
@@ -77,15 +77,15 @@ for sta in meta.deltas:
         c   = np.array([t, su1, sv1, ts1, suv, svv, tsv, tnm]).T
         f   = os.path.join(path, 'cvws', sta + '.asc')
         with open(f, 'w') as fh:
-            fh.write(header % meta.__dict__)
+            fh.write(header % meta)
             fh.write(header1)
             np.savetxt(fh, c, fmt1)
 
 # body stations
-for sta in meta.deltas:
+for sta in meta['deltas']:
     if sta.startswith('body') and sta.endswith('u1.bin'):
         sta = sta[:-7]
-        meta.sta = sta
+        meta['sta'] = sta
         f = path + sta + '-%s.bin'
         u1 = np.fromfile(f % 'u1', dtype)
         u2 = np.fromfile(f % 'u2', dtype)
@@ -96,7 +96,7 @@ for sta in meta.deltas:
         c  = np.array([t, u1, v1, u2, v2, u3, v3]).T
         f  = os.path.join(path, 'cvws', sta + '.asc')
         with open(f, 'w') as fh:
-            fh.write(header % meta.__dict__)
+            fh.write(header % meta)
             fh.write(header2)
             np.savetxt(fh, c, fmt2)
 

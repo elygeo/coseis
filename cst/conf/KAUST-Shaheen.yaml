@@ -24,7 +24,6 @@ script: |
     # @ wall_clock_limit = {walltime}
     # @ error = {name}.err
     # @ output = {name}.out
-    # @ initialdir = {rundir}
     # @ notify_user = {email}
     # @ notification = never
     # @ job_type = bluegene
@@ -33,7 +32,6 @@ script: |
 
     cd "{rundir}"
     env >> "{name}.env"
-
     echo "$( date ): {name} started" >> "{name}.out"
     {pre}
     {launch}

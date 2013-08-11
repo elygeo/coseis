@@ -15,11 +15,11 @@ run
 tmp
 TODO
 /dev
-/cst/conf/site.py
 /data
 /cst/data
 /cst/build
 /cst/cvms/build
 /cst/sord/Makefile
+/cst/sord/config.json
 /cst/tests/Makefile
 /scripts/cvm/Makefile

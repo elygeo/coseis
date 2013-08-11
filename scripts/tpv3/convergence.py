@@ -2,7 +2,7 @@
 """
 TPV3 convergence test
 """
-import os, imp, glob
+import os, json, glob
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.interpolate.RectBivariateSpline as interp2d
@@ -14,8 +14,8 @@ dirs = glob.glob('run/tpv3/[0-9]*')[3:]
 
 # reference solution
 path = dirs[0] + os.sep
-meta = imp.load_source('meta', path + 'meta.py')
-n = meta.shapes['trup']
+meta = json.load(open(path + 'meta.json'))
+n = meta['shapes']['trup']
 x0  = np.fromfile(path + 'x1.bin',   'f').reshape(n[::-1]).T
 y0  = np.fromfile(path + 'x2.bin',   'f').reshape(n[::-1]).T
 tt0 = np.fromfile(path + 'trup.bin', 'f').reshape(n[::-1]).T
@@ -35,14 +35,14 @@ svres = []
 # loop over solutions
 for d in dirs[1:]:
     path = d + os.sep
-    meta = imp.load_source('meta', path + 'meta.py')
+    meta = json.load(open(path + 'meta.json'))
     path += 'out' + os.sep
-    dx += [int(meta.delta[0] + 0.5)]
-    n = meta.shapes['trup']
+    dx += [int(meta['delta'][0] + 0.5)]
+    n = meta['shapes']['trup']
 
     # mesh
-    x = np.fromfile(path + 'x1.bin',   'f').reshape(n[::-1]).T
-    y = np.fromfile(path + 'x2.bin',   'f').reshape(n[::-1]).T
+    x = np.fromfile(path + 'x1.bin', 'f').reshape(n[::-1]).T
+    y = np.fromfile(path + 'x2.bin', 'f').reshape(n[::-1]).T
 
     # rupture time
     f = np.fromfile(path + 'trup.bin', 'f').reshape(n[::-1]).T

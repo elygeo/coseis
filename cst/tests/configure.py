@@ -6,14 +6,14 @@ def test(argv=[]):
     """
     import os, pprint
     import cst
-    p = os.path.dirname(cst.__file__)
-    p = os.path.join(p, 'conf')
+    cwd = os.getcwd()
+    path = os.path.dirname(cst.__file__)
+    path = os.path.join(path, 'conf')
     d = os.path.join('run', 'configure')
-    if not os.path.exists(d):
-        os.makedirs(d)
+    os.makedirs(d)
     os.chdir(d)
-    for f in os.listdir(p):
-        if not f.endswith('yaml') or f == 'default.yaml':
+    for f in os.listdir(path):
+        if not f.endswith('yaml'):
             continue 
         machine = os.path.splitext(f)[0]
         kwargs = {
@@ -21,14 +21,19 @@ def test(argv=[]):
             'run': 'exec',
             'argv': argv,
             'command': 'COMMAND',
+            'verbose': 0,
             'force': True,
         }
         job = cst.util.configure(**kwargs)
         job = cst.util.prepare(job)
-        job = cst.util.skeleton(job)
-        if job['verbose'] > 1:
+        job = cst.util.stage(job)
+        if job['verbose']:
+            print(80 * '-')
             print(machine)
             pprint.pprint(job)
+        else:
+            print(machine)
+    os.chdir(cwd)
 
 # continue if command line
 if __name__ == '__main__':

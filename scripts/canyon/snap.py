@@ -2,7 +2,7 @@
 """
 Snapshot plots
 """
-import os, imp
+import os, json
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -12,10 +12,10 @@ clim = 0.0, 0.000001
 path = 'run' + os.sep
 
 # metadata
-meta = imp.load_source('meta', path + 'meta.py')
-shape = meta.shapes['snap-v1.bin']
-delta = meta.deltas['snap-v1.bin']
-dtype = meta.dtype
+meta = json.load(path + 'meta.json')
+shape = meta['shapes']['snap-v1.bin']
+delta = meta['deltas']['snap-v1.bin']
+dtype = meta['dtype']
 
 # read mesh files
 nn = shape[1], shape[0]

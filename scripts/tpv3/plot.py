@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import os, imp, glob
+import os, json, glob
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -15,11 +15,11 @@ for path in glob.glob(runs):
 
     # metadata
     path += os.sep
-    meta = imp.load_source('meta', path + 'meta.py')
-    shape = meta.shape
-    delta = meta.delta
-    ihypo = meta.ihypo
-    dtype = meta.dtype
+    meta = json.load(open(path + 'meta.json'))
+    shape = meta['shape']
+    delta = meta['delta']
+    ihypo = meta['ihypo']
+    dtype = meta['dtype']
 
     # time histories
     t1 = np.arange(shape[-1]) * delta[-1]
@@ -74,11 +74,11 @@ for path in glob.glob(runs):
     v = np.arange(-20, 20) * 0.5
 
     # SOM
-    n = meta.shapes['trup.bin']
+    n = meta['shapes']['trup.bin']
     x = np.fromfile(path + 'x1.bin', dtype).reshape(n[::-1]).T
     y = np.fromfile(path + 'x2.bin', dtype).reshape(n[::-1]).T
     t = np.fromfile(path + 'trup.bin', dtype).reshape(n[::-1]).T
-    if not hasattr(meta, 'fixhypo'):
+    if 'fixhypo' not in meta:
         x = x - delta[0] * (ihypo[0] - 1)
         y = y - delta[1] * (ihypo[1] - 1)
     x *= 0.001

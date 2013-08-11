@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import os, imp
+import os, json
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -7,14 +7,14 @@ import matplotlib.pyplot as plt
 id_ = '00'
 id_ = '20'
 path = os.path.join('run', id_) + os.sep
-meta = imp.load_source('meta', path + 'meta.py')
+meta = json.load(path + 'meta.json')
 dtype = meta.dtype
 
 # off-fault displacement plot
-file = 'off-fault.bin'
-n = meta.shapes[file]
-d = meta.deltas[file]
-s = np.fromfile(path + file, dtype).reshape(n[::-1]).T
+f = 'off-fault.bin'
+n = meta['shapes'][f]
+d = meta['deltas'][f]
+s = np.fromfile(path + f, dtype).reshape(n[::-1]).T
 e = np.diff(s[:,-1]) / d[0]
 i = int(0.05 / d[1])
 s = -1000.0 * s[:,i:]
@@ -49,9 +49,9 @@ for s, x, g in [
    (4, 22, 0.020166),
   (15,  2, 0.020773),
 ]:
-    file = 'sensor%02d.bin' % s
-    dt = meta.deltas[file][-1] * 1000.0
-    a = np.fromfile(path + file, dtype) / 9.81
+    f = 'sensor%02d.bin' % s
+    dt = meta['deltas'][f][-1] * 1000.0
+    a = np.fromfile(path + f, dtype) / 9.81
     t = np.arange(a.size) * dt
     ax.plot(t, x + a * 0.5, 'k-')
     ax.text(22, x - 1, '%.0f' % abs(a).max())

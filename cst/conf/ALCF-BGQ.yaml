@@ -12,58 +12,34 @@ host_opts: {
 ppn_range: [1, 2, 4, 8, 16, 32]
 nthread: 1
 launch:
-    runjob
-    --exe {command}
-    -n {nproc}
-    -p {ppn}
-    --verbose=INFO
-    --block $COBALT_PARTNAME
+    runjob --verbose=INFO --block $COBALT_PARTNAME
     ${{COBALT_CORNER:+--corner}} $COBALT_CORNER
     ${{COBALT_SHAPE:+--shape}} $COBALT_SHAPE
-    --envs
-        BG_SHAREDMEMSIZE=32MB
-        PAMID_VERBOSE=1
+    --envs BG_SHAREDMEMSIZE=32MB PAMID_VERBOSE=1
         VPROF_PROFILE=yes\n
+    -n {nproc} -p {ppn} --exe {command}
 
 # MPI + OpenMP
 ppn_range: [1]
 nthread: 32
 launch:
-    runjob
-    --exe {command}
-    -n {nproc}
-    -p {ppn}
-    --verbose=INFO
-    --block $COBALT_PARTNAME
+    runjob --verbose=INFO --block $COBALT_PARTNAME
     ${{COBALT_CORNER:+--corner}} $COBALT_CORNER
     ${{COBALT_SHAPE:+--shape}} $COBALT_SHAPE
-    --envs
-        BG_SHAREDMEMSIZE=32MB
-        PAMID_VERBOSE=1
-        VPROF_PROFILE=yes
-        OMP_NUM_THREADS={nthread}\n
+    --envs BG_SHAREDMEMSIZE=32MB PAMID_VERBOSE=1
+        VPROF_PROFILE=yes OMP_NUM_THREADS={nthread}\n
+    -n {nproc} -p {ppn} --exe {command}
 
 # job submission
 notify: -M {email}
 submit:
-    qsub
-    {notify}
-    -O {name}
-    -A {account}
-    -n {nodes}
-    -t {minutes}
-    --mode script
+    qsub --mode script
     --env BG_SHAREDMEMSIZE=32MB:PAMID_VERBOSE=1:VPROF_PROFILE=yes
-    {submit_flags}
-    "{name}.sh"
+    -O {name} -A {account} -n {nodes} -t {minutes}
+    {notify} {submit_flags} "{name}.sh"
 submit2:
-    qsub {notify}
-    -O {name}
-    -A {account}
-    -n {nodes}
-    -t {minutes}
-    --mode script
+    qsub --mode script
     --env BG_SHAREDMEMSIZE=32MB:PAMID_VERBOSE=1:VPROF_PROFILE=yes
+    -O {name} -A {account} -n {nodes} -t {minutes}
     --dependenices {depend}
-    {submit_flags}
-    "{name}.sh"
+    {notify} {submit_flags} "{name}.sh"

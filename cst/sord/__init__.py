@@ -42,37 +42,7 @@ def f90modules(path):
                 deps.update(tok[1:])
     return list(mods), list(deps)
 
-def dumps(obj, expand=None):
-    import json
-    s = []
-    if isinstance(obj, dict):
-        obj = sorted(obj.items())
-    assert(type(obj) == list)
-    if expand is None:
-        expand = []
-    for kv in obj:
-        k, v = kv
-        if k not in expand:
-            s += ['"%s": %s' % (k, json.dumps(v))]
-        elif type(v) in (list, tuple):
-            w = []
-            for i in v:
-                w += ['    %s' % json.dumps(i)]
-            w = ',\n'.join(w)
-            s += ['"%s": [\n%s\n]' % (k, w)]
-        elif type(v) is dict:
-            w = []
-            for i in sorted(v):
-                w += ['    "%s": %s' % (i, json.dumps(v[i]))]
-            w = ',\n'.join(w)
-            s += ['"%s": {\n%s\n}' % (k, w)]
-        else:
-            raise Exception('Cannot expand %s type %s' % (k, type(v)))
-    s = ',\n'.join(s)
-    s = '{\n' + s + '\n}\n'
-    return s
-
-def configure(job=None, force=False, **kwargs):
+def configure(force=False):
     """
     Create SORD Makefile.
     """
@@ -126,7 +96,7 @@ def configure(job=None, force=False, **kwargs):
             if ext == '.c':
                 rules += [o + ' : ' + s + '\n	$(CC) $(CFLAGS) -c $<']
             elif ext == '.f90':
-                d = util.f90modules(s)[1]
+                d = f90modules(s)[1]
                 d = [s] + [k + '.mod' for k in d if k != 'mpi']
                 d = ' \\\n        '.join(d)
                 rules += [o + ' : ' + d + '\n	$(FC) $(FFLAGS) -c $<']
@@ -138,10 +108,9 @@ def configure(job=None, force=False, **kwargs):
         rules = '	\n\n'.join(rules)
 
         # makefile
-        if job == None:
-            job = util.configure(**kwargs)
+        host, machine = util.hostname()
         m = open('Makefile.in').read()
-        m = m.format(machine=job['machine'], objects=objects, rules=rules)
+        m = m.format(machine=machine, objects=objects, rules=rules)
         open('Makefile', 'w').write(m)
 
     # finished
@@ -149,24 +118,30 @@ def configure(job=None, force=False, **kwargs):
 
     return
 
-def make(job=None, **kwargs):
+def make(force=False):
     """
     Build SORD code.
     """
-    import os, subprocess
-    configure(job, **kwargs)
-    p = os.path.dirname(__file__)
-    subprocess.check_call(['make', '-j', '4', '-C', p])
-    return
+    import os, subprocess, json
+    p = os.path.dirname(__file__) + os.sep
+    if force:
+        subprocess.check_call(['make', '-C', p, 'distclean'])
+    configure(force)
+    subprocess.check_call(['make', '-C', p, '-j', '4'])
+    cfg = json.load(open('config.json'))
+    return cfg
 
 def stage(prm, **kwargs):
     """
     Stage job
     """
-    import os, re, shutil
+    import os, re, shutil, json
     from .. import util
 
-    print('\nSORD: Support Operator Rupture Dynamics')
+    # build code
+    build = make()
+
+    print('SORD: Support Operator Rupture Dynamics')
 
     # old-style parameters
     if type(prm) == dict:
@@ -193,15 +168,13 @@ def stage(prm, **kwargs):
     else:
         prm = util.storage(**prm)
 
-    # prepare parameters
-    prm = prepare_param(prm)
+    # configure and prepare parameters
     job = util.configure(**kwargs)
+    prm = prepare_param(prm)
 
     # partition for parallelization
     nx, ny, nz = prm.shape[:3]
     j, k, l = prm.nproc3
-    #if not job.build_mpi:
-    #    j, k, l = 1, 1, 1
     nl = [
         (nx - 1) // j + 1,
         (ny - 1) // k + 1,
@@ -213,7 +186,7 @@ def stage(prm, **kwargs):
     j = (nx - 1) // nl[0] + 1
     k = (ny - 1) // nl[1] + 1
     l = (nz - 1) // nl[2] + 1
-    prm.nproc3 = j, k, l
+    prm.nproc3 = [j, k, l]
     job.nproc = j * k * l
 
     # resources
@@ -228,28 +201,30 @@ def stage(prm, **kwargs):
     if not job.minutes:
         job.minutes = 10 + int((prm.shape[3] + 10) * nm // (40 * job.rate))
 
-    # configure and build
+    # configure
     job.command = os.path.join('.', 'sord.x')
     job = util.prepare(job)
-    path = job.rundir + os.sep
-    make(job)
-
-    # check for previous run
-    if os.path.exists(path + 'parameters.json'):
-        raise Exception('Previous run found in %s' % path)
 
     # create run scripts 
-    util.skeleton(job)
-    util.archive(path + 'coseis.tgz')
+    util.stage(job)
+    util.archive('coseis.tgz')
     d = os.path.dirname(__file__)
     f = os.path.join(d, 'sord.x')
-    shutil.copy2(f, path)
+    shutil.copy2(f, '.')
     if prm.debug > 2:
-        os.mkdir(path + 'debug')
+        os.mkdir('debug')
 
     # save input parameters
-    f = dumps(prm, expand=['fieldio'])
-    open(path + 'parameters.json', 'w').write(f)
+    out = ''
+    for i in sorted(prm):
+        if i != 'fieldio':
+            out += str(prm[i]) + '\n'
+    out += '%s\n>\n' % len(prm.fieldio)
+    for i in prm.fieldio:
+        out += str(i) + '\n'
+    for i in "',[]":
+        out = out.replace(i, '')
+    open('parameters.txt', 'w').write(out)
 
     # metadata
     xis = {}
@@ -274,25 +249,23 @@ def stage(prm, **kwargs):
                 shapes[k] = [1]
 
     # save metadata
-    m = [
-        ('# configuration', None),
-        ('name',    job.name),
-        ('rundate', job.rundate),
-        ('machine', job.machine),
-        ('host',    job.host),
-        ('rundir',  job.rundir),
-        ('dtype',   job.dtype),
-        ('# model parameters', None),
-    ] + sorted(i for i in prm.items() if i[0] != 'fieldio') + [
-        ('fieldio', prm.fieldio),
-        ('# output dimensions', None),
-        ('shapes',  shapes),
-        ('deltas',  deltas),
-        ('xis',     xis),
-        ('indices', indices),
-    ]
-    m = dumps(m, expand=['fieldio', 'shapes', 'deltas', 'xis', 'indices'])
-    open(path + 'meta.json', 'w').write(m)
+    m = {
+        'dtype':   job.dtype,
+        'shapes':  shapes,
+        'deltas':  deltas,
+        'xis':     xis,
+        'indices': indices,
+    }
+    m.update(prm)
+    f = open('meta.json', 'w')
+    json.dump(m, f, indent=4, sort_keys=True)
+    try:
+        import yaml
+    except ImportError:
+        pass
+    else:
+        f = open('meta.yaml', 'w')
+        yaml.dump(m, f)
 
     return job
 
@@ -307,35 +280,35 @@ def run(prm, **kwargs):
 
 def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
     """
-    >>> shape = 8, 8, 8, 8
+    >>> shape = [8, 8, 8, 8]
 
     >>> expand_slices(shape, [])
-    [(0, 8, 1), (0, 8, 1), (0, 8, 1), (0, 8, 1)]
+    [(0, 8, 1], [0, 8, 1], [0, 8, 1], [0, 8, 1]]
 
     >>> expand_slices(shape, [0.4, 0.6, -0.6, -0.4])
-    [(0, 1, 1), (1, 2, 1), (7, 8, 1), (8, 9, 1)]
+    [(0, 1, 1], [1, 2, 1], [7, 8, 1], [8, 9, 1]]
 
     >>> expand_slices(shape, s_[0.4, 0.6, -0.6:-0.4:2, :])
-    [(0, 1, 1), (1, 2, 1), (7, 8, 2), (0, 8, 1)]
+    [[0, 1, 1], [1, 2, 1], [7, 8, 2], [0, 8, 1]]
 
     >>> expand_slices(shape, s_[0.9, 1.1, -1.1:-0.9:2, :], base=0.5)
-    [(0, 1, 1), (1, 2, 1), (6, 7, 2), (0, 7, 1)]
+    [[0, 1, 1], [1, 2, 1], [6, 7, 2], [0, 7, 1]]
 
     >>> expand_slices(shape, s_[1.4, 1.6, -1.6:-1.4:2, :], base=1)
-    [(1, 1, 1), (2, 2, 1), (7, 8, 2), (1, 8, 1)]
+    [[1, 1, 1], [2, 2, 1], [7, 8, 2], [1, 8, 1]]
 
     >>> expand_slices(shape, s_[1.9, 2.1, -2.1:-1.9:2, :], base=1.5)
-    [(1, 1, 1), (2, 2, 1), (6, 7, 2), (1, 7, 1)]
+    [[1, 1, 1], [2, 2, 1], [6, 7, 2], [1, 7, 1]]
 
     >>> expand_slices(shape, [0, 1, 2, ()], base=0, new_base=1)
-    [(1, 1, 1), (2, 2, 1), (3, 3, 1), (1, 8, 1)]
+    [[1, 1, 1], [2, 2, 1], [3, 3, 1], [1, 8, 1]]
     """
 
     # normalize type
     n = len(shape)
     slices = list(slices)
     if len(slices) == 0:
-        slices = n * [()]
+        slices = n * [[]]
     elif len(slices) != n:
         raise Exception('error in indices: %r' % (slices,))
 
@@ -346,23 +319,23 @@ def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
     # loop over slices
     for i, s in enumerate(slices):
 
-        # convert to tuple
+        # convert to list
         if type(s) == slice:
-            s = s.start, s.stop, s.step
+            s = [s.start, s.stop, s.step]
         elif type(s) not in (tuple, list):
-            s = s,
+            s = [s]
 
         # fill missing values
         wraparound = shape[i] + int(base)
         if len(s) == 0:
-            s = None, None, 1
+            s = [None, None, 1]
         elif len(s) == 1:
             s = s[0]
             if s < 0:
                 s += wraparound
-            s = s, s + 1 - int(base), 1
+            s = [s, s + 1 - int(base), 1]
         elif len(s) == 2:
-            s = s[0], s[1], 1
+            s = [s[0], s[1], 1]
         elif len(s) != 3:
             raise Exception('error in indices: %r' % (slices,))
 
@@ -392,7 +365,7 @@ def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
             r = new_base - int(new_base)
             start = int(start - r + 0.5)
             stop  = int(stop  - r + 0.5)
-        slices[i] = start, stop, step
+        slices[i] = [start, stop, step]
 
     return slices
 
@@ -412,7 +385,7 @@ def prepare_param(prm):
 
     # hypocenter coordinates
     nn = prm.shape[:3]
-    xi = list(prm.ihypo)
+    xi = prm.ihypo
     for i in range(3):
         xi[i] = 0.0 + xi[i]
         if xi[i] == 0.0:
@@ -421,12 +394,11 @@ def prepare_param(prm):
             xi[i] = xi[i] + nn[i] + 1
         if xi[i] < 1.0 or xi[i] > nn[i]:
             raise Exception('Error: ihypo %s out of bounds' % xi)
-    prm.ihypo = tuple(xi)
 
     # rupture boundary conditions
     nn = prm.shape[:3]
-    i1 = list(prm.bc1)
-    i2 = list(prm.bc2)
+    i1 = prm.bc1
+    i2 = prm.bc2
     i = abs(prm.faultnormal) - 1
     if i >= 0:
         irup = int(xi[i])
@@ -436,13 +408,11 @@ def prepare_param(prm):
             i2[i] = -2
         if irup < 1 or irup > (nn[i] - 1):
             raise Exception('Error: ihypo %s out of bounds' % xi)
-    prm.bc1 = tuple(i1)
-    prm.bc2 = tuple(i2)
 
     # pml region
     nn = prm.shape[:3]
     i1 = [0, 0, 0]
-    i2 = [nn[0]+1, nn[1]+1, nn[2]+1]
+    i2 = [nn[0] + 1, nn[1] + 1, nn[2] + 1]
     if prm.npml > 0:
         for i in range(3):
             if prm.bc1[i] == 10:
@@ -451,8 +421,8 @@ def prepare_param(prm):
                 i2[i] = nn[i] - prm.npml + 1
             if i1[i] > i2[i]:
                 raise Exception('Error: model too small for PML')
-    prm.i1pml = tuple(i1)
-    prm.i2pml = tuple(i2)
+    prm.i1pml = i1
+    prm.i2pml = i2
 
     # i/o sequence
     fieldio = []
@@ -460,7 +430,7 @@ def prepare_param(prm):
         line = list(line)
         filename = '-'
         pulse, val, tau = 'const', 1.0, 1.0
-        x1 = x2 = 0.0, 0.0, 0.0
+        x1 = x2 = [0.0, 0.0, 0.0]
 
         # parse line
         op = line[0][0]
@@ -490,6 +460,7 @@ def prepare_param(prm):
         mode = mode.replace('f', '')
         if isinstance(fields, basestring):
             fields = [fields]
+        fields = [str(f) for f in fields]
 
         # error check
         fn = fieldnames()
@@ -518,18 +489,18 @@ def prepare_param(prm):
         nt = prm.shape[3]
         if 'i' in mode:
             x1 = expand_slices(nn, ii[:3], base, round=False)
-            x1 = tuple(i[0] + 1 - base for i in x1)
-            i1 = tuple(math.ceil(i) for i in x1)
+            x1 = [i[0] + 1 - base for i in x1]
+            i1 = [math.ceil(i) for i in x1]
             ii = (expand_slices(nn, i1, 1)
                  + expand_slices([nt], ii[3:], 1))
         else:
             ii = (expand_slices(nn, ii[:3], base)
                  + expand_slices([nt], ii[3:], 1))
         if field in fn['initial']:
-            ii[3] = 0, 0, 1
+            ii[3] = [0, 0, 1]
         if field in fn['fault']:
             i = abs(prm.faultnormal) - 1
-            ii[i] = 2 * (irup,) + (1,)
+            ii[i] = [irup, irup, 1]
 
         # buffer size
         shape = [(i[1] - i[0]) // i[2] + 1 for i in ii]
@@ -544,7 +515,7 @@ def prepare_param(prm):
 
         # append to list
         fieldio += [
-            (op + mode, nc, pulse, tau, x1, x2, nb, ii, filename, val, fields)
+            [op + mode, nc, pulse, tau, x1, x2, nb, ii, str(filename), val, fields]
         ]
 
     # check for duplicate filename

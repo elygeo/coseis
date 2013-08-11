@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-import os, imp
+import os, json
 import numpy as np
 import matplotlib.pyplot as plt
 import cst
 
 # parameters
 path = 'run' + os.sep
-meta = imp.load_source('meta', path + 'meta.py')
-shape = meta.shape
-delta = meta.delta
-dtype = meta.dtype
-vrup = meta.vrup
+meta = json.load(path + 'meta.json')
+shape = meta['shape']
+delta = meta['delta']
+dtype = meta['dtype']
+vrup = meta['vrup']
 rho = 2670.0
 vp = 6000.0
 vs = 3464.0

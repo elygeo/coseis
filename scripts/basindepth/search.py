@@ -2,17 +2,17 @@
 """
 Locate the shallowest 2D isosurface in a volume.
 """
-import os, imp
+import os, json
 import numpy as np
 
 # parameters
 val = 2500.0
 cell = 0
 up = 0
-f = os.path.join('run', 'mesh', 'meta.py')
-meta = imp.load_source('meta', f)
-delta = meta.delta
-shape = meta.shape
+path = os.path.join('run', 'mesh') + os.sep
+meta = json.load(open(path + 'meta.json'))
+delta = meta['delta']
+shape = meta['shape']
 
 # setup
 dz = delta[2]
@@ -20,7 +20,7 @@ n1 = shape[0] * shape[1]
 n2 = shape[2]
 
 # iterate over depth planes looking for vertical isosurface crossings
-f = os.path.join('run', 'mesh', 'hold', 'vs.bin')
+f = os.path.join(path, 'hold', 'vs.bin')
 f = open(f, 'rb')
 v2 = np.fromfile(f, 'f', n1)
 if up:
@@ -41,6 +41,5 @@ else:
         z[i] = ((val - v1[i]) / (v2[i] - v1[i]) + j - 1 + 0.5 * cell) * dz
 
 # write output
-f = os.path.join('run', 'mesh', 'z25.npy')
-np.save(f, z)
+np.save(path + 'z25.npy', z)
 

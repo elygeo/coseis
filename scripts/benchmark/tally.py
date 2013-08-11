@@ -2,7 +2,7 @@
 """
 Tally benchmarks
 """
-import os, imp, glob
+import os, json, glob
 import numpy as np
 
 label = 'ACLF BG/Q'
@@ -10,9 +10,9 @@ procs = []
 times = []
 
 for path in glob.glob('run/bench[0-9]*'):
-    meta = os.path.join(path, 'meta.py')
-    meta = imp.load_source('meta', meta)
-    f = os.path.join(path, 'prof-8step.bin')
+    path += os.sep
+    meta = json.load(open(path + 'meta.json'))
+    f = path + 'prof-8step.bin'
     if os.path.exists(f):
         t = np.fromfile(f, meta.dtype)
         x, y, z = meta.nproc3

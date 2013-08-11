@@ -2,7 +2,7 @@
 """
 PEER Lifelines program task 1A02, Problem SC2.1
 """
-import os, imp
+import os, json
 import numpy as np
 import matplotlib.pyplot as plt
 import cst
@@ -12,11 +12,11 @@ path = os.path.join('run', 'sim', '200') + os.sep
 path = os.path.join('run', 'sim', '2000') + os.sep
 path = os.path.join('run', 'sim', '500') + os.sep
 path = os.path.join('run', 'sim', '100') + os.sep
-meta = imp.load_source('meta', path + 'meta.py')
-dt = meta.delta[-1]
-nt = meta.shape[-1]
-tau = meta.tau
-dtype = meta.dtype
+meta = json.load(open(path + 'meta.json'))
+dt = meta['delta'][-1]
+nt = meta['shape'][-1]
+tau = meta['tau']
+dtype = meta['dtype']
 sigma = 0.5
 
 # read time history

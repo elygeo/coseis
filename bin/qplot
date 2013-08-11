@@ -14,7 +14,7 @@ Options
 -s <step>      Decimate data
 -t             Transpose data
 """
-import os, sys, imp, getopt
+import os, sys, json, getopt
 import numpy as np
 from numpy.lib.npyio import format as npy
 import matplotlib.pyplot as plt
@@ -86,12 +86,12 @@ def plot(*argv):
             for i in range(1, len(f)):
                 path = os.sep.join(f[:-i])
                 tail = os.sep.join(f[i:])[:-4] + '.bin'
-                meta = os.path.join(path, 'meta.py')
+                meta = os.path.join(path, 'meta.json')
                 if os.path.exists(meta):
-                    meta = imp.load_source('meta', meta)
-                    if hasattr(meta, 'deltas'):
-                        if tail in meta.deltas:
-                            delta = meta.deltas[tail]
+                    meta = json.load(open(meta))
+                    if 'deltas' in meta:
+                        if tail in meta['deltas']:
+                            delta = meta['deltas'][tail]
                     break
             fh = open(filename, 'rb')
             npy.read_magic(fh)
@@ -110,17 +110,17 @@ def plot(*argv):
             for i in range(1, len(f)):
                 path = os.sep.join(f[:-i])
                 tail = os.sep.join(f[i:])
-                meta = os.path.join(path, 'meta.py')
+                meta = os.path.join(path, 'meta.json')
                 if os.path.exists(meta):
-                    meta = imp.load_source('meta', meta)
-                    if hasattr(meta, 'dtype'):
-                        dtype = meta.dtype
-                    if hasattr(meta, 'deltas'):
-                        if tail in meta.deltas:
-                            delta = meta.deltas[tail]
-                    if hasattr(meta, 'shapes'):
-                        if tail in meta.shapes:
-                            shape = meta.shapes[tail]
+                    meta = json.load(open(meta))
+                    if dtype in meta:
+                        dtype = meta['dtype']
+                    if 'deltas' in meta:
+                        if tail in meta['deltas']:
+                            delta = meta['deltas'][tail]
+                    if 'shapes' in meta:
+                        if tail in meta['shapes']:
+                            shape = meta['shapes'][tail]
                     break
             if len(shape) < 3:
                 if shape:

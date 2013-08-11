@@ -37,11 +37,12 @@ def archive(path):
     import os, gzip, cStringIO
     try:
         import git
-    except ImportError:
+        assert git.__version__ > '0.2'
+    except (ImportError, AssertionError):
         print('Warning: Source code not archived. Source archiving')
         print('improves reproducibility by storing the exact code')
-        print('version with the simulations results. To enable, use')
-        print('Git versioned source code and install GitPython.')
+        print('version with the simulations results. To enable, use Git')
+        print('versioned source code and install GitPython version > 2.0')
     else:
         p = os.path.dirname(__file__)
         r = git.Repo(p)
@@ -67,39 +68,41 @@ class storage(dict):
         return self[key]
 
 
-def configure(**kwargs):
-    import os, sys, json, pwd, socket, multiprocessing
-    import numpy as np
-
-    # defaults
-    path = os.path.join(os.path.dirname(__file__), 'conf') + os.sep
-    f = path + 'default.json'
-    job = json.load(open(f))
-    job['rundir'] = os.getcwd()
-    job['dtype'] = np.dtype('f').str
-    job['argv'] = sys.argv[1:]
-    job = storage(**job)
-    job['maxcores'] = multiprocessing.cpu_count()
-
-    # host
+def hostname():
+    import os, json, socket
     h = os.uname()
     g = socket.getfqdn()
-    job['host'] = ' '.join([h[0], h[4], h[1], g])
+    host = ' '.join([h[0], h[4], h[1], g])
+    f = os.path.dirname(__file__)
+    f = os.path.join(f, 'conf', 'hostmap.json')
+    d = json.load(open(f))
+    for m, h in d:
+        if h in host:
+            return host, m
+    return host, 'Default'
+
+
+def configure(**kwargs):
+    import os, sys, json, pwd, multiprocessing
+
+    # defaults
+    path = os.path.dirname(__file__)
+    path = os.path.join(path, 'conf') + os.sep
+    f = path + 'default.json'
+    job = json.load(open(f))
+    job = storage(**job)
+    job['argv'] = sys.argv[1:]
+    job['host'], job['machine'] = hostname()
+    job['maxcores'] = multiprocessing.cpu_count()
 
     # email
     try:
         import configobj
-        f = os.path.join(os.path.expanduser('~'), '.gitconfig')
+        f = os.path.expanduser('~')
+        f = os.path.join(f, '.gitconfig')
         job['email'] = configobj.ConfigObj(f)['user']['email']
     except:
         job['email'] = pwd.getpwuid(os.geteuid())[0]
-
-    # guess machine
-    for m, h in job['host_map']:
-        if h in job['host']:
-            job['machine'] = m
-            break
-    del(job['host_map'])
 
     # merge key-word arguments, 1st pass
     for k in kwargs:
@@ -127,12 +130,6 @@ def configure(**kwargs):
         k, v = i[2:].split('=')
         job[k] = json.loads(v)
 
-    # notification
-    if job['nproc'] > job['notify_threshold']:
-        job['notify'] = job['notify'].format(email=job['email'])
-    else:
-        job['notify'] = ''
-
     return job
 
 
@@ -152,8 +149,15 @@ def prepare(job=None, **kwargs):
     # misc
     job.update({
         'jobid': '',
-        'rundate': time.strftime('%Y %b %d'),
+        'rundir': os.getcwd(),
+        'rundate': time.strftime('%Y-%m-%d'),
     })
+
+    # notification
+    if job['nproc'] > job['notify_threshold']:
+        job['notify'] = job['notify'].format(email=job['email'])
+    else:
+        job['notify'] = ''
 
     # queue options
     opts = job['queue_opts']
@@ -219,15 +223,11 @@ def prepare(job=None, **kwargs):
         print('Time: ' + job['walltime'])
 
     # warnings
-    if job['verbose'] > 0:
+    if job['verbose']:
         if job['ram'] and job['ram'] > job['maxram']:
             print('Warning: exceeding available RAM per node (%sMb)' % job['maxram'])
         if job['maxtime'] and job['minutes'] == job['maxtime']:
             print('Warning: exceeding maximum time limit (%02d:00)' % job['maxtime'])
-
-    # directories
-    job['rundir'] = os.path.realpath(os.path.expanduser(job['rundir']))
-    job['iodir'] = os.path.expanduser(job['iodir'])
 
     # launch commands
     job['command'] = job['command'].format(**job)
@@ -242,15 +242,7 @@ def prepare(job=None, **kwargs):
     return job
 
 
-rundir_error = """\
-For safety, run directories are no longer created or replaced.
-To manually create the run directory do:
-
-    import os
-    os.makedirs(%s)
-"""
-
-def skeleton(job=None, **kwargs):
+def stage(job=None, **kwargs):
     """
     Create run files
     """
@@ -263,22 +255,18 @@ def skeleton(job=None, **kwargs):
         for k in kwargs:
             job[k] = kwargs[k]
 
-    # test for previous runs 
-    f = os.path.join(job['rundir'], job['name'] + '.conf.json')
-    if not job['force'] and os.path.exists(f):
-        raise Exception('Existing job found. Use --force=True to overwrite')
-    if not os.path.isdir(job['rundir']):
-        raise Exception(rundir_error % job['rundir'])
-
-    # create submit script
-    if job['submit']:
-        g = os.path.join(job['rundir'], job['name'] + '.sh')
-        open(g, 'w').write(job['script'])
-        os.chmod(g, 0755)
-
-    # save configuration
+    # write configuration
+    f = job['name'] + '.conf.json'
+    if os.path.exists(f):
+        raise Exception('Existing job found')
     f = open(f, 'w')
     json.dump(job, f, indent=4, sort_keys=True)
+
+    # write submit script
+    if job['submit']:
+        g = job['name'] + '.sh'
+        open(g, 'w').write(job['script'])
+        os.chmod(g, 0755)
 
     return job
 
@@ -287,11 +275,11 @@ def launch(job=None, **kwargs):
     """
     Launch or submit job.
     """
-    import os, re, shlex, subprocess, json
+    import re, shlex, subprocess, json
 
     # prepare job
     if job is None:
-        job = skeleton(**kwargs)
+        job = stage(**kwargs)
     else:
         for k in kwargs:
             job[k] = kwargs[k]
@@ -299,10 +287,6 @@ def launch(job=None, **kwargs):
     # launch command
     if not job['run']:
         return job
-
-    # run directory
-    cwd = os.getcwd()
-    os.chdir(job['rundir'])
 
     # launch
     if job['run'] == 'submit':
@@ -315,10 +299,12 @@ def launch(job=None, **kwargs):
             raise Exception('Submit failed')
         d = re.search(job['submit_pattern'], out).groupdict()
         job.update(d)
-        f = open(job['name'] + '.conf.json', 'w')
+        f = job['name'] + '.conf.json'
+        f = open(f, 'w')
         json.dump(job, f, indent=4, sort_keys=True)
     else:
-        f = open(job['name'] + '.conf.json', 'w')
+        f = job['name'] + '.conf.json'
+        f = open(f, 'w')
         json.dump(job, f, indent=4, sort_keys=True)
         for c in job['pre'], job['launch'], job['post']:
             if c:
@@ -328,6 +314,5 @@ def launch(job=None, **kwargs):
                 elif c:
                     subprocess.check_call(shlex.split(c))
 
-    os.chdir(cwd)
     return job
 

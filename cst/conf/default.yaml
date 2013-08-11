@@ -9,13 +9,13 @@ depend: ''
 command: ''
 pre: ''
 post: ''
-force: False
 nproc: 1
 nthread: 0
 nstripe: -2
 minutes: 0
 pmem: 0
 iodir: ''
+argv: []
 
 # machine properties
 machine: ''
@@ -43,24 +43,10 @@ submit_pattern: (?P<jobid>\d+\S*)\D*$
 # job script
 script: |
     #!/bin/sh
-    cd "{rundir}"
+    cd "${rundir}"
     env >> "{name}.env"
     echo "$( date ): {name} started" >> "{name}.out"
     {pre} >> "{name}.out"
     {launch} >> "{name}.out"
     {post} >> "{name}.out"
     echo "$( date ): {name} finished" >> "{name}.out"
-
-# machine host name mapping
-host_map:
-- [ALCF-BGQ,    vestalac1.ftd.alcf.anl.gov]
-- [ALCF-BGQ,    cetuslac1.fst.alcf.anl.gov]
-- [ALCF-BGQ,    miralac1.fst.alcf.anl.gov]
-- [ALCF-BGP,    surveyor.alcf.anl.gov]
-- [ALCF-BGP,    challenger.alcf.anl.gov]
-- [ALCF-BGP,    intreplid.alcf.anl.gov]
-- [IBM-Wat2Q,   grotius.watson.ibm.com]
-- [NICS-Kraken, kraken]
-- [USC-HPC,     hpc-login1.usc.edu]
-- [USC-HPC,     hpc-login2-l.usc.edu]
-- [Airy,        airy]

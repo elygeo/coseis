@@ -3,10 +3,10 @@
 def make():
     import os, subprocess
     import cst
-    path = os.path.dirname(__file__)
     cwd = os.getcwd()
-    os.chdir(path)
     cfg = cst.util.configure()
+    path = os.path.dirname(__file__)
+    os.chdir(path)
     if cfg['force'] or not os.path.exists('Makefile'):
         m = open('Makefile.in').read().format(**cfg)
         open('Makefile', 'w').write(m)
@@ -17,11 +17,14 @@ def make():
 def test(argv=[]):
     import os, shutil
     import cst
-    make()
     cwd = os.getcwd()
-    d = os.paht.join(cwd, 'run', 'hello-c')
+    path = os.path.dirname(__file__) + os.sep
+    make()
+
+    # C version
+    d = os.path.join('run', 'hello-c')
     os.makedirs(d)
-    shutil.copy2('hello.c.x', d)
+    shutil.copy2(path + 'hello.c.x', d)
     os.chdir(d)
     cst.util.launch(
         run = 'exec',
@@ -32,9 +35,12 @@ def test(argv=[]):
         ppn_range = [2],
         minutes = 10,
     )
-    d = os.paht.join(cwd, 'run', 'hello-f')
+    os.chdir(cwd)
+
+    # Fortran version
+    d = os.path.join('run', 'hello-f')
     os.makedirs(d)
-    shutil.copy2('hello.f.x', d)
+    shutil.copy2(path + 'hello.f.x', d)
     os.chdir(d)
     cst.util.launch(
         run = 'exec',
@@ -45,6 +51,8 @@ def test(argv=[]):
         ppn_range = [2],
         minutes = 10,
     )
+    os.chdir(cwd)
+
     return
 
 # continue if command line

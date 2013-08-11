@@ -25,6 +25,6 @@
     "ppn_range": [
         1
     ], 
-    "submit": "qsub {notify} -O {name} -A {account} -q {queue} -n {nodes} -t {minutes} --mode script {submit_flags} \"{name}.sh\"", 
-    "submit2": "qsub {notify} -O {name} -A {account} -q {queue} -n {nodes} -t {minutes} --mode script --dependenices {depend} {submit_flags} \"{name}.sh\""
+    "submit": "qsub --mode script -O {name} -A {account} -q {queue} -n {nodes} -t {minutes} {notify} {submit_flags} \"{name}.sh\"", 
+    "submit2": "qsub --mode script --dependenices {depend} -O {name} -A {account} -q {queue} -n {nodes} -t {minutes} {notify} {submit_flags} \"{name}.sh\""
 }

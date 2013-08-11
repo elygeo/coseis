@@ -2,7 +2,7 @@
 """
 Material model extraction from CVM
 """
-import os, shutil
+import os, json, shutil
 import numpy as np
 import cst
 
@@ -46,11 +46,9 @@ meta = dict(
 # create run directory
 path = os.path.join('run', 'mesh', '%.0f' % dx) + os.sep
 os.makedirs(path)
-
-# save data
 shutil.copy2('mesh.py', path)
 os.chdir(path)
-cst.util.save('meta.py', meta)
+json.dump(meta, open('meta.json', 'w'))
 x.astype('f').T.tofile('lat.bin')
 y.astype('f').T.tofile('lon.bin')
 

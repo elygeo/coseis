@@ -2,15 +2,15 @@
 """
 Mesh generation
 """
-import os
+import os, json
 import numpy as np
-import meta
 
 # metedata
-dtype = meta.dtype
-shape = meta.shape
-delta = meta.delta
-npml = meta.npml
+meta = json.load(open('meta.json'))
+dtype = meta['dtype']
+shape = meta['shape']
+delta = meta['delta']
+npml = meta['npml']
 
 # read data
 dep = np.arange(shape[2]) * delta[2]
