@@ -137,14 +137,14 @@ indices, followed by mode dependent parameters.  The following I/O modes are
 available, where ``'f'`` is the field variable name (from the list
 fieldnames.yaml_), and ``[]`` are the slice indices::
 
-    ('=',   'f', [], val),             # Set f to value
-    ('+',   'f', [], val),             # Add value to f
-    ('=s',  'f', [], val),             # Set f to random numbers in range (0, val)
-    ('=f',  'f', [], val, tfunc, T),   # Set f to time function with period T, scaled by val
-    ('=r',  'f', [], filename),        # Read from filename into f
-    ('=R',  'f', [], filename),        # Read from filename into f with exrapolation.
-    ('=w',  'f', [], filename),        # Write f to filename
-    ('=wi', 'f', [], filename),        # Write weighted average of f to filename.
+    ['=',   'f', [], val],             # Set f to value
+    ['+',   'f', [], val],             # Add value to f
+    ['=s',  'f', [], val],             # Set f to random numbers in range (0, val)
+    ['=f',  'f', [], val, tfunc, T],   # Set f to time function with period T, scaled by val
+    ['=r',  'f', [], filename],        # Read from filename into f
+    ['=R',  'f', [], filename],        # Read from filename into f with exrapolation.
+    ['=w',  'f', [], filename],        # Write f to filename
+    ['=wi', 'f', [], filename],        # Write weighted average of f to filename.
 
 A letter ``'i'`` in the mode indicates sub-cell positioning via weighted
 averaging.  In this case the spatial indices are single logical coordinates
@@ -214,16 +214,16 @@ slip surface of a symmetric rupture.
 Example: a 3D problem with a free surface at Z=0, and PML absorbing boundaries
 on all other boundary faces::
 
-    shape = 50, 50, 50, 100
-    bc1 = 10, 10,  0
-    bc2 = 10, 10, 10
+    shape = [50, 50, 50, 100]
+    bc1 = [10, 10,  0]
+    bc2 = [10, 10, 10]
 
 Example: a 2D antiplane strain problem with PML absorbing boundaries.  The
 number of nodes is 2 for the zero-width axis::
 
-    shape  = 50, 50, 2, 100
-    bc1 = 10, 10, -1
-    bc2 = 10, 10, -1
+    shape = [50, 50, 2, 100]
+    bc1 = [10, 10, -1]
+    bc2 = [10, 10, -1]
 
 
 Defining the fault rupture surface
@@ -241,12 +241,12 @@ nodes are given by ``int(ihypo(faultnormal))``, and ``int(ihypo(faultnormal)) +
 fault plane located at z = 100.0, and double nodes at l = (21, 22), may be set
 up as such::
 
-    delta = 5.0, 5.0, 5.0, 0.1
+    delta = [5.0, 5.0, 5.0, 0.1]
     faultnormal = 3
-    ihypo = 21, 21, 21.5
-    shape  = 41, 41, 42, 100
-    bc1 = 0, 0, 0
-    bc2 = 0, 0, 0
+    ihypo = [21, 21, 21.5]
+    shape  = [41, 41, 42, 100]
+    bc1 = [0, 0, 0]
+    bc2 = [0, 0, 0]
 
 For problems with symmetry across the rupture surface (where mesh and material
 properties are mirror images), the symmetry may be exploited for computational
@@ -256,25 +256,25 @@ must lie at the model boundary, and the and the cell-centered anti-mirror
 symmetry condition used.  For example, reducing the size of the previous
 example to put the rupture surface along the far z boundary::
 
-    shape = 41, 41, 22, 100
-    bc2 = 0, 0, -2
+    shape = [41, 41, 22, 100]
+    bc2 = [0, 0, -2]
 
 Alternatively, put the rupture surface along the near z boundary::
 
-    ihypo = 21, 21, 1.5
-    shape = 41, 41, 22, 100
-    bc1 = 0, 0, -2
-    bc2 = 0, 0, 0
+    ihypo = [21, 21, 1.5]
+    shape = [41, 41, 22, 100]
+    bc1 = [0, 0, -2]
+    bc2 = [0, 0, 0]
 
 Further symmetries may present. If our previous problem has slip only in the
 x direction, then we may also use node-centered mirror symmetry along the in-plane
 axis, and node-centered anti-mirror symmetry along the anti-plane axis, to reduce
 computations eight-fold::
 
-    ihypo = 21, 21, 21.5
-    shape = 21, 21, 22, 100
-    bc1 = 0, 0, 0
-    bc2 = -1, 1, -2
+    ihypo = [21, 21, 21.5]
+    shape = [21, 21, 22, 100]
+    bc1 = [0, 0, 0]
+    bc2 = [-1, 1, -2]
 
 Memory Usage and Scaling
 ========================

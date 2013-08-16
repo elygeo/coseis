@@ -6,41 +6,10 @@ DEBUG =
 PROFILE =
 REAL8 =
 
-# Rules
-config.json: sord.x parameters.json fieldnames.json
-	echo {{"mode": $(MODE), "omp": $(OMP), "real8": $(REAL8)}} > config.json
-
-clean:
-	rm -f *.o *.mod *.x *.lst *.pyc
-
-distclean: clean
-	rm Makefile
-
-sord.x: {objects} \
-	collective_$(MODE).o
-	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
-
-collective.mod: collective_$(MODE).o
-	@true   
-
-{rules}
-
-%.mod: %.o
-	@true
-
-%.json: %.yaml
-	yaml2json $< > $@
-
 # Default: # GNU Compiler Collection
-ifeq ($(MODE), mpi)
-    CC = mpicc
-    FC = mpif90 
-    LD = mpif90
-else
-    CC = gcc
-    FC = gfortran 
-    LD = gfortran
-endif
+CC = gcc
+FC = gfortran 
+LD = gfortran
 CFLAGS = $(LDFLAGS) -pedantic
 FFLAGS = $(LDFLAGS) -fimplicit-none
 LDFLAGS = -g -O3 -Wall
@@ -55,6 +24,14 @@ ifdef PROFILE
 endif
 ifdef DEBUG
     LDFLAGS += -fbounds-check -ffpe-trap=invalid,zero,overflow
+endif
+
+# MPICH
+ifeq ($(MACHINE), Airy)
+    MODE = mpi
+    CC = mpicc
+    FC = mpif90 
+    LD = mpif90
 endif
 
 # ALCF IBM Blue Gene/P
@@ -158,6 +135,28 @@ ifeq ($(MACHINE), NICS-Kraken)
     endif
 endif
 
-ifeq ($(MACHINE), Airy)
-    MODE = mpi
-endif
+# Rules
+config.json: sord.x parameters.json fieldnames.json
+	printf '{{"mode": "%s", "omp": "%s", "real8": "%s"}}' "$(MODE)" "$(OMP)" "$(REAL8)" > config.json
+
+clean:
+	rm -f *.o *.mod *.x *.lst *.pyc
+
+distclean: clean
+	rm Makefile
+
+sord.x: {objects} \
+	collective_$(MODE).o
+	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+collective.mod: collective_$(MODE).o
+	@true   
+
+{rules}
+
+%.mod: %.o
+	@true
+
+%.json: %.yaml
+	yaml2json $< > $@
+

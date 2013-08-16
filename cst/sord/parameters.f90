@@ -37,8 +37,8 @@ read (str, *) &
     affine, bc1, bc2, debug, delta, faultnormal, faultopening, gam1, gam2, &
     gridnoise, hourglass, i1pml, i2pml, ihypo, itio, itstats, mpin, mpout, &
     n1expand, n2expand, npml, nproc3, nsource, oplevel, ppml, pulse, rcrit, &
-    rexpand, rho1, rho2, shape_, slipvector, source, source1, source2, svtol, tau, &
-    tm0, trelax, vdamp, vp1, vp2, vpml, vrup, vs1, vs2, nio
+    rexpand, rho1, rho2, shape_, slipvector, source, source1, source2, svtol, &
+    tau, tm0, trelax, vdamp, vp1, vp2, vpml, vrup, vs1, vs2, nio
 
 ! find start of fieldio and change file delimeter
 i = scan(str, '>')
@@ -57,7 +57,7 @@ io%field = 'head'
 
 ! select input key
 do j = 1, nio
-    i = scan(str, new_line('a'))
+    i = scan(str, new_line('a')) + 1
     str = str(i:)
     call pappend
     io%ib = -1

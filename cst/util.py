@@ -83,7 +83,7 @@ def hostname():
 
 
 def configure(**kwargs):
-    import os, sys, json, pwd, multiprocessing
+    import os, sys, pwd, json, multiprocessing
 
     # defaults
     path = os.path.dirname(__file__)
@@ -128,7 +128,9 @@ def configure(**kwargs):
         if not i.startswith('--'):
             raise Exception('Bad argument ' + i)
         k, v = i[2:].split('=')
-        job[k] = json.loads(v)
+        if not isinstance(v, basestring):
+            v = json.loads(v)
+        job[k] = v
 
     return job
 

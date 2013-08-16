@@ -122,24 +122,22 @@ def make(force=False):
     """
     Build SORD code.
     """
-    import os, subprocess, json
+    import os, json, subprocess
     p = os.path.dirname(__file__) + os.sep
     if force:
         subprocess.check_call(['make', '-C', p, 'distclean'])
     configure(force)
     subprocess.check_call(['make', '-C', p, '-j', '4'])
-    cfg = json.load(open('config.json'))
+    cfg = json.load(open(p + 'config.json'))
     return cfg
 
 def stage(prm, **kwargs):
     """
     Stage job
     """
-    import os, re, shutil, json
+    import os, re, json, shutil
+    import numpy as np
     from .. import util
-
-    # build code
-    build = make()
 
     print('SORD: Support Operator Rupture Dynamics')
 
@@ -168,8 +166,15 @@ def stage(prm, **kwargs):
     else:
         prm = util.storage(**prm)
 
-    # configure and prepare parameters
+    # configure and make
     job = util.configure(**kwargs)
+    job.update(**make())
+    if job.real8:
+        job.update({'dtype': np.dtype('d').str})
+    else:
+        job.update({'dtype': np.dtype('f').str})
+
+    # prepare parameters
     prm = prepare_param(prm)
 
     # partition for parallelization
@@ -188,6 +193,8 @@ def stage(prm, **kwargs):
     l = (nz - 1) // nl[2] + 1
     prm.nproc3 = [j, k, l]
     job.nproc = j * k * l
+    if job.nproc > 1 and job.mode != 'mpi':
+        raise('MPI build required for multiprocessing') 
 
     # resources
     if prm.oplevel in (1, 2):
@@ -215,6 +222,7 @@ def stage(prm, **kwargs):
         os.mkdir('debug')
 
     # save input parameters
+    json.dump(prm, open('parameters.json', 'w'), indent=4, sort_keys=True)
     out = ''
     for i in sorted(prm):
         if i != 'fieldio':

@@ -7,7 +7,7 @@ def make():
     cfg = cst.util.configure()
     path = os.path.dirname(__file__)
     os.chdir(path)
-    if cfg['force'] or not os.path.exists('Makefile'):
+    if not os.path.exists('Makefile'):
         m = open('Makefile.in').read().format(**cfg)
         open('Makefile', 'w').write(m)
     subprocess.check_call(['make'])

@@ -557,7 +557,7 @@ def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
     -------
     srf: (metadata, data) SRF dictionaries
     """
-    import os, gzip, json, cStringIO, subprocess
+    import os, json, gzip, cStringIO, subprocess
     import numpy as np
     from . import srf as srflib
 
