@@ -68,14 +68,23 @@ class storage(dict):
         return self[key]
 
 
+def load(fh):
+    try:
+        import yaml
+        return yaml.load(fh)
+    except ImportError:
+        import json
+        return json.load(fh)
+
+
 def hostname():
-    import os, json, socket
+    import os, socket
     h = os.uname()
     g = socket.getfqdn()
     host = ' '.join([h[0], h[4], h[1], g])
     f = os.path.dirname(__file__)
     f = os.path.join(f, 'conf', 'hostmap.json')
-    d = json.load(open(f))
+    d = load(open(f))
     for m, h in d:
         if h in host:
             return host, m
@@ -89,7 +98,7 @@ def configure(**kwargs):
     path = os.path.dirname(__file__)
     path = os.path.join(path, 'conf') + os.sep
     f = path + 'default.json'
-    job = json.load(open(f))
+    job = load(open(f))
     job = storage(**job)
     job['argv'] = sys.argv[1:]
     job['host'], job['machine'] = hostname()
@@ -109,9 +118,9 @@ def configure(**kwargs):
         job[k] = kwargs[k]
 
     # merge machine parameters
-    if job['machine']:
+    if job['machine'] and job['machine'].lower() != 'default':
         f = path + job['machine'] + '.json'
-        m = json.load(open(f))
+        m = load(open(f))
         for k in m:
             job[k] = m[k]
     for h, o in job['host_opts'].items():
@@ -128,7 +137,7 @@ def configure(**kwargs):
         if not i.startswith('--'):
             raise Exception('Bad argument ' + i)
         k, v = i[2:].split('=')
-        if not isinstance(v, basestring):
+        if not v[0].isalpha():
             v = json.loads(v)
         job[k] = v
 

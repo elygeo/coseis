@@ -5,7 +5,7 @@ maxram: 16384
 host_opts: {
     vesta: {maxnodes: 1024,  maxtime: 120},
     cetus: {maxnodes: 1024,  maxtime: 120},
-    mira:  {maxnodes: 49152, maxtime: 720},
+    mira:  {maxnodes: 49152, maxtime: 1440},
 }
 
 # MPI

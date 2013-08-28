@@ -7,7 +7,7 @@
         }, 
         "mira": {
             "maxnodes": 49152, 
-            "maxtime": 720
+            "maxtime": 1440
         }, 
         "vesta": {
             "maxnodes": 1024, 

@@ -30,7 +30,7 @@
     "queue_opts": [], 
     "rate": 1000000, 
     "run": "", 
-    "script": "#!/bin/sh\ncd \"{rundir}\"\nenv >> \"{name}.env\"\necho \"$( date ): {name} started\" >> \"{name}.out\"\n{pre} >> \"{name}.out\"\n{launch} >> \"{name}.out\"\n{post} >> \"{name}.out\"\necho \"$( date ): {name} finished\" >> \"{name}.out\"\n", 
+    "script": "#!/bin/sh\ncd \"${rundir}\"\nenv >> \"{name}.env\"\necho \"$( date ): {name} started\" >> \"{name}.out\"\n{pre} >> \"{name}.out\"\n{launch} >> \"{name}.out\"\n{post} >> \"{name}.out\"\necho \"$( date ): {name} finished\" >> \"{name}.out\"\n", 
     "submit": "qsub {notify} {submit_flags} \"{name}.sh\"", 
     "submit2": "qsub {notify} -W depend=\"afterok:{depend}\" {submit_flags} \"{name}.sh\"", 
     "submit_flags": "", 

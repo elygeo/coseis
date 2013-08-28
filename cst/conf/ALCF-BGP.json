@@ -8,7 +8,7 @@
         }, 
         "intrepid": {
             "maxnodes": 40960, 
-            "maxtime": 720, 
+            "maxtime": 1440, 
             "queue": "prod"
         }, 
         "surveyor": {

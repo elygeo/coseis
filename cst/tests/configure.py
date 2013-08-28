@@ -4,16 +4,24 @@ def test(argv=[]):
     """
     Test configurations
     """
-    import os, pprint
+    import os
     import cst
+    try:
+        import yaml
+    except ImportError:
+        import pprint
+        dump = pprint.pprint
+    else:
+        def dump(x):
+            print(yaml.dump(x, default_flow_style=False))
     cwd = os.getcwd()
     path = os.path.dirname(cst.__file__)
     path = os.path.join(path, 'conf')
     d = os.path.join('run', 'configure')
     os.makedirs(d)
     os.chdir(d)
-    for f in os.listdir(path):
-        if not f.endswith('yaml'):
+    for f in ['DEFAULT'] + os.listdir(path):
+        if f.endswith('.yaml') or f in ('Makefile', 'default.json', 'hostmap.json'):
             continue 
         machine = os.path.splitext(f)[0]
         kwargs = {
@@ -22,15 +30,15 @@ def test(argv=[]):
             'argv': argv,
             'command': 'COMMAND',
             'verbose': 0,
-            'force': True,
         }
         job = cst.util.configure(**kwargs)
         job = cst.util.prepare(job)
         job = cst.util.stage(job)
+        os.unlink('job.conf.json')
         if job['verbose']:
             print(80 * '-')
             print(machine)
-            pprint.pprint(job)
+            dump(dict(job))
         else:
             print(machine)
     os.chdir(cwd)

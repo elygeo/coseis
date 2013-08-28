@@ -11,5 +11,5 @@
     ], 
     "python": "/lustre/scratch/gely/local/bin/python", 
     "rate": 1000000, 
-    "script": "#!/bin/bash\n#PBS -A {account}\n#PBS -N {name}\n#PBS -M {email}\n#PBS -l size={totalcores}\n#PBS -l walltime={walltime}\n#PBS -e {name}.err\n#PBS -o {name}.out\n#PBS -m n\n\ncd $PBS_O_WORKDIR\nenv >> \"{name}.env\"\n\nlfs setstripe -c 1 .\n[ {nstripe} -ge -1 -a -d {iodir} ] && lfs setstripe -c {nstripe} {iodir}\n\necho \"$( date ): {name} started\" >> \"{name}.out\"\n{pre}\n{launch}\n{post}\necho \"$( date ): {name} finished\" >> \"{name}.out\"\n"
+    "script": "#!/bin/bash\n#PBS -A {account}\n#PBS -N {name}\n#PBS -M {email}\n#PBS -l size={totalcores}\n#PBS -l walltime={walltime}\n#PBS -e {name}.err\n#PBS -o {name}.out\n#PBS -m n\n\ncd \"$PBS_O_WORKDIR\"\nenv >> \"{name}.env\"\n\nlfs setstripe -c 1 .\n[ {nstripe} -ge -1 -a -d {iodir} ] && lfs setstripe -c {nstripe} {iodir}\n\necho \"$( date ): {name} started\" >> \"{name}.out\"\n{pre}\n{launch}\n{post}\necho \"$( date ): {name} finished\" >> \"{name}.out\"\n"
 }
