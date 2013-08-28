@@ -15,15 +15,17 @@ input_template = """\
 """
 
 def configure(**kwargs):
-    import os
-    from .. import util, conf
-    from . import conf as conf_local
-    job = util.configure(conf.default, conf.site, conf_local, **kwargs)
-    for k, d in job.host_opts_cvms.items():
-        if k in job.machine:
+    import os, json
+    from .. import util
+    job = util.configure(**kwargs)
+    f = os.path.dirname(__file__)
+    f = os.path.join(f, 'conf.json')
+    job.update(json.load(open(f)))
+    for k, d in job['host_opts':]
+        if k in job['machine']:
             for k, v in d.items():
                 job[k] = v
-    job.command = os.path.join('.', 'cvms.x')
+    job['command'] = os.path.join('.', 'cvms.x')
     assert job.version in ('2.2', '3.0', '4.0')
     return job
 

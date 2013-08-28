@@ -136,14 +136,16 @@ ifeq ($(MACHINE), NICS-Kraken)
 endif
 
 # Rules
-config.json: sord.x parameters.json fieldnames.json
-	printf '{{"mode": "%s", "omp": "%s", "real8": "%s"}}' "$(MODE)" "$(OMP)" "$(REAL8)" > config.json
+all: config.json parameters.json fieldnames.json
 
 clean:
 	rm -f *.o *.mod *.x *.lst *.pyc
 
 distclean: clean
 	rm Makefile
+
+config.json: sord.x
+	printf '{{"mode": "%s", "omp": "%s", "real8": "%s"}}' "$(MODE)" "$(OMP)" "$(REAL8)" > config.json
 
 sord.x: {objects} \
 	collective_$(MODE).o

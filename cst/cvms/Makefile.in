@@ -1,26 +1,17 @@
 # CVMS Makefile
-
-cvms.x : io$(MODE).o version{version}.o
-	$(FC) $(FFLAGS) -o $@ $^
-
-clean :
-	rm -f *.o *.x *.lst *.pyc
-
-distclean : clean
-	rm Makefile
-
-# Options
 MACHINE = {machine}
+MODE = bin
 
 # Default: GNU Compiler Collection
-MODE = serial
-ifeq ($(MODE), mpi)
-    FC = mpif90 
-else
-    FC = gfortran 
-endif
+FC = gfortran 
 FFLAGS = $(LDFLAGS) -fimplicit-none
 LDFLAGS = -g -O3 -Wall
+
+# MPICH
+ifeq ($(MACHINE), Airy)
+    MODE = mpi
+    FC = mpif90
+endif
 
 # ALCF IBM Blue Gene/P
 ifeq ($(MACHINE), ALCF-BGP)
@@ -61,4 +52,19 @@ ifeq ($(MACHINE), NICS-Kraken)
     FFLAGS = $(LDFLAGS) -Mdclchk
     LDFLAGS = -g -fast
 endif
+
+# Rules
+all: cvms.x conf.json
+
+clean :
+	rm -f *.o *.x *.lst *.pyc
+
+distclean : clean
+	rm Makefile
+
+cvms.x : io$(MODE).o version{version}.o
+	$(FC) $(FFLAGS) -o $@ $^
+
+%.json: %.yaml
+	yaml2json $< > $@
 
