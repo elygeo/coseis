@@ -2,21 +2,6 @@
 MACHINE = {machine}
 OMP = 1
 
-# Rules
-all: hello.c.x hello.f.x
-
-clean:
-	rm -rf *.pyc run hello.?.x hello.?.x.dSYM
-
-distclean : clean
-	rm Makefile
-
-hello.c.x : hello.c Makefile
-	$(CC) $(CFLAGS) -o $@ $< $(LIBS)
-
-hello.f.x : hello.f90 Makefile
-	$(FC) $(FFLAGS) -o $@ $< $(LIBS)
-
 # Default: GNU Compiler Collection
 CC = mpicc
 FC = mpif90 
@@ -57,4 +42,19 @@ ifeq ($(MACHINE), ALCF-BGQ)
     endif
     LIBS += /bgsys/drivers/ppcfloor/bgpm/lib/libbgpm.a
 endif
+
+# Rules
+all: hello.c.x hello.f.x
+
+clean:
+	rm -rf *.pyc run hello.?.x hello.?.x.dSYM
+
+distclean : clean
+	rm Makefile
+
+hello.c.x : hello.c Makefile
+	$(CC) $(CFLAGS) -o $@ $< $(LIBS)
+
+hello.f.x : hello.f90 Makefile
+	$(FC) $(FFLAGS) -o $@ $< $(LIBS)
 

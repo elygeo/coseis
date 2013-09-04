@@ -58,10 +58,6 @@ source2: [0.0, 0.0, 0.0] # shear components
 pulse: 'none'            # source pulse shape, see cst.signal.time_function
 tau: 0.03                # source characteristic time
 
-# Placeholders
-i1pml: [0, 0, 0]
-i2pml: [42, 42, 43]
-
 # Field I/O
 fieldio: [
     ['=', 'rho', [], 2670.0], # density

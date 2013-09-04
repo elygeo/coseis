@@ -6,7 +6,7 @@ DEBUG =
 PROFILE =
 REAL8 =
 
-# Default: # GNU Compiler Collection
+# Default: GNU Compiler Collection
 CC = gcc
 FC = gfortran 
 LD = gfortran

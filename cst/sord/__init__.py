@@ -429,8 +429,7 @@ def prepare_param(prm):
                 i2[i] = nn[i] - prm.npml + 1
             if i1[i] > i2[i]:
                 raise Exception('Error: model too small for PML')
-    prm.i1pml = i1
-    prm.i2pml = i2
+    prm.update({'i1pml': i1, 'i2pml': i2})
 
     # i/o sequence
     fieldio = []
