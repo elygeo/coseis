@@ -1,0 +1,7 @@
+#!/usr/bin/env python
+import json, yaml
+
+x = open('conf.yaml')
+x = yaml.load(x)
+x = json.dumps(x, indent=4, sort_keys=True)
+open('conf.json', 'w').write(x)

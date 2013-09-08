@@ -164,6 +164,12 @@ def prepare(job=None, **kwargs):
         'rundate': time.strftime('%Y-%m-%d'),
     })
 
+    # dependency
+    if job['depend']:
+        job['depend_flag'] = job['depend_flag'].format(depend=job['depend'])
+    else:
+        job['depend_flag'] = ''
+
     # notification
     if job['nproc'] > job['notify_threshold']:
         job['notify'] = job['notify'].format(email=job['email'])
@@ -244,11 +250,7 @@ def prepare(job=None, **kwargs):
     job['command'] = job['command'].format(**job)
     job['launch'] = job['launch'].format(**job)
     job['script'] = job['script'].format(**job)
-    if job['depend']:
-        job['submit'] = job['submit2'].format(**job)
-    else:
-        job['submit'] = job['submit'].format(**job)
-    del(job['submit2'])
+    job['submit'] = job['submit'].format(**job)
 
     return job
 

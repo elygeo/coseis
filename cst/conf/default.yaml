@@ -32,12 +32,12 @@ python: python
 f2py_flags: ''
 
 # job scheduler
-notify_threshold: 4096
-notify: -m abe
 launch: mpiexec -np {nproc} {command}
-submit: qsub {notify} {submit_flags} "{name}.sh"
-submit2: qsub {notify} -W depend="afterok:{depend}" {submit_flags} "{name}.sh"
+notify_flag: -m abe
+notify_threshold: 4096
+depend_flag: -W depend="afterok:{depend}"
 submit_flags: ''
+submit: qsub {notify_flag} {depend_flag} {submit_flags} "{name}.sh"
 submit_pattern: (?P<jobid>\d+\S*)\D*$
 
 # job script

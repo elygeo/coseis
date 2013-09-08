@@ -6,35 +6,23 @@ maxram: 16384
 # MPI
 ppn_range: [1, 2, 4, 8, 16, 32]
 nthread: 1
+
+# MPI + OpenMP
+ppn_range: [1]
+nthread: 32
+
+# job submission
+notify_flag: -M {email}
+depend_flag: --dependenices {depend}
+submit:
+    qsub --mode script
+    --env BG_SHAREDMEMSIZE=32MB:PAMID_VERBOSE=1:VPROF_PROFILE=yes
+    -O {name} -A {account} -n {nodes} -t {minutes}
+    {notify_flag} {depend_flag} {submit_flags} "{name}.sh"
 launch:
     runjob --verbose=INFO --block $COBALT_PARTNAME
     ${{COBALT_SHAPE:+--shape}} $COBALT_SHAPE
     ${{COBALT_CORNER:+--corner}} $COBALT_CORNER
     --envs BG_SHAREDMEMSIZE=32MB PAMID_VERBOSE=1 VPROF_PROFILE=yes
+        OMP_NUM_THREADS={nthread}
     -n {nproc} -p {ppn} --exe {command}\n
-
-# MPI + OpenMP
-ppn_range: [1]
-nthread: 32
-launch:
-    runjob --verbose=INFO --block $COBALT_PARTNAME
-    ${{COBALT_SHAPE:+--shape}} $COBALT_SHAPE
-    ${{COBALT_CORNER:+--corner}} $COBALT_CORNER
-    --envs
-        BG_SHAREDMEMSIZE=32MB PAMID_VERBOSE=1
-        VPROF_PROFILE=yes OMP_NUM_THREADS={nthread}
-    -n {nproc} -p {ppn} --exe {command}\n
-
-# job submission
-notify: -M {email}
-submit:
-    qsub --mode script
-    --env BG_SHAREDMEMSIZE=32MB:PAMID_VERBOSE=1:VPROF_PROFILE=yes
-    -O {name} -A {account} -n {nodes} -t {minutes}
-    {notify} {submit_flags} "{name}.sh"
-submit2:
-    qsub --mode script
-    --env BG_SHAREDMEMSIZE=32MB:PAMID_VERBOSE=1:VPROF_PROFILE=yes
-    -O {name} -A {account} -n {nodes} -t {minutes}
-    --dependenices {depend}
-    {notify} {submit_flags} "{name}.sh"

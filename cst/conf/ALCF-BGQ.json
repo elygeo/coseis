@@ -1,5 +1,6 @@
 {
     "account": "GroundMotion_esp", 
+    "depend_flag": "--dependenices {depend}", 
     "host_opts": {
         "cetus": {
             "maxnodes": 1024, 
@@ -17,11 +18,10 @@
     "launch": "runjob --verbose=INFO --block $COBALT_PARTNAME ${{COBALT_CORNER:+--corner}} $COBALT_CORNER ${{COBALT_SHAPE:+--shape}} $COBALT_SHAPE --envs BG_SHAREDMEMSIZE=32MB PAMID_VERBOSE=1 VPROF_PROFILE=yes OMP_NUM_THREADS={nthread}\\n -n {nproc} -p {ppn} --exe {command}", 
     "maxcores": 16, 
     "maxram": 16384, 
-    "notify": "-M {email}", 
+    "notify_flag": "-M {email}", 
     "nthread": 32, 
     "ppn_range": [
         1
     ], 
-    "submit": "qsub --mode script --env BG_SHAREDMEMSIZE=32MB:PAMID_VERBOSE=1:VPROF_PROFILE=yes -O {name} -A {account} -n {nodes} -t {minutes} {notify} {submit_flags} \"{name}.sh\"", 
-    "submit2": "qsub --mode script --env BG_SHAREDMEMSIZE=32MB:PAMID_VERBOSE=1:VPROF_PROFILE=yes -O {name} -A {account} -n {nodes} -t {minutes} --dependenices {depend} {notify} {submit_flags} \"{name}.sh\""
+    "submit": "qsub --mode script --env BG_SHAREDMEMSIZE=32MB:PAMID_VERBOSE=1:VPROF_PROFILE=yes -O {name} -A {account} -n {nodes} -t {minutes} {notify_flag} {depend_flag} {submit_flags} \"{name}.sh\""
 }

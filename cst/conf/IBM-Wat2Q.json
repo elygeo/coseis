@@ -1,13 +1,13 @@
 {
+    "depend_flag": "--dependenices {depend}", 
     "launch": "runjob --verbose=INFO --block $COBALT_PARTNAME ${{COBALT_SHAPE:+--shape}} $COBALT_SHAPE ${{COBALT_CORNER:+--corner}} $COBALT_CORNER --envs BG_SHAREDMEMSIZE=32MB PAMID_VERBOSE=1 VPROF_PROFILE=yes OMP_NUM_THREADS={nthread} -n {nproc} -p {ppn} --exe {command}\\n", 
     "maxcores": 16, 
     "maxnodes": 1024, 
     "maxram": 16384, 
-    "notify": "-M {email}", 
+    "notify_flag": "-M {email}", 
     "nthread": 32, 
     "ppn_range": [
         1
     ], 
-    "submit": "qsub --mode script --env BG_SHAREDMEMSIZE=32MB:PAMID_VERBOSE=1:VPROF_PROFILE=yes -O {name} -A {account} -n {nodes} -t {minutes} {notify} {submit_flags} \"{name}.sh\"", 
-    "submit2": "qsub --mode script --env BG_SHAREDMEMSIZE=32MB:PAMID_VERBOSE=1:VPROF_PROFILE=yes -O {name} -A {account} -n {nodes} -t {minutes} --dependenices {depend} {notify} {submit_flags} \"{name}.sh\""
+    "submit": "qsub --mode script --env BG_SHAREDMEMSIZE=32MB:PAMID_VERBOSE=1:VPROF_PROFILE=yes -O {name} -A {account} -n {nodes} -t {minutes} {notify_flag} {depend_flag} {submit_flags} \"{name}.sh\""
 }

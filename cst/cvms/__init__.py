@@ -52,7 +52,7 @@ def make(job=None, **kwargs):
     # configure
     if job == None:
         job = configure(options=[], **kwargs)
-    ver = 'cvms-' + job.version
+    ver = 'cvms-' + job['version']
     tar = download(ver)
 
     # build directory
