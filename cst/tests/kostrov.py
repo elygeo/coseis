@@ -8,36 +8,42 @@ def test(argv=[]):
     import numpy as np
     import cst
 
-    # parameters
-    prm = cst.sord.parameters()
-    prm.nproc3 = [1, 1, 2]
-    prm.delta = [100.0, 100.0, 100.0, 0.0075]
-    prm.shape = [51, 51, 24, 200]
-
-    # material properties
+    dtau = 10e6
     rho = 2670.0
     vp = 6000.0
     vs = 3464.0
-    prm.hourglass = [1.0, 1.0]
-    prm.fieldio = [
-        ['=', 'rho', [], rho],
-        ['=', 'vp',  [], vp],
-        ['=', 'vs',  [], vs],
-        ['=', 'gam', [], 1.0],
-    ]
 
-    # boundary conditions
-    prm.bc1 = [10, 10, 10]
-    prm.bc2 = [-1, 1, -2]
+    # parameters
+    prm = {
+        'argv': argv,
+        'run': 'exec',
+        'nproc3': [1, 1, 2],
+        'delta': [100.0, 100.0, 100.0, 0.0075],
+        'shape': [51, 51, 24, 200],
 
-    # rupture parameters
-    prm.faultnormal = 3
-    prm.ihypo = [-1, -1, -1.5]
-    prm.vrup = 0.9 * 3464.0
-    prm.rcrit = 1e9
-    prm.trelax = 0.0
-    dtau = 10e6
-    prm.fieldio += [
+        # material properties
+        'hourglass': [1.0, 1.0],
+        'fieldio': [
+            ['=', 'rho', [], rho],
+            ['=', 'vp',  [], vp],
+            ['=', 'vs',  [], vs],
+            ['=', 'gam', [], 1.0],
+        ],
+
+        # boundary conditions
+        'bc1': [10, 10, 10],
+        'bc2': [-1, 1, -2],
+
+        # rupture parameters
+        'faultnormal': 3,
+        'ihypo': [-1, -1, -1.5],
+        'vrup': 0.9 * 3464.0,
+        'rcrit': 1e9,
+        'trelax': 0.0,
+    }
+
+    # rupture fields
+    prm['fieldio'] += [
         ['=', 'mud', [], 1.0],
         ['=', 'mus', [], 1e9],
         ['=', 'dc',  [], 1e9],
@@ -45,8 +51,8 @@ def test(argv=[]):
         ['=', 'ts',  [], -90e6 - dtau],
     ]
 
-    # recievers
-    prm.fieldio += [
+    # receivers
+    prm['fieldio'] += [
         ['=w', 'svm', [ -1,-21,-1,-1], 'p20a.bin'],
         ['=w', 'svm', [-13,-17,-1,-1], 'p20b.bin'],
         ['=w', 'svm', [-17,-13,-1,-1], 'p20c.bin'],
@@ -55,22 +61,22 @@ def test(argv=[]):
 
     # analytical solution
     r = 2000.0
-    t = (prm.shape[-1] - 1.5) * prm.delta[-1] - r / prm.vrup
-    #v = cst.kostrov.slip_rate(rho, vp, vs, prm.vrup, dtau, r, t, 0.82)
-    v = cst.kostrov.slip_rate(rho, vp, vs, prm.vrup, dtau, r, t)
+    t = (prm['shape'][-1] - 1.5) * prm['delta'][-1] - r / prm['vrup']
+    #v = cst.kostrov.slip_rate(rho, vp, vs, prm['vrup'], dtau, r, t, 0.82)
+    v = cst.kostrov.slip_rate(rho, vp, vs, prm['vrup'], dtau, r, t)
 
     # run SORD
     cwd = os.getcwd()
     d = os.path.join(cwd, 'run', 'kostrov') + os.sep
     os.makedirs(d)
     os.chdir(d)
-    job = cst.sord.run(prm, run='exec', argv=argv)
+    cfg = cst.sord.run(prm)
     os.chdir(cwd)
 
     # compare with analytical solution
     for p in 'abcd':
         f = d + 'p20%s.bin' % p
-        dv = v - np.fromfile(f, job.dtype)[-1]
+        dv = v - np.fromfile(f, cfg['dtype'])[-1]
         err = dv / v
         print(v, err)
         assert abs(err) < 0.015

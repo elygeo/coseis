@@ -2,14 +2,16 @@
 module globals
 implicit none
 
-! input parameters, see parameters.py for documentation
-integer, dimension(3) :: nproc3, bc1, bc2, n1expand, n2expand
-integer :: shape_(4), itstats, itio, npml, ppml, oplevel, mpin, &
-    mpout, debug, faultopening, irup, faultnormal, nsource
-real :: delta(4), tm0, rho1, rho2, vp1, vp2, vs1, vs2, gam1, gam2, hourglass(2), &
-    vdamp, rexpand, affine(9), gridnoise, ihypo(3), vpml, slipvector(3)
-real :: tau, source1(3), source2(3), vrup, rcrit, trelax, svtol !, tmnucl, delts
-character(16) :: source, pulse
+! input parameters, see parameters.yaml for documentation
+integer :: &
+    bc1(3), bc2(3), debug, faultnormal, faultopening, i1pml(3), i2pml(3), itio, &
+    itstats, mpin, mpout, n1expand(3), n2expand(3), npml, nproc3(3), nsource, &
+    nthread, oplevel, ppml, shape_(4)
+real :: &
+    affine(9), delta(4), gam1, gam2, gridnoise, hourglass(2), ihypo(3), rcrit, &
+    rexpand, rho1, rho2, slipvector(3), source1(3), source2(3), svtol, tau, tm0, &
+    trelax, vdamp, vp1, vp2, vpml, vrup, vs1, vs2 ! tmnucl, delts
+character(16) :: pulse, source
 
 ! miscellaneous parameters
 real :: &
@@ -20,6 +22,7 @@ integer :: &
     it = 0,         & ! current time step
     nt,             & ! number of time steps
     ifn,            & ! fault normal component=abs(faultnormal)
+    irup,           & ! flag for rupture on this process
     ip                ! process rank
 integer, dimension(3) :: &
     nn,             & ! shape of global mesh
@@ -29,7 +32,6 @@ integer, dimension(3) :: &
     ip3,            & ! 3d process rank
     ip3hypo,        & ! hypocenter 3d rank
     i1bc, i2bc,     & ! model boundary
-    i1pml, i2pml,   & ! pml boundary
     i1core, i2core, & ! core region
     i1node, i2node, & ! node region
     i1cell, i2cell, & ! cell region

@@ -47,6 +47,6 @@
             }
         ]
     ], 
-    "script": "#!/bin/sh\n# @ account_no = {account}\n# @ class = {queue}\n# @ job_name = {name}\n# @ bg_size = {nodes}\n# @ wall_clock_limit = {walltime}\n# @ error = {name}.err\n# @ output = {name}.out\n# @ notify_user = {email}\n# @ notification = never\n# @ job_type = bluegene\n# @ environment = COPY_ALL\n# @ queue\n\ncd \"{rundir}\"\nenv >> \"{name}.env\"\necho \"$( date ): {name} started\" >> \"{name}.out\"\n{pre}\n{launch}\n{post}\necho \"$( date ): {name} finished\" >> \"{name}.out\"\n", 
+    "script": "#!/bin/sh\n# @ account_no = {account}\n# @ class = {queue}\n# @ job_name = {name}\n# @ bg_size = {nodes}\n# @ wall_clock_limit = {walltime}\n# @ error = {name}.err\n# @ output = {name}.out\n# @ notify_user = {email}\n# @ notification = never\n# @ job_type = bluegene\n# @ environment = COPY_ALL\n# @ queue\ncd \"{rundir}\"\nenv > \"{name}.env\"\ndate\n{pre}\n{launch}\n{post}\ndate\n", 
     "submit": "llsubmit {submit_flags} \"{name}.sh\""
 }

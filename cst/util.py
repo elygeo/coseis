@@ -61,11 +61,11 @@ class storage(dict):
                 raise TypeError(key, v, val)
         dict.__setitem__(self, key, val)
         return
-    def __setattr__(self, key, val):
-        self[key] = val
-        return
-    def __getattr__(self, key):
-        return self[key]
+    #def __setattr__(self, key, val):
+    #    self[key] = val
+    #    return
+    #def __getattr__(self, key):
+    #    return self[key]
 
 
 def load(fh):
@@ -148,7 +148,7 @@ def prepare(job=None, **kwargs):
     """
     Compute and display resource usage
     """
-    import os, time
+    import time
 
     # prepare job
     if job is None:
@@ -160,7 +160,6 @@ def prepare(job=None, **kwargs):
     # misc
     job.update({
         'jobid': '',
-        'rundir': os.getcwd(),
         'rundate': time.strftime('%Y-%m-%d'),
     })
 
@@ -172,9 +171,9 @@ def prepare(job=None, **kwargs):
 
     # notification
     if job['nproc'] > job['notify_threshold']:
-        job['notify'] = job['notify'].format(email=job['email'])
+        job['notify_flag'] = job['notify_flag'].format(email=job['email'])
     else:
-        job['notify'] = ''
+        job['notify_flag'] = ''
 
     # queue options
     opts = job['queue_opts']
@@ -268,6 +267,10 @@ def stage(job=None, **kwargs):
         for k in kwargs:
             job[k] = kwargs[k]
 
+    # run directory
+    cwd = os.getcwd()
+    os.chdir(job['rundir'])
+
     # write configuration
     f = job['name'] + '.conf.json'
     if os.path.exists(f):
@@ -281,6 +284,7 @@ def stage(job=None, **kwargs):
         open(g, 'w').write(job['script'])
         os.chmod(g, 0755)
 
+    os.chdir(cwd)
     return job
 
 
@@ -288,7 +292,7 @@ def launch(job=None, **kwargs):
     """
     Launch or submit job.
     """
-    import re, shlex, subprocess, json
+    import os, re, shlex, subprocess, json
 
     # prepare job
     if job is None:
@@ -300,6 +304,10 @@ def launch(job=None, **kwargs):
     # launch command
     if not job['run']:
         return job
+
+    # run directory
+    cwd = os.getcwd()
+    os.chdir(job['rundir'])
 
     # launch
     if job['run'] == 'submit':
@@ -327,5 +335,6 @@ def launch(job=None, **kwargs):
                 elif c:
                     subprocess.check_call(shlex.split(c))
 
+    os.chdir(cwd)
     return job
 

@@ -29,11 +29,10 @@ script: |
     # @ job_type = bluegene
     # @ environment = COPY_ALL
     # @ queue
-
     cd "{rundir}"
-    env >> "{name}.env"
-    echo "$( date ): {name} started" >> "{name}.out"
+    env > "{name}.env"
+    date
     {pre}
     {launch}
     {post}
-    echo "$( date ): {name} finished" >> "{name}.out"
+    date

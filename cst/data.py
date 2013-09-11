@@ -126,8 +126,8 @@ def etopo1(downsample=1):
     """
     import os, urllib, zipfile, cStringIO
     import numpy as np
-    filename0 = os.path.join(repo, 'dem0060.npy')
-    filename  = os.path.join(repo, 'dem%04d.npy' % (60 * downsample))
+    filename0 = os.path.join(repo, 'DEM0060.npy')
+    filename  = os.path.join(repo, 'DEM%04d.npy' % (60 * downsample))
     url = 'http://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/binary/etopo1_ice_g_i2.zip'
     shape = 10801, 21601
     if not os.path.exists(filename0):
@@ -170,7 +170,7 @@ def globe30(tile=(0, 1), fill=True):
     """
     import os, urllib, gzip, cStringIO
     import numpy as np
-    filename = os.path.join(repo, 'dem0030-%s%s.npy' % tile)
+    filename = os.path.join(repo, 'DEM0030-%s%s.npy' % tile)
     url = 'http://www.ngdc.noaa.gov/mgg/topo/DATATILES/elev/%s10g.gz'
     tiles = ('im', 'jn', 'ko', 'lp'), ('ae', 'bf', 'cg', 'dh')
     shape = 10800, 10800
@@ -296,7 +296,7 @@ def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):
     import os, math, gzip, urllib, cStringIO
     import numpy as np
     from . import interp
-    f = os.path.join(repo, 'vs30-wald-%s.npy') % region.lower().replace('_', '-')
+    f = os.path.join(repo, 'Vs30-Wald-%s.npy') % region.replace('_', '-')
     u = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/%s.grd.gz'
     if not os.path.exists(f):
         u = u % region
@@ -369,7 +369,7 @@ def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0
 
     url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhs/version2.2.0/gshhs+wdbii_2.2.0.zip'
     url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhg/latest/gshhg-bin-2.2.2.zip'
-    d = os.path.join(repo, 'gshhs')
+    d = os.path.join(repo, 'GSHHS')
     if not os.path.exists(d):
         print('Retrieving %s' % url)
         data = urllib.urlopen(url)
@@ -379,7 +379,7 @@ def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0
         return
     name = {'c': 'GSHHS coastlines', 'r': 'WDB rivers', 'b': 'WDB borders'}[kind[0]]
     kind = {'c': 'gshhs', 'r': 'wdb_rivers', 'b': 'wdb_borders'}[kind[0]]
-    filename = os.path.join(repo, 'gshhs/%s_%s.b' % (kind, resolution[0]))
+    filename = os.path.join(repo, 'GSHHS/%s_%s.b' % (kind, resolution[0]))
     data = np.fromfile(filename, '>i')
     if kind != 'gshhs':
         min_area = 0.0
@@ -435,7 +435,7 @@ def us_place_names():
     """
     import os, urllib, zipfile, cStringIO
     import numpy as np
-    filename = os.path.join(repo, 'us-place-names.npy')
+    filename = os.path.join(repo, 'US-Place-Names.npy')
     url = 'http://geonames.usgs.gov/docs/stategaz/US_CONCISE.zip'
     cols = 1, 2, 3, 5, 9, 10, 15
     dtype = [
@@ -467,7 +467,7 @@ def engdahl_cat():
     """
     import os, urllib
     import numpy as np
-    filename = os.path.join(repo, 'engdahl-centennial-cat.npy')
+    filename = os.path.join(repo, 'Engdahl-Centennial-Cat.npy')
     url = 'http://earthquake.usgs.gov/research/data/centennial_Y2K.CAT'
     d = [
         6, ('icat',   'S6'),
@@ -504,7 +504,7 @@ def lsh_cat():
     """
     import os, urllib
     import numpy as np
-    filename = os.path.join(repo, 'lsh-catalog.npy')
+    filename = os.path.join(repo, 'LSH-Catalog.npy')
     url="http://www.rsmas.miami.edu/personal/glin/LSH_files/LSH_1.12"
     dtype = [
         ('year',    'u2'),
@@ -563,7 +563,7 @@ def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
 
     # locations
     v0, v1 = version
-    path = os.path.join(repo, 'cybershake') + os.sep
+    path = os.path.join(repo, 'CyberShake') + os.sep
     host = 'intensity.usc.edu'
     erf = '/home/scec-00/cybershk/reports/'
     srf = '/home/rcf-104/CyberShake2007/ruptures/RuptureVariations_35_V%d_%d/%d/%d/%d_%d.txt'

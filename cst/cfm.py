@@ -19,10 +19,10 @@ def catalog(version='CFM4-socal-primary'):
     from . import gocad
 
     url = 'http://structure.harvard.edu/cfm/download/vdo/SCEC_VDO.jar'
-    path = os.path.join(repo, 'cfm4', version) + os.sep
+    path = os.path.join(repo, 'CFM4', version) + os.sep
 
     if not os.path.exists(path):
-        f = os.path.join(repo, 'scec-vdo.jar')
+        f = os.path.join(repo, 'SCEC-VDO.jar')
         if not os.path.exists(f):
             print('Downloading %s' % url)
             urllib.urlretrieve(url, f)
@@ -117,7 +117,7 @@ def read(fault, version='CFM4-socal-primary'):
     """
     import os
     import numpy as np
-    path = os.path.join(repo, 'cfm4', version) + os.sep
+    path = os.path.join(repo, 'CFM4', version) + os.sep
     f, i = (fault + ':').split(':')[:2]
     d = np.load(path + f + '.npz')
     x = d['vtx']
@@ -533,7 +533,7 @@ def explore(prefix, faults):
     fig.scene.disable_render = True
 
     # DEM
-    f = os.path.join(repo, 'cfm4', 'dem.npy')
+    f = os.path.join(repo, 'CFM4', 'dem.npy')
     if os.path.exists(f):
         x, y, z = np.load(f)
     else:
@@ -544,7 +544,7 @@ def explore(prefix, faults):
     mlab.mesh(x, y, z, color=(1,1,1), opacity=0.3)
 
     # base map
-    f = os.path.join(repo, 'cfm4', 'mapdata.npy')
+    f = os.path.join(repo, 'CFM4', 'mapdata.npy')
     if os.path.exists(f):
         x, y, z = np.load(f)
     else:

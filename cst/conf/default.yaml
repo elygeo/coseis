@@ -14,6 +14,7 @@ nthread: 0
 nstripe: -2
 minutes: 0
 pmem: 0
+rundir: '.'
 iodir: ''
 argv: []
 
@@ -44,9 +45,9 @@ submit_pattern: (?P<jobid>\d+\S*)\D*$
 script: |
     #!/bin/sh
     cd "${rundir}"
-    env >> "{name}.env"
-    echo "$( date ): {name} started" >> "{name}.out"
-    {pre} >> "{name}.out"
-    {launch} >> "{name}.out"
-    {post} >> "{name}.out"
-    echo "$( date ): {name} finished" >> "{name}.out"
+    env > "{name}.env"
+    date
+    {pre}
+    {launch}
+    {post}
+    date

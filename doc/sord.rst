@@ -70,32 +70,35 @@ Run a simple point source explosion test and plot a 2D slice of particle
 velocity::
 
     cd scripts/sord
-    python sim.py -i
+    sord sim.yaml --run=exec
     python plot.py
 
 Plotting requires Matplotlib, and the result should look like this:
 
     .. image:: ../scripts/sord/example.png
 
+
+Running SORD
+------------
+
+The simplest way to run SORD is to execute the ``sord`` command giving a
+parameter text file in YAML format. See for example the above example `sim.yaml
+<../scripts/sord/sim.yaml>`__:
+
+.. include:: ../scripts/sord/sim.yaml
+   :literal:
+
+A complete list of possible SORD parameters and default values are specified in
+`parameters.yaml <../cst/sord/parameters.yaml>`__.
+
 Scripting with Python
 ---------------------
 
-For a simple example consider the above test,
-`sim.py <../scripts/sord/sim.py>`__:
+A more powerful method of running the code is write a Python script. The
+procedure is to import the ``cst`` module and pass a dictionary of parameters
+to ``cst.sord.run()``.
 
-.. include:: ../scripts/sord/sim.py
-   :literal:
-
-The first thing to do is import the ``cst`` module and instantiate a parameter
-object from ``cst.sord.parameters()``.  The parameter object contains all of
-the simulation settings and then passed to ``cst.sord.run()``.  A complete list
-of possible SORD parameters and default values are specified in `parameters.yaml
-<../cst/sord/parameters.yaml>`__.
-
-Running jobs
-------------
-
-The ``cst.sord.run()`` function does four tasks: (1) configure job parameters
+the ``cst.sord.run()`` function does four tasks: (1) configure job parameters
 (2) compile the source code if necessary (3) populate the run directory with
 necessary executable, input, and metadata files, and (4) launch the job
 interactively or through a batch processing system.  By default, step (4) is
@@ -236,7 +239,7 @@ the j, k, or l logical mesh directions. Any other value (typically 0) disables
 rupture altogether. The location of the rupture plane with in the mesh is
 determined by the ``ihypo`` parameter, which has a dual purpose of also
 defining the nucleation point. So, the indices of the collocated fault double
-nodes are given by ``int(ihypo(faultnormal))``, and ``int(ihypo(faultnormal)) +
+nodes are given by ``int(ihypo[faultnormal])``, and ``int(ihypo[faultnormal]) +
 1``. For example, a 3D problem of dimensions 200.0 x 200.0 x 200.0, with a
 fault plane located at z = 100.0, and double nodes at l = (21, 22), may be set
 up as such::

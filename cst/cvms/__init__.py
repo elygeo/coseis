@@ -21,7 +21,7 @@ def configure(**kwargs):
     f = os.path.dirname(__file__)
     f = os.path.join(f, 'conf.json')
     job.update(json.load(open(f)))
-    for k, d in job['host_opts']:
+    for k, d in job['machine_opts'].items():
         if k in job['machine']:
             for k, v in d.items():
                 job[k] = v
@@ -52,7 +52,7 @@ def make(job=None, **kwargs):
     # configure
     if job == None:
         job = configure(options=[], **kwargs)
-    ver = 'cvms-' + job['version']
+    ver = 'CVMS-' + job['version']
     tar = download(ver)
 
     # build directory

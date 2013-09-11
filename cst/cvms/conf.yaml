@@ -16,7 +16,7 @@ nthread: 1
 minutes: 60
 
 # host specific configuration
-host_opts:
+machine_opts:
     alcf_bgp:
         ppn_range: [1, 2, 4]
         launch: cobalt-mpirun -mode vn -verbose 2 -np {nproc} {command}

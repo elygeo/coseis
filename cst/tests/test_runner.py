@@ -16,6 +16,7 @@ cst.util.launch(
     launch = "{python} ./test_suite.py",
     nproc = 6,
     minutes = 30,
+    run = 'exec',
 )
 os.chdir(cwd)
 

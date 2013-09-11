@@ -29,6 +29,6 @@ launch:
     ${{COBALT_CORNER:+--corner}} $COBALT_CORNER
     ${{COBALT_SHAPE:+--shape}} $COBALT_SHAPE
     --envs BG_SHAREDMEMSIZE=32MB PAMID_VERBOSE=1 VPROF_PROFILE=yes
-        OMP_NUM_THREADS={nthread}\n
-    -n {nproc} -p {ppn} --exe {command}
+        OMP_NUM_THREADS={nthread}
+    -n {nproc} -p {ppn} --exe {command}\n
 

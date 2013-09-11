@@ -27,15 +27,12 @@ script: |
     #PBS -e {name}.err
     #PBS -o {name}.out
     #PBS -m n
-
     cd "$PBS_O_WORKDIR"
-    env >> "{name}.env"
-
+    env > "{name}.env"
     lfs setstripe -c 1 .
     [ {nstripe} -ge -1 -a -d {iodir} ] && lfs setstripe -c {nstripe} {iodir}
-
-    echo "$( date ): {name} started" >> "{name}.out"
+    date
     {pre}
     {launch}
     {post}
-    echo "$( date ): {name} finished" >> "{name}.out"
+    date

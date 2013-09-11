@@ -15,23 +15,23 @@ voxet3d = {
     'lab':    ('CVM_HR', True),
 }
 
-def vs30_model(x, y, version='wills+wald', method='nearest'):
+def vs30_model(x, y, version='Wills+Wald', method='nearest'):
     import os, urllib, gzip, cStringIO
     import numpy as np
     from . import data, interp
-    if version not in ['wills', 'wald', 'wills+wald']:
+    if version not in ['Wills', 'Wald', 'Wills+Wald']:
         raise Exception()
-    if 'wald' in version:
+    if 'Wald' in version:
         z = data.vs30_wald(x, y, method=method)
     else:
         z = np.empty_like(x)
         z.fill(float('nan'))
-    if 'wills' in version:
+    if 'Wills' in version:
         delta = 0.000439344930055
         x0 = -121.12460921883338
         y0 = 32.53426695497164
-        u = 'http://earth.usc.edu/~gely/cvm-data/vs30-wills-cvmh.npy.gz'
-        f = os.path.join(repo, 'vs30-wills-cvmh.npy')
+        u = 'http://earth.usc.edu/~gely/cvm-data/Vs30-Wills-CVMH.npy.gz'
+        f = os.path.join(repo, 'Vs30-Wills-CVMH.npy')
         if not os.path.exists(f):
             print('Downloading %s' % u)
             d = urllib.urlopen(u)
@@ -100,7 +100,7 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version='11.9.0'):
     import os, urllib, tarfile
     from . import gocad
 
-    path = os.path.join(repo, 'cvmh-%s' % version)
+    path = os.path.join(repo, 'CVMH-%s' % version)
     if version[:2] == 'vx':
         url = 'http://structure.harvard.edu/cvm-h/download/%s.tar.bz2' % version
         base = '%s/bin' % version
@@ -247,7 +247,7 @@ class Extraction():
     ---------------
     x, y: Coordinates arrays
     vm: 'vp', 'vs', 'tag', or Model object.
-    vs30: 'wills', 'wald', 'wills+wald', None, or Model object.
+    vs30: 'Wills', 'Wald', 'Wills+Wald', None, or Model object.
     topo: 'topo' or Model object.
     interpolation: 'nearest', or 'linear'.
     geographic: X Y coordinate type, True for geographic, False for UTM.
@@ -265,7 +265,7 @@ class Extraction():
     out: Property samples at coordinates (x, y, z)
     """
 
-    def __init__(self, x, y, vm, vs30='wills+wald', topo='topo',
+    def __init__(self, x, y, vm, vs30='Wills+Wald', topo='topo',
         interpolation='nearest', geographic=True, **kwargs):
         import numpy as np
         x = np.asarray(x)

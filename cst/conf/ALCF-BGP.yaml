@@ -25,7 +25,7 @@ ppn_range: [1]
 nthread: 4
 launch:
     cobalt-mpirun -mode smp -verbose 2 -np {nproc}
-        -env OMP_NUM_THREADS={nthread} {command}
+    -env OMP_NUM_THREADS={nthread} {command}
 
 # job submission
 notify_flag: -M {email}

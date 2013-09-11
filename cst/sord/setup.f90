@@ -73,24 +73,20 @@ end if
 ! debugging
 sync = debug > 1
 if (debug > 2) then
-    write (filename, "(a,i6.6,a)") 'debug/db', ip, '.py'
+    write (filename, "(a,i6.6,a)") 'debug/db', ip, '.json'
     open (1, file=filename, status='replace')
-    write (1, "('ifn     = ', i8)") ifn
-    write (1, "('irup    = ', i8)") irup
-    write (1, "('ip      = ', i8)") ip
-    write (1, "('nproc3  = ', i8, 2(',', i8))") nproc3
-    write (1, "('ip3     = ', i8, 2(',', i8))") ip3
-    write (1, "('nn      = ', i8, 2(',', i8))") nn
-    write (1, "('nm      = ', i8, 2(',', i8))") nm
-    write (1, "('bc1     = ', i8, 2(',', i8))") bc1
-    write (1, "('bc2     = ', i8, 2(',', i8))") bc2
-    write (1, "('nhalo   = ', i8, 2(',', i8))") nhalo
-    write (1, "('nnoff   = ', i8, 2(',', i8))") nnoff
-    write (1, "('i1bc    = ', i8, 2(',', i8), '; i2bc   = ', i8, 2(',', i8))") i1bc, i2bc
-    write (1, "('i1pml   = ', i8, 2(',', i8), '; i2pml  = ', i8, 2(',', i8))") i1pml, i2pml
-    write (1, "('i1core  = ', i8, 2(',', i8), '; i2core = ', i8, 2(',', i8))") i1core, i2core
-    write (1, "('i1node  = ', i8, 2(',', i8), '; i2node = ', i8, 2(',', i8))") i1node, i2node
-    write (1, "('i1cell  = ', i8, 2(',', i8), '; i2cell = ', i8, 2(',', i8))") i1cell, i2cell
+    write (1, '(a)') '{'
+    write (1, "(a, i8, ',')") &
+        '"ifn":    ', ifn,    '"irup":   ', irup,   '"ip":     ', ip
+    write (1, "(a, '[', i8, ',', i8, ',', i8, '],')") &
+        '"bc1":    ', bc1,    '"bc2":    ', bc2,    '"ip3":    ', ip3, &
+        '"nhalo":  ', nhalo,  '"nm":     ', nm,     '"nn":     ', nn, &
+        '"nnoff":  ', nnoff,  '"nproc3": ', nproc3, &
+        '"i1bc":   ', i1bc,   '"i1cell": ', i1cell, '"i1core": ', i1core, &
+        '"i1node": ', i1node, '"i1pml":  ', i1pml, &
+        '"i2bc":   ', i2bc,   '"i2cell": ', i2cell, '"i2core": ', i2core, &
+        '"i2node": ', i2node, '"i2pml":  ', i2pml
+    write (1, '(a)') '}'
     close (1)
 end if
 
