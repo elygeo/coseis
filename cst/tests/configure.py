@@ -22,9 +22,9 @@ def test(argv=[]):
         machine = os.path.splitext(f)[0]
         job = cst.util.prepare(
             machine = machine,
-            argv = argv,
             command = 'COMMAND',
             verbose = 0,
+            argv = argv,
         )
         if job['verbose']:
             print(80 * '-')

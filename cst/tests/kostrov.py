@@ -25,7 +25,7 @@ def test(argv=[]):
         ['=', 'vp',  [], vp],
         ['=', 'vs',  [], vs],
         ['=', 'gam', [], 1.0],
-    ],
+    ]
 
     # boundary conditions
     prm['bc1'] = [10, 10, 10]
@@ -35,7 +35,7 @@ def test(argv=[]):
     dtau = 10e6
     prm['faultnormal'] = 3
     prm['ihypo'] = [-1, -1, -1.5]
-    prm['vrup'] = 0.9 * 3464.0
+    prm['vrup'] = 0.9 * vs
     prm['rcrit'] = 1e9
     prm['trelax'] = 0.0
     prm['fieldio'] += [

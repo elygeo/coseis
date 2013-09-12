@@ -70,7 +70,8 @@ Run a simple point source explosion test and plot a 2D slice of particle
 velocity::
 
     cd scripts/sord
-    sord sim.yaml --run=exec
+    mkdir run
+    sord sim.yaml
     python plot.py
 
 Plotting requires Matplotlib, and the result should look like this:

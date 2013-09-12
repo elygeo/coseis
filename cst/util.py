@@ -137,7 +137,7 @@ def configure(**kwargs):
         if not i.startswith('--'):
             raise Exception('Bad argument ' + i)
         k, v = i[2:].split('=')
-        if not v[0].isalpha():
+        if len(v) and not v[0].isalpha():
             v = json.loads(v)
         job[k] = v
 
@@ -323,7 +323,7 @@ def launch(job=None, **kwargs):
         f = job['name'] + '.conf.json'
         f = open(f, 'w')
         json.dump(job, f, indent=4, sort_keys=True)
-    else:
+    elif job['run'] == 'exec':
         f = job['name'] + '.conf.json'
         f = open(f, 'w')
         json.dump(job, f, indent=4, sort_keys=True)
@@ -334,6 +334,8 @@ def launch(job=None, **kwargs):
                     subprocess.check_call(c, shell=True)
                 elif c:
                     subprocess.check_call(shlex.split(c))
+    else:
+        raise Exception("'run' must be 'exec' or 'submit'")
 
     os.chdir(cwd)
     return job

@@ -272,28 +272,52 @@ def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
     >>> expand_slices(shape, [])
     [[0, 8, 1], [0, 8, 1], [0, 8, 1], [0, 8, 1]]
 
-    >>> expand_slices(shape, [0.4, 0.6, -0.6, -0.4])
+    >>> expand_slices(shape, [0.4,0.6,-0.6,-0.4])
     [[0, 1, 1], [1, 2, 1], [7, 8, 1], [8, 9, 1]]
 
-    >>> expand_slices(shape, s_[0.4, 0.6, -0.6:-0.4:2, :])
+    >>> expand_slices(shape, s_[0.4,0.6,-0.6:-0.4:2,:])
     [[0, 1, 1], [1, 2, 1], [7, 8, 2], [0, 8, 1]]
 
-    >>> expand_slices(shape, s_[0.9, 1.1, -1.1:-0.9:2, :], base=0.5)
+    >>> expand_slices(shape, s_[0.9,1.1,-1.1:-0.9:2,:], base=0.5)
     [[0, 1, 1], [1, 2, 1], [6, 7, 2], [0, 7, 1]]
 
-    >>> expand_slices(shape, s_[1.4, 1.6, -1.6:-1.4:2, :], base=1)
+    >>> expand_slices(shape, s_[1.4,1.6,-1.6:-1.4:2,:], base=1)
     [[1, 1, 1], [2, 2, 1], [7, 8, 2], [1, 8, 1]]
 
-    >>> expand_slices(shape, s_[1.9, 2.1, -2.1:-1.9:2, :], base=1.5)
+    >>> expand_slices(shape, s_[1.9,2.1,-2.1:-1.9:2,:], base=1.5)
     [[1, 1, 1], [2, 2, 1], [6, 7, 2], [1, 7, 1]]
 
-    >>> expand_slices(shape, [0, 1, 2, ()], base=0, new_base=1)
+    >>> expand_slices(shape, [0,1,2,[]], base=0, new_base=1)
+    [[1, 1, 1], [2, 2, 1], [3, 3, 1], [1, 8, 1]]
+
+    >>> expand_slices(shape, '')
+    [[0, 8, 1], [0, 8, 1], [0, 8, 1], [0, 8, 1]]
+
+    >>> expand_slices(shape, '0.4,0.6,-0.6,-0.4')
+    [[0, 1, 1], [1, 2, 1], [7, 8, 1], [8, 9, 1]]
+
+    >>> expand_slices(shape, '0.4,0.6,-0.6:-0.4:2,:')
+    [[0, 1, 1], [1, 2, 1], [7, 8, 2], [0, 8, 1]]
+
+    >>> expand_slices(shape, '0.9,1.1,-1.1:-0.9:2,:', base=0.5)
+    [[0, 1, 1], [1, 2, 1], [6, 7, 2], [0, 7, 1]]
+
+    >>> expand_slices(shape, '1.4,1.6,-1.6:-1.4:2,:', base=1)
+    [[1, 1, 1], [2, 2, 1], [7, 8, 2], [1, 8, 1]]
+
+    >>> expand_slices(shape, '1.9,2.1,-2.1:-1.9:2,:', base=1.5)
+    [[1, 1, 1], [2, 2, 1], [6, 7, 2], [1, 7, 1]]
+
+    >>> expand_slices(shape, '0,1,2,:', base=0, new_base=1)
     [[1, 1, 1], [2, 2, 1], [3, 3, 1], [1, 8, 1]]
     """
 
     # normalize type
     n = len(shape)
-    slices = list(slices)
+    if isinstance(slices, basestring):
+        slices = slices.split(',')
+    else:
+        slices = list(slices)
     if len(slices) == 0:
         slices = n * [[]]
     elif len(slices) != n:
@@ -309,6 +333,16 @@ def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
         # convert to list
         if type(s) == slice:
             s = [s.start, s.stop, s.step]
+        if isinstance(s, basestring):
+            s_ = []
+            for i in s.split(':'):
+                if i == '':
+                    s_.append(None)
+                elif '.' in s:
+                    s_.append(float(i))
+                else:
+                    s_.append(int(i))
+            s = s_
         elif type(s) not in (tuple, list):
             s = [s]
 

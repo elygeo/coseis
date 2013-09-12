@@ -1,31 +1,17 @@
 #!/usr/bin/env python
 
 def test():
-    import os, doctest
+    import os
     import cst.tests
 
     passed = []
     failed = []
 
-    # doc tests
-    for m in [
-        cst.util,
-        cst.coord,
-        cst.sord,
-    ]:
-        c = 'doctest.testmod(%s)' % m.__name__
-        print('-' * 80)
-        print('>>> ' + c)
-        f, t = doctest.testmod(m)
-        if f:
-            failed.append('FAILED: ' + c)
-        elif t:
-            passed.append('PASSED: ' + c)
-
     # unit tests
     path = os.path.dirname(cst.tests.__file__)
     for m in [
         cst.tests.syntax,
+        cst.tests.doctests,
         cst.tests.configure,
         cst.tests.hello,
         cst.tests.point_source,
