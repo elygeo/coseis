@@ -269,6 +269,7 @@ def stage(job=None, **kwargs):
 
     # run directory
     cwd = os.getcwd()
+    print 11111, cwd
     os.chdir(job['rundir'])
 
     # write configuration

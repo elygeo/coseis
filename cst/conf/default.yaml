@@ -3,7 +3,7 @@ name: job
 verbose: 1
 account: ''
 email: ''
-run: ''
+run: 'exec'
 queue: ''
 depend: ''
 command: ''
@@ -14,7 +14,7 @@ nthread: 0
 nstripe: -2
 minutes: 0
 pmem: 0
-rundir: '.'
+rundir: 'run'
 iodir: ''
 argv: []
 

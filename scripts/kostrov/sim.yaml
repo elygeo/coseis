@@ -1,5 +1,7 @@
 # Kostrov circular crack test.
 
+rundir: run
+
 # dimensions
 nproc3: [1, 1, 2]
 delta: [100.0, 100.0, 100.0, 0.0075]

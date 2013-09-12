@@ -22,7 +22,6 @@ def test(argv=[]):
         machine = os.path.splitext(f)[0]
         job = cst.util.prepare(
             machine = machine,
-            run = 'exec',
             argv = argv,
             command = 'COMMAND',
             verbose = 0,

@@ -27,7 +27,6 @@ def test(argv=[]):
     shutil.copy2(path + 'hello.c.x', d)
     os.chdir(d)
     cst.util.launch(
-        run = 'exec',
         argv = argv,
         command = './hello.c.x',
         nthread = 2,
@@ -43,7 +42,6 @@ def test(argv=[]):
     shutil.copy2(path + 'hello.f.x', d)
     os.chdir(d)
     cst.util.launch(
-        run = 'exec',
         argv = argv,
         command = './hello.f.x',
         nthread = 2,

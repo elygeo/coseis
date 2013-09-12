@@ -1,5 +1,6 @@
-run/sord.x : sim.py
+run/sord.x : sim.yaml
 	mkdir run
-	cd run
-	sord ../sim.yaml --run=exec
+	sord sim.yaml
 
+clean:
+	rm -rf run

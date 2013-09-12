@@ -12,7 +12,6 @@ def test(argv=[]):
     # parameters
     prm = {
         'argv': argv,
-        'run': 'exec',
         'itstats': 1,
         'shape': [21, 21, 21, 11],
         'delta': [100.0, 100.0, 100.0, 0.0075],

@@ -1,9 +1,9 @@
 run/example.png : run
 	python plot.py
 
-run : sim.py
+run : sim.yaml
 	mkdir run
-	sord sim.yaml --run=exec
+	sord sim.yaml
 
 clean:
-	rm -rf test/*
+	rm -rf run

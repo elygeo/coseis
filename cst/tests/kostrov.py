@@ -16,7 +16,6 @@ def test(argv=[]):
     # parameters
     prm = {
         'argv': argv,
-        'run': 'exec',
         'nproc3': [1, 1, 2],
         'delta': [100.0, 100.0, 100.0, 0.0075],
         'shape': [51, 51, 24, 200],
