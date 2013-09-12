@@ -191,10 +191,9 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         f = os.path.joing(cwd, 'cook.py')
         shutil.copy2(f, path)
         cst.util.launch(
-            depend = job.jobid,
-            run = job['run'],
             name = 'cook',
             command = '{python} cook.py',
+            depend = job.jobid,
             minutes = m,
         )
 

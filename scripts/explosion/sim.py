@@ -76,11 +76,9 @@ for source, s in sources:
     if 1:
         prm['nsource'] = 0
         prm['pulse'] = 'integral_brune'
-        p = os.path.join('run', 'point-' + source)
+        prm['rundir'] = p = os.path.join('run', 'point-' + source)
         os.makedirs(p)
-        os.chdir(p)
         cst.sord.run(prm)
-        os.chdir(cwd)
 
     # finite source
     if 0:

@@ -8,35 +8,37 @@ def test(argv=[]):
     import numpy as np
     import cst
 
-    # parameters
-    prm = {
-        'argv': argv,
-        #'nproc3': [2, 1, 1],
-        'nproc3': [1, 1, 1],
-        'debug': 0,
-        'itstats': 1,
-        'shape': [5, 4, 2, 2],
-        'delta': [100.0, 100.0, 100.0, 0.0075],
-        'bc1': [0, 0, 0],
-        'bc2': [0, 0, 0],
+    prm = {}
+    prm['argv'] = argv
+    prm['debug'] = 0
+    prm['itstats'] = 1
 
-        # source
-        'source': 'potency',
-        'ihypo': [1.5, 1.5, 1.5],
-        'ihypo': [3.0, 1.5, 1.5],
-        'source1': [1e10, 1e10, 1e10],
-        'source2': [0.0,  0.0,  0.0],
-        'pulse': 'delta',
+    # dimensions
+    prm['nproc3'] = [2, 1, 1]
+    prm['nproc3'] = [1, 1, 1]
+    prm['shape'] = [5, 4, 2, 2]
+    prm['delta'] = [100.0, 100.0, 100.0, 0.0075]
 
-        # material
-        'hourglass': [1.0, 1.0],
-        'fieldio': [
-            ['=', 'rho', [], 2670.0],
-            ['=', 'vp',  [], 6000.0],
-            ['=', 'vs',  [], 3464.0],
-            ['=', 'gam', [], 0.3],
-        ],
-    }
+    # boundary conditions
+    prm['bc1'] = [0, 0, 0]
+    prm['bc2'] = [0, 0, 0]
+
+    # source
+    prm['source'] = 'potency'
+    prm['ihypo'] = [1.5, 1.5, 1.5]
+    prm['ihypo'] = [3.0, 1.5, 1.5]
+    prm['source1'] = [1e10, 1e10, 1e10]
+    prm['source2'] = [0.0,  0.0,  0.0]
+    prm['pulse'] = 'delta'
+
+    # material
+    prm['hourglass'] = [1.0, 1.0],
+    prm['fieldio'] = [
+        ['=', 'rho', [], 2670.0],
+        ['=', 'vp',  [], 6000.0],
+        ['=', 'vs',  [], 3464.0],
+        ['=', 'gam', [], 0.3],
+    ]
 
     # output
     for f in cst.sord.fieldnames.volume:
@@ -44,22 +46,17 @@ def test(argv=[]):
 
     # master
     prm['oplevel'] = 5
-    cwd = os.getcwd()
-    d0 = os.path.join('run', 'oplevel%s' % prm['oplevel']) + os.sep
+    prm['rundir'] = d0 = os.path.join('run', 'oplevel%s' % prm['oplevel']) + os.sep
     os.makedirs(d0)
-    os.chdir(d0)
     cst.sord.run(prm)
-    os.chdir(cwd)
 
     # variations
     max_err_all_ = 0.0
     for i in 6,:
         prm['oplevel'] = i
-        d = os.path.join(cwd, 'run', 'oplevel%s' % i)
+        prm['rundir'] = d = os.path.join('run', 'oplevel%s' % i)
         os.makedirs(d)
-        os.chdir(d)
         job = cst.sord.run(prm)
-        os.chdir(cwd)
         max_err_ = 0.0
         for f in cst.sord.fieldnames.volume:
             f1 = d0 + f + '.bin'

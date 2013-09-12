@@ -9,54 +9,52 @@ def test(argv=[]):
     import cst
 
     # parameters
-    prm = {
-        'argv': argv,
-        'debug': 3,
-        'itstats': 1,
-        'shape': [5, 4, 2, 2],
-        'delta': [100.0, 100.0, 100.0, 0.0075],
-        'bc1': [0, 0, 0],
-        'bc2': [0, 0, 0],
+    prm = {}
+    prm['argv'] = argv
+    prm['debug'] = 3
+    prm['itstats'] = 1
 
-        # source
-        'ihypo': [3.0, 1.5, 1.5],
-        #'ihypo': [1.5, 1.5, 1.5],
-        'pulse': 'delta',
-        'source': 'potency',
-        'source1': [1e10, 1e10, 1e10],
-        'source2': [0.0,  0.0,  0.0],
+    # dimensions
+    prm['shape'] = [5, 4, 2, 2]
+    prm['delta'] = [100.0, 100.0, 100.0, 0.0075]
 
-        # material
-        'hourglass': [1.0, 1.0],
-        'fieldio': [
-            ['=', 'rho', [], 2670.0],
-            ['=', 'vp',  [], 6000.0],
-            ['=', 'vs',  [], 3464.0],
-            ['=', 'gam', [], 0.3],
-        ],
-    }
+    # boundary conditions
+    prm['bc1'] = [0, 0, 0]
+    prm['bc2'] = [0, 0, 0]
+
+    # source
+    prm['ihypo'] = [3.0, 1.5, 1.5]
+    prm['ihypo'] = [1.5, 1.5, 1.5]
+    prm['pulse'] = 'delta'
+    prm['source'] = 'potency'
+    prm['source1'] = [1e10, 1e10, 1e10]
+    prm['source2'] = [0.0,  0.0,  0.0]
+
+    # material
+    prm['hourglass'] = [1.0, 1.0]
+    prm['fieldio'] = [
+        ['=', 'rho', [], 2670.0],
+        ['=', 'vp',  [], 6000.0],
+        ['=', 'vs',  [], 3464.0],
+        ['=', 'gam', [], 0.3],
+    ]
 
     # output
     for f in cst.sord.fieldnames()['volume']:
         prm['fieldio'] += [['=w', f, [], f + '.bin']]
 
     # master
-    cwd = os.getcwd()
-    d0 = os.path.join('run', 'point_source') + os.sep
+    prm['rundir'] = d0 = os.path.join('run', 'point_source') + os.sep
     os.makedirs(d0)
-    os.chdir(d0)
     cst.sord.run(prm)
-    os.chdir(cwd)
 
     # variations
     max_err_all_ = 0.0
     for i, n in enumerate([[3, 1, 1], [2, 2, 1]]):
         prm['nproc3'] = n
-        d = os.path.join('run', 'point_source%s' % i) + os.sep
+        prm['rundir'] = d = os.path.join('run', 'point_source%s' % i) + os.sep
         os.makedirs(d)
-        os.chdir(d)
         job = cst.sord.run(prm)
-        os.chdir(cwd)
         max_err_ = 0.0
         for f in cst.sord.fieldnames()['volume']:
             f1 = d0 + f + '.bin'

@@ -10,52 +10,50 @@ def test(argv=[]):
     prm = {}
 
     # parameters
-    prm = {
-        'argv': argv,
-        'itstats': 1,
-        'shape': [21, 21, 21, 11],
-        'delta': [100.0, 100.0, 100.0, 0.0075],
-        'bc1': [10, 10, 10],
-        'bc2': [10, 10, 10],
+    prm = {}
+    prm['argv'] = argv
+    prm['itstats'] = 1
 
-        # source
-        'source': 'potency',
-        'ihypo': [11, 11, 11],
-        'source1': [1e10, 1e10, 1e10],
-        'source2': [0.0,  0.0,  0.0],
-        'pulse': 'delta',
+    # dimensions
+    prm['shape'] = [21, 21, 21, 11]
+    prm['delta'] = [100.0, 100.0, 100.0, 0.0075]
 
-        # material
-        'hourglass': [1.0, 1.0],
-        'fieldio': [
-            ['=', 'rho', [], 2670.0],
-            ['=', 'vp',  [], 6000.0],
-            ['=', 'vs',  [], 3464.0],
-            ['=', 'gam', [], 0.3],
-        ],
-    }
+    # boundary conditions
+    prm['bc1'] = [10, 10, 10]
+    prm['bc2'] = [10, 10, 10]
+
+    # source
+    prm['source'] = 'potency'
+    prm['ihypo'] = [11, 11, 11]
+    prm['source1'] = [1e10, 1e10, 1e10]
+    prm['source2'] = [0.0,  0.0,  0.0]
+    prm['pulse'] = 'delta'
+
+    # material
+    prm['hourglass'] = [1.0, 1.0]
+    prm['fieldio'] = [
+        ['=', 'rho', [], 2670.0],
+        ['=', 'vp',  [], 6000.0],
+        ['=', 'vs',  [], 3464.0],
+        ['=', 'gam', [], 0.3],
+    ]
 
     # output
     for f in cst.sord.fieldnames()['volume']:
         prm['fieldio'] += [['=w', f, [], f + '.bin']]
 
     # master
-    cwd = os.getcwd()
-    d0 = os.path.join('run', 'pml_boundary') + os.sep
+    prm['rundir'] = d0 = os.path.join('run', 'pml_boundary') + os.sep
     os.makedirs(d0)
-    os.chdir(d0)
     cst.sord.run(prm)
-    os.chdir(cwd)
 
     # variations
     max_err_all_ = 0.0
     for i, n in enumerate([[4, 1, 1], [1, 2, 3]]):
         prm['nproc3'] = n
-        d = os.path.join('run', 'pml_boundary%s' % i) + os.sep
+        prm['rundir'] = d = os.path.join('run', 'pml_boundary%s' % i) + os.sep
         os.makedirs(d)
-        os.chdir(d)
         job = cst.sord.run(prm)
-        os.chdir(cwd)
         max_err_ = 0.0
         for f in cst.sord.fieldnames()['volume']:
             f1 = d0 + f + '.bin'

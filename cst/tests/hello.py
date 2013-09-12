@@ -17,7 +17,6 @@ def make():
 def test(argv=[]):
     import os, shutil
     import cst
-    cwd = os.getcwd()
     path = os.path.dirname(__file__) + os.sep
     make()
 
@@ -25,8 +24,8 @@ def test(argv=[]):
     d = os.path.join('run', 'hello-c')
     os.makedirs(d)
     shutil.copy2(path + 'hello.c.x', d)
-    os.chdir(d)
     cst.util.launch(
+        rundir = d,
         argv = argv,
         command = './hello.c.x',
         nthread = 2,
@@ -34,14 +33,13 @@ def test(argv=[]):
         ppn_range = [2],
         minutes = 10,
     )
-    os.chdir(cwd)
 
     # Fortran version
     d = os.path.join('run', 'hello-f')
     os.makedirs(d)
     shutil.copy2(path + 'hello.f.x', d)
-    os.chdir(d)
     cst.util.launch(
+        rundir = d,
         argv = argv,
         command = './hello.f.x',
         nthread = 2,
@@ -49,7 +47,6 @@ def test(argv=[]):
         ppn_range = [2],
         minutes = 10,
     )
-    os.chdir(cwd)
 
     return
 

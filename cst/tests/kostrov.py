@@ -7,41 +7,37 @@ def test(argv=[]):
     import os
     import numpy as np
     import cst
+    prm = {}
 
-    dtau = 10e6
+    # parameters
+    prm['argv'] = argv
+    prm['nproc3'] = [1, 1, 2]
+    prm['delta'] = [100.0, 100.0, 100.0, 0.0075]
+    prm['shape'] = [51, 51, 24, 200]
+
+    # material properties
     rho = 2670.0
     vp = 6000.0
     vs = 3464.0
+    prm['hourglass'] = [1.0, 1.0]
+    prm['fieldio'] = [
+        ['=', 'rho', [], rho],
+        ['=', 'vp',  [], vp],
+        ['=', 'vs',  [], vs],
+        ['=', 'gam', [], 1.0],
+    ],
 
-    # parameters
-    prm = {
-        'argv': argv,
-        'nproc3': [1, 1, 2],
-        'delta': [100.0, 100.0, 100.0, 0.0075],
-        'shape': [51, 51, 24, 200],
+    # boundary conditions
+    prm['bc1'] = [10, 10, 10]
+    prm['bc2'] = [-1, 1, -2]
 
-        # material properties
-        'hourglass': [1.0, 1.0],
-        'fieldio': [
-            ['=', 'rho', [], rho],
-            ['=', 'vp',  [], vp],
-            ['=', 'vs',  [], vs],
-            ['=', 'gam', [], 1.0],
-        ],
-
-        # boundary conditions
-        'bc1': [10, 10, 10],
-        'bc2': [-1, 1, -2],
-
-        # rupture parameters
-        'faultnormal': 3,
-        'ihypo': [-1, -1, -1.5],
-        'vrup': 0.9 * 3464.0,
-        'rcrit': 1e9,
-        'trelax': 0.0,
-    }
-
-    # rupture fields
+    # rupture
+    dtau = 10e6
+    prm['faultnormal'] = 3
+    prm['ihypo'] = [-1, -1, -1.5]
+    prm['vrup'] = 0.9 * 3464.0
+    prm['rcrit'] = 1e9
+    prm['trelax'] = 0.0
     prm['fieldio'] += [
         ['=', 'mud', [], 1.0],
         ['=', 'mus', [], 1e9],
@@ -65,12 +61,9 @@ def test(argv=[]):
     v = cst.kostrov.slip_rate(rho, vp, vs, prm['vrup'], dtau, r, t)
 
     # run SORD
-    cwd = os.getcwd()
-    d = os.path.join(cwd, 'run', 'kostrov') + os.sep
+    prm['rundir'] = d = os.path.join('run', 'kostrov') + os.sep
     os.makedirs(d)
-    os.chdir(d)
     cfg = cst.sord.run(prm)
-    os.chdir(cwd)
 
     # compare with analytical solution
     for p in 'abcd':
