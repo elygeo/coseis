@@ -191,16 +191,14 @@ def stage(args, **kwargs):
     if not cfg['minutes']:
         cfg['minutes'] = 10 + int((prm['shape'][3] + 10) * nm // (40 * cfg['rate']))
 
-    # configure
+    # configure and stage
     cfg['command'] = os.path.join('.', 'sord.x')
     cfg = util.prepare(cfg)
-
-    # run directory
-    cwd = os.getcwd()
-    os.chdir(cfg['rundir'])
+    util.stage(cfg)
 
     # create run scripts 
-    util.stage(cfg)
+    cwd = os.getcwd()
+    os.chdir(cfg['rundir'])
     util.archive('coseis.tgz')
     d = os.path.dirname(__file__)
     f = os.path.join(d, 'sord.x')
