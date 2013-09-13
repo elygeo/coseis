@@ -30,18 +30,18 @@ prm['shape'] = [
 # material properties
 prm['hourglass'] = [1.0, 2.0]       	# hourglass stiffness and viscosity
 prm['fieldio'] = [
-    ['=', 'rho', [], 2700.0],	# density
-    ['=', 'vp',  [], 6000.0],	# P-wave speed
-    ['=', 'vs',  [], 3464.0],	# S-wave speed
-    ['=', 'gam', [],    0.0],	# viscosity
+    ['rho', [], '=', 2700.0],	# density
+    ['vp',  [], '=', 6000.0],	# P-wave speed
+    ['vs',  [], '=', 3464.0],	# S-wave speed
+    ['gam', [], '=',    0.0],	# viscosity
 ]
 
 # material properties of the layer
 i = 1000.0 / prm['delta'][2] + 0.5
 prm['fieldio'] += [
-    ['=', 'rho', s_[:,:,:i,:], 2600.0],
-    ['=', 'vp',  s_[:,:,:i,:], 4000.0],
-    ['=', 'vs',  s_[:,:,:i,:], 2000.0],
+    ['rho', s_[:,:,:i,:], '=', 2600.0],
+    ['vp',  s_[:,:,:i,:], '=', 4000.0],
+    ['vs',  s_[:,:,:i,:], '=', 2000.0],
 ]
 
 # near side boundary conditions:
@@ -66,9 +66,9 @@ for i in range(10):
     j = prm['ihypo'][0] + 600.0 * (i + 1) / prm['delta'][0]
     k = prm['ihypo'][1] + 800.0 * (i + 1) / prm['delta'][1]
     prm['fieldio'] += [
-        ['=w', 'v1', [j,k,1,()], 'p%s-v1.bin' % i],
-        ['=w', 'v2', [j,k,1,()], 'p%s-v2.bin' % i],
-        ['=w', 'v3', [j,k,1,()], 'p%s-v3.bin' % i],
+        ['v1', [j,k,1,()], 'w', 'p%s-v1.bin' % i],
+        ['v2', [j,k,1,()], 'w', 'p%s-v2.bin' % i],
+        ['v3', [j,k,1,()], 'w', 'p%s-v3.bin' % i],
     ]
 
 # run job

@@ -35,31 +35,31 @@ prm['shape'] = [
 # material
 prm['hourglass'] = [1.0, 1.0]
 prm['fieldio'] = [
-    ['=', 'rho', [], rho],
-    ['=', 'vp',  [], vp],
-    ['=', 'vs',  [], vs],
-    ['=', 'gam', [], 0.0],
+    ['rho', [], '=', rho],
+    ['vp',  [], '=', vp],
+    ['vs',  [], '=', vs],
+    ['gam', [], '=', 0.0],
 ]
 
 # output
 i = prm['ihypo'][0]
 _3 = 3000.0 / prm['delta'][0] + i
 _4 = 4000.0 / prm['delta'][0] + i
-op = '=w'
-op = '=wi'
+op = 'w'
+op = 'wi'
 for f in 'v1', 'v2', 'v3', 'e11', 'e22', 'e33':
     prm['fieldio'] += [
-        [op, f, [ i, i,_4,()], 'p1-%s.bin' % f],
-        [op, f, [ i,_3,_4,()], 'p2-%s.bin' % f],
-        [op, f, [ i,_4,_4,()], 'p3-%s.bin' % f],
-        [op, f, [_3,_3,_4,()], 'p4-%s.bin' % f],
-        [op, f, [_3,_4,_4,()], 'p5-%s.bin' % f],
-        [op, f, [_4,_4,_4,()], 'p6-%s.bin' % f],
+        [f, [ i, i,_4,()], op, 'p1-%s.bin' % f],
+        [f, [ i,_3,_4,()], op, 'p2-%s.bin' % f],
+        [f, [ i,_4,_4,()], op, 'p3-%s.bin' % f],
+        [f, [_3,_3,_4,()], op, 'p4-%s.bin' % f],
+        [f, [_3,_4,_4,()], op, 'p5-%s.bin' % f],
+        [f, [_4,_4,_4,()], op, 'p6-%s.bin' % f],
     ]
 prm['fieldio'] += [
-    ['=w', 'v1', s_[i,:,:,::10], 'snap-v1.bin'],
-    ['=w', 'v2', s_[i,:,:,::10], 'snap-v2.bin'],
-    ['=w', 'v3', s_[i,:,:,::10], 'snap-v3.bin'],
+    ['v1', s_[i,:,:,::10], 'w', 'snap-v1.bin'],
+    ['v2', s_[i,:,:,::10], 'w', 'snap-v2.bin'],
+    ['v3', s_[i,:,:,::10], 'w', 'snap-v3.bin'],
 ]
 
 # loop over sources

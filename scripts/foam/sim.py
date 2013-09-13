@@ -33,10 +33,10 @@ prm['shape'] = [
 # material model
 prm['hourglass'] = [1.0, 1.0]
 prm['fieldio'] = [
-    ['=', 'rho', [], 16.0],
-    ['=', 'vp',  [], 56.0],
-    ['=', 'vs',  [], 30.0],
-    ['=', 'gam', [], 0.5],
+    ['rho', [], '=', 16.0],
+    ['vp',  [], '=', 56.0],
+    ['vs',  [], '=', 30.0],
+    ['gam', [], '=', 0.5],
 ]
 
 # boundary conditions
@@ -48,13 +48,13 @@ j = prm['ihypo'][0]
 prm['faultnormal'] = 3
 prm['slipvector'] = [0.0, 1.0, 0.0]
 prm['fieldio'] += [
-    ['=', 'ts',  [], -730.0],
-    ['=', 'tn',  [], -330.0],
-    ['=', 'mus', [],  1e5],
-    ['=', 'mud', [],  1e5],
-    ['=', 'dc',  [],  0.001],
-    ['=', 'mus', s_[:j,:,:,0], 2.4],
-    ['=', 'mud', s_[:j,:,:,0], 1.85],
+    ['ts',  [], '=', -730.0],
+    ['tn',  [], '=', -330.0],
+    ['mus', [], '=',  1e5],
+    ['mud', [], '=',  1e5],
+    ['dc',  [], '=',  0.001],
+    ['mus', s_[:j,:,:,0], '=', 2.4],
+    ['mud', s_[:j,:,:,0], '=', 1.85],
 ]
 
 # nucleation
@@ -67,9 +67,9 @@ prm['trelax'] = 10.0 * dt
 if weakzone:
     j = weakzone / dx + 1.0
     prm['fieldio'] += [
-        ['=', 'ts',  s_[:j,:,:,0], -66.0],
-        ['=', 'mus', s_[:j,:,:,0],  0.6],
-        ['=', 'mud', s_[:j,:,:,0],  0.6],
+        ['ts',  s_[:j,:,:,0], '=', -66.0],
+        ['mus', s_[:j,:,:,0], '=',  0.6],
+        ['mud', s_[:j,:,:,0], '=',  0.6],
     ]
 
 # sensors
@@ -85,18 +85,18 @@ for s, x, g in [
     j = x / dx + 1.0
     l = z / dz + 2.0
     prm['fieldio'] += [
-        ['=w', 'a2', s_[j,1,l,:], 'sensor%02d.bin' % s],
+        ['a2', s_[j,1,l,:], 'w', 'sensor%02d.bin' % s],
     ]
 prm['fieldio'] += [
-    ['=w', 'u2', s_[1,1,1,:], 'sensor16.bin'],
+    ['u2', s_[1,1,1,:], 'w', 'sensor16.bin'],
 ]
 
 # surface output
 k = prm['ihypo'][1]
 l = 0.8 / dz + 2.0
 prm['fieldio'] += [
-    ['=w', 'u2', s_[1,k,2:l,:], 'off-fault.bin'],
-    #['=w', 'v2', s_[:,k,2:l.::10], 'xsec.bin'],
+    ['u2', s_[1,k,2:l,:], 'w', 'off-fault.bin'],
+    #['v2', s_[:,k,2:l.::10], 'w', 'xsec.bin'],
 ]
 
 # run SORD

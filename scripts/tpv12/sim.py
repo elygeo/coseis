@@ -49,11 +49,11 @@ l = [prm['ihypo'][2] - l, prm['ihypo'][2] + l]
 # material properties
 prm['hourglass'] = [1.0, 2.0]
 prm['fieldio'] = [
-    ['=', 'rho', [], 2700.0],
-    ['=', 'vp',  [], 5716.0],
-    ['=', 'vs',  [], 3300.0],
-    ['=', 'gam', [], 0.2],
-    ['=', 'gam', [j,k,l,0], 0.02],
+    ['rho', [], '=', 2700.0],
+    ['vp', [],  '=', 5716.0],
+    ['vs', [],  '=', 3300.0],
+    ['gam', [], '=', 0.2],
+    ['gam', [j,k,l,0], '=', 0.02],
 ]
 
 # fault parameters
@@ -62,25 +62,25 @@ j = [1, 15000.0 / dx]
 k = [1, 15000.0 / dy]
 l = prm['ihypo'][2]
 prm['fieldio'] += [
-    ['=',  'co',   [], 2e5],
-    ['=',  'dc',   [], 0.5],
-    ['=',  'mud',  [], 0.1],
-    ['=',  'mus',  [], 1e4],
-    ['=',  'mus',  [j,k,l,[]], 0.7],
-    ['=R', 's11',  [1,[],l,0], 's11.bin'],
-    ['=R', 's22',  [1,[],l,0], 's22.bin'],
-    ['=R', 's33',  [1,[],l,0], 's33.bin'],
-    ['=w', 'trup', [j,k,l,[]], 'trup.bin'],
+    ['co', [],  '=', 2e5],
+    ['dc', [],  '=', 0.5],
+    ['mud', [], '=', 0.1],
+    ['mus', [], '=', 1e4],
+    ['mus', [j,k,l,[]], '=', 0.7],
+    ['s11', [1,[],l,0], 'R', 's11.bin'],
+    ['s22', [1,[],l,0], 'R', 's22.bin'],
+    ['s33', [1,[],l,0], 'R', 's33.bin'],
+    ['trup', [j,k,l,[]], 'w', 'trup.bin'],
 ]
 
 # nucleation
 i = 1500.0 / dx
 j, k, l = prm['ihypo']
 prm['fieldio'] += [
-    ['=', 'mus', s_[:j+i+1,k-i-1:k+i+1,l,:], 0.66],
-    ['=', 'mus', s_[:j+i,  k-i-1:k+i+1,l,:], 0.62],
-    ['=', 'mus', s_[:j+i+1,k-i:  k+i,  l,:], 0.62],
-    ['=', 'mus', s_[:j+i,  k-i:  k+i,  l,:], 0.54],
+    ['mus', s_[:j+i+1,k-i-1:k+i+1,l,:], '=', 0.66],
+    ['mus', s_[:j+i,  k-i-1:k+i+1,l,:], '=', 0.62],
+    ['mus', s_[:j+i+1,k-i:  k+i,  l,:], '=', 0.62],
+    ['mus', s_[:j+i,  k-i:  k+i,  l,:], '=', 0.54],
 ]
 
 # slip, slip velocity, and shear traction time histories
@@ -102,7 +102,7 @@ for x, y in [
     for f in 'su1', 'su2', 'su3', 'sv1', 'sv2', 'sv3', 'ts1', 'ts2', 'ts3', 'tnm':
         p = 'faultst%03ddp%03d-%s.bin' % (x, y, f)
         p = p.replace('fault-', 'fault-0')
-        prm['fieldio'] += [['=w', f, [j,k,l,[]], p]]
+        prm['fieldio'] += [[f, [j,k,l,[]], 'w', p]]
 
 # displacement and velocity time histories
 for x, y, z in [
@@ -125,7 +125,7 @@ for x, y, z in [
     for f in 'u1', 'u2', 'u3', 'v1', 'v2', 'v3':
         p = 'body%03dst%03ddp%03d-%s.bin' % (z, x, y, f)
         p = p.replace('body-', 'body-0')
-        prm['fieldio'] += [['=w', f, [j,k,l,[]], p]]
+        prm['fieldio'] += [[f, [j,k,l,[]], 'w', p]]
 
 # pre-stress
 d = np.arange(ny) * alpha * dy

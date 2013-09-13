@@ -18,29 +18,29 @@ prm['bc2'] = [1, -1, 1]
 # material model
 prm['hourglass'] = [1.0, 2.0]
 prm['fieldio'] = [
-    ['=', 'rho', [], 1.0],
-    ['=', 'vp',  [], 2.0],
-    ['=', 'vs',  [], 1.0],
-    ['=', 'gam', [], 0.0],
+    ['rho', [], '=', 1.0],
+    ['vp',  [], '=', 2.0],
+    ['vs',  [], '=', 1.0],
+    ['gam', [], '=', 0.0],
 ]
 
 # Ricker wavelet source with 2 s period.
-prm['fieldio'] += [['=f', 'v2', s_[-1,161:,:,:], 1.0, 'ricker1', 2.0]]
+prm['fieldio'] += [['v2', s_[-1,161:,:,:], 'f', 1.0, 'ricker1', 2.0]]
 
 # mesh input
 prm['fieldio'] += [
-    ['=R', 'x1', s_[:,:,1,0], 'x.bin'],
-    ['=R', 'x2', s_[:,:,1,0], 'y.bin'],
+    ['x1', s_[:,:,1,0], 'R', 'x.bin'],
+    ['x2', s_[:,:,1,0], 'R', 'y.bin'],
 ]
 
 # output
 for c in '12':
     prm['fieldio'] += [
-        ['=w', 'u' + c, s_[-1,-1,1,0],   'source-u%s.bin' % c],
-        ['=w', 'u' + c, s_[1,:,1,0],     'canyon-u%s.bin' % c],
-        ['=w', 'u' + c, s_[2:158,1,1,0], 'flank-u%s.bin' % c],
-        ['=w', 'v' + c, s_[:,:,1,::10],  'snap-v%s.bin' % c],
-        ['=w', 'u' + c, s_[:,:,1,::10],  'snap-u%s.bin' % c],
+        ['u' + c, s_[-1,-1,1,0],   'w', 'source-u%s.bin' % c],
+        ['u' + c, s_[1,:,1,0],     'w', 'canyon-u%s.bin' % c],
+        ['u' + c, s_[2:158,1,1,0], 'w', 'flank-u%s.bin' % c],
+        ['v' + c, s_[:,:,1,::10],  'w', 'snap-v%s.bin' % c],
+        ['u' + c, s_[:,:,1,::10],  'w', 'snap-u%s.bin' % c],
     ]
 
 # run job

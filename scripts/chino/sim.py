@@ -68,15 +68,15 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     prm['vdamp'] = 400.0
     prm['gam2'] = 0.8
     prm['fieldio'] = [
-        ['=r', 'rho', [], 'hold/rho.bin'],
-        ['=r', 'vp',  [], 'hold/vp.bin'],
-        ['=r', 'vs',  [], 'hold/vs.bin'],
+        ['rho', [], '=', 'hold/rho.bin'],
+        ['vp',  [], '=', 'hold/vp.bin'],
+        ['vs',  [], '=', 'hold/vs.bin'],
     ]
 
     # topography
     if surf == 'topo':
         prm['fieldio'] += [
-            ['=r', 'x3',  [], 'hold/z3.bin']
+            ['x3', [], 'r', 'hold/z3.bin']
         ]
 
     # boundary conditions
@@ -108,9 +108,9 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
 
     # receivers
     if register:
-        m = '=w'
+        m = 'w'
     else:
-        m = '=wi'
+        m = 'wi'
     f = os.path.join(cwd, 'run', 'data', 'station-list.txt')
     for s in open(f).readlines():
         s, y, x = s.split()[:3]
@@ -118,10 +118,10 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         j = x / delta[0] + 1.0
         k = y / delta[1] + 1.0
         prm['fieldio'] += [
-            [m, 'vs', [j,k,1,[]], 'out/' + s + '-vs.bin'],
-            [m, 'v1', [j,k,1,[]], 'out/' + s + '-v1.bin'],
-            [m, 'v2', [j,k,1,[]], 'out/' + s + '-v2.bin'],
-            [m, 'v3', [j,k,1,[]], 'out/' + s + '-v3.bin'],
+            ['vs', [j,k,1,[]], m, 'out/' + s + '-vs.bin'],
+            ['v1', [j,k,1,[]], m, 'out/' + s + '-v1.bin'],
+            ['v2', [j,k,1,[]], m, 'out/' + s + '-v2.bin'],
+            ['v3', [j,k,1,[]], m, 'out/' + s + '-v3.bin'],
         ]
 
     # surface output
@@ -131,15 +131,15 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         mh = max(1, int(0.025 / dt + 0.5))
         ms = max(1, int(0.125 / (dt * mh) + 0.5))
         prm['fieldio'] += [
-            ['=w', 'v1', s_[::ns,::ns,1,::mh], 'hold/full-v1.bin'],
-            ['=w', 'v2', s_[::ns,::ns,1,::mh], 'hold/full-v2.bin'],
-            ['=w', 'v3', s_[::ns,::ns,1,::mh], 'hold/full-v3.bin'],
-            ['#w', 'v1', s_[::ns,::ns,1,::ms], 'hold/snap-v1.bin'],
-            ['#w', 'v2', s_[::ns,::ns,1,::ms], 'hold/snap-v2.bin'],
-            ['#w', 'v3', s_[::ns,::ns,1,::ms], 'hold/snap-v3.bin'],
-            ['#w', 'v1', s_[::nh,::nh,1,::mh], 'hold/hist-v1.bin'],
-            ['#w', 'v2', s_[::nh,::nh,1,::mh], 'hold/hist-v2.bin'],
-            ['#w', 'v3', s_[::nh,::nh,1,::mh], 'hold/hist-v3.bin'],
+            ['v1', s_[::ns,::ns,1,::mh], 'w', 'hold/full-v1.bin'],
+            ['v2', s_[::ns,::ns,1,::mh], 'w', 'hold/full-v2.bin'],
+            ['v3', s_[::ns,::ns,1,::mh], 'w', 'hold/full-v3.bin'],
+            ['v1', s_[::ns,::ns,1,::ms], '#', 'hold/snap-v1.bin'],
+            ['v2', s_[::ns,::ns,1,::ms], '#', 'hold/snap-v2.bin'],
+            ['v3', s_[::ns,::ns,1,::ms], '#', 'hold/snap-v3.bin'],
+            ['v1', s_[::nh,::nh,1,::mh], '#', 'hold/hist-v1.bin'],
+            ['v2', s_[::nh,::nh,1,::mh], '#', 'hold/hist-v2.bin'],
+            ['v3', s_[::nh,::nh,1,::mh], '#', 'hold/hist-v3.bin'],
         ]
 
     # cross section output
@@ -147,8 +147,8 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         j, k, l = prm['ihypo']
         for f in 'v1', 'v2', 'v3', 'rho', 'vp', 'vs', 'gam':
             prm['fieldio'] += [
-                ['=w', f, s_[j,:,:,::10], 'hold/xsec-ns-%s.bin' % f],
-                ['=w', f, s_[:,k,:,::10], 'hold/xsec-ew-%s.bin' % f],
+                [f, s_[j,:,:,::10], 'w', 'hold/xsec-ns-%s.bin' % f],
+                [f, s_[:,k,:,::10], 'w', 'hold/xsec-ew-%s.bin' % f],
             ]
 
     # run directory

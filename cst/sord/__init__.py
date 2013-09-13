@@ -272,52 +272,39 @@ def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
     >>> expand_slices(shape, [])
     [[0, 8, 1], [0, 8, 1], [0, 8, 1], [0, 8, 1]]
 
+    >>> expand_slices(shape, '')
+    [[0, 8, 1], [0, 8, 1], [0, 8, 1], [0, 8, 1]]
+
     >>> expand_slices(shape, [0.4,0.6,-0.6,-0.4])
     [[0, 1, 1], [1, 2, 1], [7, 8, 1], [8, 9, 1]]
 
-    >>> expand_slices(shape, s_[0.4,0.6,-0.6:-0.4:2,:])
+    >>> expand_slices(shape, '[0.4,0.6,-0.6:-0.4:2,:]')
     [[0, 1, 1], [1, 2, 1], [7, 8, 2], [0, 8, 1]]
 
-    >>> expand_slices(shape, s_[0.9,1.1,-1.1:-0.9:2,:], base=0.5)
+    >>> expand_slices(shape, '[0.9,1.1,-1.1:-0.9:2,:]', base=0.5)
     [[0, 1, 1], [1, 2, 1], [6, 7, 2], [0, 7, 1]]
 
-    >>> expand_slices(shape, s_[1.4,1.6,-1.6:-1.4:2,:], base=1)
+    >>> expand_slices(shape, '[1.4,1.6,-1.6:-1.4:2,:]', base=1)
     [[1, 1, 1], [2, 2, 1], [7, 8, 2], [1, 8, 1]]
 
-    >>> expand_slices(shape, s_[1.9,2.1,-2.1:-1.9:2,:], base=1.5)
+    >>> expand_slices(shape, '[1.9,2.1,-2.1:-1.9:2,:]', base=1.5)
     [[1, 1, 1], [2, 2, 1], [6, 7, 2], [1, 7, 1]]
 
     >>> expand_slices(shape, [0,1,2,[]], base=0, new_base=1)
     [[1, 1, 1], [2, 2, 1], [3, 3, 1], [1, 8, 1]]
-
-    >>> expand_slices(shape, '')
-    [[0, 8, 1], [0, 8, 1], [0, 8, 1], [0, 8, 1]]
-
-    >>> expand_slices(shape, '0.4,0.6,-0.6,-0.4')
-    [[0, 1, 1], [1, 2, 1], [7, 8, 1], [8, 9, 1]]
-
-    >>> expand_slices(shape, '0.4,0.6,-0.6:-0.4:2,:')
-    [[0, 1, 1], [1, 2, 1], [7, 8, 2], [0, 8, 1]]
-
-    >>> expand_slices(shape, '0.9,1.1,-1.1:-0.9:2,:', base=0.5)
-    [[0, 1, 1], [1, 2, 1], [6, 7, 2], [0, 7, 1]]
-
-    >>> expand_slices(shape, '1.4,1.6,-1.6:-1.4:2,:', base=1)
-    [[1, 1, 1], [2, 2, 1], [7, 8, 2], [1, 8, 1]]
-
-    >>> expand_slices(shape, '1.9,2.1,-2.1:-1.9:2,:', base=1.5)
-    [[1, 1, 1], [2, 2, 1], [6, 7, 2], [1, 7, 1]]
-
-    >>> expand_slices(shape, '0,1,2,:', base=0, new_base=1)
-    [[1, 1, 1], [2, 2, 1], [3, 3, 1], [1, 8, 1]]
     """
 
-    # normalize type
-    n = len(shape)
+    # string style
     if isinstance(slices, basestring):
-        slices = slices.split(',')
-    else:
-        slices = list(slices)
+        if slices == '':
+            slices = []
+        elif slices[0] + slices[-1] == '[]':
+            slices = slices[1:-1].split(',')
+        else:
+            raise Exception('error in indices: %r' % (slices,))
+
+    # list style
+    n = len(shape)
     if len(slices) == 0:
         slices = n * [[]]
     elif len(slices) != n:
@@ -335,13 +322,13 @@ def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
             s = [s.start, s.stop, s.step]
         if isinstance(s, basestring):
             s_ = []
-            for i in s.split(':'):
-                if i == '':
+            for j in s.split(':'):
+                if j == '':
                     s_.append(None)
                 elif '.' in s:
-                    s_.append(float(i))
+                    s_.append(float(j))
                 else:
-                    s_.append(int(i))
+                    s_.append(int(j))
             s = s_
         elif type(s) not in (tuple, list):
             s = [s]
@@ -452,29 +439,34 @@ def prepare_param(prm):
         pulse, val, tau = 'const', 1.0, 1.0
         x1 = x2 = [0.0, 0.0, 0.0]
 
-        # parse line
-        op = line[0][0]
-        mode = line[0][1:]
-        if op not in '=+#':
-            raise Exception('Error: unsupported operator: %r' % line)
-        try:
-            if len(line) is 11:
-                nc, pulse, tau, x1, x2, nb, ii, filename, val, fields = line[1:]
-            elif mode in ['r', 'R', 'w', 'wi']:
-                fields, ii, filename = line[1:]
-            elif mode in ['', 's', 'i']:
-                fields, ii, val = line[1:]
-            elif mode in ['f', 'fs', 'fi']:
-                fields, ii, val, pulse, tau = line[1:]
-            elif mode in ['c']:
-                fields, ii, val, x1, x2 = line[1:]
-            elif mode in ['fc']:
-                fields, ii, val, pulse, tau, x1, x2 = line[1:]
+        # select mode
+        if len(line) is 11:
+            mode, nc, pulse, tau, x1, x2, nb, ii, filename, val, fields = line[1:]
+        else:
+            if line[0][0] in '+=':
+                mode, fields, ii = line[:3]
+                if len(mode) > 1 and mode[0] == '=':
+                    mode = mode[1:]
+                if mode[0] == '+':
+                    mode = mode[1:] + '+'
             else:
-                raise Exception('Error: bad i/o mode: %r' % line)
-        except ValueError:
-            print('Error: bad i/o spec: %r' % line)
-            raise
+                fields, ii, mode = line[:3]
+            try:
+                if mode in ['r', 'R', 'r+', 'R+', 'w', 'wi']:
+                    filename = line[3]
+                elif mode in ['=', '+', 's', 's+', 'i', 'i+']:
+                    val = line[3]
+                elif mode in ['f', 'f+', 'fs', 'fs+', 'fi', 'fi+']:
+                    val, pulse, tau = line[3:]
+                elif mode in ['c', 'c+']:
+                    val, x1, x2 = line[3:]
+                elif mode in ['fc', 'fc+']:
+                    val, pulse, tau, x1, x2 = line[3:]
+                else:
+                    raise Exception('Error: bad i/o mode: %r' % line)
+            except ValueError:
+                print('Error: bad i/o spec: %r' % line)
+                raise
 
         filename = os.path.expanduser(filename)
         if len(filename) > 32:
@@ -537,7 +529,7 @@ def prepare_param(prm):
 
         # append to list
         fieldio += [
-            [op + mode, nc, pulse, tau, x1, x2, nb, ii, str(filename), val, fields]
+            [mode, nc, pulse, tau, x1, x2, nb, ii, str(filename), val, fields]
         ]
 
     # check for duplicate filename

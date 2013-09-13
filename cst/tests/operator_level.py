@@ -34,15 +34,15 @@ def test(argv=[]):
     # material
     prm['hourglass'] = [1.0, 1.0],
     prm['fieldio'] = [
-        ['=', 'rho', [], 2670.0],
-        ['=', 'vp',  [], 6000.0],
-        ['=', 'vs',  [], 3464.0],
-        ['=', 'gam', [], 0.3],
+        ['rho', [], '=', 2670.0],
+        ['vp',  [], '=', 6000.0],
+        ['vs',  [], '=', 3464.0],
+        ['gam', [], '=', 0.3],
     ]
 
     # output
     for f in cst.sord.fieldnames.volume:
-        prm['fieldio'] += [['=w', f, [], f + '.bin']]
+        prm['fieldio'] += [[f, [], 'w', f + '.bin']]
 
     # master
     prm['oplevel'] = 5

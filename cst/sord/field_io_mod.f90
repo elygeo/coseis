@@ -103,8 +103,8 @@ do i = 1, 3
 end do
 
 ! pass test
-if (pass == '<' .and. io%mode(2:2) == 'w') cycle loop
-if (pass == '>' .and. io%mode(2:2) /= 'w') cycle loop
+if (pass == '<' .and. io%mode(1:1) == 'w') cycle loop
+if (pass == '>' .and. io%mode(1:1) /= 'w') cycle loop
 
 !XXX loop over fields
 if (field /= io%field) cycle loop
@@ -112,9 +112,9 @@ if (field /= io%field) cycle loop
 ! i/o
 val = io%val * time_function(io%pulse, tm, dt, io%tau)
 select case (io%mode)
-case ('=c', '+c')
+case ('c', 'c+')
     call set_cube(f, w1, i3, i4, di, io%x1, io%x2, val, io%mode)
-case ('=C', '+C')
+case ('C', 'C+')
     call set_cube(f, w2, i3, i4, di, io%x1, io%x2, val, io%mode)
 case ('=')
     do l = i1(3), i2(3), di(3)
@@ -132,7 +132,7 @@ case ('+')
     end do
     end do
     end do
-case ('=i')
+case ('i')
     if (all(i1 == i2)) then
         do l = i1(3) - 1, i1(3)
         do k = i1(2) - 1, i1(2)
@@ -145,7 +145,7 @@ case ('=i')
         end do
         end do
     end if
-case ('+i')
+case ('i+')
     if (all(i1 == i2)) then
         do l = i1(3) - 1, i1(3)
         do k = i1(2) - 1, i1(2)
@@ -158,7 +158,7 @@ case ('+i')
         end do
         end do
     end if
-case ('=s')
+case ('s')
     call random_number(s1)
     do l = i1(3), i2(3), di(3)
     do k = i1(2), i2(2), di(2)
@@ -167,7 +167,7 @@ case ('=s')
     end do
     end do
     end do
-case ('+s')
+case ('s+')
     call random_number(s1)
     do l = i1(3), i2(3), di(3)
     do k = i1(2), i2(2), di(2)
@@ -176,8 +176,8 @@ case ('+s')
     end do
     end do
     end do
-case ('=r', '+r', '=R', '+R')
-    if (io%mode(2:2) == 'R') then
+case ('r', 'R', 'r+', 'R+')
+    if (io%mode(1:1) == 'R') then
         do i = 1, 3
             if (m(i) == 1) then
                 i1(i) = 1
@@ -231,7 +231,7 @@ case ('=r', '+r', '=R', '+R')
         call scalar_swap_halo(s1, nhalo)
         call interpolate(s1, i1, i2, di)
     end if
-    if (io%mode(2:2) == 'R') then
+    if (io%mode(1:1) == 'R') then
         if (m(1) == 1) then
             i2(1) = size(f, 1)
             do i = 2, i2(1)
@@ -251,19 +251,19 @@ case ('=r', '+r', '=R', '+R')
             end do
         end if
     end if
-    if (io%mode(1:1) == '=') then
-        do l = i1(3), i2(3)
-        do k = i1(2), i2(2)
-        do j = i1(1), i2(1)
-            f(j,k,l) = s1(j,k,l)
-        end do
-        end do
-        end do
-    elseif (io%mode(1:1) == '+') then
+    if (io%mode(2:2) == '+') then
         do l = i1(3), i2(3)
         do k = i1(2), i2(2)
         do j = i1(1), i2(1)
             f(j,k,l) = f(j,k,l) + s1(j,k,l)
+        end do
+        end do
+        end do
+    else
+        do l = i1(3), i2(3)
+        do k = i1(2), i2(2)
+        do j = i1(1), i2(1)
+            f(j,k,l) = s1(j,k,l)
         end do
         end do
         end do
@@ -273,7 +273,7 @@ case ('=r', '+r', '=R', '+R')
         call pdelete
         cycle loop
     end if
-case ('=w', '=wi')
+case ('w', 'wi')
     if (io%ib < 0) then
         !XXX allocate (io%buff(io%nc,n(1)*n(2)*n(3),io%nb))
         allocate (io%buff(n(1)*n(2)*n(3),io%nb))
@@ -290,7 +290,7 @@ case ('=w', '=wi')
         end select
     end if
     io%ib = io%ib + 1
-    if (io%mode == '=wi' .and. all(i1 == i2)) then
+    if (io%mode(2:2) == 'i' .and. all(i1 == i2)) then
         io%buff(1,io%ib) = 0.0
         do l = i1(3) - 1, i2(3)
         do k = i1(2) - 1, i2(2)

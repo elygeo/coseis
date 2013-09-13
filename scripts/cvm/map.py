@@ -9,6 +9,7 @@ import cst
 
 # parameters
 prop = 'vs'
+prop = 'rho'
 label = 'S-wave velocity (m/s)'
 depth = 500.0
 vmin, vmax = 300, 3200
@@ -24,14 +25,17 @@ z = np.empty_like(x)
 z.fill(depth)
 
 # CVM extractions
-vss = cst.cvms.extract(x, y, z, prop)[0]
+#vss = cst.cvms.extract(x, y, z, prop)[0]
 vsh = cst.cvmh.extract(x, y, z, prop)[0]
 
 # map data
 x, y = cst.data.mapdata('coastlines', 'high', (lon, lat), 100.0)
 
 # plot
-for vs, tag in (vss, 'S'), (vsh, 'H'):
+for vs, tag in [
+    #(vss, 'S'),
+    (vsh, 'H'),
+]:
     fig = plt.figure(figsize=(6.4, 4.8))
     ax = plt.gca()
     im = ax.imshow(vs, extent=lon+lat, cmap=cmap, vmin=vmin, vmax=vmax,

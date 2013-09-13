@@ -127,5 +127,5 @@ f = os.path.join('run', 'fence-%s-%s.png' % (model, prop))
 print f
 mlab.savefig(f, magnification=1)
 fig.scene.disable_render = False
-mlab.show()
+#mlab.show()
 
