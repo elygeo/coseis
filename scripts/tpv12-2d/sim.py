@@ -6,7 +6,6 @@ FIXME: prestress not correct
 import os, math
 import numpy as np
 import cst
-s_ = cst.sord.s_
 prm = {}
 
 # dimensions
@@ -49,11 +48,11 @@ prm['fieldio'] = [
     ['vp',  [], '=', 5716.0],
     ['vs',  [], '=', 3300.0],
     ['gam', [], '=', 0.2],
-    ['gam', [j,k,l,[]], '=', 0.02],
+    ['gam', [j,k,l,':'], '=', 0.02],
 ]
 
 # fault parameters
-k = [1, 15000.0 / dy]
+k = [None, 15000.0 / dy]
 l = prm['ihypo'][2]
 prm['faultnormal'] = 3
 prm['fieldio'] += [
@@ -61,28 +60,31 @@ prm['fieldio'] += [
     ['dc',  [], '=', 0.5],
     ['mud', [], '=', 0.1],
     ['mus', [], '=', 1e4],
-    ['mus', [[],k,l,[]], 'R', 0.7],
-    ['s11', [1,[],l,0], 'R', 's11.bin'],
-    ['s22', [1,[],l,0], 'R', 's22.bin'],
-    ['s33', [1,[],l,0], 'R', 's33.bin'],
+    ['mus', [':',k,l,':'], 'R', 0.7],
+    ['s11', [1,':',l,0], 'R', 's11.bin'],
+    ['s22', [1,':',l,0], 'R', 's22.bin'],
+    ['s33', [1,':',l,0], 'R', 's33.bin'],
 ]
 
 # nucleation
 i = 1500.0 / dx
 j, k, l = prm['ihypo']
+k0 = [k - i, k + i]
+k1 = [k - i - 1, k + i + 1]
 prm['fieldio'] += [
-    ['mus', s_[:,k-i-1:k+i+1,l,:], '=', 0.62],
-    ['mus', s_[:,k-i:k+i,    l,:], '=', 0.54],
+    ['mus', [':',k1,l,':'], '=', 0.62],
+    ['mus', [':',k0,l,':'], '=', 0.54],
 ]
 
 # fault time histories
-x, j, l = 0, 1, prm['ihypo'][2]
+x, j = 0, 1
+l = prm['ihypo'][2]
 for y in 0, 15, 30, 45, 75, 120:
     k = y * 100.0 / dy + 1
     for f in 'su1', 'su2', 'su3', 'sv1', 'sv2', 'sv3', 'ts1', 'ts2', 'ts3', 'tnm':
         p = 'faultst%03ddp%03d-%s.bin' % (x, y, f)
         p = p.replace('fault-', 'fault-0')
-        prm['fieldio'] += [[f, [j,k,l,[]], 'w', p]]
+        prm['fieldio'] += [[f, [j,k,l,':'], 'w', p]]
 
 # body time histories
 x, j = 0, 1
@@ -103,7 +105,7 @@ for y, z in [
     for f in 'u1', 'u2', 'u3', 'v1', 'v2', 'v3':
         p = 'body%03dst%03ddp%03d-%s.bin' % (z, x, y, f)
         p = p.replace('body-', 'body-0')
-        prm['fieldio'] += [[f, [j,k,l,[]], 'w', p]]
+        prm['fieldio'] += [[f, [j,k,l,':'], 'w', p]]
 
 # pre-stress
 d = np.arange(ny) * alpha * dy

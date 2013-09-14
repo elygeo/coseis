@@ -3,7 +3,6 @@
 Semi-cylindrical canyon with vertically incident P-wave.
 """
 import cst
-s_ = cst.sord.s_
 prm = {}
 
 # dimentions
@@ -29,18 +28,18 @@ prm['fieldio'] += [['v2', s_[-1,161:,:,:], 'f', 1.0, 'ricker1', 2.0]]
 
 # mesh input
 prm['fieldio'] += [
-    ['x1', s_[:,:,1,0], 'R', 'x.bin'],
-    ['x2', s_[:,:,1,0], 'R', 'y.bin'],
+    ['x1', '[:,:,1,0]', 'R', 'x.bin'],
+    ['x2', '[:,:,1,0]', 'R', 'y.bin'],
 ]
 
 # output
 for c in '12':
     prm['fieldio'] += [
-        ['u' + c, s_[-1,-1,1,0],   'w', 'source-u%s.bin' % c],
-        ['u' + c, s_[1,:,1,0],     'w', 'canyon-u%s.bin' % c],
-        ['u' + c, s_[2:158,1,1,0], 'w', 'flank-u%s.bin' % c],
-        ['v' + c, s_[:,:,1,::10],  'w', 'snap-v%s.bin' % c],
-        ['u' + c, s_[:,:,1,::10],  'w', 'snap-u%s.bin' % c],
+        ['u' + c, '[-1,-1,1,0]',   'w', 'source-u%s.bin' % c],
+        ['u' + c, '[1,:,1,0]',     'w', 'canyon-u%s.bin' % c],
+        ['u' + c, '[2:158,1,1,0]', 'w', 'flank-u%s.bin' % c],
+        ['v' + c, '[:,:,1,::10]',  'w', 'snap-v%s.bin' % c],
+        ['u' + c, '[:,:,1,::10]',  'w', 'snap-u%s.bin' % c],
     ]
 
 # run job

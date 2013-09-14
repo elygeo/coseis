@@ -440,33 +440,30 @@ def prepare_param(prm):
         x1 = x2 = [0.0, 0.0, 0.0]
 
         # select mode
-        if len(line) is 11:
-            mode, nc, pulse, tau, x1, x2, nb, ii, filename, val, fields = line[1:]
+        if line[0][0] in '+=':
+            mode, fields, ii = line[:3]
+            if len(mode) > 1 and mode[0] == '=':
+                mode = mode[1:]
+            if mode[0] == '+':
+                mode = mode[1:] + '+'
         else:
-            if line[0][0] in '+=':
-                mode, fields, ii = line[:3]
-                if len(mode) > 1 and mode[0] == '=':
-                    mode = mode[1:]
-                if mode[0] == '+':
-                    mode = mode[1:] + '+'
+            fields, ii, mode = line[:3]
+        try:
+            if mode in ['r', 'R', 'r+', 'R+', 'w', 'wi']:
+                filename = line[3]
+            elif mode in ['=', '+', 's', 's+', 'i', 'i+']:
+                val = line[3]
+            elif mode in ['f', 'f+', 'fs', 'fs+', 'fi', 'fi+']:
+                val, pulse, tau = line[3:]
+            elif mode in ['c', 'c+']:
+                val, x1, x2 = line[3:]
+            elif mode in ['fc', 'fc+']:
+                val, pulse, tau, x1, x2 = line[3:]
             else:
-                fields, ii, mode = line[:3]
-            try:
-                if mode in ['r', 'R', 'r+', 'R+', 'w', 'wi']:
-                    filename = line[3]
-                elif mode in ['=', '+', 's', 's+', 'i', 'i+']:
-                    val = line[3]
-                elif mode in ['f', 'f+', 'fs', 'fs+', 'fi', 'fi+']:
-                    val, pulse, tau = line[3:]
-                elif mode in ['c', 'c+']:
-                    val, x1, x2 = line[3:]
-                elif mode in ['fc', 'fc+']:
-                    val, pulse, tau, x1, x2 = line[3:]
-                else:
-                    raise Exception('Error: bad i/o mode: %r' % line)
-            except ValueError:
-                print('Error: bad i/o spec: %r' % line)
-                raise
+                raise Exception('Error: bad i/o mode: %r' % line)
+        except ValueError:
+            print('Error: bad i/o spec: %r' % line)
+            raise
 
         filename = os.path.expanduser(filename)
         if len(filename) > 32:

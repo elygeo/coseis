@@ -6,7 +6,6 @@ import os, json, shutil
 import numpy as np
 import pyproj
 import cst
-s_ = cst.sord.s_
 prm = {}
 
 # resolution and parallelization
@@ -118,10 +117,10 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         j = x / delta[0] + 1.0
         k = y / delta[1] + 1.0
         prm['fieldio'] += [
-            ['vs', [j,k,1,[]], m, 'out/' + s + '-vs.bin'],
-            ['v1', [j,k,1,[]], m, 'out/' + s + '-v1.bin'],
-            ['v2', [j,k,1,[]], m, 'out/' + s + '-v2.bin'],
-            ['v3', [j,k,1,[]], m, 'out/' + s + '-v3.bin'],
+            ['vs', [j,k,1,':'], m, 'out/' + s + '-vs.bin'],
+            ['v1', [j,k,1,':'], m, 'out/' + s + '-v1.bin'],
+            ['v2', [j,k,1,':'], m, 'out/' + s + '-v2.bin'],
+            ['v3', [j,k,1,':'], m, 'out/' + s + '-v3.bin'],
         ]
 
     # surface output
@@ -130,25 +129,30 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         nh = 4 * ns
         mh = max(1, int(0.025 / dt + 0.5))
         ms = max(1, int(0.125 / (dt * mh) + 0.5))
+        i = [None, None, ns]
+        j = [None, None, nh]
+        k = [None, None, ms]
+        l = [None, None, mh]
         prm['fieldio'] += [
-            ['v1', s_[::ns,::ns,1,::mh], 'w', 'hold/full-v1.bin'],
-            ['v2', s_[::ns,::ns,1,::mh], 'w', 'hold/full-v2.bin'],
-            ['v3', s_[::ns,::ns,1,::mh], 'w', 'hold/full-v3.bin'],
-            ['v1', s_[::ns,::ns,1,::ms], '#', 'hold/snap-v1.bin'],
-            ['v2', s_[::ns,::ns,1,::ms], '#', 'hold/snap-v2.bin'],
-            ['v3', s_[::ns,::ns,1,::ms], '#', 'hold/snap-v3.bin'],
-            ['v1', s_[::nh,::nh,1,::mh], '#', 'hold/hist-v1.bin'],
-            ['v2', s_[::nh,::nh,1,::mh], '#', 'hold/hist-v2.bin'],
-            ['v3', s_[::nh,::nh,1,::mh], '#', 'hold/hist-v3.bin'],
+            ['v1', [i,i,1,l], 'w', 'hold/full-v1.bin'],
+            ['v2', [i,i,1,l], 'w', 'hold/full-v2.bin'],
+            ['v3', [i,i,1,l], 'w', 'hold/full-v3.bin'],
+            ['v1', [i,i,1,k], '#', 'hold/snap-v1.bin'],
+            ['v2', [i,i,1,k], '#', 'hold/snap-v2.bin'],
+            ['v3', [i,i,1,k], '#', 'hold/snap-v3.bin'],
+            ['v1', [j,j,1,l], '#', 'hold/hist-v1.bin'],
+            ['v2', [j,j,1,l], '#', 'hold/hist-v2.bin'],
+            ['v3', [j,j,1,l], '#', 'hold/hist-v3.bin'],
         ]
 
     # cross section output
     if 0:
+        i = []
         j, k, l = prm['ihypo']
         for f in 'v1', 'v2', 'v3', 'rho', 'vp', 'vs', 'gam':
             prm['fieldio'] += [
-                [f, s_[j,:,:,::10], 'w', 'hold/xsec-ns-%s.bin' % f],
-                [f, s_[:,k,:,::10], 'w', 'hold/xsec-ew-%s.bin' % f],
+                [f, [j,i,i,'::10'], 'w', 'hold/xsec-ns-%s.bin' % f],
+                [f, [i,k,i,'::10'], 'w', 'hold/xsec-ew-%s.bin' % f],
             ]
 
     # run directory

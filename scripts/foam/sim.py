@@ -10,7 +10,6 @@ doi:10.1785/0120010273.
 """
 import os
 import cst
-s_ = cst.sord.s_
 prm = {}
 
 # parameters
@@ -44,7 +43,7 @@ prm['bc1'] = [0, -1, -2]
 prm['bc2'] = [10, 10, 10]
 
 # rupture
-j = prm['ihypo'][0]
+j = [None, prm['ihypo'][0]]
 prm['faultnormal'] = 3
 prm['slipvector'] = [0.0, 1.0, 0.0]
 prm['fieldio'] += [
@@ -53,8 +52,8 @@ prm['fieldio'] += [
     ['mus', [], '=',  1e5],
     ['mud', [], '=',  1e5],
     ['dc',  [], '=',  0.001],
-    ['mus', s_[:j,:,:,0], '=', 2.4],
-    ['mud', s_[:j,:,:,0], '=', 1.85],
+    ['mus', [j,':',':',0], '=', 2.4],
+    ['mud', [j,':',':',0], '=', 1.85],
 ]
 
 # nucleation
@@ -65,11 +64,11 @@ prm['trelax'] = 10.0 * dt
 
 # weak zone
 if weakzone:
-    j = weakzone / dx + 1.0
+    j = [None, weakzone / dx + 1.0]
     prm['fieldio'] += [
-        ['ts',  s_[:j,:,:,0], '=', -66.0],
-        ['mus', s_[:j,:,:,0], '=',  0.6],
-        ['mud', s_[:j,:,:,0], '=',  0.6],
+        ['ts',  [j,':',':',0], '=', -66.0],
+        ['mus', [j,':',':',0], '=',  0.6],
+        ['mud', [j,':',':',0], '=',  0.6],
     ]
 
 # sensors
@@ -85,18 +84,18 @@ for s, x, g in [
     j = x / dx + 1.0
     l = z / dz + 2.0
     prm['fieldio'] += [
-        ['a2', s_[j,1,l,:], 'w', 'sensor%02d.bin' % s],
+        ['a2', [j,1,l,':'], 'w', 'sensor%02d.bin' % s],
     ]
 prm['fieldio'] += [
-    ['u2', s_[1,1,1,:], 'w', 'sensor16.bin'],
+    ['u2', [1,1,1,':'], 'w', 'sensor16.bin'],
 ]
 
 # surface output
 k = prm['ihypo'][1]
-l = 0.8 / dz + 2.0
+l = [2, 0.8 / dz + 2.0]
 prm['fieldio'] += [
-    ['u2', s_[1,k,2:l,:], 'w', 'off-fault.bin'],
-    #['v2', s_[:,k,2:l.::10], 'w', 'xsec.bin'],
+    ['u2', [1,k,l,':'], 'w', 'off-fault.bin'],
+    #['v2', [':',k,l,'::10'], 'w', 'xsec.bin'],
 ]
 
 # run SORD

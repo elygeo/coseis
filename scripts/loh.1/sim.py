@@ -9,7 +9,6 @@ http://www-rohan.sdsu.edu/~steveday/BASINS/Final_Report_1A01.pdf
 """
 import os
 import cst
-s_ = cst.sord.s_
 prm = {}
 
 # number of processors in each dimension
@@ -37,11 +36,11 @@ prm['fieldio'] = [
 ]
 
 # material properties of the layer
-i = 1000.0 / prm['delta'][2] + 0.5
+i = [None, 1000.0 / prm['delta'][2] + 0.5]
 prm['fieldio'] += [
-    ['rho', s_[:,:,:i,:], '=', 2600.0],
-    ['vp',  s_[:,:,:i,:], '=', 4000.0],
-    ['vs',  s_[:,:,:i,:], '=', 2000.0],
+    ['rho', [':',':',i,':'], '=', 2600.0],
+    ['vp',  [':',':',i,':'], '=', 4000.0],
+    ['vs',  [':',':',i,':'], '=', 2000.0],
 ]
 
 # near side boundary conditions:
@@ -66,9 +65,9 @@ for i in range(10):
     j = prm['ihypo'][0] + 600.0 * (i + 1) / prm['delta'][0]
     k = prm['ihypo'][1] + 800.0 * (i + 1) / prm['delta'][1]
     prm['fieldio'] += [
-        ['v1', [j,k,1,()], 'w', 'p%s-v1.bin' % i],
-        ['v2', [j,k,1,()], 'w', 'p%s-v2.bin' % i],
-        ['v3', [j,k,1,()], 'w', 'p%s-v3.bin' % i],
+        ['v1', [j,k,1,':'], 'w', 'p%s-v1.bin' % i],
+        ['v2', [j,k,1,':'], 'w', 'p%s-v2.bin' % i],
+        ['v3', [j,k,1,':'], 'w', 'p%s-v3.bin' % i],
     ]
 
 # run job

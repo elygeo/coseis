@@ -5,7 +5,6 @@ Explosion test problem
 import os, math
 import numpy as np
 import cst
-s_ = cst.sord.s_
 prm = {}
 
 # parameters
@@ -42,24 +41,24 @@ prm['fieldio'] = [
 ]
 
 # output
-i = prm['ihypo'][0]
-_3 = 3000.0 / prm['delta'][0] + i
-_4 = 4000.0 / prm['delta'][0] + i
+j = prm['ihypo'][0]
+k = 3000.0 / prm['delta'][0] + i
+l = 4000.0 / prm['delta'][0] + i
 op = 'w'
 op = 'wi'
 for f in 'v1', 'v2', 'v3', 'e11', 'e22', 'e33':
     prm['fieldio'] += [
-        [f, [ i, i,_4,()], op, 'p1-%s.bin' % f],
-        [f, [ i,_3,_4,()], op, 'p2-%s.bin' % f],
-        [f, [ i,_4,_4,()], op, 'p3-%s.bin' % f],
-        [f, [_3,_3,_4,()], op, 'p4-%s.bin' % f],
-        [f, [_3,_4,_4,()], op, 'p5-%s.bin' % f],
-        [f, [_4,_4,_4,()], op, 'p6-%s.bin' % f],
+        [f, [j,j,l,':'], op, 'p1-%s.bin' % f],
+        [f, [j,k,l,':'], op, 'p2-%s.bin' % f],
+        [f, [j,l,l,':'], op, 'p3-%s.bin' % f],
+        [f, [k,k,l,':'], op, 'p4-%s.bin' % f],
+        [f, [k,l,l,':'], op, 'p5-%s.bin' % f],
+        [f, [l,l,l,':'], op, 'p6-%s.bin' % f],
     ]
 prm['fieldio'] += [
-    ['v1', s_[i,:,:,::10], 'w', 'snap-v1.bin'],
-    ['v2', s_[i,:,:,::10], 'w', 'snap-v2.bin'],
-    ['v3', s_[i,:,:,::10], 'w', 'snap-v3.bin'],
+    ['v1', [j,':',':','::10'], 'w', 'snap-v1.bin'],
+    ['v2', [j,':',':','::10'], 'w', 'snap-v2.bin'],
+    ['v3', [j,':',':','::10'], 'w', 'snap-v3.bin'],
 ]
 
 # loop over sources
