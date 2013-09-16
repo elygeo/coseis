@@ -43,7 +43,7 @@ prm['ihypo'] = [1, k, l]
 j = [1.5, 15000.0 / dx + 0.5]
 k = [1.5, 15000.0 / dy + 0.5]
 l = 3000.0 / dz + 0.5
-l = [prm['ihypo'][2] - l, prm['ihypo'][2] + l]
+l = slice(prm['ihypo'][2] - l, prm['ihypo'][2] + l)
 
 # material properties
 prm['hourglass'] = [1.0, 2.0]
@@ -57,8 +57,8 @@ prm['fieldio'] = [
 
 # fault parameters
 prm['faultnormal'] = 3
-j = [None, 15000.0 / dx]
-k = [None, 15000.0 / dy]
+j = slice(None, 15000.0 / dx)
+k = slice(None, 15000.0 / dy)
 l = prm['ihypo'][2]
 prm['fieldio'] += [
     ['co', [],  '=', 2e5],
@@ -66,19 +66,19 @@ prm['fieldio'] += [
     ['mud', [], '=', 0.1],
     ['mus', [], '=', 1e4],
     ['mus', [j,k,l,':'], '=', 0.7],
-    ['s11', [1,':',l,0], 'R', 's11.bin'],
-    ['s22', [1,':',l,0], 'R', 's22.bin'],
-    ['s33', [1,':',l,0], 'R', 's33.bin'],
-    ['trup', [j,k,l,':'], 'w', 'trup.bin'],
+    ['s11', [1,':',l,0], '=fill_read', 's11.bin'],
+    ['s22', [1,':',l,0], '=fill_read', 's22.bin'],
+    ['s33', [1,':',l,0], '=fill_read', 's33.bin'],
+    ['trup', [j,k,l,':'], 'write', 'trup.bin'],
 ]
 
 # nucleation
 i = 1500.0 / dx
 j, k, l = prm['ihypo']
-j0 = [None, j + i]
-j1 = [None, j + i + 1]
-k0 = [k - i, k + i]
-k1 = [k - i - 1, k + i + 1]
+j0 = slice(None, j + i)
+j1 = slice(None, j + i + 1)
+k0 = slice(k - i, k + i)
+k1 = slice(k - i - 1, k + i + 1)
 prm['fieldio'] += [
     ['mus', [j1,k1,l,':'], '=', 0.66],
     ['mus', [j0,k1,l,':'], '=', 0.62],
@@ -105,7 +105,7 @@ for x, y in [
     for f in 'su1', 'su2', 'su3', 'sv1', 'sv2', 'sv3', 'ts1', 'ts2', 'ts3', 'tnm':
         p = 'faultst%03ddp%03d-%s.bin' % (x, y, f)
         p = p.replace('fault-', 'fault-0')
-        prm['fieldio'] += [[f, [j,k,l,':'], 'w', p]]
+        prm['fieldio'] += [[f, [j,k,l,':'], 'write', p]]
 
 # displacement and velocity time histories
 for x, y, z in [
@@ -128,7 +128,7 @@ for x, y, z in [
     for f in 'u1', 'u2', 'u3', 'v1', 'v2', 'v3':
         p = 'body%03dst%03ddp%03d-%s.bin' % (z, x, y, f)
         p = p.replace('body-', 'body-0')
-        prm['fieldio'] += [[f, [j,k,l,':'], 'w', p]]
+        prm['fieldio'] += [[f, [j,k,l,':'], 'write', p]]
 
 # pre-stress
 d = np.arange(ny) * alpha * dy

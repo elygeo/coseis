@@ -182,14 +182,13 @@ td {
 <li><a class="reference internal" href="#publications" id="id2">Publications</a></li>
 <li><a class="reference internal" href="#user-guide" id="id3">User Guide</a><ul>
 <li><a class="reference internal" href="#quick-test" id="id4">Quick test</a></li>
-<li><a class="reference internal" href="#scripting-with-python" id="id5">Scripting with Python</a></li>
-<li><a class="reference internal" href="#running-jobs" id="id6">Running jobs</a></li>
-<li><a class="reference internal" href="#field-i-o" id="id7">Field I/O</a></li>
-<li><a class="reference internal" href="#boundary-conditions" id="id8">Boundary Conditions</a></li>
-<li><a class="reference internal" href="#defining-the-fault-rupture-surface" id="id9">Defining the fault rupture surface</a></li>
+<li><a class="reference internal" href="#running-sord" id="id5">Running SORD</a></li>
+<li><a class="reference internal" href="#field-i-o" id="id6">Field I/O</a></li>
+<li><a class="reference internal" href="#boundary-conditions" id="id7">Boundary Conditions</a></li>
+<li><a class="reference internal" href="#defining-the-fault-rupture-surface" id="id8">Defining the fault rupture surface</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#memory-usage-and-scaling" id="id10">Memory Usage and Scaling</a></li>
+<li><a class="reference internal" href="#memory-usage-and-scaling" id="id9">Memory Usage and Scaling</a></li>
 </ul>
 </div>
 <div class="section" id="summary">
@@ -240,7 +239,8 @@ heterogeneous media</a>,
 velocity:</p>
 <pre class="literal-block">
 cd scripts/sord
-python sim.py -i
+mkdir run
+sord sim.yaml
 python plot.py
 </pre>
 <p>Plotting requires Matplotlib, and the result should look like this:</p>
@@ -248,50 +248,37 @@ python plot.py
 <img alt="../scripts/sord/example.png" src="../scripts/sord/example.png" />
 </blockquote>
 </div>
-<div class="section" id="scripting-with-python">
-<h2>Scripting with Python</h2>
-<p>For a simple example consider the above test,
-<a class="reference external" href="../scripts/sord/sim.py">sim.py</a>:</p>
+<div class="section" id="running-sord">
+<h2>Running SORD</h2>
+<p>The simplest way to run SORD is to execute the <tt class="docutils literal">sord</tt> command giving a
+parameter file in <a class="reference external" href="http://www.yaml.org">YAML</a> or <a class="reference external" href="http://www.json.org">JSON</a> format. See for example the above example
+<a class="reference external" href="../scripts/sord/sim.yaml">sim.yaml</a>:</p>
 <pre class="literal-block">
-#!/usr/bin/env python
-import os                                   # import O/S untilities
-import cst                                  # import the Coseis module
-prm = cst.sord.parameters()                 # for specifying SORD parameters
-s_ = cst.sord.s_                            # for specifying slices
-prm.delta = [100.0, 100.0, 100.0, 0.0075]   # step length in (x, y, z, t)
-prm.shape = [61, 61, 61, 60]                # mesh size in (x, y, z, t)
-prm.fieldio = [                             # field variable input and output
-    ['=',  'rho', [], 2670.0],              # material density
-    ['=',  'vp',  [], 6000.0],              # material P-wave velocity
-    ['=',  'vs',  [], 3464.0],              # material S-wave velocity
-    ['=',  'gam', [], 0.3],                 # material viscosity
-    ['=w', 'v1',  s_[:,:,31,-1], 'vx.bin'], # write X velocity slice output
-    ['=w', 'v2',  s_[:,:,31,-1], 'vy.bin'], # write Y velocity slice output
+delta: [100.0, 100.0, 100.0, 0.0075] # step length [dx, dy, dz, dt]
+shape: [61, 61, 61, 60]              # mesh size [nx, ny, nz, nt]
+ihypo: [31.0, 31.0, 31.0]            # hypocenter location [x, y, z]
+source1: [1e6, 1e6, 1e6]             # source components [xx, yy, zz]
+source2: [0.0, 0.0, 0.0]             # source components [yz, zx, xy]
+source: potency                      # source type
+pulse: integral_brune                # source time function
+tau: 0.045                           # source characteristic time
+fieldio: [                           # 3D field specs
+  [rho, [], '=', 2670.0],            # density
+  [vp,  [], '=', 6000.0],            # P-wave velocity
+  [vs,  [], '=', 3464.0],            # S-wave velocity
+  [gam, [], '=', 0.3],               # viscosity
+  [v1, '[:,:,31,-1]', w, vx.bin],    # v_x output slice
+  [v2, '[:,:,31,-1]', w, vy.bin],    # v_y output slice
 ]
-prm.ihypo = [31.0, 31.0, 31.0]                # source location
-prm.source = 'potency'                      # source type
-prm.source1 = [1e6, 1e6, 1e6]                 # source normal components
-prm.source2 = [0.0, 0.0, 0.0]                 # source shear components
-prm.pulse = 'integral_brune'                # source time function
-prm.tau = 6 * prm.delta[3]                  # source characteristic time
-os.mkdir('run')                             # create run directory
-os.chdir('run')                             # switch to run directory
-cst.sord.run(prm)                           # launch SORD job
+
 
 </pre>
-<p>The first thing to do is import the <tt class="docutils literal">cst</tt> module and instantiate a parameter
-object from <tt class="docutils literal">cst.sord.parameters()</tt>.  The parameter object contains all of
-the simulation settings and then passed to <tt class="docutils literal">cst.sord.run()</tt>.  A complete list
-of possible SORD parameters and default values are specified in <a class="reference external" href="../cst/sord/parameters.yaml">parameters.yaml</a>.</p>
-</div>
-<div class="section" id="running-jobs">
-<h2>Running jobs</h2>
-<p>The <tt class="docutils literal">cst.sord.run()</tt> function does four tasks: (1) configure job parameters
-(2) compile the source code if necessary (3) populate the run directory with
-necessary executable, input, and metadata files, and (4) launch the job
-interactively or through a batch processing system.  By default, step (4) is
-skipped, giving the user an opportunity to inspect the run directory prior to
-launching the job.</p>
+<p>A complete list of possible SORD parameters and default values are specified in
+<a class="reference external" href="../cst/sord/parameters.yaml">parameters.yaml</a>.</p>
+<p>A more powerful way to run the code is with Python scripting. The basic
+procedure it to import the <tt class="docutils literal">cst</tt> module, create a dictionary of parameters,
+and pass that dictionary to the <tt class="docutils literal">cst.sord.run()</tt> function. See many examples
+in the <tt class="docutils literal">cst/scripts</tt> directory.</p>
 </div>
 <div class="section" id="field-i-o">
 <h2>Field I/O</h2>
@@ -306,34 +293,34 @@ with subsequent inputs overwriting previous inputs.  So, for example, a field
 may be assigned to one value for the entire volume, followed by a different
 value for a sub-region of the volume.</p>
 <p>The four-dimensional sub-volume of the array in space and time is specified
-using Python slicing notation and a helper function <tt class="docutils literal">s_</tt> (similar to NumPy
-index expressions).  The notation is extended here to use integers for node
-indices and integers + 0.5 for cell indices (1.5, 2.5, 3.5, ...).  Array
-indexing starts at 1 for the first node, and 1.5 for the first cell.  Negative
-indices count inward from end of the array, starting at -1 for the last node,
-and -1.5 for the last cell.  Empty brackets <tt class="docutils literal">[]</tt> are shorthand for the entire
-4D volume.  Some examples of slice notation:</p>
+using Python slicing notation.  The notation is extended here to use integers
+for node indices and integers + 0.5 for cell indices (1.5, 2.5, 3.5, ...).
+Array indexing starts at 1 for the first node, and 1.5 for the first cell.
+Negative indices count inward from end of the array, starting at -1 for the
+last node, and -1.5 for the last cell.  Empty brackets <tt class="docutils literal">[]</tt> are shorthand for
+the entire 4D volume.  Colons (:) indication a slice range can only occur
+inside a string, so the slice index or the entire expression must be surrounded
+by quotes.  Some examples of slice notation:</p>
 <pre class="literal-block">
-s_ = cst.sord.s_    # Helper function for specifying slices
-s_[10,20,1,:]       # Single node, full time history
-s_[10.5,20.5,1.5,:] # Single cell, full time history
-s_[2,:,:,::10]      # j=2 node surface, every 10th time step
-s_[:,:,:,-1]        # Full 3D volume, last time step
 []                  # Entire 4D volume
+[10,20,1,-1]        # Single node, last time step
+[10.5,20.5,1.5,':'] # Single cell, full time history
+'[2,:,:,::10]'      # j=2 node surface, every 10th time step
+'[:,:,:,-1]'        # Full 3D volume, last time step
 </pre>
-<p>Each member of the <tt class="docutils literal">fieldio</tt> list contains a mode, a field name, and slice
-indices, followed by mode dependent parameters.  The following I/O modes are
+<p>Each member of the <tt class="docutils literal">fieldio</tt> list contains a field name, slice indices, and a
+mode, followed by mode dependent parameters.  The following I/O modes are
 available, where <tt class="docutils literal">'f'</tt> is the field variable name (from the list
 <a class="reference external" href="../cst/sord/fieldnames.yaml">fieldnames.yaml</a>), and <tt class="docutils literal">[]</tt> are the slice indices:</p>
 <pre class="literal-block">
-['=',   'f', [], val],             # Set f to value
-['+',   'f', [], val],             # Add value to f
-['=s',  'f', [], val],             # Set f to random numbers in range (0, val)
-['=f',  'f', [], val, tfunc, T],   # Set f to time function with period T, scaled by val
-['=r',  'f', [], filename],        # Read from filename into f
-['=R',  'f', [], filename],        # Read from filename into f with exrapolation.
-['=w',  'f', [], filename],        # Write f to filename
-['=wi', 'f', [], filename],        # Write weighted average of f to filename.
+['f', [], '=',   val],           # Set f to value
+['f', [], '+',   val],           # Add value to f
+['f', [], '=s',  val],           # Set f to random numbers in range (0, val)
+['f', [], '=f',  val, tfunc, T], # Set f to time function with period T, scaled by val
+['f', [], '=r',  filename],      # Read from filename into f
+['f', [], '=R',  filename],      # Read from filename into f with exrapolation.
+['f', [], '=w',  filename],      # Write f to filename
+['f', [], '=wi', filename],      # Write weighted average of f to filename.
 </pre>
 <p>A letter <tt class="docutils literal">'i'</tt> in the mode indicates sub-cell positioning via weighted
 averaging.  In this case the spatial indices are single logical coordinates
@@ -418,7 +405,7 @@ the j, k, or l logical mesh directions. Any other value (typically 0) disables
 rupture altogether. The location of the rupture plane with in the mesh is
 determined by the <tt class="docutils literal">ihypo</tt> parameter, which has a dual purpose of also
 defining the nucleation point. So, the indices of the collocated fault double
-nodes are given by <tt class="docutils literal">int(ihypo(faultnormal))</tt>, and <tt class="docutils literal">int(ihypo(faultnormal)) +
+nodes are given by <tt class="docutils literal">int(ihypo[faultnormal])</tt>, and <tt class="docutils literal">int(ihypo[faultnormal]) +
 1</tt>. For example, a 3D problem of dimensions 200.0 x 200.0 x 200.0, with a
 fault plane located at z = 100.0, and double nodes at l = (21, 22), may be set
 up as such:</p>

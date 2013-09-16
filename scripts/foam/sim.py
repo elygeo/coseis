@@ -42,8 +42,14 @@ prm['fieldio'] = [
 prm['bc1'] = [0, -1, -2]
 prm['bc2'] = [10, 10, 10]
 
+# nucleation
+prm['ihypo'] = [1.4 / dx + 1.0, 1, 1.5]
+prm['vrup'] = 15.0
+prm['rcrit'] = 0.4
+prm['trelax'] = 10.0 * dt
+
 # rupture
-j = [None, prm['ihypo'][0]]
+j = slice(None, prm['ihypo'][0]])
 prm['faultnormal'] = 3
 prm['slipvector'] = [0.0, 1.0, 0.0]
 prm['fieldio'] += [
@@ -56,15 +62,9 @@ prm['fieldio'] += [
     ['mud', [j,':',':',0], '=', 1.85],
 ]
 
-# nucleation
-prm['ihypo'] = [1.4 / dx + 1.0, 1, 1.5]
-prm['vrup'] = 15.0
-prm['rcrit'] = 0.4
-prm['trelax'] = 10.0 * dt
-
 # weak zone
 if weakzone:
-    j = [None, weakzone / dx + 1.0]
+    j = slice(None, weakzone / dx + 1.0)
     prm['fieldio'] += [
         ['ts',  [j,':',':',0], '=', -66.0],
         ['mus', [j,':',':',0], '=',  0.6],
@@ -84,18 +84,18 @@ for s, x, g in [
     j = x / dx + 1.0
     l = z / dz + 2.0
     prm['fieldio'] += [
-        ['a2', [j,1,l,':'], 'w', 'sensor%02d.bin' % s],
+        ['a2', [j,1,l,':'], 'write', 'sensor%02d.bin' % s],
     ]
 prm['fieldio'] += [
-    ['u2', [1,1,1,':'], 'w', 'sensor16.bin'],
+    ['u2', [1,1,1,':'], 'write', 'sensor16.bin'],
 ]
 
 # surface output
 k = prm['ihypo'][1]
-l = [2, 0.8 / dz + 2.0]
+l = slice(2, 0.8 / dz + 2.0)
 prm['fieldio'] += [
-    ['u2', [1,k,l,':'], 'w', 'off-fault.bin'],
-    #['v2', [':',k,l,'::10'], 'w', 'xsec.bin'],
+    ['u2', [1,k,l,':'], 'write', 'off-fault.bin'],
+    #['v2', [':',k,l,'::10'], 'write', 'xsec.bin'],
 ]
 
 # run SORD

@@ -44,8 +44,8 @@ prm['fieldio'] = [
 j = prm['ihypo'][0]
 k = 3000.0 / prm['delta'][0] + i
 l = 4000.0 / prm['delta'][0] + i
-op = 'w'
-op = 'wi'
+op = 'write'
+op = 'write~'
 for f in 'v1', 'v2', 'v3', 'e11', 'e22', 'e33':
     prm['fieldio'] += [
         [f, [j,j,l,':'], op, 'p1-%s.bin' % f],
@@ -56,9 +56,9 @@ for f in 'v1', 'v2', 'v3', 'e11', 'e22', 'e33':
         [f, [l,l,l,':'], op, 'p6-%s.bin' % f],
     ]
 prm['fieldio'] += [
-    ['v1', [j,':',':','::10'], 'w', 'snap-v1.bin'],
-    ['v2', [j,':',':','::10'], 'w', 'snap-v2.bin'],
-    ['v3', [j,':',':','::10'], 'w', 'snap-v3.bin'],
+    ['v1', [j,':',':','::10'], 'write', 'snap-v1.bin'],
+    ['v2', [j,':',':','::10'], 'write', 'snap-v2.bin'],
+    ['v3', [j,':',':','::10'], 'write', 'snap-v3.bin'],
 ]
 
 # loop over sources

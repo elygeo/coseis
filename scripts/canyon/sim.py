@@ -24,22 +24,22 @@ prm['fieldio'] = [
 ]
 
 # Ricker wavelet source with 2 s period.
-prm['fieldio'] += [['v2', s_[-1,161:,:,:], 'f', 1.0, 'ricker1', 2.0]]
+prm['fieldio'] += [['v2', '[-1,161:,:,:]', '=ricker1', 1.0, 2.0]]
 
 # mesh input
 prm['fieldio'] += [
-    ['x1', '[:,:,1,0]', 'R', 'x.bin'],
-    ['x2', '[:,:,1,0]', 'R', 'y.bin'],
+    ['x1', '[:,:,1,0]', '=fill_read', 'x.bin'],
+    ['x2', '[:,:,1,0]', '=fill_read', 'y.bin'],
 ]
 
 # output
 for c in '12':
     prm['fieldio'] += [
-        ['u' + c, '[-1,-1,1,0]',   'w', 'source-u%s.bin' % c],
-        ['u' + c, '[1,:,1,0]',     'w', 'canyon-u%s.bin' % c],
-        ['u' + c, '[2:158,1,1,0]', 'w', 'flank-u%s.bin' % c],
-        ['v' + c, '[:,:,1,::10]',  'w', 'snap-v%s.bin' % c],
-        ['u' + c, '[:,:,1,::10]',  'w', 'snap-u%s.bin' % c],
+        ['u' + c, [-1,-1,1,0],     'write', 'source-u%s.bin' % c],
+        ['u' + c, '[1,:,1,0]',     'write', 'canyon-u%s.bin' % c],
+        ['u' + c, '[2:158,1,1,0]', 'write', 'flank-u%s.bin' % c],
+        ['v' + c, '[:,:,1,::10]',  'write', 'snap-v%s.bin' % c],
+        ['u' + c, '[:,:,1,::10]',  'write', 'snap-u%s.bin' % c],
     ]
 
 # run job

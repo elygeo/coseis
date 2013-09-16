@@ -109,75 +109,10 @@ if (pass == '>' .and. io%mode(1:1) /= 'w') cycle loop
 !XXX loop over fields
 if (field /= io%field) cycle loop
 
-! i/o
-val = io%val * time_function(io%pulse, tm, dt, io%tau)
+! disk i/o
 select case (io%mode)
-case ('c', 'c+')
-    call set_cube(f, w1, i3, i4, di, io%x1, io%x2, val, io%mode)
-case ('C', 'C+')
-    call set_cube(f, w2, i3, i4, di, io%x1, io%x2, val, io%mode)
-case ('=')
-    do l = i1(3), i2(3), di(3)
-    do k = i1(2), i2(2), di(2)
-    do j = i1(1), i2(1), di(1)
-        f(j,k,l) = val
-    end do
-    end do
-    end do
-case ('+')
-    do l = i1(3), i2(3), di(3)
-    do k = i1(2), i2(2), di(2)
-    do j = i1(1), i2(1), di(1)
-        f(j,k,l) = f(j,k,l) + val
-    end do
-    end do
-    end do
-case ('i')
-    if (all(i1 == i2)) then
-        do l = i1(3) - 1, i1(3)
-        do k = i1(2) - 1, i1(2)
-        do j = i1(1) - 1, i1(1)
-            f(j,k,l) = val * &
-                ( (1.0 - abs(io%x1(1) - j - nnoff(1))) &
-                * (1.0 - abs(io%x1(2) - k - nnoff(2))) &
-                * (1.0 - abs(io%x1(3) - l - nnoff(3))) )
-        end do
-        end do
-        end do
-    end if
-case ('i+')
-    if (all(i1 == i2)) then
-        do l = i1(3) - 1, i1(3)
-        do k = i1(2) - 1, i1(2)
-        do j = i1(1) - 1, i1(1)
-            f(j,k,l) = f(j,k,l) + val * &
-                ( (1.0 - abs(io%x1(1) - j - nnoff(1))) &
-                * (1.0 - abs(io%x1(2) - k - nnoff(2))) &
-                * (1.0 - abs(io%x1(3) - l - nnoff(3))) )
-        end do
-        end do
-        end do
-    end if
-case ('s')
-    call random_number(s1)
-    do l = i1(3), i2(3), di(3)
-    do k = i1(2), i2(2), di(2)
-    do j = i1(1), i2(1), di(1)
-        f(j,k,l) = val * s1(j,k,l)
-    end do
-    end do
-    end do
-case ('s+')
-    call random_number(s1)
-    do l = i1(3), i2(3), di(3)
-    do k = i1(2), i2(2), di(2)
-    do j = i1(1), i2(1), di(1)
-        f(j,k,l) = f(j,k,l) + val * s1(j,k,l)
-    end do
-    end do
-    end do
-case ('r', 'R', 'r+', 'R+')
-    if (io%mode(1:1) == 'R') then
+case ('=read', '+read', '=fill', '+fill')
+    if (io%mode(2:5) == 'fill') then
         do i = 1, 3
             if (m(i) == 1) then
                 i1(i) = 1
@@ -231,7 +166,7 @@ case ('r', 'R', 'r+', 'R+')
         call scalar_swap_halo(s1, nhalo)
         call interpolate(s1, i1, i2, di)
     end if
-    if (io%mode(1:1) == 'R') then
+    if (io%mode(2:5) == 'fill') then
         if (m(1) == 1) then
             i2(1) = size(f, 1)
             do i = 2, i2(1)
@@ -251,7 +186,7 @@ case ('r', 'R', 'r+', 'R+')
             end do
         end if
     end if
-    if (io%mode(2:2) == '+') then
+    if (io%mode(1:1) == '+') then
         do l = i1(3), i2(3)
         do k = i1(2), i2(2)
         do j = i1(1), i2(1)
@@ -273,7 +208,8 @@ case ('r', 'R', 'r+', 'R+')
         call pdelete
         cycle loop
     end if
-case ('w', 'wi')
+    cycle loop
+case ('write', 'write~')
     if (io%ib < 0) then
         !XXX allocate (io%buff(io%nc,n(1)*n(2)*n(3),io%nb))
         allocate (io%buff(n(1)*n(2)*n(3),io%nb))
@@ -290,7 +226,7 @@ case ('w', 'wi')
         end select
     end if
     io%ib = io%ib + 1
-    if (io%mode(2:2) == 'i' .and. all(i1 == i2)) then
+    if (io%mode(6:6) == '~' .and. all(i1 == i2)) then
         io%buff(1,io%ib) = 0.0
         do l = i1(3) - 1, i2(3)
         do k = i1(2) - 1, i2(2)
@@ -328,6 +264,76 @@ case ('w', 'wi')
             cycle loop
         end if
     end if
+    cycle loop
+end select
+
+! non-disk i/o
+val = io%val * time_function(io%pulse, tm, dt, io%tau)
+select case (io%mode)
+case ('=cube', '+cube')
+    call set_cube(f, w1, i3, i4, di, io%x1, io%x2, val, io%mode)
+case ('=CUBE', '+CUBE')
+    call set_cube(f, w2, i3, i4, di, io%x1, io%x2, val, io%mode)
+case ('=')
+    do l = i1(3), i2(3), di(3)
+    do k = i1(2), i2(2), di(2)
+    do j = i1(1), i2(1), di(1)
+        f(j,k,l) = val
+    end do
+    end do
+    end do
+case ('+')
+    do l = i1(3), i2(3), di(3)
+    do k = i1(2), i2(2), di(2)
+    do j = i1(1), i2(1), di(1)
+        f(j,k,l) = f(j,k,l) + val
+    end do
+    end do
+    end do
+case ('=~')
+    if (all(i1 == i2)) then
+        do l = i1(3) - 1, i1(3)
+        do k = i1(2) - 1, i1(2)
+        do j = i1(1) - 1, i1(1)
+            f(j,k,l) = val * &
+                ( (1.0 - abs(io%x1(1) - j - nnoff(1))) &
+                * (1.0 - abs(io%x1(2) - k - nnoff(2))) &
+                * (1.0 - abs(io%x1(3) - l - nnoff(3))) )
+        end do
+        end do
+        end do
+    end if
+case ('+~')
+    if (all(i1 == i2)) then
+        do l = i1(3) - 1, i1(3)
+        do k = i1(2) - 1, i1(2)
+        do j = i1(1) - 1, i1(1)
+            f(j,k,l) = f(j,k,l) + val * &
+                ( (1.0 - abs(io%x1(1) - j - nnoff(1))) &
+                * (1.0 - abs(io%x1(2) - k - nnoff(2))) &
+                * (1.0 - abs(io%x1(3) - l - nnoff(3))) )
+        end do
+        end do
+        end do
+    end if
+case ('=rand')
+    call random_number(s1)
+    do l = i1(3), i2(3), di(3)
+    do k = i1(2), i2(2), di(2)
+    do j = i1(1), i2(1), di(1)
+        f(j,k,l) = val * s1(j,k,l)
+    end do
+    end do
+    end do
+case ('+rand')
+    call random_number(s1)
+    do l = i1(3), i2(3), di(3)
+    do k = i1(2), i2(2), di(2)
+    do j = i1(1), i2(1), di(1)
+        f(j,k,l) = f(j,k,l) + val * s1(j,k,l)
+    end do
+    end do
+    end do
 case default
     write (0,*) "bad i/o mode '", trim(io%mode), "' for ", trim(io%filename)
     stop

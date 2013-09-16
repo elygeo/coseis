@@ -7,11 +7,10 @@ def test(argv=[]):
     import os
     import numpy as np
     import cst
+    prm = {}
 
     # parameters
-    prm = {}
     prm['argv'] = argv
-    prm['debug'] = 3
     prm['itstats'] = 1
 
     # dimensions
@@ -41,7 +40,7 @@ def test(argv=[]):
 
     # output
     for f in cst.sord.fieldnames()['volume']:
-        prm['fieldio'] += [[f, [], 'w', f + '.bin']]
+        prm['fieldio'] += [[f, [], 'write', f + '.bin']]
 
     # master
     prm['rundir'] = d0 = os.path.join('run', 'point_source') + os.sep

@@ -36,7 +36,7 @@ prm['fieldio'] = [
 ]
 
 # material properties of the layer
-i = [None, 1000.0 / prm['delta'][2] + 0.5]
+i = slice(None, 1000.0 / prm['delta'][2] + 0.5)
 prm['fieldio'] += [
     ['rho', [':',':',i,':'], '=', 2600.0],
     ['vp',  [':',':',i,':'], '=', 4000.0],
@@ -65,9 +65,9 @@ for i in range(10):
     j = prm['ihypo'][0] + 600.0 * (i + 1) / prm['delta'][0]
     k = prm['ihypo'][1] + 800.0 * (i + 1) / prm['delta'][1]
     prm['fieldio'] += [
-        ['v1', [j,k,1,':'], 'w', 'p%s-v1.bin' % i],
-        ['v2', [j,k,1,':'], 'w', 'p%s-v2.bin' % i],
-        ['v3', [j,k,1,':'], 'w', 'p%s-v3.bin' % i],
+        ['v1', [j,k,1,':'], 'write', 'p%s-v1.bin' % i],
+        ['v2', [j,k,1,':'], 'write', 'p%s-v2.bin' % i],
+        ['v3', [j,k,1,':'], 'write', 'p%s-v3.bin' % i],
     ]
 
 # run job

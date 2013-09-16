@@ -55,9 +55,9 @@ for dx, np in runs:
     ]
 
     # material properties
-    j = [-15000.0 / dx - 0.5, -1.5]             # X fault extent
-    k = [ -7500.0 / dx - 0.5, -1.5]             # Y fault extent
-    l = [ -3000.0 / dx - 0.5, -1.5]             # Z low viscosity extent
+    j = slice(-15000.0 / dx - 0.5, -1.5)        # X fault extent
+    k = slice( -7500.0 / dx - 0.5, -1.5)        # Y fault extent
+    l = slice( -3000.0 / dx - 0.5, -1.5)        # Z low viscosity extent
     prm['hourglass'] = [1.0, 2.0]
     prm['fieldio'] = [
         ['rho', [], '=', 2670.0],               # density
@@ -70,10 +70,10 @@ for dx, np in runs:
     # fault parameters
     prm['faultnormal'] = 3                      # fault plane of constant z
     prm['ihypo'] = [-1, -1, -1.5]               # hypocenter indices
-    j = [-15000.0 / dx, None]                   # X fault extent
-    k = [ -7500.0 / dx, None]                   # Y fault extent
-    o = [ -1500.0 / dx - 1, None]               # nucleation patch outer extent
-    i = [ -1500.0 / dx, None]                   # nucleation patch inner extent
+    j = slice(-15000.0 / dx, None)              # X fault extent
+    k = slice( -7500.0 / dx, None)              # Y fault extent
+    o = slice( -1500.0 / dx - 1, None)          # nucleation patch outer extent
+    i = slice( -1500.0 / dx, None)              # nucleation patch inner extent
     prm['fieldio'] += [
         ['dc',  [],           '=',    0.4],     # slip weakening distance
         ['mud', [],           '=',  0.525],     # dynamic friction
@@ -89,12 +89,12 @@ for dx, np in runs:
 
     # write fault plane output
     prm['fieldio'] += [
-        ['x1',   [j,k,-2,0],    'w', 'x1.bin'], # X coordinates
-        ['x2',   [j,k,-2,0],    'w', 'x2.bin'], # Y coordinates
-        ['su1',  [j,k,-2,-1],  'w', 'su1.bin'], # final horizontal slip
-        ['su2',  [j,k,-2,-1],  'w', 'su2.bin'], # final vertical slip
-        ['psv',  [j,k,-2,-1],  'w', 'psv.bin'], # peak slip velocity
-        ['trup', [j,k,-2,-1], 'w', 'trup.bin'], # rupture time
+        ['x1',   [j,k,-2,0],  'write', 'x1.bin'],   # X coordinates
+        ['x2',   [j,k,-2,0],  'write', 'x2.bin'],   # Y coordinates
+        ['su1',  [j,k,-2,-1], 'write', 'su1.bin'],  # final horizontal slip
+        ['su2',  [j,k,-2,-1], 'write', 'su2.bin'],  # final vertical slip
+        ['psv',  [j,k,-2,-1], 'write', 'psv.bin'],  # peak slip velocity
+        ['trup', [j,k,-2,-1], 'write', 'trup.bin'], # rupture time
     ]
 
     # write slip, slip velocity, and shear traction time histories
@@ -103,8 +103,8 @@ for dx, np in runs:
     k -= 6000.0 / dx
     for f in 'su1', 'su2', 'sv1', 'sv2', 'ts1', 'ts2':
         prm['fieldio'] += [
-            [f, [j,-1,-2,':'], 'w', 'P1-%s.bin' % f],     # mode II point
-            [f, [-1,k,-2,':'], 'w', 'P2-%s.bin' % f],     # mode III point
+            [f, [j,-1,-2,':'], 'write', 'P1-%s.bin' % f], # mode II point
+            [f, [-1,k,-2,':'], 'write', 'P2-%s.bin' % f], # mode III point
         ]
 
     # run SORD

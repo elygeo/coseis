@@ -7,10 +7,10 @@ def test(argv=[]):
     import os
     import numpy as np
     import cst
-
     prm = {}
+
+    # parameters
     prm['argv'] = argv
-    prm['debug'] = 0
     prm['itstats'] = 1
 
     # dimensions
@@ -42,7 +42,7 @@ def test(argv=[]):
 
     # output
     for f in cst.sord.fieldnames.volume:
-        prm['fieldio'] += [[f, [], 'w', f + '.bin']]
+        prm['fieldio'] += [[f, [], 'write', f + '.bin']]
 
     # master
     prm['oplevel'] = 5

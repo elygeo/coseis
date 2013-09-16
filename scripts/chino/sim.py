@@ -75,7 +75,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     # topography
     if surf == 'topo':
         prm['fieldio'] += [
-            ['x3', [], 'r', 'hold/z3.bin']
+            ['x3', [], '=read', 'hold/z3.bin']
         ]
 
     # boundary conditions
@@ -107,9 +107,9 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
 
     # receivers
     if register:
-        m = 'w'
+        m = 'write'
     else:
-        m = 'wi'
+        m = 'write~'
     f = os.path.join(cwd, 'run', 'data', 'station-list.txt')
     for s in open(f).readlines():
         s, y, x = s.split()[:3]
@@ -124,35 +124,34 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         ]
 
     # surface output
+    nsnap = max(1, max(shape[:3]) / 1024)
+    nhist = 4 * nsnap
+    mhist = max(1, int(0.025 / dt + 0.5))
+    msnap = max(1, int(0.125 / (dt * mhist) + 0.5))
+    m = slice(None, None, msnap)
+    n = slice(None, None, mhist)
     if surf_out:
-        ns = max(1, max(shape[:3]) / 1024)
-        nh = 4 * ns
-        mh = max(1, int(0.025 / dt + 0.5))
-        ms = max(1, int(0.125 / (dt * mh) + 0.5))
-        i = [None, None, ns]
-        j = [None, None, nh]
-        k = [None, None, ms]
-        l = [None, None, mh]
+        j = slice(None, None, nsnap)
+        k = slice(None, None, nhist)
         prm['fieldio'] += [
-            ['v1', [i,i,1,l], 'w', 'hold/full-v1.bin'],
-            ['v2', [i,i,1,l], 'w', 'hold/full-v2.bin'],
-            ['v3', [i,i,1,l], 'w', 'hold/full-v3.bin'],
-            ['v1', [i,i,1,k], '#', 'hold/snap-v1.bin'],
-            ['v2', [i,i,1,k], '#', 'hold/snap-v2.bin'],
-            ['v3', [i,i,1,k], '#', 'hold/snap-v3.bin'],
-            ['v1', [j,j,1,l], '#', 'hold/hist-v1.bin'],
-            ['v2', [j,j,1,l], '#', 'hold/hist-v2.bin'],
-            ['v3', [j,j,1,l], '#', 'hold/hist-v3.bin'],
+            ['v1', [j,j,1,n], 'write', 'hold/full-v1.bin'],
+            ['v2', [j,j,1,n], 'write', 'hold/full-v2.bin'],
+            ['v3', [j,j,1,n], 'write', 'hold/full-v3.bin'],
+            ['v1', [j,j,1,m], '#', 'hold/snap-v1.bin'],
+            ['v2', [j,j,1,m], '#', 'hold/snap-v2.bin'],
+            ['v3', [j,j,1,m], '#', 'hold/snap-v3.bin'],
+            ['v1', [k,k,1,n], '#', 'hold/hist-v1.bin'],
+            ['v2', [k,k,1,n], '#', 'hold/hist-v2.bin'],
+            ['v3', [k,k,1,n], '#', 'hold/hist-v3.bin'],
         ]
 
     # cross section output
     if 0:
-        i = []
         j, k, l = prm['ihypo']
         for f in 'v1', 'v2', 'v3', 'rho', 'vp', 'vs', 'gam':
             prm['fieldio'] += [
-                [f, [j,i,i,'::10'], 'w', 'hold/xsec-ns-%s.bin' % f],
-                [f, [i,k,i,'::10'], 'w', 'hold/xsec-ew-%s.bin' % f],
+                [f, [j,':',':',m], 'write', 'hold/xsec-ns-%s.bin' % f],
+                [f, [':',k,':',m], 'write', 'hold/xsec-ew-%s.bin' % f],
             ]
 
     # run directory
@@ -176,7 +175,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         n = shape[:2]
         for f in 'lon.npy', 'lat.npy', 'topo.npy':
             s = np.load(mesh + f)
-            np.save(f, s[::ns,::ns])
+            np.save(f, s[::nsnap,::nsnap])
 
     # link input files
     h = mesh + 'hold' + os.sep

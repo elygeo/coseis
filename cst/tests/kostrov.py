@@ -11,6 +11,8 @@ def test(argv=[]):
 
     # parameters
     prm['argv'] = argv
+
+    # dimensions
     prm['nproc3'] = [1, 1, 2]
     prm['delta'] = [100.0, 100.0, 100.0, 0.0075]
     prm['shape'] = [51, 51, 24, 200]
@@ -48,10 +50,10 @@ def test(argv=[]):
 
     # receivers
     prm['fieldio'] += [
-        ['svm', [ -1,-21,-1,-1], 'w', 'p20a.bin'],
-        ['svm', [-13,-17,-1,-1], 'w', 'p20b.bin'],
-        ['svm', [-17,-13,-1,-1], 'w', 'p20c.bin'],
-        ['svm', [-21, -1,-1,-1], 'w', 'p20d.bin'],
+        ['svm', [ -1,-21,-1,-1], 'write', 'p20a.bin'],
+        ['svm', [-13,-17,-1,-1], 'write', 'p20b.bin'],
+        ['svm', [-17,-13,-1,-1], 'write', 'p20c.bin'],
+        ['svm', [-21, -1,-1,-1], 'write', 'p20d.bin'],
     ]
 
     # analytical solution

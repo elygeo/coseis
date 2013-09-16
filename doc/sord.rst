@@ -83,8 +83,8 @@ Running SORD
 ------------
 
 The simplest way to run SORD is to execute the ``sord`` command giving a
-parameter text file in YAML format. See for example the above example `sim.yaml
-<../scripts/sord/sim.yaml>`__:
+parameter file in YAML_ or JSON_ format. See for example the above example
+`sim.yaml <../scripts/sord/sim.yaml>`__:
 
 .. include:: ../scripts/sord/sim.yaml
    :literal:
@@ -92,19 +92,13 @@ parameter text file in YAML format. See for example the above example `sim.yaml
 A complete list of possible SORD parameters and default values are specified in
 `parameters.yaml <../cst/sord/parameters.yaml>`__.
 
-Scripting with Python
----------------------
+A more powerful way to run the code is with Python scripting. The basic
+procedure it to import the ``cst`` module, create a dictionary of parameters,
+and pass that dictionary to the ``cst.sord.run()`` function. See many examples
+in the ``cst/scripts`` directory.
 
-A more powerful method of running the code is write a Python script. The
-procedure is to import the ``cst`` module and pass a dictionary of parameters
-to ``cst.sord.run()``.
-
-the ``cst.sord.run()`` function does four tasks: (1) configure job parameters
-(2) compile the source code if necessary (3) populate the run directory with
-necessary executable, input, and metadata files, and (4) launch the job
-interactively or through a batch processing system.  By default, step (4) is
-skipped, giving the user an opportunity to inspect the run directory prior to
-launching the job.
+.. _YAML: http://www.yaml.org
+.. _JSON: http://www.json.org
 
 Field I/O
 ---------
@@ -121,40 +115,40 @@ may be assigned to one value for the entire volume, followed by a different
 value for a sub-region of the volume.
 
 The four-dimensional sub-volume of the array in space and time is specified
-using Python slicing notation and a helper function ``s_`` (similar to NumPy
-index expressions).  The notation is extended here to use integers for node
-indices and integers + 0.5 for cell indices (1.5, 2.5, 3.5, ...).  Array
-indexing starts at 1 for the first node, and 1.5 for the first cell.  Negative
-indices count inward from end of the array, starting at -1 for the last node,
-and -1.5 for the last cell.  Empty brackets ``[]`` are shorthand for the entire
-4D volume.  Some examples of slice notation::
+using Python slicing notation.  The notation is extended here to use integers
+for node indices and integers + 0.5 for cell indices (1.5, 2.5, 3.5, ...).
+Array indexing starts at 1 for the first node, and 1.5 for the first cell.
+Negative indices count inward from end of the array, starting at -1 for the
+last node, and -1.5 for the last cell.  Empty brackets ``[]`` are shorthand for
+the entire 4D volume.  Colons (:) indication a slice range can only occur
+inside a string, so the slice index or the entire expression must be surrounded
+by quotes.  Some examples of slice notation::
 
-    s_ = cst.sord.s_    # Helper function for specifying slices
-    s_[10,20,1,:]       # Single node, full time history
-    s_[10.5,20.5,1.5,:] # Single cell, full time history
-    s_[2,:,:,::10]      # j=2 node surface, every 10th time step
-    s_[:,:,:,-1]        # Full 3D volume, last time step
     []                  # Entire 4D volume
+    [10,20,1,-1]        # Single node, last time step
+    [10.5,20.5,1.5,':'] # Single cell, full time history
+    '[2,:,:,::10]'      # j=2 node surface, every 10th time step
+    '[:,:,:,-1]'        # Full 3D volume, last time step
 
-Each member of the ``fieldio`` list contains a mode, a field name, and slice
-indices, followed by mode dependent parameters.  The following I/O modes are
+Each member of the ``fieldio`` list contains a field name, slice indices, and a
+mode, followed by mode dependent parameters.  The following I/O modes are
 available, where ``'f'`` is the field variable name (from the list
 fieldnames.yaml_), and ``[]`` are the slice indices::
 
-    ['=',   'f', [], val],             # Set f to value
-    ['+',   'f', [], val],             # Add value to f
-    ['=s',  'f', [], val],             # Set f to random numbers in range (0, val)
-    ['=f',  'f', [], val, tfunc, T],   # Set f to time function with period T, scaled by val
-    ['=r',  'f', [], filename],        # Read from filename into f
-    ['=R',  'f', [], filename],        # Read from filename into f with exrapolation.
-    ['=w',  'f', [], filename],        # Write f to filename
-    ['=wi', 'f', [], filename],        # Write weighted average of f to filename.
+    ['f', [], '=',      val],      # Set to value
+    ['f', [], '+',      val],      # Add value
+    ['f', [], '=rand',  val],      # Random numbers in range (0, val)
+    ['f', [], '=tfunc', val, T],   # Time function with period T, scaled by val
+    ['f', [], '=read',  filename], # Read from filename
+    ['f', [], '=fill',  filename], # Read from filename with exrapolation.
+    ['f', [], 'write',  filename], # Write to filename
+    ['f', [], 'write~', filename], # Write weighted average to filename.
 
-A letter ``'i'`` in the mode indicates sub-cell positioning via weighted
-averaging.  In this case the spatial indices are single logical coordinates
-that may vary continuously over the range.  The fractional part of the index
-determines the weights.  For example, an index of 3.2 to the 1D variable f
-would specify the weighted average: 0.8 * f(3) + 0.2 * f(4).
+A tilde ``~`` indicates sub-cell positioning via weighted averaging.  In this
+case the spatial indices are single logical coordinates that may vary
+continuously over the range.  The fractional part of the index determines the
+weights.  For example, an index of 3.2 to the 1D variable f would specify the
+weighted average: 0.8 * f(3) + 0.2 * f(4).
 
 Reading and writing to disk uses flat binary files where j is the fastest
 changing index, and t is the slowest changing index.  Mode 'R' extrapolates any

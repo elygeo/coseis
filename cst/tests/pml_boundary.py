@@ -10,7 +10,6 @@ def test(argv=[]):
     prm = {}
 
     # parameters
-    prm = {}
     prm['argv'] = argv
     prm['itstats'] = 1
 
@@ -40,7 +39,7 @@ def test(argv=[]):
 
     # output
     for f in cst.sord.fieldnames()['volume']:
-        prm['fieldio'] += [[f, [], 'w', f + '.bin']]
+        prm['fieldio'] += [[f, [], 'write', f + '.bin']]
 
     # master
     prm['rundir'] = d0 = os.path.join('run', 'pml_boundary') + os.sep

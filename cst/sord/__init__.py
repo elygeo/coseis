@@ -325,7 +325,7 @@ def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
             for j in s.split(':'):
                 if j == '':
                     s_.append(None)
-                elif '.' in s:
+                elif '.' in j:
                     s_.append(float(j))
                 else:
                     s_.append(int(j))
