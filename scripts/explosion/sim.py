@@ -44,8 +44,8 @@ prm['fieldio'] = [
 w = 'write'
 w = 'write~'
 j = prm['ihypo'][0]
-k = 3000.0 / prm['delta'][0] + i
-l = 4000.0 / prm['delta'][0] + i
+k = 3000.0 / prm['delta'][0] + j
+l = 4000.0 / prm['delta'][0] + j
 for f in 'v1', 'v2', 'v3', 'e11', 'e22', 'e33':
     prm['fieldio'] += [
         '{}[{},{},{},:] {} p1-{}.bin'.format(f, j, j, l, w, f),
