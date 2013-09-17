@@ -26,7 +26,7 @@ ax.set_title('Surface displacement (mm)')
 ax.set_xlabel('Distance from fault (cm)')
 ax.set_ylabel('Time (ms)')
 fig.colorbar(im)
-fig.savefig(path + 'foam-%s-off-fault.png' % id_)
+fig.savefig(path + 'foam-{}-off-fault.png'.format(id_))
 fig.show()
 
 # approximate static strain
@@ -36,7 +36,7 @@ ax = fig.add_subplot(111)
 ax.plot(x, e, 'k-')
 ax.set_xlabel('Distance from fault (cm)')
 ax.set_ylabel('Strain')
-fig.savefig(path + 'foam-%s-strain.pdf' % id_)
+fig.savefig(path + 'foam-{}-strain.pdf'.format(id_))
 fig.show()
 
 # acceleration plots
@@ -60,6 +60,6 @@ for s, x, g in [
     ax.set_title('Acceleration')
     ax.set_xlabel('Time (ms)')
     ax.set_ylabel('Depth along fault (cm)')
-fig.savefig(path + 'foam-%s-acceleration.pdf' % id_)
+fig.savefig(path + 'foam-{}-acceleration.pdf'.format(id_))
 fig.show()
 

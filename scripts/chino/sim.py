@@ -67,16 +67,14 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     prm['vdamp'] = 400.0
     prm['gam2'] = 0.8
     prm['fieldio'] = [
-        ['rho', [], '=', 'hold/rho.bin'],
-        ['vp',  [], '=', 'hold/vp.bin'],
-        ['vs',  [], '=', 'hold/vs.bin'],
+        'rho = hold/rho.bin',
+        'vp  = hold/vp.bin',
+        'vs  = read hold/vs.bin',
     ]
 
     # topography
     if surf == 'topo':
-        prm['fieldio'] += [
-            ['x3', [], '=read', 'hold/z3.bin']
-        ]
+        prm['fieldio'] += ['x3 = read hold/z3.bin']
 
     # boundary conditions
     prm['bc1'] = [10, 10, 0]
@@ -107,42 +105,38 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
 
     # receivers
     if register:
-        m = 'write'
+        write = 'write'
     else:
-        m = 'write~'
+        write = 'write~'
     f = os.path.join(cwd, 'run', 'data', 'station-list.txt')
     for s in open(f).readlines():
-        s, y, x = s.split()[:3]
+        sta, y, x = s.split()[:3]
         x, y = proj(float(x), float(y))
         j = x / delta[0] + 1.0
         k = y / delta[1] + 1.0
         prm['fieldio'] += [
-            ['vs', [j,k,1,':'], m, 'out/' + s + '-vs.bin'],
-            ['v1', [j,k,1,':'], m, 'out/' + s + '-v1.bin'],
-            ['v2', [j,k,1,':'], m, 'out/' + s + '-v2.bin'],
-            ['v3', [j,k,1,':'], m, 'out/' + s + '-v3.bin'],
+            'vs[{},{},1,:] {} out/{}-vs.bin'.format(j, k, write, sta),
+            'v1[{},{},1,:] {} out/{}-v1.bin'.format(j, k, write, sta),
+            'v2[{},{},1,:] {} out/{}-v2.bin'.format(j, k, write, sta),
+            'v3[{},{},1,:] {} out/{}-v3.bin'.format(j, k, write, sta),
         ]
 
     # surface output
-    nsnap = max(1, max(shape[:3]) / 1024)
-    nhist = 4 * nsnap
-    mhist = max(1, int(0.025 / dt + 0.5))
-    msnap = max(1, int(0.125 / (dt * mhist) + 0.5))
-    m = slice(None, None, msnap)
-    n = slice(None, None, mhist)
+    ns = max(1, max(shape[:3]) / 1024)
+    nh = 4 * ns
+    mh = max(1, int(0.025 / dt + 0.5))
+    ms = max(1, int(0.125 / (dt * mh) + 0.5))
     if surf_out:
-        j = slice(None, None, nsnap)
-        k = slice(None, None, nhist)
         prm['fieldio'] += [
-            ['v1', [j,j,1,n], 'write', 'hold/full-v1.bin'],
-            ['v2', [j,j,1,n], 'write', 'hold/full-v2.bin'],
-            ['v3', [j,j,1,n], 'write', 'hold/full-v3.bin'],
-            ['v1', [j,j,1,m], '#', 'hold/snap-v1.bin'],
-            ['v2', [j,j,1,m], '#', 'hold/snap-v2.bin'],
-            ['v3', [j,j,1,m], '#', 'hold/snap-v3.bin'],
-            ['v1', [k,k,1,n], '#', 'hold/hist-v1.bin'],
-            ['v2', [k,k,1,n], '#', 'hold/hist-v2.bin'],
-            ['v3', [k,k,1,n], '#', 'hold/hist-v3.bin'],
+            'v1[::{},::{},1,::{}] write hold/full-v1.bin'.format(ns, ns, mh),
+            'v2[::{},::{},1,::{}] write hold/full-v2.bin'.format(ns, ns, mh),
+            'v3[::{},::{},1,::{}] write hold/full-v3.bin'.format(ns, ns, mh),
+            'v1[::{},::{},1,::{}] #     hold/snap-v1.bin'.format(ns, ns, ms),
+            'v2[::{},::{},1,::{}] #     hold/snap-v2.bin'.format(ns, ns, ms),
+            'v3[::{},::{},1,::{}] #     hold/snap-v3.bin'.format(ns, ns, ms),
+            'v1[::{},::{},1,::{}] #     hold/hist-v1.bin'.format(nh, nh, mh),
+            'v2[::{},::{},1,::{}] #     hold/hist-v2.bin'.format(nh, nh, mh),
+            'v3[::{},::{},1,::{}] #     hold/hist-v3.bin'.format(nh, nh, mh),
         ]
 
     # cross section output
@@ -150,8 +144,8 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         j, k, l = prm['ihypo']
         for f in 'v1', 'v2', 'v3', 'rho', 'vp', 'vs', 'gam':
             prm['fieldio'] += [
-                [f, [j,':',':',m], 'write', 'hold/xsec-ns-%s.bin' % f],
-                [f, [':',k,':',m], 'write', 'hold/xsec-ew-%s.bin' % f],
+                '{}[{},:,:,::{}] write hold/xsec-ns-{}.bin'.format(f, j, ms, f),
+                '{}[:,{},:,::{}] write hold/xsec-ew-{}.bin'.format(f, k, ms, f),
             ]
 
     # run directory
@@ -175,7 +169,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         n = shape[:2]
         for f in 'lon.npy', 'lat.npy', 'topo.npy':
             s = np.load(mesh + f)
-            np.save(f, s[::nsnap,::nsnap])
+            np.save(f, s[::ns,::ns])
 
     # link input files
     h = mesh + 'hold' + os.sep

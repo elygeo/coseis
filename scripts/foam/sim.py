@@ -32,10 +32,10 @@ prm['shape'] = [
 # material model
 prm['hourglass'] = [1.0, 1.0]
 prm['fieldio'] = [
-    ['rho', [], '=', 16.0],
-    ['vp',  [], '=', 56.0],
-    ['vs',  [], '=', 30.0],
-    ['gam', [], '=', 0.5],
+    'rho = 16.0',
+    'vp  = 56.0',
+    'vs  = 30.0',
+    'gam = 0.5',
 ]
 
 # boundary conditions
@@ -49,26 +49,26 @@ prm['rcrit'] = 0.4
 prm['trelax'] = 10.0 * dt
 
 # rupture
-j = slice(None, prm['ihypo'][0]])
+j = prm['ihypo'][0]
 prm['faultnormal'] = 3
 prm['slipvector'] = [0.0, 1.0, 0.0]
 prm['fieldio'] += [
-    ['ts',  [], '=', -730.0],
-    ['tn',  [], '=', -330.0],
-    ['mus', [], '=',  1e5],
-    ['mud', [], '=',  1e5],
-    ['dc',  [], '=',  0.001],
-    ['mus', [j,':',':',0], '=', 2.4],
-    ['mud', [j,':',':',0], '=', 1.85],
+    'ts  = -730.0',
+    'tn  = -330.0',
+    'mus = 1e5',
+    'mud = 1e5',
+    'dc  = 0.001',
+    'mus[:{},:,:,0] = 2.4'.format(j),
+    'mud[:{},:,:,0] = 1.85'.format(j),
 ]
 
 # weak zone
+j = weakzone / dx + 1.0
 if weakzone:
-    j = slice(None, weakzone / dx + 1.0)
     prm['fieldio'] += [
-        ['ts',  [j,':',':',0], '=', -66.0],
-        ['mus', [j,':',':',0], '=',  0.6],
-        ['mud', [j,':',':',0], '=',  0.6],
+        'ts[{},:,:,0], = -66.0'.format(j),
+        'mus[{},:,:,0], =  0.6'.format(j),
+        'mud[{},:,:,0], =  0.6'.format(j),
     ]
 
 # sensors
@@ -84,22 +84,22 @@ for s, x, g in [
     j = x / dx + 1.0
     l = z / dz + 2.0
     prm['fieldio'] += [
-        ['a2', [j,1,l,':'], 'write', 'sensor%02d.bin' % s],
+        'a2[{},1,{},:] write sensor{:02d}.bin'.format(j, l, s),
     ]
 prm['fieldio'] += [
-    ['u2', [1,1,1,':'], 'write', 'sensor16.bin'],
+    'u2[1,1,1,:] write sensor16.bin'
 ]
 
 # surface output
 k = prm['ihypo'][1]
-l = slice(2, 0.8 / dz + 2.0)
+l = 0.8 / dz + 2.0
 prm['fieldio'] += [
-    ['u2', [1,k,l,':'], 'write', 'off-fault.bin'],
-    #['v2', [':',k,l,'::10'], 'write', 'xsec.bin'],
+    'u2[1,{},2:{},:] write off-fault.bin'.format(k, l),
+    #'v2[:,{},2:{},::10] write xsec.bin'.format(k, l),
 ]
 
 # run SORD
-prm['rundir'] = os.path.join('run', '%02.0f' % (weakzone * 100))
+prm['rundir'] = os.path.join('run', '{:02.0f}'.format(weakzone * 100))
 os.makedirs(prm['rundir'])
 cst.sord.run(prm)
 

@@ -32,20 +32,20 @@ prm['bc1'] = [0, 0, 0]
 prm['bc2'] = [0, 0, 0]
 prm['npml'] = 0
 prm['fieldio'] = [
-    ['rho', [], '=', 2670.0],
-    ['vp',  [], '=', 6000.0],
-    ['vs',  [], '=', 3464.0],
-    ['gam', [], '=',    0.0],
-    ['v1', '[:,:,:,1]', '=rand', 1.0],
-    ['v2', '[:,:,:,1]', '=rand', 1.0],
-    ['v3', '[:,:,:,1]', '=rand', 1.0],
+    'rho = 2670.0',
+    'vp = 6000.0',
+    'vs = 3464.0',
+    'gam = 0.0',
+    'v1[:,:,:,1] = rand 1.0',
+    'v2[:,:,:,1] = rand 1.0',
+    'v3[:,:,:,1] = rand 1.0',
 ]
 
 for i in power[::-1]:
     n = 2 ** i
     prm['nproc3'] = [2, n, n]
     prm['shape'] = [points, n * points, n * points, prm['itio']]
-    d = os.path.joing('run', 'bench%s' % i)
+    d = os.path.joing('run', 'bench{}'.format(i))
     os.makedirs(d)
     cst.sord.run(prm)
 

@@ -79,10 +79,10 @@ for path in glob.glob(runs):
         ax.set_xlim(0.5, dt * n)
         ax.legend(['v_r', 'v_t1', 'v_t2', 'v_a'])
         name = os.path.split(path)[-1]
-        ax.set_title(name + ' (%s, %s, %s)' % tuple(x))
+        ax.set_title(name + ' ' + str(tuple(x)))
         if sta in save_plot:
             name = 'Explosion point source'
-            ax.set_title(name + ' (%s, %s, %s)' % tuple(x))
+            ax.set_title(name + ' ' + str(tuple(x)))
             f = os.path.join(path, 'explosion.png')
             fig.savefig(f)
         fig.show()

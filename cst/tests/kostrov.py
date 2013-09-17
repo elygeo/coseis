@@ -23,10 +23,10 @@ def test(argv=[]):
     vs = 3464.0
     prm['hourglass'] = [1.0, 1.0]
     prm['fieldio'] = [
-        ['rho', [], '=', rho],
-        ['vp',  [], '=', vp],
-        ['vs',  [], '=', vs],
-        ['gam', [], '=', 1.0],
+        'rho = {}'.format(rho),
+        'vp  = {}'.format(vp),
+        'vs  = {}'.format(vs),
+        'gam = 1.0',
     ]
 
     # boundary conditions
@@ -41,19 +41,19 @@ def test(argv=[]):
     prm['rcrit'] = 1e9
     prm['trelax'] = 0.0
     prm['fieldio'] += [
-        ['mud', [], '=', 1.0],
-        ['mus', [], '=', 1e9],
-        ['dc',  [], '=', 1e9],
-        ['tn',  [], '=', -90e6],
-        ['ts',  [], '=', -90e6 - dtau],
+        'mud = 1.0',
+        'mus = 1e9',
+        'dc = 1e9',
+        'tn = {}'.format(-90e6),
+        'ts = {}'.format(-90e6 - dtau),
     ]
 
     # receivers
     prm['fieldio'] += [
-        ['svm', [ -1,-21,-1,-1], 'write', 'p20a.bin'],
-        ['svm', [-13,-17,-1,-1], 'write', 'p20b.bin'],
-        ['svm', [-17,-13,-1,-1], 'write', 'p20c.bin'],
-        ['svm', [-21, -1,-1,-1], 'write', 'p20d.bin'],
+        'svm[ -1,-21,-1,-1] write p20a.bin',
+        'svm[-13,-17,-1,-1] write p20b.bin',
+        'svm[-17,-13,-1,-1] write p20c.bin',
+        'svm[-21, -1,-1,-1] write p20d.bin',
     ]
 
     # analytical solution
@@ -69,7 +69,7 @@ def test(argv=[]):
 
     # compare with analytical solution
     for p in 'abcd':
-        f = d + 'p20%s.bin' % p
+        f = d + 'p20{}.bin'.format(p)
         dv = v - np.fromfile(f, cfg['dtype'])[-1]
         err = dv / v
         print(v, err)

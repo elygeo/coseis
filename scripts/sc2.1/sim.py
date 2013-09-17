@@ -38,10 +38,10 @@ prm['hourglass'] = [1.0, 1.0]
 prm['vs1'] = 200.0
 prm['vp1'] = 600.0
 prm['fieldio'] = [
-    ['rho', [], '=read', 'rho.bin'],
-    ['vp',  [], '=read', 'vp.bin'],
-    ['vs',  [], '=read', 'vs.bin'],
-    ['gam', [], '=',  0.0],
+    'rho = read rho.bin',
+    'vp  = read vp.bin',
+    'vs  = read vs.bin',
+    'gam = 0.0',
 ]
 
 # source
@@ -60,13 +60,13 @@ for i in range(8):
     j = (74000.0 - 6000.0 * i) / delta[0] + 1
     k = (16000.0 + 8000.0 * i) / delta[1] + 1
     prm['fieldio'] += [
-        ['v1', [j,k,1,':'], 'write~', 'p%s-v1.bin' % i],
-        ['v2', [j,k,1,':'], 'write~', 'p%s-v2.bin' % i],
-        ['v3', [j,k,1,':'], 'write~', 'p%s-v3.bin' % i],
+        'v1[{},{},1,:] ~write p{}-v1.bin'.format(j, k, i),
+        'v2[{},{},1,:] ~write p{}-v2.bin'.format(j, k, i),
+        'v3[{},{},1,:] ~write p{}-v3.bin'.format(j, k, i),
     ]
 
 # run job
-prm['rundir'] = d = os.path.join('run', 'sim', '%.0f' % dx)
+prm['rundir'] = d = os.path.join('run', 'sim', '{:.0f}'.format(dx))
 os.makedirs(d)
 for v in 'rho', 'vp', 'vs':
     os.link(mesh + v + '.bin', d + v + 'bin')

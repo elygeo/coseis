@@ -31,15 +31,15 @@ def test(argv=[]):
     # material
     prm['hourglass'] = [1.0, 1.0]
     prm['fieldio'] = [
-        ['rho', [], '=', 2670.0],
-        ['vp',  [], '=', 6000.0],
-        ['vs',  [], '=', 3464.0],
-        ['gam', [], '=', 0.3],
+        'rho = 2670.0',
+        'vp  = 6000.0',
+        'vs  = 3464.0',
+        'gam = 0.3',
     ]
 
     # output
     for f in cst.sord.fieldnames()['volume']:
-        prm['fieldio'] += [[f, [], 'write', f + '.bin']]
+        prm['fieldio'] += ['{} write {}.bin'.format(f, f)]
 
     # master
     prm['rundir'] = d0 = os.path.join('run', 'pml_boundary') + os.sep

@@ -34,19 +34,19 @@ def test(argv=[]):
     # material
     prm['hourglass'] = [1.0, 1.0],
     prm['fieldio'] = [
-        ['rho', [], '=', 2670.0],
-        ['vp',  [], '=', 6000.0],
-        ['vs',  [], '=', 3464.0],
-        ['gam', [], '=', 0.3],
+        'rho = 2670.0',
+        'vp  = 6000.0',
+        'vs  = 3464.0',
+        'gam = 0.3',
     ]
 
     # output
     for f in cst.sord.fieldnames.volume:
-        prm['fieldio'] += [[f, [], 'write', f + '.bin']]
+        prm['fieldio'] += ['{} write {}.bin'.format(f, f)]
 
     # master
     prm['oplevel'] = 5
-    prm['rundir'] = d0 = os.path.join('run', 'oplevel%s' % prm['oplevel']) + os.sep
+    prm['rundir'] = d0 = os.path.join('run', 'oplevel{}'.format(prm['oplevel'])) + os.sep
     os.makedirs(d0)
     cst.sord.run(prm)
 
@@ -54,7 +54,7 @@ def test(argv=[]):
     max_err_all_ = 0.0
     for i in 6,:
         prm['oplevel'] = i
-        prm['rundir'] = d = os.path.join('run', 'oplevel%s' % i)
+        prm['rundir'] = d = os.path.join('run', 'oplevel{}'.format(i))
         os.makedirs(d)
         job = cst.sord.run(prm)
         max_err_ = 0.0
@@ -67,7 +67,7 @@ def test(argv=[]):
             e = np.abs(dv).max()
             if e:
                 e = 0.5 * e / (np.abs(v1).max() + np.abs(v2).max())
-                print('%s error: %s' % (f, e))
+                print('{} error: {}'.format(f, e))
                 max_err_ = max(max_err_, e)
         print('max error: ', max_err_)
         max_err_all_ = max(max_err_all_, max_err_)

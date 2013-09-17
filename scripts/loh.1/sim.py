@@ -27,20 +27,20 @@ prm['shape'] = [
 ]
 
 # material properties
-prm['hourglass'] = [1.0, 2.0]       	# hourglass stiffness and viscosity
+prm['hourglass'] = [1.0, 2.0]
 prm['fieldio'] = [
-    ['rho', [], '=', 2700.0],	# density
-    ['vp',  [], '=', 6000.0],	# P-wave speed
-    ['vs',  [], '=', 3464.0],	# S-wave speed
-    ['gam', [], '=',    0.0],	# viscosity
+    'rho = 2700.0',
+    'vp  = 6000.0',
+    'vs  = 3464.0',
+    'gam = 0.0',
 ]
 
 # material properties of the layer
-i = slice(None, 1000.0 / prm['delta'][2] + 0.5)
+l = 1000.0 / prm['delta'][2] + 0.5
 prm['fieldio'] += [
-    ['rho', [':',':',i,':'], '=', 2600.0],
-    ['vp',  [':',':',i,':'], '=', 4000.0],
-    ['vs',  [':',':',i,':'], '=', 2000.0],
+    'rho[:,:,:{},:] = 2600.0'.format(l),
+    'vp[:,:,:{},:] = 4000.0'.format(l),
+    'vs[:,:,:{},:] = 2000.0'.format(l),
 ]
 
 # near side boundary conditions:
@@ -53,11 +53,11 @@ prm['bc1'] = [-2, -2, 0]
 prm['bc2'] = [10, 10, 10]
 
 # source
-prm['ihypo'] = [1.5, 1.5, 41.5]     	# hypocenter indices
+prm['ihypo'] = [1.5, 1.5, 41.5]		# hypocenter indices
 prm['source'] = 'moment'		# specify moment source
 prm['pulse'] = 'integral_brune'		# Brune pulse source time function
 prm['tau'] = 0.1			# source characteristic time
-prm['source1'] = [0.0, 0.0, 0.0]    	# moment tensor M_xx, M_yy, M_zz
+prm['source1'] = [0.0, 0.0, 0.0]	# moment tensor M_xx, M_yy, M_zz
 prm['source2'] = [0.0, 0.0, 1e18]	# moment tensor M_yz, M_zx, M_yz
 
 # receivers
@@ -65,9 +65,9 @@ for i in range(10):
     j = prm['ihypo'][0] + 600.0 * (i + 1) / prm['delta'][0]
     k = prm['ihypo'][1] + 800.0 * (i + 1) / prm['delta'][1]
     prm['fieldio'] += [
-        ['v1', [j,k,1,':'], 'write', 'p%s-v1.bin' % i],
-        ['v2', [j,k,1,':'], 'write', 'p%s-v2.bin' % i],
-        ['v3', [j,k,1,':'], 'write', 'p%s-v3.bin' % i],
+        'v1[{},{},1,:] write p{}-v1.bin'.format(j, k, i),
+        'v2[{},{},1,:] write p{}-v2.bin'.format(j, k, i),
+        'v3[{},{},1,:] write p{}-v3.bin'.format(j, k, i),
     ]
 
 # run job

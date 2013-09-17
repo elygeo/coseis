@@ -34,31 +34,32 @@ prm['shape'] = [
 # material
 prm['hourglass'] = [1.0, 1.0]
 prm['fieldio'] = [
-    ['rho', [], '=', rho],
-    ['vp',  [], '=', vp],
-    ['vs',  [], '=', vs],
-    ['gam', [], '=', 0.0],
+    'rho = {}'.format(rho),
+    'vp  = {}'.format(vp),
+    'vs  = {}'.format(vs),
+    'gam = 0.0',
 ]
 
 # output
+w = 'write'
+w = 'write~'
 j = prm['ihypo'][0]
 k = 3000.0 / prm['delta'][0] + i
 l = 4000.0 / prm['delta'][0] + i
-op = 'write'
-op = 'write~'
 for f in 'v1', 'v2', 'v3', 'e11', 'e22', 'e33':
     prm['fieldio'] += [
-        [f, [j,j,l,':'], op, 'p1-%s.bin' % f],
-        [f, [j,k,l,':'], op, 'p2-%s.bin' % f],
-        [f, [j,l,l,':'], op, 'p3-%s.bin' % f],
-        [f, [k,k,l,':'], op, 'p4-%s.bin' % f],
-        [f, [k,l,l,':'], op, 'p5-%s.bin' % f],
-        [f, [l,l,l,':'], op, 'p6-%s.bin' % f],
+        '{}[{},{},{},:] {} p1-{}.bin'.format(f, j, j, l, w, f),
+        '{}[{},{},{},:] {} p2-{}.bin'.format(f, j, k, l, w, f),
+        '{}[{},{},{},:] {} p3-{}.bin'.format(f, j, j, l, w, f),
+        '{}[{},{},{},:] {} p4-{}.bin'.format(f, k, k, l, w, f),
+        '{}[{},{},{},:] {} p5-{}.bin'.format(f, k, j, l, w, f),
+        '{}[{},{},{},:] {} p6-{}.bin'.format(f, j, j, l, w, f),
     ]
+
 prm['fieldio'] += [
-    ['v1', [j,':',':','::10'], 'write', 'snap-v1.bin'],
-    ['v2', [j,':',':','::10'], 'write', 'snap-v2.bin'],
-    ['v3', [j,':',':','::10'], 'write', 'snap-v3.bin'],
+    'v1[{},:,:,::10] write snap-v1.bin'.format(j),
+    'v2[{},:,:,::10] write snap-v2.bin'.format(j),
+    'v3[{},:,:,::10] write snap-v3.bin'.format(j),
 ]
 
 # loop over sources
