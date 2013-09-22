@@ -22,7 +22,7 @@ for path in glob.glob('run/bench[0-9]*'):
 
 print 'time cores'
 for i in np.argsort(procs):
-    print('{:4.2f} {}'.format(times[i], procs[i]))
+    print('%4.2f %s' % (times[i], procs[i]))
 
 if 0:
     import matplotlib.pyplot as plt

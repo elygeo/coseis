@@ -6,17 +6,18 @@ FIXME: prestress not correct
 import os, math
 import numpy as np
 import cst
-prm = {}
+prm = cst.sord.parameters()
+fld = cst.sord.fieldnames()
 
 # dimensions
+dx, dy, dz, dt = 100.0, 100.0, 100.0, 100.0 / 12500.0
+nx = 2
+ny = int(16500.0 / dy +  21.5)
+nz = int(12000.0 / dz + 120.5)
+nt = int(    8.0 / dt +   1.5)
+prm['delta'] = [dx, dy, dz, dt]
+prm['shape'] = [nx, ny, nz, nt]
 prm['nproc3'] = [1, 1, 2]
-prm['delta'] = dx, dy, dz, dt = [100.0, 100.0, 100.0, 100.0 / 12500.0]
-prm['shape'] = nx, ny, nz, nt = [
-    2,
-    int(16500.0 / dy +  21.5),
-    int(12000.0 / dz + 120.5),
-    int(    8.0 / dt +   1.5),
-]
 
 # boundary conditions
 prm['bc1'] = [1,  0, 0]
@@ -44,11 +45,11 @@ l1 = prm['ihypo'][2] + l
 # material properties
 prm['hourglass'] = 1.0, 2.0
 prm['fieldio'] = [
-    'rho = 2700.0',
-    'vp = 5716.0',
-    'vs = 3300.0',
-    'gam = 0.2',
-    'gam[1.5,1.5:{},{}:{},:] = 0.02'.format(k, l0, l1),
+    fld['rho'] == 2700.0,
+    fld['vp']  == 5716.0,
+    fld['vs']  == 3300.0,
+    fld['gam'] == 0.2,
+    fld['gam'][1.5,1.5:k,l0:l1,:] == 0.02,
 ]
 
 # fault parameters
@@ -56,35 +57,33 @@ k = 15000.0 / dy
 l = prm['ihypo'][2]
 prm['faultnormal'] = 3
 prm['fieldio'] += [
-    'co = 2e5',
-    'dc = 0.5',
-    'mud = 0.1',
-    'mus = 1e4',
-    'mus[:,:{},{},:] = 0.7'.format(k, l),
-    's11[1,:,{},0] = fill s11.bin'.format(l),
-    's22[1,:,{},0] = fill s22.bin'.format(l),
-    's33[1,:,{},0] = fill s33.bin'.format(l),
+    fld['co'] == 2e5,
+    fld['dc'] == 0.5,
+    fld['mud'] == 0.1,
+    fld['mus'] == 1e4,
+    fld['mus'][:,:k,l,:] == 0.7,
+    fld['s11'][1,:,l,0] << 's11.bin',
+    fld['s22'][1,:,l,0] << 's22.bin',
+    fld['s33'][1,:,l,0] << 's33.bin',
 ]
 
 # nucleation
 i = 1500.0 / dx
 j, k, l = prm['ihypo']
 prm['fieldio'] += [
-    'mus[:,{}:{},{},:] = 0.62'.format(k-i, k+i, l),
-    'mus[:,{}:{},{},:] = 0.54'.format(k-i-1, k+i+1, l),
+    fld['mus'][:,k-i:k+i,l,:] == 0.62,
+    fld['mus'][:,k-i-1:k+i+1,l,:] == 0.54,
 ]
 
 # fault time histories
-fmt = '{f}[1,{k},{l},:] write faultst{y:03d}dp000-{f}.bin'
 l = prm['ihypo'][2]
 for y in 0, 15, 30, 45, 75, 120:
     k = y * 100.0 / dy + 1
     for f in 'su1', 'su2', 'su3', 'sv1', 'sv2', 'sv3', 'ts1', 'ts2', 'ts3', 'tnm':
-        s = fmt.format(f=f, k=k, l=l, y=y)
-        prm['fieldio'] += [s]
+        s = 'faultst%03ddp000-%s.bin' % (y, f)
+        prm['fieldio'] += [fld[f][1,k,l,:] > s]
 
 # body time histories
-fmt = '{f}[1,{k},{l},:] write body{z:%03d}st000dp{y:%03d}-{f}.bin'
 for y, z in [
     [0, -30],
     [0, -20],
@@ -100,8 +99,9 @@ for y, z in [
     k = y * 100.0 / dx / alpha + 1
     l = z * 100.0 / dy + prm['ihypo'][2]
     for f in 'u1', 'u2', 'u3', 'v1', 'v2', 'v3':
-        s = fmt.format(f=f, k=k, l=l, y=y, z=z).replace('body-', 'body-0')
-        prm['fieldio'] += [s]
+        s = 'body%03dst000dp%03d-%s.bin' % (z, y, f)
+        s = s.replace('body-', 'body-0')
+        prm['fieldio'] += [fld[f][1,k,l,:] > s]
 
 # pre-stress
 d = np.arange(ny) * alpha * dy

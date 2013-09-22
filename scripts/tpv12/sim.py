@@ -6,19 +6,20 @@ FIXME: prestress not correct
 import os, math
 import numpy as np
 import cst
-prm = {}
+prm = cst.sord.parameters()
+fld = cst.sord.fieldnames()
 
 # number of processes
 prm['nproc3'] = [1, 1, 2]
 
 # model dimensions
-prm['delta'] = dx, dy, dz, dt = [100.0, 100.0, 100.0, 100.0 / 12500.0]
-prm['shape'] = nx, ny, nz, nt = [
-    int(16500.0 / dx +  21.5),
-    int(16500.0 / dy +  21.5),
-    int(12000.0 / dz + 120.5),
-    int(    8.0 / dt +   1.5),
-]
+dx, dy, dz, dt = 100.0, 100.0, 100.0, 100.0 / 12500.0
+nx = int(16500.0 / dx +  21.5)
+ny = int(16500.0 / dy +  21.5)
+nz = int(12000.0 / dz + 120.5)
+nt = int(    8.0 / dt +   1.5)
+prm['shape'] = [nx, ny, nz, nt]
+prm['delta'] = [dx, dy, dz, dt]
 
 # boundary conditions
 prm['bc1'] = [-1,  0, 0]
@@ -49,11 +50,11 @@ l1 = prm['ihypo'][2] + l
 # material properties
 prm['hourglass'] = [1.0, 2.0]
 prm['fieldio'] = [
-    'rho = 2700.0',
-    'vp = 5716.0',
-    'vs = 3300.0',
-    'gam = 0.2',
-    'gam[1.5:{},1.5:{},{}:{},0] = 0.02'.format(j, k, l0, l1),
+    fld['rho'] == 2700.0,
+    fld['vp']  == 5716.0,
+    fld['vs']  == 3300.0,
+    fld['gam'] == 0.2,
+    fld['gam'][1.5:j,1.5:k,l0:l1,0] == 0.02,
 ]
 
 # fault parameters
@@ -62,15 +63,15 @@ j = 15000.0 / dx
 k = 15000.0 / dy
 l = prm['ihypo'][2]
 prm['fieldio'] += [
-    'co  = 2e5',
-    'dc  = 0.5',
-    'mud = 0.1',
-    'mus = 1e4',
-    'mus[:{},:{},{},:] = 0.7'.format(j, k, l),
-    'trup[:{},:{},{},:] write trup.bin'.format(j, k, l),
-    's11[1,:,{},0] = fill s11.bin'.format(l),
-    's22[1,:,{},0] = fill s22.bin'.format(l),
-    's33[1,:,{},0] = fill s33.bin'.format(l),
+    fld['co'] == 2e5,
+    fld['dc'] == 0.5,
+    fld['mud'] == 0.1,
+    fld['mus'] == 1e4,
+    fld['mus'][:j,:k,l,:] == 0.7,
+    fld['trup'][:j,:k,l,:] >> 'trup.bin',
+    fld['s11'][1,:,l,0] >> 's11.bin',
+    fld['s22'][1,:,l,0] >> 's22.bin',
+    fld['s33'][1,:,l,0] >> 's33.bin',
 ]
 
 # nucleation
@@ -78,14 +79,13 @@ m = 1500.0 / dx
 n = 1500.0 / dx + 1
 j, k, l = prm['ihypo']
 prm['fieldio'] += [
-    'mus[:{},{}:{},{},:] = 0.66'.format(j+n, k-n, k+n, l),
-    'mus[:{},{}:{},{},:] = 0.62'.format(j+n, k-m, k+m, l),
-    'mus[:{},{}:{},{},:] = 0.62'.format(j+m, k-n, k+n, l),
-    'mus[:{},{}:{},{},:] = 0.54'.format(j+m, k-m, k+m, l),
+    fld['mus'][:j+n,k-n:k+n,l,:] == 0.66,
+    fld['mus'][:j+n,k-m:k+m,l,:] == 0.62,
+    fld['mus'][:j+m,k-n:k+n,l,:] == 0.62,
+    fld['mus'][:j+m,k-m:k+m,l,:] == 0.54,
 ]
 
 # slip, slip velocity, and shear traction time histories
-fmt = '{f}[{j},{k},{l},:] write faultst{x:03d}dp{y:03d}-{f}.bin'
 for x, y in [
     [0, 0],
     [45, 0],
@@ -102,11 +102,10 @@ for x, y in [
     k = y * 100.0 / dy + 1
     l = prm['ihypo'][2]
     for f in 'su1', 'su2', 'su3', 'sv1', 'sv2', 'sv3', 'ts1', 'ts2', 'ts3', 'tnm':
-        s = fmt.format(f=f, j=j, k=k, l=l, x=x, y=y)
-        prm['fieldio'] += [s]
+        s = 'faultst%03ddp%03d-%s.bin' % (x, y, f)
+        prm['fieldio'] += [fld[f][j,k,l,:] > s]
 
 # displacement and velocity time histories
-fmt = '{f}[{j},{k},{l},:] write body{z:03d}st{x:03d}dp{y:03d}-{f}.bin'
 for x, y, z in [
     [0, 0, -30],
     [0, 0, -20],
@@ -125,8 +124,9 @@ for x, y, z in [
     k = y * 100.0 / dy / alpha + 1
     l = z * 100.0 / dz + prm['ihypo'][2]
     for f in 'u1', 'u2', 'u3', 'v1', 'v2', 'v3':
-        s = fmt.format(f=f, j=j, k=k, l=l, x=x, y=y, z=z).replace('body-', 'body-0')
-        prm['fieldio'] += [s]
+        s = 'body%03dst%03ddp%03d-%s.bin' % (z, x, y, f)
+        s = s.replace('body-', 'body-0')
+        prm['fieldio'] += [fld[f][j,k,l,:] > s]
 
 # pre-stress
 d = np.arange(ny) * alpha * dy

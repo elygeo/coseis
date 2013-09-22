@@ -111,7 +111,7 @@ if (field /= io%field) cycle loop
 
 ! disk i/o
 select case (io%mode)
-case ('=read', '+read', '=fill', '+fill')
+case ('=read', '+=read', '=fill', '+=fill')
     if (io%mode(2:5) == 'fill') then
         do i = 1, 3
             if (m(i) == 1) then
@@ -209,7 +209,7 @@ case ('=read', '+read', '=fill', '+fill')
         cycle loop
     end if
     cycle loop
-case ('write', 'write~')
+case ('=write', '~write')
     if (io%ib < 0) then
         !XXX allocate (io%buff(io%nc,n(1)*n(2)*n(3),io%nb))
         allocate (io%buff(n(1)*n(2)*n(3),io%nb))
@@ -270,9 +270,9 @@ end select
 ! non-disk i/o
 val = io%val * time_function(io%pulse, tm, dt, io%tau)
 select case (io%mode)
-case ('=cube', '+cube')
+case ('=cube', '+=cube')
     call set_cube(f, w1, i3, i4, di, io%x1, io%x2, val, io%mode)
-case ('=CUBE', '+CUBE')
+case ('=CUBE', '+=CUBE')
     call set_cube(f, w2, i3, i4, di, io%x1, io%x2, val, io%mode)
 case ('=')
     do l = i1(3), i2(3), di(3)
@@ -282,7 +282,7 @@ case ('=')
     end do
     end do
     end do
-case ('+')
+case ('+=')
     do l = i1(3), i2(3), di(3)
     do k = i1(2), i2(2), di(2)
     do j = i1(1), i2(1), di(1)
@@ -290,7 +290,7 @@ case ('+')
     end do
     end do
     end do
-case ('=~')
+case ('~')
     if (all(i1 == i2)) then
         do l = i1(3) - 1, i1(3)
         do k = i1(2) - 1, i1(2)
@@ -325,7 +325,7 @@ case ('=rand')
     end do
     end do
     end do
-case ('+rand')
+case ('+=rand')
     call random_number(s1)
     do l = i1(3), i2(3), di(3)
     do k = i1(2), i2(2), di(2)

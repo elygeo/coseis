@@ -4,19 +4,51 @@ Support Operator Rupture Dynamics
 from ..util import launch, storage
 launch # silence pyflakes warning
 
+class field:
+    def __getitem__(self, slices):
+        f = field(self.name, self.label, self.flags)
+        f.slices = slices
+        return f
+    def __init__(self, name, label, flags):
+        self.slices = None
+        self.name = name
+        self.label = label
+        self.flags = flags
+        self.cell = False
+        self.fault = False
+        self.input = False
+        self.initial = False
+        if 'c' in flags:
+            self.cell = True
+        if 'f' in flags:
+            self.fault = True
+        if '<' in flags:
+            self.input = True
+        if '0' in flags:
+            self.initial = True
+    def __eq__(self, func):
+        self.mode = '='
+        self.func = func
+        return self
+    def __lshift__(self, filename):
+        self.mode = '<'
+        self.filename = filename
+        return self
+    def __rshift(self, filename):
+        self.mode = '>'
+        self.filename = filename
+        return self
+
 def fieldnames():
     import os, json
     f = os.path.dirname(__file__)
     f = os.path.join(f, 'fieldnames.json')
-    d = json.load(open(f))
-    return {
-        'dict': d,
-        'input':   [k for k in d if '<' in d[k][-1]],
-        'initial': [k for k in d if '0' in d[k][-1]],
-        'cell':    [k for k in d if 'c' in d[k][-1]],
-        'fault':   [k for k in d if 'f' in d[k][-1]],
-        'volume':  [k for k in d if 'f' not in d[k][-1]],
-    }
+    d = {}
+    for k, w in json.load(open(f)).items():
+        k = str(k)
+        w = [str(v) for v in w]
+        d[k] = field(*w)
+    return storage(**d)
 
 def parameters():
     import os, json
@@ -434,59 +466,40 @@ def prepare_param(prm):
     # i/o sequence
     fieldio = []
     for line in prm['fieldio']:
-        line = list(line)
         filename = '-'
-        pulse, val, tau = 'const', 1.0, 1.0
+        func, val, tau = 'const', 1.0, 1.0
         x1 = x2 = [0.0, 0.0, 0.0]
-
-        # select mode
-        if line[0][0] in '+=':
-            mode, fields, ii = line[:3]
-            if len(mode) > 1 and mode[0] == '=':
-                mode = mode[1:]
-            if mode[0] == '+':
-                mode = mode[1:] + '+'
-        else:
-            fields, ii, mode = line[:3]
-        try:
-            if mode in ['r', 'R', 'r+', 'R+', 'w', 'wi']:
-                filename = line[3]
-            elif mode in ['=', '+', 's', 's+', 'i', 'i+']:
-                val = line[3]
-            elif mode in ['f', 'f+', 'fs', 'fs+', 'fi', 'fi+']:
-                val, pulse, tau = line[3:]
-            elif mode in ['c', 'c+']:
-                val, x1, x2 = line[3:]
-            elif mode in ['fc', 'fc+']:
-                val, pulse, tau, x1, x2 = line[3:]
+        tok = line.split()
+        if tok[1] in ['=', '+=']:
+            if '()' in tok[2]:
+                if tok[2] == 'cube()':
+                    field, op, func, x1, x2 = tok
+                else:
+                    field, op, func, val, tau = tok
             else:
-                raise Exception('Error: bad i/o mode: %r' % line)
-        except ValueError:
-            print('Error: bad i/o spec: %r' % line)
-            raise
+                field, op, val = tok
+        elif tok[1] in '<>':
+            field, op, filename = tok
+        else:
+            raise Exception('Error: bad i/o mode: %r' % line)
 
         filename = os.path.expanduser(filename)
         if len(filename) > 32:
             raise Exception('Filename too long: ' + filename)
-        mode = mode.replace('f', '')
-        if isinstance(fields, basestring):
-            fields = [fields]
-        fields = [str(f) for f in fields]
 
         # error check
         fn = fieldnames()
-        for field in fields:
-            if field not in fn['dict']:
-                raise Exception('Error: unknown field: %r' % line)
-            if field not in fn['input'] and 'w' not in mode:
-                raise Exception('Error: field is ouput only: %r' % line)
-            if (field in fn['cell']) != (fields[0] in fn['cell']):
-                raise Exception('Error: cannot mix node and cell i/o: %r' % line)
-            if field in fn['fault']:
-                if fields[0] not in fn['fault']:
-                    raise Exception('Error: cannot mix fault and non-fault i/o: %r' % line)
-                if prm['faultnormal'] == 0:
-                    raise Exception('Error: field only for ruptures: %r' % line)
+        if field not in fn['dict']:
+            raise Exception('Error: unknown field: %r' % line)
+        if field not in fn['input'] and 'w' not in mode:
+            raise Exception('Error: field is ouput only: %r' % line)
+        if (field in fn['cell']) != (fields[0] in fn['cell']):
+            raise Exception('Error: cannot mix node and cell i/o: %r' % line)
+        if field in fn['fault']:
+            if fields[0] not in fn['fault']:
+                raise Exception('Error: cannot mix fault and non-fault i/o: %r' % line)
+            if prm['faultnormal'] == 0:
+                raise Exception('Error: field only for ruptures: %r' % line)
 
         # cell or node registration
         if field in fn['cell']:

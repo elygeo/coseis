@@ -6,7 +6,8 @@ import os, json, shutil
 import numpy as np
 import pyproj
 import cst
-prm = {}
+prm = cst.sord.parameters()
+fld = cst.sord.fieldnames()
 
 # resolution and parallelization
 dx = 50.0;   prm['nproc3'] = [1, 32, 480]; nstripe = 32
@@ -67,14 +68,14 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     prm['vdamp'] = 400.0
     prm['gam2'] = 0.8
     prm['fieldio'] = [
-        'rho = hold/rho.bin',
-        'vp  = hold/vp.bin',
-        'vs  = read hold/vs.bin',
+        fld['rho'] << 'hold/rho.bin',
+        fld['vp'] << 'hold/vp.bin',
+        fld['vs'] << 'hold/vs.bin',
     ]
 
     # topography
     if surf == 'topo':
-        prm['fieldio'] += ['x3 = read hold/z3.bin']
+        prm['fieldio'] += [fld['x3'] << 'hold/z3.bin']
 
     # boundary conditions
     prm['bc1'] = [10, 10, 0]
@@ -104,22 +105,14 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     prm['ihypo'] = [j, k, l]
 
     # receivers
-    if register:
-        write = 'write'
-    else:
-        write = 'write~'
     f = os.path.join(cwd, 'run', 'data', 'station-list.txt')
     for s in open(f).readlines():
-        sta, y, x = s.split()[:3]
+        s, y, x = s.split()[:3]
         x, y = proj(float(x), float(y))
         j = x / delta[0] + 1.0
         k = y / delta[1] + 1.0
-        prm['fieldio'] += [
-            'vs[{},{},1,:] {} out/{}-vs.bin'.format(j, k, write, sta),
-            'v1[{},{},1,:] {} out/{}-v1.bin'.format(j, k, write, sta),
-            'v2[{},{},1,:] {} out/{}-v2.bin'.format(j, k, write, sta),
-            'v3[{},{},1,:] {} out/{}-v3.bin'.format(j, k, write, sta),
-        ]
+        for f in 'vs', 'v1', 'v2', 'v3':
+            prm['fieldio'] += [fld[f][j,k,1,:] >> 'out/%s-%s.bin' % (s, f)]
 
     # surface output
     ns = max(1, max(shape[:3]) / 1024)
@@ -127,25 +120,20 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     mh = max(1, int(0.025 / dt + 0.5))
     ms = max(1, int(0.125 / (dt * mh) + 0.5))
     if surf_out:
-        prm['fieldio'] += [
-            'v1[::{},::{},1,::{}] write hold/full-v1.bin'.format(ns, ns, mh),
-            'v2[::{},::{},1,::{}] write hold/full-v2.bin'.format(ns, ns, mh),
-            'v3[::{},::{},1,::{}] write hold/full-v3.bin'.format(ns, ns, mh),
-            'v1[::{},::{},1,::{}] #     hold/snap-v1.bin'.format(ns, ns, ms),
-            'v2[::{},::{},1,::{}] #     hold/snap-v2.bin'.format(ns, ns, ms),
-            'v3[::{},::{},1,::{}] #     hold/snap-v3.bin'.format(ns, ns, ms),
-            'v1[::{},::{},1,::{}] #     hold/hist-v1.bin'.format(nh, nh, mh),
-            'v2[::{},::{},1,::{}] #     hold/hist-v2.bin'.format(nh, nh, mh),
-            'v3[::{},::{},1,::{}] #     hold/hist-v3.bin'.format(nh, nh, mh),
-        ]
+        for i in '123':
+            prm['fieldio'] += [
+                fld['v'+i][::ns,::ns,1,::mh] >> 'hold/full-v%s.bin' % i,
+                fld['v'+i][::ns,::ns,1,::ms] >> '#hold/snap-v%s.bin' % i,
+                fld['v'+i][::nh,::nh,1,::mh] >> '#hold/hist-v%s.bin' % i,
+            ]
 
     # cross section output
     if 0:
         j, k, l = prm['ihypo']
         for f in 'v1', 'v2', 'v3', 'rho', 'vp', 'vs', 'gam':
             prm['fieldio'] += [
-                '{}[{},:,:,::{}] write hold/xsec-ns-{}.bin'.format(f, j, ms, f),
-                '{}[:,{},:,::{}] write hold/xsec-ew-{}.bin'.format(f, k, ms, f),
+                fld[f][j,:,:,::ms] >> 'hold/xsec-ns-%s.bin' % f,
+                fld[f][:,k,:,::ms] >> 'hold/xsec-ew-%s.bin' % f,
             ]
 
     # run directory

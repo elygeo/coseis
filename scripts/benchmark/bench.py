@@ -4,6 +4,8 @@ Benchmarks
 """
 import os
 import cst
+prm = cst.sord.parameters()
+fld = cst.sord.fieldnames()
 
 # MPI
 power = range(7, 10) # Mira
@@ -19,7 +21,6 @@ power = 3, # Vesta 128 nodes, 1 ppn, 32 threads
 points = 400
 power = range(6) # Challenger
 
-prm = {}
 prm['oplevel'] = 5
 prm['minutes'] = 20
 prm['oplevel'] = 6
@@ -32,20 +33,20 @@ prm['bc1'] = [0, 0, 0]
 prm['bc2'] = [0, 0, 0]
 prm['npml'] = 0
 prm['fieldio'] = [
-    'rho = 2670.0',
-    'vp = 6000.0',
-    'vs = 3464.0',
-    'gam = 0.0',
-    'v1[:,:,:,1] = rand 1.0',
-    'v2[:,:,:,1] = rand 1.0',
-    'v3[:,:,:,1] = rand 1.0',
+    fld['rho'] == 2670.0,
+    fld['vp']  == 6000.0,
+    fld['vs']  == 3464.0,
+    fld['gam'] == 0.0,
+    fld['v1'][:,:,:,1] == cst.sord.func.rand(1.0),
+    fld['v2'][:,:,:,1] == cst.sord.func.rand(1.0),
+    fld['v3'][:,:,:,1] == cst.sord.func.rand(1.0),
 ]
 
 for i in power[::-1]:
     n = 2 ** i
     prm['nproc3'] = [2, n, n]
     prm['shape'] = [points, n * points, n * points, prm['itio']]
-    d = os.path.joing('run', 'bench{}'.format(i))
+    d = os.path.joing('run', 'bench%s' % i)
     os.makedirs(d)
     cst.sord.run(prm)
 

@@ -266,14 +266,12 @@
     ], 
     "td": [
         "\\tau_d", 
-        "Pre-traction", 
-        "dip component", 
+        "Pre-traction dip component", 
         "<f0"
     ], 
     "tn": [
         "\\tau_n", 
-        "Pre-traction", 
-        "normal component", 
+        "Pre-traction normal component", 
         "<f0"
     ], 
     "tnm": [
@@ -288,8 +286,7 @@
     ], 
     "ts": [
         "\\tau_s", 
-        "Pre-traction", 
-        "strike component", 
+        "Pre-traction strike component", 
         "<f0"
     ], 
     "ts1": [

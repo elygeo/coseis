@@ -1,7 +1,11 @@
 #!/usr/bin/env python
+"""
+SCEC Code Validation Workshop, Test Problem Version 3
+"""
 import os
 import cst
-prm = {}
+prm = cst.sord.parameters()
+fld = cst.sord.fieldnames()
 
 # list of runs:
 # column 1 is dx, the spatial step size
@@ -57,21 +61,21 @@ for dx, np in runs:
     # material properties
     prm['hourglass'] = [1.0, 2.0]
     prm['fieldio'] = [
-        'rho = 2670.0',				# density
-        'vp  = 6000.0',				# P-wave speed
-        'vs  = 3464.0',				# S-wave speed
-        'gam = 0.2',				# high viscosity
+        fld['rho'] == 2670.0,			# density
+        fld['vp'] == 6000.0,			# P-wave speed
+        fld['vs'] == 3464.0,			# S-wave speed
+        fld['gam'] == 0.2,			# high viscosity
     ]
 
     # fault properties
     prm['faultnormal'] = 3			# fault plane of constant z
     prm['ihypo'] = [-1, -1, -1.5]		# hypocenter indices
     prm['fieldio'] += [
-        'dc = 0.4',				# slip weakening distance
-        'mud = 0.525',				# dynamic friction
-        'mus = 1e4',				# static friction (locked)
-        'tn = -120e6',				# normal traction
-        'ts = 70e6',				# shear traction
+        fld['dc'] == 0.4,			# slip weakening distance
+        fld['mud'] == 0.525,			# dynamic friction
+        fld['mus'] == 1e4,			# static friction (locked)
+        fld['tn'] == -120e6,			# normal traction
+        fld['ts'] == 70e6,			# shear traction
     ]
 
     # slipping patch
@@ -79,27 +83,28 @@ for dx, np in runs:
     k =  -7500.0 / dx				# Y fault extent
     l =  -3000.0 / dx				# Z low viscosity extent
     prm['fieldio'] += [
-        'mus[{}:,{}:,:,:] = 0.677'.format(j, k),
-        'gam[{}:,{}:,{}:,:] = 0.02'.format(j-0.5, k-0.5, l-0.5)
+        fld['mus'][j:,k:,:,:] == 0.677,
+        fld['gam'][j-0,5:,k-0,5:,l-0,5:,:] == 0.02,
     ]
     
     # nucleation patch
     i0 = -1500.0 / dx,				# outer extent
     i1 = -1500.0 / dx - 1,			# inner extent
     prm['fieldio'] += [
-        'ts[{}:,{}:,-2,:] = 72.9e6'.format(i1, i1),
-        'ts[{}:,{}:,-2,:] = 75.8e6'.format(i1, i0),
-        'ts[{}:,{}:,-2,:] = 75.8e6'.format(i0, i1),
+        fld['ts'][i1:,i1:,-2,:] == 72.9e6,
+        fld['ts'][i0:,i1:,-2,:] == 75.8e6,
+        fld['ts'][i1:,i0:,-2,:] == 75.8e6,
+        # FIXME???
     ]
 
     # fault plane output
     prm['fieldio'] += [
-        'x1[{}:,{}:,-2,0] write x1.bin'.format(j, k),		# X coordinates
-        'x2[{}:,{}:,-2,0] write x2.bin'.format(j, k),		# Y coordinates
-        'su1[{}:,{}:,-2,-1] write su1.bin'.format(j, k),	# horizontal slip
-        'su2[{}:,{}:,-2,-1] write su2.bin'.format(j, k),	# vertical slip
-        'psv[{}:,{}:,-2,-1] write psv.bin'.format(j, k),	# peak slip rate
-        'trup[{}:,{}:,-2,-1] write trup.bin'.format(j, k),	# rupture time
+        fld['x1'][j:,k:,-2,0] >> 'x1.bin',	# X coordinates
+        fld['x2'][j:,k:,-2,0] >> 'x2.bin',	# Y coordinates
+        fld['su1'][j:,k:,-2,-1] >> 'su1.bin',	# horizontal slip
+        fld['su2'][j:,k:,-2,-1] >> 'su2.bin',	# vertical slip
+        fld['psv'][j:,k:,-2,-1] >> 'psv.bin',	# peak slip rate
+        fld['trup'][j:,k:,-2,-1] >> 'trup.bin',	# rupture time
     ]
 
     # slip, slip velocity, and shear traction time histories
@@ -108,12 +113,12 @@ for dx, np in runs:
     k -= 6000.0 / dx
     for f in 'su1', 'su2', 'sv1', 'sv2', 'ts1', 'ts2':
         prm['fieldio'] += [
-            '{}[{},-1,-2,:] write P1-{}.bin'.format(f, j, f), # mode II point
-            '{}[-1,{},-2,:] write P2-{}.bin'.format(f, k, f), # mode III point
+            fld[f][j,-1,-2,:] >> 'P1-%s.bin' % f, # mode II point
+            fld[f][-1,k,-2,:] >> 'P2-%s.bin' % f, # mode III point
         ]
 
     # run SORD
-    prm['rundir'] = d = os.path.join('run', 'tpv3', '{:03.0f}'.format(dx))
+    prm['rundir'] = d = os.path.join('run', 'tpv3', '%03.0f' % dx)
     os.makedirs(d)
     cst.sord.run(prm)
 

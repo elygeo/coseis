@@ -7,6 +7,7 @@ def test(argv=[]):
     import os
     import numpy as np
     import cst
+    io = cst.sord.fieldnames()
     prm = {}
 
     # parameters
@@ -32,15 +33,15 @@ def test(argv=[]):
     # material
     prm['hourglass'] = [1.0, 1.0]
     prm['fieldio'] = [
-        'rho = 2670.0',
-        'vp  = 6000.0',
-        'vs  = 3464.0',
-        'gam = 0.3',
+        io['rho'] == 2670.0,
+        io['vp']  == 6000.0,
+        io['vs']  == 3464.0,
+        io['gam'] == 0.3,
     ]
 
     # output
     for f in cst.sord.fieldnames()['volume']:
-        prm['fieldio'] += ['{} write {}.bin'.format(f, f)]
+        prm['fieldio'] += [io[f] >> f + '.bin']
 
     # master
     prm['rundir'] = d0 = os.path.join('run', 'point_source') + os.sep

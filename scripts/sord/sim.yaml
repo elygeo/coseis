@@ -11,5 +11,5 @@ fieldio:                             # 3D field specs
     - vp  = 6000.0                   # P-wave velocity
     - vs  = 3464.0                   # S-wave velocity
     - gam = 0.3                      # viscosity
-    - v1[:,:,31,-1] write vx.bin     # v_x output slice
-    - v2[:,:,31,-1] write vy.bin     # v_y output slice
+    - v1[:,:,31,-1] >> vx.bin        # v_x output slice
+    - v2[:,:,31,-1] >> vy.bin        # v_y output slice
