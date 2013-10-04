@@ -6,10 +6,6 @@ Circular crack with uniform rupture velocity.
 cee.py : Test computing of C parameter from Dahlen (1974) Eqn. (44) and Fig. 3,
 use for computing analytical slip velocity function.
 
-sim.py : Run numerical test with SORD.
-
-plot.py : Compare numerical test with analytical solution.
-
 References
 ----------
 

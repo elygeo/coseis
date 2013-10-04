@@ -11,11 +11,13 @@ debug: 0                 # >1 sync, >2 mpi vars, >3 I/O
 oplevel: 0               # spatial difference operator level
 
 # Mesh parameters
-shape: [41, 41, 42, 41]  # mesh size [nx, ny, nz, nt]
+shape: [41, 41, 41, 41]  # mesh size [nx, ny, nz, nt]
 delta:                   # step length [dx, dy, dz, dt]
     [100.0, 100.0, 100.0, 0.0075]
 affine:                  # grid transformation
-    [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
+  - [1.0, 0.0, 0.0]
+  - [0.0, 1.0, 0.0]
+  - [0.0, 0.0, 1.0]
 rexpand: 1.06            # grid expansion ratio
 n1expand: [0, 0, 0]      # number of grid expansion nodes - near side
 n2expand: [0, 0, 0]      # number of grid expansion nodes - far side
@@ -23,12 +25,16 @@ gridnoise: 0.0           # random noise added to mesh, assumes planar fault
 tm0: 0.0                 # initial time
 
 # Material model
+rho: [2670.0]            # density
+vp:  [6000.0]            # P-wave speed
+vs:  [3464.0]            # S-wave speed
+gam: [0.0]               # viscosity
 rho1: -1.0               # min density
 rho2: -1.0               # max density
-vp1: -1.0                # min P-wave speed
-vp2: -1.0                # max P-wave speed
-vs1: -1.0                # min S-wave speed
-vs2: -1.0                # max S-wave speed
+vp1:  -1.0               # min P-wave speed
+vp2:  -1.0               # max P-wave speed
+vs1:  -1.0               # min S-wave speed
+vs2:  -1.0               # max S-wave speed
 gam1: -1.0               # min viscosity
 gam2: 0.8                # max viscosity
 hourglass: [1.0, 1.0]    # hourglass stiffness (1) and viscosity (2)
@@ -41,18 +47,12 @@ npml: 10                 # number of PML damping nodes
 ppml: 2                  # PML exponent, 1-4. Generally 2 is best.
 vpml: -1.0               # damping velocity, <0 default to min, max V_s harmonic mean
 
-# Point source parameters
-ihypo: [0, 0, 0]         # hypocenter indices (with fractional values), 0: center
-pulse: none              # source pulse shape, see cst.signal.time_function
-tau: 0.03                # source characteristic time
-source1: [0.0, 0.0, 0.0] # normal components [xx, yy, zz]
-source2: [0.0, 0.0, 0.0] # shear components [yz, zx, xy]
-
 # Finite source parameters
 source: potency          # potency, moment, force, or non'
 nsource: 0               # number of sub-faults
 
 # Dynamic rupture parameters
+ihypo: [1.0, 1.0, 1.0]   # hypocenter indices for nucleation
 slipvector:              # shear traction direction for ts1
      [1.0, 0.0, 0.0]
 faultnormal: 0           # normal direction to fault plane (0=no fault)
@@ -62,10 +62,3 @@ rcrit: 1000.0            # nucleation critical radius
 trelax: 0.075            # nucleation relaxation time
 svtol: 0.001             # slip velocity considered rupturing
 
-# Field I/O
-fieldio: [
-    ['=', rho, [], 2670.0], # density
-    ['=', vp,  [], 6000.0], # P-wave speed
-    ['=', vs,  [], 3464.0], # S-wave speed
-    ['=', gam, [],    0.0], # viscosity
-]

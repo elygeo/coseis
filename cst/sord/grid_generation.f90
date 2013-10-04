@@ -15,15 +15,14 @@ integer :: i1(3), i2(3), i3(3), i4(3), bc(3), &
     i, j, k, l, j1, k1, l1, j2, k2, l2, b, c
 real :: m(9), tol, h
 logical :: err
-integer, allocatable :: seed(:)
 
 if (sync) call barrier
 if (master) print *, clock(), 'Grid generation'
 
 ! create rectangular mesh with double nodes at the fault
 w1 = 0.0
-i1 = i1core
-i2 = i2core
+i1 = i1node
+i2 = i2node
 do i = i1(1), i2(1); w1(i,:,:,1) = dx(1) * (i + nnoff(1) - 1); end do
 do i = i1(2), i2(2); w1(:,i,:,2) = dx(2) * (i + nnoff(2) - 1); end do
 do i = i1(3), i2(3); w1(:,:,i,3) = dx(3) * (i + nnoff(3) - 1); end do
@@ -43,10 +42,6 @@ call field_io('<', 'x3', w1(:,:,:,3))
 
 ! add random noise except at boundaries and in pml
 if (gridnoise > 0.0) then
-    call random_seed(size=i)
-    allocate (seed(i))
-    seed = ip
-    call random_seed(put=seed)
     call random_number(w2)
     w2 = sqrt(sum(dx * dx)) * gridnoise * (w2 - 0.5)
     i1 = i1pml + 1
@@ -73,8 +68,8 @@ end if
 if (rexpand > 1.0) then
     i1 = n1expand - nnoff
     i2 = nn - n2expand + 1 - nnoff
-    i3 = i1core
-    i4 = i2core
+    i3 = i1node
+    i4 = i2node
     do j = i3(1), min(i4(1), i1(1))
         i = i1(1) - j
         w1(j,:,:,1) = w1(j,:,:,1) + &
@@ -126,7 +121,7 @@ w1 = w2
 bc = 4
 i1 = i1bc - 1
 i2 = i2bc + 1
-call vector_swap_halo(w1, nhalo)
+!call vector_swap_halo(w1, nhalo) ! this should be handled in field_io now
 call vector_bc(w1, bc, bc, i1, i2)
 
 ! cell centers

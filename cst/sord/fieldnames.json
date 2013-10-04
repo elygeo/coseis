@@ -44,36 +44,6 @@
         "Slip weakening distance", 
         "<f0"
     ], 
-    "e11": [
-        "e_{xx}", 
-        "Strain", 
-        "<c"
-    ], 
-    "e12": [
-        "e_{xy}", 
-        "Strain", 
-        "<c"
-    ], 
-    "e22": [
-        "e_{yy}", 
-        "Strain", 
-        "<c"
-    ], 
-    "e23": [
-        "e_{yz}", 
-        "Strain", 
-        "<c"
-    ], 
-    "e31": [
-        "e_{zx}", 
-        "Strain", 
-        "<c"
-    ], 
-    "e33": [
-        "e_{zz}", 
-        "Strain", 
-        "<c"
-    ], 
     "f1": [
         "f_x", 
         "Force", 
@@ -103,6 +73,36 @@
         "\\lambda", 
         "Elastic modulus", 
         "c0"
+    ], 
+    "m11": [
+        "m_{xx}", 
+        "Seismic moment", 
+        "<c"
+    ], 
+    "m12": [
+        "m_{xy}", 
+        "Seismic moment", 
+        "<c"
+    ], 
+    "m22": [
+        "m_{yy}", 
+        "Seismic moment", 
+        "<c"
+    ], 
+    "m23": [
+        "m_{yz}", 
+        "Seismic moment", 
+        "<c"
+    ], 
+    "m31": [
+        "m_{zx}", 
+        "Seismic moment", 
+        "<c"
+    ], 
+    "m33": [
+        "m_{zz}", 
+        "Seismic moment", 
+        "<c"
     ], 
     "mu": [
         "\\mu", 
@@ -138,6 +138,36 @@
         "\\nu", 
         "Poisson ratio", 
         "c0"
+    ], 
+    "p11": [
+        "p_{xx}", 
+        "Seismic potency", 
+        "<c"
+    ], 
+    "p12": [
+        "p_{xy}", 
+        "Seismic potency", 
+        "<c"
+    ], 
+    "p22": [
+        "p_{yy}", 
+        "Seismic potency", 
+        "<c"
+    ], 
+    "p23": [
+        "p_{yz}", 
+        "Seismic potency", 
+        "<c"
+    ], 
+    "p31": [
+        "p_{zx}", 
+        "Seismic potency", 
+        "<c"
+    ], 
+    "p33": [
+        "p_{zz}", 
+        "Seismic potency", 
+        "<c"
     ], 
     "psv": [
         "|\\dot s|_{peak}", 

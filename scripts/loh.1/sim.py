@@ -9,41 +9,31 @@ http://www-rohan.sdsu.edu/~steveday/BASINS/Final_Report_1A01.pdf
 """
 import os
 import cst
-prm = cst.sord.parameters()
-fld = cst.sord.fieldnames()
+s_ = cst.sord.get_slices()
+prm = {}
 
 # number of processors in each dimension
 prm['nthread'] = 1; prm['nproc3'] = [1, 16, 1]
 prm['nthread'] = 4; prm['nproc3'] = [1, 1, 1]
 
 # dimensions
+dx, dt = 50.0, 0.004
+dx, dt = 100.0, 0.008
 x, y, z, t = 8000.0, 10000.0, 6000.0, 9.0
-dx, dy, dz, dt = 50.0, 50.0, 50.0, 0.004
-dx, dy, dz, dt = 100.0, 100.0, 100.0, 0.008
-prm['delta'] = [dx, dy, dz, dt]
-prm['shape'] = [
-    int(x / dx + 20.5),
-    int(y / dy + 20.5),
-    int(z / dz + 20.5),
-    int(t / dt + 1.5),
-]
+nx = int(x / dx + 20.5)
+ny = int(y / dx + 20.5)
+nz = int(z / dx + 20.5)
+nt = int(t / dt + 1.5)
+prm['delta'] = [dx, dx, dx, dt]
+prm['shape'] = [nx, ny, nz, nt]
 
 # material properties
+l = 1000.0 / dx + 0.5
+prm['rho'] = [2700.0, (s_[:,:,:l], '=', 2600.0)]
+prm['vp']  = [6000.0, (s_[:,:,:l], '=', 4000.0)]
+prm['vs']  = [3464.0, (s_[:,:,:l], '=', 2000.0)]
+prm['gam'] = 0.0
 prm['hourglass'] = [1.0, 2.0]
-prm['fieldio'] = [
-    fld['rho'] == 2700.0,
-    fld['vp'] == 6000.0,
-    fld['vs'] == 3464.0,
-    fld['gam'] == 0.0,
-]
-
-# material properties of the layer
-l = 1000.0 / dz + 0.5
-prm['fieldio'] += [
-    fld['rho'][:,:,:l,:] == 2600.0,
-    fld['vp'][:,:,:l,:] == 4000.0,
-    fld['vs'][:,:,:l,:] == 2000.0,
-]
 
 # near side boundary conditions:
 # anti-mirror symmetry at the near x and y boundaries
@@ -55,19 +45,16 @@ prm['bc1'] = [-2, -2, 0]
 prm['bc2'] = [10, 10, 10]
 
 # source
-prm['ihypo'] = [1.5, 1.5, 41.5]		# hypocenter indices
-prm['source'] = 'moment'		# specify moment source
-prm['pulse'] = 'integral_brune'		# Brune pulse source time function
-prm['tau'] = 0.1			# source characteristic time
-prm['source1'] = [0.0, 0.0, 0.0]	# moment tensor M_xx, M_yy, M_zz
-prm['source2'] = [0.0, 0.0, 1e18]	# moment tensor M_yz, M_zx, M_yz
+prm['m12'] = (s_[1.5,1.5,41.5,:], '+', 1e18, 'brune', 0.1)
 
 # receivers
 for i in range(10):
-    j = prm['ihypo'][0] + 600.0 * (i + 1) / dx
-    k = prm['ihypo'][1] + 800.0 * (i + 1) / dy
+    j = 1.5 + 600.0 * (i + 1) / dx
+    k = 1.5 + 800.0 * (i + 1) / dx
     for f in 'v1', 'v2', 'v3':
-        prm['fieldio'] += [fld['v1'][j,k,1,:] >> 'p%s-%s.bin' % (i, f)]
+        prm[f] = [
+            (s_[j,k,1,:], '.>', 'p%s-%s.bin' % (i, f)),
+        ]
 
 # run job
 os.mkdir('run')

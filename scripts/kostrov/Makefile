@@ -1,6 +1,6 @@
-run/sord.x : sim.yaml
+run : sim.yaml
 	mkdir run
 	sord sim.yaml
 
-clean:
+clean :
 	rm -rf run

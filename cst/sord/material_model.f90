@@ -53,11 +53,13 @@ end if
 ! limits
 call rlimits(gam, gam1, gam2, size(gam))
 
+! this should be taken care of inside field_io now
+!call scalar_swap_halo(mr,  nhalo)
+!call scalar_swap_halo(s1,  nhalo)
+!call scalar_swap_halo(s2,  nhalo)
+!call scalar_swap_halo(gam, nhalo)
+
 ! halos
-call scalar_swap_halo(mr,  nhalo)
-call scalar_swap_halo(s1,  nhalo)
-call scalar_swap_halo(s2,  nhalo)
-call scalar_swap_halo(gam, nhalo)
 call set_halo(mr,  0.0, i1cell, i2cell)
 call set_halo(s1,  0.0, i1cell, i2cell)
 call set_halo(s2,  0.0, i1cell, i2cell)

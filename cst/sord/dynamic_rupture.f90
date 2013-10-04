@@ -124,6 +124,8 @@ call rinvert(f1, size(f1))
 do i = 1, 3
     nhat(:,:,:,i) = nhat(:,:,:,i) * f1
 end do
+call scalar_swap_halo(area,  nhalo)
+call vector_swap_halo(nhat,  nhalo)
 call field_io('>', 'nhat1', nhat(:,:,:,1))
 call field_io('>', 'nhat2', nhat(:,:,:,2))
 call field_io('>', 'nhat3', nhat(:,:,:,3))
@@ -221,15 +223,13 @@ trup  =  1e9
 tarr  =  0.0
 efric =  0.0
 
-! halos
-call scalar_swap_halo(mus,   nhalo)
-call scalar_swap_halo(mud,   nhalo)
-call scalar_swap_halo(dc,    nhalo)
-call scalar_swap_halo(co,    nhalo)
-call scalar_swap_halo(area,  nhalo)
-call scalar_swap_halo(rhypo, nhalo)
-call vector_swap_halo(nhat,  nhalo)
-call vector_swap_halo(t0,    nhalo)
+! halos (this shoud be handled by field_io now)
+!call scalar_swap_halo(mus,   nhalo)
+!call scalar_swap_halo(mud,   nhalo)
+!call scalar_swap_halo(dc,    nhalo)
+!call scalar_swap_halo(co,    nhalo)
+!call vector_swap_halo(t0,    nhalo)
+!call scalar_swap_halo(rhypo, nhalo)
 
 end subroutine
 

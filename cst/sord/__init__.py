@@ -1,61 +1,44 @@
 """
 Support Operator Rupture Dynamics
 """
-from ..util import launch, storage
+from ..util import launch
 launch # silence pyflakes warning
-
-class field:
-    def __getitem__(self, slices):
-        f = field(self.name, self.label, self.flags)
-        f.slices = slices
-        return f
-    def __init__(self, name, label, flags):
-        self.slices = None
-        self.name = name
-        self.label = label
-        self.flags = flags
-        self.cell = False
-        self.fault = False
-        self.input = False
-        self.initial = False
-        if 'c' in flags:
-            self.cell = True
-        if 'f' in flags:
-            self.fault = True
-        if '<' in flags:
-            self.input = True
-        if '0' in flags:
-            self.initial = True
-    def __eq__(self, func):
-        self.mode = '='
-        self.func = func
-        return self
-    def __lshift__(self, filename):
-        self.mode = '<'
-        self.filename = filename
-        return self
-    def __rshift(self, filename):
-        self.mode = '>'
-        self.filename = filename
-        return self
-
-def fieldnames():
-    import os, json
-    f = os.path.dirname(__file__)
-    f = os.path.join(f, 'fieldnames.json')
-    d = {}
-    for k, w in json.load(open(f)).items():
-        k = str(k)
-        w = [str(v) for v in w]
-        d[k] = field(*w)
-    return storage(**d)
 
 def parameters():
     import os, json
     f = os.path.dirname(__file__)
     f = os.path.join(f, 'parameters.json')
     d = json.load(open(f))
-    return storage(**d)
+    d = {str(k): v for k, v in d.items()}
+    return d
+
+def fieldnames():
+    import os, json
+    f = os.path.dirname(__file__)
+    f = os.path.join(f, 'fieldnames.json')
+    d = json.load(open(f))
+    d = {str(k): v for k, v in d.items()}
+    return {
+        'dict': d,
+        'input':   [k for k in d if '<' in d[k][-1]],
+        'initial': [k for k in d if '0' in d[k][-1]],
+        'cell':    [k for k in d if 'c' in d[k][-1]],
+        'fault':   [k for k in d if 'f' in d[k][-1]],
+        'volume':  [k for k in d if 'f' not in d[k][-1]],
+    }
+
+tfuncs = [
+    'const',
+    'delta',
+    'step', 'integral_delta',
+    'brune',
+    'integral_brune',
+    'hann',
+    'integral_hann',
+    'gaussian', 'integral_ricker1',
+    'ricker1', 'integral_ricker2',
+    'ricker2',
+]
 
 class get_slices:
     def __getitem__(self, item):
@@ -174,11 +157,19 @@ def stage(args, **kwargs):
     print('SORD: Support Operator Rupture Dynamics')
 
     # configure and make
-    cfg = {}
     prm = parameters()
+    fld = fieldnames()['dict']
+    fio = {}
+    cfg = {}
     args.update(kwargs)
+    for k, v in prm.items():
+        if k in fld:
+            fio[k] = v
+            del(prm[k])
     for k, v in args.items():
-        if k in prm:
+        if k in fld:
+            fio[k] = v
+        elif k in prm:
             prm[k] = v
         else:
             cfg[k] = v
@@ -190,10 +181,10 @@ def stage(args, **kwargs):
         d = 'f'
     cfg.update({'dtype': np.dtype(d).str})
     prm.update({'nthread': cfg['nthread']})
-    prm = prepare_param(prm)
+    prm, fio = prepare_param(prm, fio)
 
     # partition for parallelization
-    nx, ny, nz = prm['shape'][:3]
+    nx, ny, nz, nt = prm['shape']
     j, k, l = prm['nproc3']
     nl = [
         (nx - 1) // j + 1,
@@ -221,7 +212,7 @@ def stage(args, **kwargs):
     nm = (nl[0] + 2) * (nl[1] + 2) * (nl[2] + 2)
     cfg['pmem'] = 32 + int(1.2 * nm * nvars * int(cfg['dtype'][-1]) / 1024 / 1024)
     if not cfg['minutes']:
-        cfg['minutes'] = 10 + int((prm['shape'][3] + 10) * nm // (40 * cfg['rate']))
+        cfg['minutes'] = 10 + int((nt + 10) * nm // (40 * cfg['rate']))
 
     # configure and stage
     cfg['command'] = os.path.join('.', 'sord.x')
@@ -242,26 +233,26 @@ def stage(args, **kwargs):
     json.dump(prm, open('parameters.json', 'w'), indent=4, sort_keys=True)
     out = ''
     for i in sorted(prm):
-        if i != 'fieldio':
-            out += str(prm[i]) + '\n'
-    out += '%s\n>\n' % len(prm['fieldio'])
-    for i in prm['fieldio']:
+        out += str(prm[i]) + '\n'
+    out += '%s\n>\n' % len(fio)
+    for i in fio:
         out += str(i) + '\n'
     for i in "',[]":
         out = out.replace(i, '')
     open('parameters.txt', 'w').write(out)
 
     # metadata
+    # [field, reg, ii, nb, x1, x2, val, tau, op, fname]
     xis = {}
     indices = {}
     shapes = {}
     deltas = {}
-    for f in prm['fieldio']:
-        op, k = f[0], f[8]
-        if k != '-':
-            if 'wi' in op:
+    for f in fio:
+        op, k = f[-2], f[-1]
+        if op[-1] in '<>':
+            if '.' in op:
                 xis[k] = f[4]
-            indices[k] = f[7]
+            indices[k] = f[2]
             shapes[k] = []
             deltas[k] = []
             for i, ii in enumerate(indices[k]):
@@ -272,6 +263,8 @@ def stage(args, **kwargs):
                     deltas[k] += [d]
             if shapes[k] == []:
                 shapes[k] = [1]
+            if deltas[k] == []:
+                del(deltas[k])
 
     # save metadata
     m = {
@@ -336,15 +329,20 @@ def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
             raise Exception('error in indices: %r' % (slices,))
 
     # list style
+    slices = slices[:]
     n = len(shape)
     if len(slices) == 0:
         slices = n * [[]]
     elif len(slices) != n:
         raise Exception('error in indices: %r' % (slices,))
 
-    # default no base conversion
+    # index base
     if new_base is None:
         new_base = base
+    if type(base) in (int, float):
+        base = n * [base]
+    if type(new_base) in (int, float):
+        new_base = n * [new_base]
 
     # loop over slices
     for i, s in enumerate(slices):
@@ -366,14 +364,14 @@ def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
             s = [s]
 
         # fill missing values
-        wraparound = shape[i] + int(base)
+        wraparound = shape[i] + int(base[i])
         if len(s) == 0:
             s = [None, None, 1]
         elif len(s) == 1:
             s = s[0]
             if s < 0:
                 s += wraparound
-            s = [s, s + 1 - int(base), 1]
+            s = [s, s + 1 - int(base[i]), 1]
         elif len(s) == 2:
             s = [s[0], s[1], 1]
         elif len(s) != 3:
@@ -382,9 +380,9 @@ def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
         # handle None
         start, stop, step = s
         if start is None:
-            start = base
+            start = base[i]
         if stop is None:
-            stop = -base + wraparound
+            stop = -base[i] + wraparound
         if step is None:
             step = 1
 
@@ -395,25 +393,25 @@ def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
             stop += wraparound
 
         # convert base
-        if new_base != base:
-            r = new_base - base
+        if new_base[i] != base[i]:
+            r = new_base[i] - base[i]
             start += r
             stop += r - int(r)
 
         # round and finish
         if round:
-            r = new_base - int(new_base)
+            r = new_base[i] - int(new_base[i])
             start = int(start - r + 0.5)
             stop  = int(stop  - r + 0.5)
         slices[i] = [start, stop, step]
 
     return slices
 
-def prepare_param(prm):
+def prepare_param(prm, fio):
     """
     Prepare input parameters
     """
-    import os, math
+    import os
 
     # checks
     if prm['source'] not in ('potency', 'moment', 'force', 'none'):
@@ -428,9 +426,7 @@ def prepare_param(prm):
     xi = prm['ihypo']
     for i in range(3):
         xi[i] = 0.0 + xi[i]
-        if xi[i] == 0.0:
-            xi[i] = 0.5 * (nn[i] + 1)
-        elif xi[i] <= -1.0:
+        if xi[i] <= -1.0:
             xi[i] = xi[i] + nn[i] + 1
         if xi[i] < 1.0 or xi[i] > nn[i]:
             raise Exception('Error: ihypo %s out of bounds' % xi)
@@ -463,93 +459,95 @@ def prepare_param(prm):
                 raise Exception('Error: model too small for PML')
     prm.update({'i1pml': i1, 'i2pml': i2})
 
-    # i/o sequence
+    # field i/o 
+    fld = fieldnames()
     fieldio = []
-    for line in prm['fieldio']:
-        filename = '-'
-        func, val, tau = 'const', 1.0, 1.0
-        x1 = x2 = [0.0, 0.0, 0.0]
-        tok = line.split()
-        if tok[1] in ['=', '+=']:
-            if '()' in tok[2]:
-                if tok[2] == 'cube()':
-                    field, op, func, x1, x2 = tok
-                else:
-                    field, op, func, val, tau = tok
+    filenames = []
+    for field, ios in sorted(fio.items()):
+        if type(ios) in (float, int):
+            ios = [ios]
+        elif len(ios) > 1 and isinstance(ios[1], basestring):
+            ios = [ios]
+        ios_ = []
+        it1, it2 = prm['shape'][-1] + 1, -1
+        for io in ios:
+            x1 = x2 = [0.0, 0.0, 0.0]
+            fname, val, tau = 'const', 0.0, 0.0
+            if type(io) in (float, int):
+                ii, op, rhs = [], '=', [io]
             else:
-                field, op, val = tok
-        elif tok[1] in '<>':
-            field, op, filename = tok
-        else:
-            raise Exception('Error: bad i/o mode: %r' % line)
+                ii, op, rhs = io[0], io[1], io[2:]
+            if op == '#':
+                pass
+            elif op in ['.', '=', '+', '*', '=~', '+~', '*~']:
+                if len(rhs) == 1:
+                    val, = rhs
+                else:
+                    val, fname, tau = rhs
+            elif op in ['=@', '+@', '*@']:
+                if len(rhs) == 3:
+                    x1, x2, val = rhs
+                else:
+                    x1, x2, val, fname, tau = rhs
+            elif op in ['.<', '=<', '+<', '*<', '.>', '=>']:
+                fname, = rhs
+                if fname in filenames:
+                    raise Exception('Error: duplicate filename: ' + fname)
+                filenames.append(fname)
+                filename = os.path.expanduser(fname)
+            else:
+                raise Exception('Error: bad i/o operation: %r' % io)
 
-        filename = os.path.expanduser(filename)
-        if len(filename) > 32:
-            raise Exception('Filename too long: ' + filename)
+            # error check
+            if len(fname) > 32:
+                raise Exception('File/function name too long: ' + fname)
+            if field in fld['input'] and op == '>':
+                raise Exception('Error: field is ouput only: %r' % field)
+            if field in fld['fault'] and prm['faultnormal'] == 0:
+                raise Exception('Error: field only for ruptures: %r' % field)
 
-        # error check
-        fn = fieldnames()
-        if field not in fn['dict']:
-            raise Exception('Error: unknown field: %r' % line)
-        if field not in fn['input'] and 'w' not in mode:
-            raise Exception('Error: field is ouput only: %r' % line)
-        if (field in fn['cell']) != (fields[0] in fn['cell']):
-            raise Exception('Error: cannot mix node and cell i/o: %r' % line)
-        if field in fn['fault']:
-            if fields[0] not in fn['fault']:
-                raise Exception('Error: cannot mix fault and non-fault i/o: %r' % line)
-            if prm['faultnormal'] == 0:
-                raise Exception('Error: field only for ruptures: %r' % line)
+            # cell or node registration
+            if field in fld['cell']:
+                reg = 'c'
+                base = 1.5, 1.5, 1.5, 1
+            else:
+                reg = 'n'
+                base = 1, 1, 1, 1
 
-        # cell or node registration
-        if field in fn['cell']:
-            mode = mode.replace('c', 'C')
-            base = 1.5
-        else:
-            base = 1
+            # indices
+            nn = prm['shape']
+            if field in fld['initial']:
+                nn = nn[:3]
+            if '.' in op:
+                x1 = expand_slices(nn, ii, base, round=False)
+                x1 = [x1[0][0], x1[1][0], x1[2][0]]
+            ii = expand_slices(nn, ii, base)
+            if field in fld['initial']:
+                ii += [[0, 0, 1]]
+            if field in fld['fault']:
+                i = abs(prm['faultnormal']) - 1
+                ii[i] = [irup, irup, 1]
+            it1 = min(it1, ii[-1][0])
+            it2 = max(it2, ii[-1][1])
 
-        # indices
-        nn = prm['shape'][:3]
-        nt = prm['shape'][3]
-        if 'i' in mode:
-            x1 = expand_slices(nn, ii[:3], base, round=False)
-            x1 = [i[0] + 1 - base for i in x1]
-            i1 = [math.ceil(i) for i in x1]
-            ii = (expand_slices(nn, i1, 1)
-                 + expand_slices([nt], ii[3:], 1))
-        else:
-            ii = (expand_slices(nn, ii[:3], base)
-                 + expand_slices([nt], ii[3:], 1))
-        if field in fn['initial']:
-            ii[3] = [0, 0, 1]
-        if field in fn['fault']:
-            i = abs(prm['faultnormal']) - 1
-            ii[i] = [irup, irup, 1]
+            # buffer size
+            shape = [(i[1] - i[0]) // i[2] + 1 for i in ii]
+            nb = (min(prm['itio'], nt) - 1) // ii[3][2] + 1
+            nb = max(1, min(nb, shape[3]))
+            n = shape[0] * shape[1] * shape[2]
+            if n > (nn[0] + nn[1] + nn[2]) ** 2:
+                nb = 1
+            elif n > 1:
+                nb = min(nb, prm['itbuff'])
 
-        # buffer size
-        shape = [(i[1] - i[0]) // i[2] + 1 for i in ii]
-        nb = (min(prm['itio'], nt) - 1) // ii[3][2] + 1
-        nb = max(1, min(nb, shape[3]))
-        n = shape[0] * shape[1] * shape[2]
-        if n > (nn[0] + nn[1] + nn[2]) ** 2:
-            nb = 1
-        elif n > 1:
-            nb = min(nb, prm['itbuff'])
-        nc = len(fields)
+            # append to list
+            ios_ += [[field, reg, ii, nb, x1, x2, val, tau, op, fname]]
 
-        # append to list
-        fieldio += [
-            [mode, nc, pulse, tau, x1, x2, nb, ii, str(filename), val, fields]
-        ]
+        fieldio += [(it1, it2, ios_)]
 
-    # check for duplicate filename
-    f = [line[8] for line in fieldio if line[8] != '-']
-    for i in range(len(f)):
-        if f[i] in f[:i]:
-            raise Exception('Error: duplicate filename: %r' % f[i])
+    fieldio = [g for f in sorted(fieldio) for g in f[2]]
 
     # done
-    prm['fieldio'] = fieldio
     del(prm['itbuff'])
-    return prm
+    return prm, fieldio
 

@@ -9,9 +9,9 @@ integer :: &
     nthread, oplevel, ppml, shape_(4)
 real :: &
     affine(9), delta(4), gam1, gam2, gridnoise, hourglass(2), ihypo(3), rcrit, &
-    rexpand, rho1, rho2, slipvector(3), source1(3), source2(3), svtol, tau, tm0, &
-    trelax, vdamp, vp1, vp2, vpml, vrup, vs1, vs2 ! tmnucl, delts
-character(16) :: pulse, source
+    rexpand, rho1, rho2, slipvector(3), svtol, tm0, trelax, vdamp, vp1, vp2, vpml, &
+    vrup, vs1, vs2
+character(16) :: source
 
 ! miscellaneous parameters
 real :: &

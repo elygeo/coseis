@@ -103,7 +103,7 @@ do isrc = 1, abs(nsource)
             do l = i1(3), i2(3)
             do k = i1(2), i2(2)
             do j = i1(1), i2(1)
-                w = h * vc(j,k,l) * ((1.0-abs(xi(1)-j)) * (1.0-abs(xi(2)-k)) * (1.0-abs(xi(3)-l)))
+                w = h * ((1.0-abs(xi(1)-j)) * (1.0-abs(xi(2)-k)) * (1.0-abs(xi(3)-l)))
                 do i = 1, 3
                     w1(j,k,l,i) = w1(j,k,l,i) - w * src_w1(isrc,i)
                     w2(j,k,l,i) = w2(j,k,l,i) - w * src_w2(isrc,i)
@@ -114,61 +114,6 @@ do isrc = 1, abs(nsource)
         end if
     end if
     itoff = itoff + src_nt(isrc)
-end do
-end subroutine
-
-! add point source to vector
-subroutine vector_point_source
-use globals
-use utilities
-integer :: i1(3), i2(3), i, j, k, l
-real :: xi(3), f, w
-if (pulse == 'none') return
-xi = ihypo - nnoff
-i1 = max(i1node, floor(xi))
-i2 = min(i2node, floor(xi) + 1)
-if (any(i2 < i1)) then
-    pulse = 'none'
-    return
-end if
-f = time_function(pulse, tm, dt, tau)
-do l = i1(3), i2(3)
-do k = i1(2), i2(2)
-do j = i1(1), i2(1)
-    w = f * ((1.0-abs(xi(1)-j)) * (1.0-abs(xi(2)-k)) * (1.0-abs(xi(3)-l)))
-    do i = 1, 3
-        w1(j,k,l,i) = w1(j,k,l,i) + w * source1(i)
-    end do
-end do
-end do
-end do
-end subroutine
-
-! add point source to strain/stress tensor
-subroutine tensor_point_source
-use globals
-use utilities
-integer :: i1(3), i2(3), i, j, k, l
-real :: xi(3), f, w
-if (pulse == 'none') return
-xi = ihypo - 0.5 - nnoff
-i1 = max(i1cell, floor(xi))
-i2 = min(i2cell, floor(xi) + 1)
-if (any(i2 < i1)) then
-    pulse = 'none'
-    return
-end if
-f = time_function(pulse, tm, dt, tau)
-do l = i1(3), i2(3)
-do k = i1(2), i2(2)
-do j = i1(1), i2(1)
-    w = f * vc(j,k,l) * ((1.0-abs(xi(1)-j)) * (1.0-abs(xi(2)-k)) * (1.0-abs(xi(3)-l)))
-    do i = 1, 3
-        w1(j,k,l,i) = w1(j,k,l,i) - w * source1(i)
-        w2(j,k,l,i) = w2(j,k,l,i) - w * source2(i)
-    end do
-end do
-end do
 end do
 end subroutine
 

@@ -7,8 +7,9 @@ subroutine setup_dimensions
 use globals
 use collective
 use utilities
-integer :: nl(3)
+integer :: nl(3), i
 character(32) :: filename
+integer, allocatable :: seed(:)
 
 if (sync) call barrier
 if (master) print *, clock(), 'Setup dimensions'
@@ -29,6 +30,12 @@ if (ifn /= 0) nhalo(ifn) = 2
 nl3 = max(nl3, nhalo)
 nproc3 = (nn - 1) / nl3 + 1
 call rank(ip, ip3, nproc3)
+
+! random seed
+call random_seed(size=i)
+allocate (seed(i))
+seed = ip
+call random_seed(put=seed)
 
 ! master process
 master = ip == 0

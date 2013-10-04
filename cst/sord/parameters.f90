@@ -19,7 +19,7 @@ subroutine read_parameters1(n)
 use field_io_mod
 use utilities
 integer, intent(in) :: n
-integer :: i, j, nio
+integer :: i, j
 character(n) :: str
 
 ! read with master process
@@ -36,9 +36,9 @@ call cbroadcast(str)
 read (str, *) &
     affine, bc1, bc2, debug, delta, faultnormal, faultopening, gam1, gam2, &
     gridnoise, hourglass, i1pml, i2pml, ihypo, itio, itstats, mpin, mpout, &
-    n1expand, n2expand, npml, nproc3, nsource, nthread, oplevel, ppml, pulse, &
-    rcrit, rexpand, rho1, rho2, shape_, slipvector, source, source1, source2, &
-    svtol, tau, tm0, trelax, vdamp, vp1, vp2, vpml, vrup, vs1, vs2, nio
+    n1expand, n2expand, npml, nproc3, nsource, nthread, oplevel, ppml, rcrit, &
+    rexpand, rho1, rho2, shape_, slipvector, source, svtol, tm0, trelax, vdamp, &
+    vp1, vp2, vpml, vrup, vs1, vs2, io2
 
 ! find start of fieldio and change file delimeter
 i = scan(str, '>')
@@ -46,28 +46,22 @@ str = str(i:)
 do
     i = scan(str, '/')
     if (i == 0) exit
-    str(i:i) = '#'
+    str(i:i) = '\'
 end do
 
-! i/o pointers
-allocate (io0)
-io => io0
-io%next => io0
-io%field = 'head'
-
-! select input key
-do j = 1, nio
+! field i/o
+allocate (io_list(io2))
+do j = 1, io2
+    io => io_list(j)
     i = scan(str, new_line('a')) + 1
     str = str(i:)
-    call pappend
     io%ib = -1
-    read (str, *) io%mode, io%nc, io%pulse, &
-        io%tau, io%x1, io%x2, io%nb, io%ii, io%filename, &
-        io%val, io%field
+    read (str, *) io%field, io%reg, io%ii, io%nb, io%x1, io%x2, &
+        io%val, io%tau, io%op, io%fname
     do
-        i = scan(io%filename, '#')
+        i = scan(io%fname, '\')
         if (i == 0) exit
-        io%filename(i:i) = '/'
+        io%fname(i:i) = '/'
     end do
 end do
 

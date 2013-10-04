@@ -6,8 +6,8 @@ import os, json, shutil
 import numpy as np
 import pyproj
 import cst
-prm = cst.sord.parameters()
-fld = cst.sord.fieldnames()
+s_ = cst.sord.get_slices()
+prm = {}
 
 # resolution and parallelization
 dx = 50.0;   prm['nproc3'] = [1, 32, 480]; nstripe = 32
@@ -44,9 +44,9 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     meta = open(mesh + 'meta.json')
     meta = json.load(meta)
     dtype = meta['dtype']
-    delta = meta['delta']
-    shape = meta['shape']
-    hypo = meta['origin']
+    dx, dy, dz = meta['delta']
+    nx, ny, nz = meta['shape']
+    origin = meta['origin']
     prm['npml'] = meta['npml']
 
     # translate projection to lower left origin
@@ -58,82 +58,89 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     dt = dx / 16000.0
     dt = dx / 20000.0
     nt = int(90.0 / dt + 1.00001)
-    prm['delta'] = delta + [dt]
-    prm['shape'] = shape + [nt]
+    prm['delta'] = [dx, dy, dz, dt]
+    prm['shape'] = [nx, ny, nz, nt]
 
     # material
+    prm['rho'] = ([], '=<', 'hold/rho.bin')
+    prm['vp'] = ([], '=<', 'hold/vp.bin')
+    prm['vs'] = ([], '=<', 'hold/vs.bin')
     prm['hourglass'] = [1.0, 1.0]
     prm['vp1'] = 1500.0
     prm['vs1'] = 500.0
     prm['vdamp'] = 400.0
     prm['gam2'] = 0.8
-    prm['fieldio'] = [
-        fld['rho'] << 'hold/rho.bin',
-        fld['vp'] << 'hold/vp.bin',
-        fld['vs'] << 'hold/vs.bin',
-    ]
 
     # topography
     if surf == 'topo':
-        prm['fieldio'] += [fld['x3'] << 'hold/z3.bin']
+        prm['x3'] = [], '=<', 'hold/z3.bin'
 
     # boundary conditions
     prm['bc1'] = [10, 10, 0]
     prm['bc2'] = [10, 10, 10]
 
     # source
-    prm['source'] = 'moment'
-    prm['pulse'] = 'brune'
     mts = os.path.join(cwd, 'run', 'data', '14383980.mts.txt')
     mts = json.load(open(mts))
-    d = mts['double_couple_clvd']
-    prm['source1'] = [ d['myy'],  d['mxx'], d['mzz']]
-    prm['source2'] = [-d['mxz'], -d['myz'], d['mxy']]
 
     # scaling law: fcorner = (dsigma / moment) ^ 1/3 * 0.42 * Vs,
     # dsigma = 4 MPa, Vs = 3900 m/s, tau = 0.5 / (pi * fcorner)
-    prm['tau'] = 6e-7 * mts['moment'] ** (1.0 / 3.0) # ~0.32, fcorner = 0.5Hz
+    tau = 6e-7 * mts['moment'] ** (1.0 / 3.0) # ~0.32, fcorner = 0.5Hz
 
     # hypocenter location at x/y center
-    x, y, z = hypo
+    x, y, z = origin
     x, y = proj(x, y)
-    j = abs(x / delta[0]) + 1.0
-    k = abs(y / delta[1]) + 1.0
-    l = abs(z / delta[2]) + 1.0
+    j = abs(x / dx) + 1.0
+    k = abs(y / dx) + 1.0
+    l = abs(z / dx) + 1.0
     if register:
         l = int(l) + 0.5
-    prm['ihypo'] = [j, k, l]
+    ihypo = [j, k, l]
+
+    # moment tensor
+    m = mts['double_couple_clvd']
+    prm['m11'] = (s_[j,k,l,:], '.',  m['myy'], 'brune', tau)
+    prm['m22'] = (s_[j,k,l,:], '.',  m['mxx'], 'brune', tau)
+    prm['m33'] = (s_[j,k,l,:], '.',  m['mzz'], 'brune', tau)
+    prm['m23'] = (s_[j,k,l,:], '.', -m['mxz'], 'brune', tau)
+    prm['m31'] = (s_[j,k,l,:], '.', -m['myz'], 'brune', tau)
+    prm['m12'] = (s_[j,k,l,:], '.',  m['mxy'], 'brune', tau)
 
     # receivers
-    f = os.path.join(cwd, 'run', 'data', 'station-list.txt')
-    for s in open(f).readlines():
+    sl = os.path.join(cwd, 'run', 'data', 'station-list.txt')
+    sl = open(sl).readlines()
+    for s in sl:
         s, y, x = s.split()[:3]
         x, y = proj(float(x), float(y))
-        j = x / delta[0] + 1.0
-        k = y / delta[1] + 1.0
+        j = x / dx + 1.0
+        k = y / dx + 1.0
         for f in 'vs', 'v1', 'v2', 'v3':
-            prm['fieldio'] += [fld[f][j,k,1,:] >> 'out/%s-%s.bin' % (s, f)]
+            if f not in prm:
+                prm[f] = []
+            prm[f] += [
+                (s_[j,k,1,:], '=>', 'out/%s-%s.bin' % (s, f)),
+            ]
 
     # surface output
-    ns = max(1, max(shape[:3]) / 1024)
+    ns = max(1, np.max([nx, ny, nz]) / 1024)
     nh = 4 * ns
     mh = max(1, int(0.025 / dt + 0.5))
     ms = max(1, int(0.125 / (dt * mh) + 0.5))
     if surf_out:
-        for i in '123':
-            prm['fieldio'] += [
-                fld['v'+i][::ns,::ns,1,::mh] >> 'hold/full-v%s.bin' % i,
-                fld['v'+i][::ns,::ns,1,::ms] >> '#hold/snap-v%s.bin' % i,
-                fld['v'+i][::nh,::nh,1,::mh] >> '#hold/hist-v%s.bin' % i,
+        for f in 'v1', 'v2', 'v3':
+            prm[f] += [
+                (s_[::ns,::ns,1,::mh], '=>', 'hold/full-%s.bin' % f),
+                (s_[::ns,::ns,1,::ms], '=>', '#hold/snap-%s.bin' % f),
+                (s_[::nh,::nh,1,::mh], '=>', '#hold/hist-%s.bin' % f),
             ]
 
     # cross section output
     if 0:
-        j, k, l = prm['ihypo']
+        j, k, l = ihypo
         for f in 'v1', 'v2', 'v3', 'rho', 'vp', 'vs', 'gam':
-            prm['fieldio'] += [
-                fld[f][j,:,:,::ms] >> 'hold/xsec-ns-%s.bin' % f,
-                fld[f][:,k,:,::ms] >> 'hold/xsec-ew-%s.bin' % f,
+            prm[f] += [
+                (s_[j,:,:,::ms], '=>', 'hold/xsec-ns-%s.bin' % f),
+                (s_[:,k,:,::ms], '=>', 'hold/xsec-ew-%s.bin' % f),
             ]
 
     # run directory
@@ -154,7 +161,6 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
 
     # save decimated mesh
     if surf_out:
-        n = shape[:2]
         for f in 'lon.npy', 'lat.npy', 'topo.npy':
             s = np.load(mesh + f)
             np.save(f, s[::ns,::ns])

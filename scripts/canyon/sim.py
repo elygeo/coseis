@@ -3,47 +3,49 @@
 Semi-cylindrical canyon with vertically incident P-wave.
 """
 import cst
-prm = cst.sord.parameters()
-fld = cst.sord.fieldnames()
+s_ = cst.sord.get_slice()
+prm = {}
 
 # dimentions
-prm['nproc3'] = [2, 1, 1]
-prm['shape'] = [301, 321, 2, 6000]
 prm['delta'] = [0.0075, 0.0075, 0.0075, 0.002]
+prm['shape'] = [301, 321, 2, 6000]
+prm['nproc3'] = [2, 1, 1]
+
+# material model
+prm['rho'] = 1.0
+prm['vp']  = 2.0
+prm['vs']  = 1.0
+prm['gam'] = 0.0
+prm['hourglass'] = [1.0, 2.0]
 
 # boundary conditions
 prm['bc1'] = [0,  0, 1]
 prm['bc2'] = [1, -1, 1]
 
-# material model
-prm['hourglass'] = [1.0, 2.0]
-prm['fieldio'] = [
-    fld['rho'] == 1.0,
-    fld['vp']  == 2.0,
-    fld['vs']  == 1.0,
-    fld['gam'] == 0.0,
-]
-
 # Ricker wavelet source with 2 s period.
-prm['fieldio'] += [
-    fld['v2'][-1,161:,:,:] == cst.sord.func.ricker1(1.0, 2.0),
-]
+prm['v2'] = [(s_[-1,161:,:,:], '=', 'ricker1', 1.0, 2.0)]
 
 # mesh input
-prm['fieldio'] += [
-    fld['x1'][:,:,1,0] << 'x.bin',
-    fld['x2'][:,:,1,0] << 'y.bin',
-]
+prm['x1'] = (s_[:,:,1], '=<', 'x.bin')
+prm['x2'] = (s_[:,:,1], '=<', 'y.bin')
 
-# output
-for i in '12':
-    prm['fieldio'] += [
-        fld['u'+i][-1,-1,1,0]   >> 'source-u%s.bin' % i,
-        fld['u'+i][1,:,1,0]     >> 'canyon-u%s.bin' % i,
-        fld['u'+i][2:158,1,1,0] >> 'flank-u%s.bin' % i,
-        fld['u'+i][:,:,1,::10]  >> 'snap-u%s.bin' % i,
-        fld['v'+i][:,:,1,::10]  >> 'snap-v%s.bin' % i,
-    ]
+# velocity output
+prm['v1'] =  [(s_[:,:,1,::10],  '=>', 'snap-v1.bin')]
+prm['v2'] += [(s_[:,:,1,::10],  '=>', 'snap-v2.bin')]
+
+# displacement output
+prm['u1'] = [
+    (s_[-1,-1,1,:],   '=>', 'source-u1.bin'),
+    (s_[1,:,1,:],     '=>', 'canyon-u1.bin'),
+    (s_[2:158,1,1,:], '=>', 'flank-u1.bin'),
+    (s_[:,:,1,::10],  '=>', 'snap-u1.bin'),
+]
+prm['u2'] = [
+    (s_[-1,-1,1,:],   '=>', 'source-u2.bin'),
+    (s_[1,:,1,:],     '=>', 'canyon-u2.bin'),
+    (s_[2:158,1,1,:], '=>', 'flank-u2.bin'),
+    (s_[:,:,1,::10],  '=>', 'snap-u2.bin'),
+]
 
 # run job
 cst.sord.run(prm)

@@ -1,15 +1,18 @@
-delta: [100.0, 100.0, 100.0, 0.0075] # step length [dx, dy, dz, dt]
-shape: [61, 61, 61, 60]              # mesh size [nx, ny, nz, nt]
-ihypo: [31.0, 31.0, 31.0]            # hypocenter location [x, y, z]
-source1: [1e6, 1e6, 1e6]             # source components [xx, yy, zz]
-source2: [0.0, 0.0, 0.0]             # source components [yz, zx, xy]
-source: potency                      # source type
-pulse: integral_brune                # source time function
-tau: 0.045                           # source characteristic time
-fieldio:                             # 3D field specs
-    - rho = 2670.0                   # density
-    - vp  = 6000.0                   # P-wave velocity
-    - vs  = 3464.0                   # S-wave velocity
-    - gam = 0.3                      # viscosity
-    - v1[:,:,31,-1] >> vx.bin        # v_x output slice
-    - v2[:,:,31,-1] >> vy.bin        # v_y output slice
+# model dimentions [x, y, z, t]
+shape: [61, 61, 61, 60]
+delta: [100.0, 100.0, 100.0, 0.0075]
+
+# material properties
+rho: 2670.0 # density
+vp: 6000.0  # P-wave velocity
+vs: 3464.0  # S-wave velocity
+gam: 0.3    # viscosity
+
+# potency tensor source time function
+p11: ['[31,31,31,:]', '=', 1.0, 'integral_brune', 0.05]
+p22: ['[31,31,31,:]', '=', 1.0, 'integral_brune', 0.05]
+p33: ['[31,31,31,:]', '=', 1.0, 'integral_brune', 0.05]
+
+# write 2d velocity slice, last time step
+v1: ['[:,:,31,-1]', '=>', 'vx.bin']
+v2: ['[:,:,31,-1]', '=>', 'vy.bin']

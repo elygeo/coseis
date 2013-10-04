@@ -213,7 +213,6 @@ end if
 ! add source to force
 if (source == 'force') then
     call finite_source
-    call vector_point_source
 end if
 
 ! nodal force input

@@ -4,8 +4,7 @@ Benchmarks
 """
 import os
 import cst
-prm = cst.sord.parameters()
-fld = cst.sord.fieldnames()
+s_ = cst.sord.get_slices()
 
 # MPI
 power = range(7, 10) # Mira
@@ -21,6 +20,8 @@ power = 3, # Vesta 128 nodes, 1 ppn, 32 threads
 points = 400
 power = range(6) # Challenger
 
+# SORD parameters
+prm = {}
 prm['oplevel'] = 5
 prm['minutes'] = 20
 prm['oplevel'] = 6
@@ -32,15 +33,13 @@ prm['delta'] = [100.0, 100.0, 100.0, 0.0075]
 prm['bc1'] = [0, 0, 0]
 prm['bc2'] = [0, 0, 0]
 prm['npml'] = 0
-prm['fieldio'] = [
-    fld['rho'] == 2670.0,
-    fld['vp']  == 6000.0,
-    fld['vs']  == 3464.0,
-    fld['gam'] == 0.0,
-    fld['v1'][:,:,:,1] == cst.sord.func.rand(1.0),
-    fld['v2'][:,:,:,1] == cst.sord.func.rand(1.0),
-    fld['v3'][:,:,:,1] == cst.sord.func.rand(1.0),
-]
+prm['rho'] = 2670.0
+prm['vp']  = 6000.0
+prm['vs']  = 3464.0
+prm['gam'] = 0.0
+prm['v1'] = (s_[:,:,:,1], '=~', 1.0)
+prm['v2'] = (s_[:,:,:,1], '=~', 1.0)
+prm['v3'] = (s_[:,:,:,1], '=~', 1.0)
 
 for i in power[::-1]:
     n = 2 ** i

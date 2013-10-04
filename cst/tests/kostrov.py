@@ -7,8 +7,7 @@ def test(argv=[]):
     import os
     import numpy as np
     import cst
-    prm = cst.sord.parameters()
-    fld = cst.sord.fieldnames()
+    prm = {}
 
     # parameters
     prm['argv'] = argv
@@ -19,18 +18,14 @@ def test(argv=[]):
     prm['delta'] = [dx, dx, dx, dt]
     prm['shape'] = [nx, ny, nz, nt]
     prm['nproc3'] = [1, 1, 2]
+    prm['nproc3'] = [1, 1, 1]
 
     # material properties
-    rho = 2670.0
-    vp = 6000.0
-    vs = 3464.0
+    prm['rho'] = rho = 2670.0
+    prm['vp'] = vp = 6000.0
+    prm['vs'] = vs = 3464.0
+    prm['gam'] = 1.0
     prm['hourglass'] = [1.0, 1.0]
-    prm['fieldio'] = [
-        fld['rho'] == rho,
-        fld['vp'] == vp,
-        fld['vs'] == vs,
-        fld['gam'] == 1.0,
-    ]
 
     # boundary conditions
     prm['bc1'] = [10, 10, 10]
@@ -43,20 +38,18 @@ def test(argv=[]):
     prm['vrup'] = vr = 0.9 * vs
     prm['rcrit'] = 1e9
     prm['trelax'] = 0.0
-    prm['fieldio'] += [
-        fld['mud'] == 1.0,
-        fld['mus'] == 1e9,
-        fld['dc'] == 1e9,
-        fld['tn'] == -90e6,
-        fld['ts'] == -90e6 - dtau,
-    ]
+    prm['mud'] = 1.0
+    prm['mus'] = 1e9
+    prm['dc'] = 1e9
+    prm['tn'] = -90e6
+    prm['ts'] = -90e6 - dtau
 
     # receivers
-    prm['fieldio'] += [
-        fld['svm'][ -1,-21,-1,-1] >> 'p20a.bin',
-        fld['svm'][-13,-17,-1,-1] >> 'p20b.bin',
-        fld['svm'][-17,-13,-1,-1] >> 'p20c.bin',
-        fld['svm'][-21, -1,-1,-1] >> 'p20d.bin',
+    prm['svm'] = [
+        ([ -1,-21,-1,-1], '=>', 'p20a.bin'),
+        ([-13,-17,-1,-1], '=>', 'p20b.bin'),
+        ([-17,-13,-1,-1], '=>', 'p20c.bin'),
+        ([-21, -1,-1,-1], '=>', 'p20d.bin'),
     ]
 
     # analytical solution

@@ -137,7 +137,7 @@ if (ic < id) then
     do l = 1, nm(3)
     do k = 1, nm(2)
     do j = 1, nm(1)
-        w2(j,k,l,i) = 0.5 * s1(j,k,l) * vc(j,k,l)
+        w2(j,k,l,i) = 0.5 * s1(j,k,l)
     end do
     end do
     end do
@@ -147,7 +147,7 @@ elseif (ic > id) then
     do l = 1, nm(3)
     do k = 1, nm(2)
     do j = 1, nm(1)
-        w2(j,k,l,i) = w2(j,k,l,i) + 0.5 * s1(j,k,l) * vc(j,k,l)
+        w2(j,k,l,i) = w2(j,k,l,i) + 0.5 * s1(j,k,l)
     end do
     end do
     end do
@@ -157,7 +157,7 @@ else
     do l = 1, nm(3)
     do k = 1, nm(2)
     do j = 1, nm(1)
-        w1(j,k,l,ic) = s1(j,k,l) * vc(j,k,l)
+        w1(j,k,l,ic) = s1(j,k,l)
     end do
     end do
     end do
@@ -167,19 +167,16 @@ end if
 end do doid
 end do doic
 
-! aZd potency source to strain
+! potency i/o
 if (source == 'potency') then
     call finite_source
-    call tensor_point_source
 end if
-
-! strain i/o
-call field_io('<>', 'e11', w1(:,:,:,1))
-call field_io('<>', 'e22', w1(:,:,:,2))
-call field_io('<>', 'e33', w1(:,:,:,3))
-call field_io('<>', 'e23', w2(:,:,:,1))
-call field_io('<>', 'e31', w2(:,:,:,2))
-call field_io('<>', 'e12', w2(:,:,:,3))
+call field_io('<>', 'p11', w1(:,:,:,1))
+call field_io('<>', 'p22', w1(:,:,:,2))
+call field_io('<>', 'p33', w1(:,:,:,3))
+call field_io('<>', 'p23', w2(:,:,:,1))
+call field_io('<>', 'p31', w2(:,:,:,2))
+call field_io('<>', 'p12', w2(:,:,:,3))
 
 ! attenuation
 !do j = 1, 2
@@ -215,11 +212,30 @@ do i = 1, 3
     !$omp end parallel do
 end do
 
-! add moment source to stress
+! moment i/o
 if (source == 'moment') then
     call finite_source
-    call tensor_point_source
 end if
+call field_io('<>', 'm11', w1(:,:,:,1))
+call field_io('<>', 'm22', w1(:,:,:,2))
+call field_io('<>', 'm33', w1(:,:,:,3))
+call field_io('<>', 'm23', w2(:,:,:,1))
+call field_io('<>', 'm31', w2(:,:,:,2))
+call field_io('<>', 'm12', w2(:,:,:,3))
+
+! stress
+do i = 1, 3
+!$omp parallel do schedule(static) private(j, k, l)
+do l = 1, nm(3)
+do k = 1, nm(2)
+do j = 1, nm(1)
+    w1(j,k,l,i) = w1(j,k,l,i) * vc(j,k,l)
+    w2(j,k,l,i) = w2(j,k,l,i) * vc(j,k,l)
+end do
+end do
+end do
+!$omp end parallel do
+end do
 
 ! stress i/o
 call field_io('<>', 'w11', w1(:,:,:,1))

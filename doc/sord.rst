@@ -83,66 +83,61 @@ Running SORD
 ------------
 
 The simplest way to run SORD is to execute the ``sord`` command giving a
-parameter file in YAML_ or JSON_ format. See for example the above example
-`sim.yaml <../scripts/sord/sim.yaml>`__:
-
-.. include:: ../scripts/sord/sim.yaml
-   :literal:
-
-A complete list of possible SORD parameters and default values are specified in
-`parameters.yaml <../cst/sord/parameters.yaml>`__.
-
-A more powerful way to run the code is with Python scripting. The basic
-procedure it to import the ``cst`` module, create a dictionary of parameters,
-and pass that dictionary to the ``cst.sord.run()`` function. See many examples
-in the ``cst/scripts`` directory.
+parameter file in YAML_ or JSON_ format. The more powerful way to run the code
+is with a Python script. The basic procedure it to import the ``cst`` module,
+create a dictionary of parameters, and pass that dictionary to the
+``cst.sord.run()`` function. The ``cst/scripts`` directory contains many
+examples including the above quick test `sim.yaml
+<../scripts/sord/sim.yaml>`__:
 
 .. _YAML: http://www.yaml.org
 .. _JSON: http://www.json.org
+.. include:: ../scripts/sord/sim.yaml
+   :literal:
 
-Field I/O
----------
+A complete list of SORD parameters and default values arg given in
+`parameters.yaml <../cst/sord/parameters.yaml>`__ and `fieldnames.yaml
+<../cst/sord/fieldnames.yaml>`__. In this example, ``rho``, ``vp``, ``vs``,
+``v1``, and ``v2`` are 3- and 4-D fields.  Fields may be a single value that is
+assigned to the entire array, or various operations that can be performed on
+array slices::
 
-Multidimensional field arrays can be accessed for input and output through the
-``fieldio`` list.  The `fieldnames.yaml <../cst/sord/fieldnames.yaml>`_ file
-specifies the list of available field variables, which are categorized in four
-ways: (1) static vs. dynamic, (2) settable vs. output only, (3) node vs. cell
+    f = val                        # Set f to value
+    f = ([], '+', val)              # Add value to f
+    f = ([], '=', 'rand', val)      # Random numbers in range (0, val)
+    f = ([], '=', 'func', val, tau) # Time function with period tau, scaled by val
+    f = ([], '<', 'filename')       # Read filename into f
+    f = ([], '>', 'filename')       # Write f into filename
+
+Field variables are categorized in four ways: (1)
+static vs. dynamic, (2) settable vs. output only, (3) node vs. cell
 registration, and (4) volume vs. fault surface.  For example, density ``rho``
-is a static, settable, cell, volume variable.  Slip path length ``sl`` is a
-dynamic, output, node, fault variable.  The ``fieldio`` list is order dependent
-with subsequent inputs overwriting previous inputs.  So, for example, a field
-may be assigned to one value for the entire volume, followed by a different
-value for a sub-region of the volume.
+is a static, settable, cell, volume variable. Slip path length ``sl`` is a
+dynamic, output, node, fault variable.
 
-The four-dimensional sub-volume of the array in space and time is specified
-using Python slicing notation.  The notation is extended here to use integers
-for node indices and integers + 0.5 for cell indices (1.5, 2.5, 3.5, ...).
-Array indexing starts at 1 for the first node, and 1.5 for the first cell.
-Negative indices count inward from end of the array, starting at -1 for the
-last node, and -1.5 for the last cell.  Empty brackets ``[]`` are shorthand for
-the entire 4D volume.  Colons (:) indication a slice range can only occur
-inside a string, so the slice index or the entire expression must be surrounded
-by quotes.  Some examples of slice notation::
+Here we have specified the entire 4D volume for the slice using the shorthand
+notation empty brackets ``[]``. The array slicing notation follows that of
+Python, but is extended here to use integers for node indices and integers +
+0.5 for cell indices (1.5, 2.5, 3.5, ...).  Array indexing starts at 1 for the
+first node, and 1.5 for the first cell.  Negative indices count inward from end
+of the array, starting at -1 for the last node, and -1.5 for the last cell.
+Slices can be specified in one of three ways: with a list, with a string, or
+using the helper function ``cst.sord.get_slices()``. The helper function is
+the only 
 
+    s_ = cst.sord.get_slices()
+    j = 10
+    k = 20
     []                  # Entire 4D volume
-    [10,20,1,-1]        # Single node, last time step
-    [10.5,20.5,1.5,':'] # Single cell, full time history
-    '[2,:,:,::10]'      # j=2 node surface, every 10th time step
+    '[10.5,20.5,1.5,:]' # Single cell, full time history
     '[:,:,:,-1]'        # Full 3D volume, last time step
+    [j,k,1,-1]          # Single node, last time step
+    s_[j,:,:,::10]      # j=10 node surface, every 10th time step
 
-Each member of the ``fieldio`` list contains a field name, slice indices, and a
-mode, followed by mode dependent parameters.  The following I/O modes are
+slice indices and an operation, followed by other parameters.
+ The following I/O modes are
 available, where ``'f'`` is the field variable name (from the list
 fieldnames.yaml_), and ``[]`` are the slice indices::
-
-    ['f', [], '=',      val],      # Set to value
-    ['f', [], '+',      val],      # Add value
-    ['f', [], '=rand',  val],      # Random numbers in range (0, val)
-    ['f', [], '=tfunc', val, T],   # Time function with period T, scaled by val
-    ['f', [], '=read',  filename], # Read from filename
-    ['f', [], '=fill',  filename], # Read from filename with exrapolation.
-    ['f', [], 'write',  filename], # Write to filename
-    ['f', [], 'write~', filename], # Write weighted average to filename.
 
 A tilde ``~`` indicates sub-cell positioning via weighted averaging.  In this
 case the spatial indices are single logical coordinates that may vary
