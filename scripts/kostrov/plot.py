@@ -6,7 +6,8 @@ import cst
 
 # parameters
 path = 'run' + os.sep
-meta = json.load(path + 'meta.json')
+meta = open(path + 'meta.json')
+meta = json.load(meta)
 shape = meta['shape']
 delta = meta['delta']
 dtype = meta['dtype']
@@ -42,6 +43,6 @@ for n in 20, 40:
 ax.set_xlim(0.0, t[-1])
 ax.set_xlabel('Time (s)')
 ax.set_ylabel('Slip velocity (m/s)')
-f = os.path.join(path, 'kostrov.pdf')
+f = os.path.join(path, 'Kostrov.pdf')
 fig.savefig(f)
 

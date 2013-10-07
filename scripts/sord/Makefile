@@ -1,6 +1,6 @@
 plot : run/example.png
 
-run/example.png : run
+run/example.png : run plot.py
 	python plot.py
 
 run : sim.yaml

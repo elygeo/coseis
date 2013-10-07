@@ -40,11 +40,10 @@ def test(argv=[]):
 
     # output
     fld = cst.sord.fieldnames()
-    for k in fld['dict']:
-        if k not in fld['fault']:
-            if k not in prm:
-                k = []
-            prm[k] += [([], '>', k + '.bin')]
+    for k in fld['volume']:
+        if k not in prm:
+            k = []
+        prm[k] += [([], '>', k + '.bin')]
 
     # master
     prm['oplevel'] = i = 5

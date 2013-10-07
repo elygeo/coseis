@@ -4,6 +4,19 @@ Support Operator Rupture Dynamics
 from ..util import launch
 launch # silence pyflakes warning
 
+tfuncs = [
+    'const',
+    'delta',
+    'step', 'integral_delta',
+    'brune',
+    'integral_brune',
+    'hann',
+    'integral_hann',
+    'gaussian', 'integral_ricker1',
+    'ricker1', 'integral_ricker2',
+    'ricker2',
+]
+
 def parameters():
     import os, json
     f = os.path.dirname(__file__)
@@ -26,36 +39,6 @@ def fieldnames():
         'fault':   [k for k in d if 'f' in d[k][-1]],
         'volume':  [k for k in d if 'f' not in d[k][-1]],
     }
-
-tfuncs = [
-    'const',
-    'delta',
-    'step', 'integral_delta',
-    'brune',
-    'integral_brune',
-    'hann',
-    'integral_hann',
-    'gaussian', 'integral_ricker1',
-    'ricker1', 'integral_ricker2',
-    'ricker2',
-]
-
-class get_slices:
-    def __getitem__(self, item):
-        return item
-s_ = get_slices()
-
-def f90modules(path):
-    mods = set()
-    deps = set()
-    for line in open(path):
-        tok = line.split()
-        if tok:
-            if tok[0] == 'module':
-                mods.update(tok[1:])
-            elif tok[0] == 'use':
-                deps.update(tok[1:])
-    return list(mods), list(deps)
 
 def configure(force=False):
     """
@@ -173,6 +156,18 @@ def stage(args, **kwargs):
             prm[k] = v
         else:
             cfg[k] = v
+    for k, io in fio.items():
+        if type(io) != list:
+            io = [io]
+        elif isinstance(type(io[1]), basestring):
+            io = [io]
+        for i, o in enumerate(io):
+            if type(o) in (tuple, list):
+                o = (s_[o[0]],) + tuple(o[1:])
+            io[i] = o
+        if len(io) == 1:
+            io = io[0]
+        fio[k] = io
     cfg = util.configure(**cfg)
     cfg.update(**make())
     if cfg['real8']:
@@ -181,7 +176,8 @@ def stage(args, **kwargs):
         d = 'f'
     cfg.update({'dtype': np.dtype(d).str})
     prm.update({'nthread': cfg['nthread']})
-    prm, fio = prepare_param(prm, fio)
+    prm = prepare_param(prm)
+    fio = prepare_fieldio(prm, fio)
 
     # partition for parallelization
     nx, ny, nz, nt = prm['shape']
@@ -230,7 +226,6 @@ def stage(args, **kwargs):
         os.mkdir('debug')
 
     # save input parameters
-    json.dump(prm, open('parameters.json', 'w'), indent=4, sort_keys=True)
     out = ''
     for i in sorted(prm):
         out += str(prm[i]) + '\n'
@@ -243,40 +238,50 @@ def stage(args, **kwargs):
 
     # metadata
     # [field, reg, ii, nb, x1, x2, val, tau, op, fname]
-    xis = {}
-    indices = {}
     shapes = {}
     deltas = {}
+    indices = {}
+    xis = {}
     for f in fio:
-        op, k = f[-2], f[-1]
+        slices, xi, op, k = f[2], f[4], f[-2], f[-1]
         if op[-1] in '<>':
+            index = []
+            shape = []
+            delta = []
+            for i, s in enumerate(slices):
+                start, stop, step = s
+                d = prm['delta'][i] * step
+                n = (stop - start) // step + 1
+                if n == 1:
+                    index += [start]
+                else:
+                    delta += [d]
+                    shape += [n]
+                    if step == 1:
+                        index += [[start, stop]]
+                    else:
+                        index += [[start, stop, step]]
+            indices[k] = index
+            if shape != []:
+                shapes[k] = shape
+            if delta != []:
+                deltas[k] = delta
             if '.' in op:
-                xis[k] = f[4]
-            indices[k] = f[2]
-            shapes[k] = []
-            deltas[k] = []
-            for i, ii in enumerate(indices[k]):
-                n = (ii[1] - ii[0]) // ii[2] + 1
-                d = prm['delta'][i] * ii[2]
-                if n > 1:
-                    shapes[k] += [n]
-                    deltas[k] += [d]
-            if shapes[k] == []:
-                shapes[k] = [1]
-            if deltas[k] == []:
-                del(deltas[k])
+                xis[k] = xi
 
     # save metadata
-    m = {
-        'dtype':   cfg['dtype'],
-        'shapes':  shapes,
-        'deltas':  deltas,
-        'xis':     xis,
+    meta = {
+        'args' : args,
+        'config': cfg,
+        'deltas': deltas,
+        'fieldio': fio,
         'indices': indices,
+        'param':  prm,
+        'shapes': shapes,
+        'xis': xis,
     }
-    m.update(prm)
     f = open('meta.json', 'w')
-    json.dump(m, f, indent=4, sort_keys=True)
+    json.dump(args, f, indent=4, sort_keys=True)
 
     os.chdir(cwd)
     return cfg
@@ -290,124 +295,7 @@ def run(args, **kwargs):
     util.launch(cfg)
     return cfg
 
-def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
-    """
-    >>> shape = [8, 8, 8, 8]
-
-    >>> expand_slices(shape, [])
-    [[0, 8, 1], [0, 8, 1], [0, 8, 1], [0, 8, 1]]
-
-    >>> expand_slices(shape, '')
-    [[0, 8, 1], [0, 8, 1], [0, 8, 1], [0, 8, 1]]
-
-    >>> expand_slices(shape, [0.4,0.6,-0.6,-0.4])
-    [[0, 1, 1], [1, 2, 1], [7, 8, 1], [8, 9, 1]]
-
-    >>> expand_slices(shape, '[0.4,0.6,-0.6:-0.4:2,:]')
-    [[0, 1, 1], [1, 2, 1], [7, 8, 2], [0, 8, 1]]
-
-    >>> expand_slices(shape, '[0.9,1.1,-1.1:-0.9:2,:]', base=0.5)
-    [[0, 1, 1], [1, 2, 1], [6, 7, 2], [0, 7, 1]]
-
-    >>> expand_slices(shape, '[1.4,1.6,-1.6:-1.4:2,:]', base=1)
-    [[1, 1, 1], [2, 2, 1], [7, 8, 2], [1, 8, 1]]
-
-    >>> expand_slices(shape, '[1.9,2.1,-2.1:-1.9:2,:]', base=1.5)
-    [[1, 1, 1], [2, 2, 1], [6, 7, 2], [1, 7, 1]]
-
-    >>> expand_slices(shape, [0,1,2,[]], base=0, new_base=1)
-    [[1, 1, 1], [2, 2, 1], [3, 3, 1], [1, 8, 1]]
-    """
-
-    # string style
-    if isinstance(slices, basestring):
-        if slices == '':
-            slices = []
-        elif slices[0] + slices[-1] == '[]':
-            slices = slices[1:-1].split(',')
-        else:
-            raise Exception('error in indices: %r' % (slices,))
-
-    # list style
-    slices = slices[:]
-    n = len(shape)
-    if len(slices) == 0:
-        slices = n * [[]]
-    elif len(slices) != n:
-        raise Exception('error in indices: %r' % (slices,))
-
-    # index base
-    if new_base is None:
-        new_base = base
-    if type(base) in (int, float):
-        base = n * [base]
-    if type(new_base) in (int, float):
-        new_base = n * [new_base]
-
-    # loop over slices
-    for i, s in enumerate(slices):
-
-        # convert to list
-        if type(s) == slice:
-            s = [s.start, s.stop, s.step]
-        if isinstance(s, basestring):
-            s_ = []
-            for j in s.split(':'):
-                if j == '':
-                    s_.append(None)
-                elif '.' in j:
-                    s_.append(float(j))
-                else:
-                    s_.append(int(j))
-            s = s_
-        elif type(s) not in (tuple, list):
-            s = [s]
-
-        # fill missing values
-        wraparound = shape[i] + int(base[i])
-        if len(s) == 0:
-            s = [None, None, 1]
-        elif len(s) == 1:
-            s = s[0]
-            if s < 0:
-                s += wraparound
-            s = [s, s + 1 - int(base[i]), 1]
-        elif len(s) == 2:
-            s = [s[0], s[1], 1]
-        elif len(s) != 3:
-            raise Exception('error in indices: %r' % (slices,))
-
-        # handle None
-        start, stop, step = s
-        if start is None:
-            start = base[i]
-        if stop is None:
-            stop = -base[i] + wraparound
-        if step is None:
-            step = 1
-
-        # handle negative indices
-        if start < 0:
-            start += wraparound
-        if stop < 0:
-            stop += wraparound
-
-        # convert base
-        if new_base[i] != base[i]:
-            r = new_base[i] - base[i]
-            start += r
-            stop += r - int(r)
-
-        # round and finish
-        if round:
-            r = new_base[i] - int(new_base[i])
-            start = int(start - r + 0.5)
-            stop  = int(stop  - r + 0.5)
-        slices[i] = [start, stop, step]
-
-    return slices
-
-def prepare_param(prm, fio):
+def prepare_param(prm):
     """
     Prepare input parameters
     """
@@ -459,7 +347,8 @@ def prepare_param(prm, fio):
                 raise Exception('Error: model too small for PML')
     prm.update({'i1pml': i1, 'i2pml': i2})
 
-    # field i/o 
+    # field i/o
+    #nt = prm['shape'][-1]
     fld = fieldnames()
     fieldio = []
     filenames = []
@@ -545,9 +434,154 @@ def prepare_param(prm, fio):
 
         fieldio += [(it1, it2, ios_)]
 
-    fieldio = [g for f in sorted(fieldio) for g in f[2]]
-
     # done
+    fieldio = [g for f in sorted(fieldio) for g in f[2]]
     del(prm['itbuff'])
-    return prm, fieldio
+    return fieldio
+
+def f90modules(path):
+    mods = set()
+    deps = set()
+    for line in open(path):
+        tok = line.split()
+        if tok:
+            if tok[0] == 'module':
+                mods.update(tok[1:])
+            elif tok[0] == 'use':
+                deps.update(tok[1:])
+    return list(mods), list(deps)
+
+class get_slices:
+    def __getitem__(self, slices):
+        return slices
+s_ = get_slices()
+
+def normalize_slices(slices):
+    """
+    >>> normalize_slices('[1:1,:2,3::,::4,::]')
+    [1, (None, 2), (3, None), (None, None, 4), ()]
+
+    >>> normalize_slices([(1,1), (None,2), (3,None), (None,None,4), (None,None,1)])
+    [1, (None, 2), (3, None), (None, None, 4), ()]
+
+    >>> normalize_slices((1, slice(2), slice(None,3), slice(None,None,4), slice()))
+    [1, (None, 2), (3, None), (None, None, 4), ()]
+    """
+    if isinstance(slices, basestring):
+        assert(slices[0] + slices[-1] == '[]')
+        slices = slices[1:-1].split(','))
+    elif type(slices) in (tuple, list):
+        slices = list(slices)
+    else:
+        slices = [slices]
+    for i, s in enumerate(slices):
+        if isinstance(s, basestring):
+            t = []
+            for j in s.split(':'):
+                if j == '':
+                    t.append(None)
+                elif '.' in j:
+                    t.append(float(j))
+                else:
+                    t.append(int(j))
+            if len(t) > 1:
+                s = slice(*t)
+            else:
+                s = slice(t[0], t[0])
+        elif type(s) in (tuple, list):
+            s = slice(*s)
+        else:
+            s = slice(s, s)
+        if s.start == s.stop:
+            if s.start != None:
+                s = s.start
+            elif s.step in (None, 1):
+                s = ()
+            else:
+                s = (None, None, s.step)
+        elif s.step in (1, None):
+            s = (s.start, s.stop)
+        else:
+            s = (s.start, s.stop, s.step)
+        slices[i] = s
+    return slices
+
+def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
+    """
+    >>> shape = [8, 8, 8, 8]
+
+    >>> expand_slices(shape, [])
+    [[0, 8, 1], [0, 8, 1], [0, 8, 1], [0, 8, 1]]
+
+    >>> expand_slices(shape, [0,1,2,[]], base=0, new_base=1)
+    [[1, 1, 1], [2, 2, 1], [3, 3, 1], [1, 8, 1]]
+
+    >>> expand_slices(shape, '[0.4,0.6,-0.6:-0.4:2,:]', base=0)
+    [[0, 1, 1], [1, 2, 1], [7, 8, 2], [0, 8, 1]]
+
+    >>> expand_slices(shape, '[1.4,1.6,-1.6:-1.4:2,:]', base=1)
+    [[1, 1, 1], [2, 2, 1], [7, 8, 2], [1, 8, 1]]
+
+    >>> expand_slices(shape, '[0.9,1.1,-1.1:-0.9:2,:]', base=0.5)
+    [[0, 1, 1], [1, 2, 1], [6, 7, 2], [0, 7, 1]]
+
+    >>> expand_slices(shape, '[1.9,2.1,-2.1:-1.9:2,:]', base=1.5)
+    [[1, 1, 1], [2, 2, 1], [6, 7, 2], [1, 7, 1]]
+    """
+
+    # prep
+    slices = normalize_slices(slices)
+    n = len(shape)
+    if len(slices) == 0:
+        slices = n * [[]]
+    elif len(slices) != n:
+        raise Exception('error in indices: %r' % (slices,))
+
+    # index base
+    if new_base is None:
+        new_base = base
+    if type(base) in (int, float):
+        base = n * [base]
+    if type(new_base) in (int, float):
+        new_base = n * [new_base]
+
+    # loop over slices
+    for i, s in enumerate(slices):
+
+        # convert to slice
+        if type(s) in (tuple, list):
+            s = slice(*s)
+        else:
+            s = slice(s, s)
+        start, stop, step = s.start, s.stop, s.step
+
+        # handle None
+        if start is None:
+            start = base[i]
+        if stop is None:
+            stop = -base[i]
+        if step is None:
+            step = 1
+
+        # handle negative indices
+        wraparound = shape[i] + int(base[i])
+        if start < 0:
+            start += wraparound
+        if stop < 0:
+            stop += wraparound
+
+        # convert base
+        if new_base[i] != base[i]:
+            r = new_base[i] - base[i]
+            start += r
+            stop += r - int(r)
+
+        # round and finish
+        if round:
+            r = new_base[i] - int(new_base[i])
+            start = int(start - r + 0.5)
+            stop  = int(stop  - r + 0.5)
+        slices[i] = [start, stop, step]
+
+    return slices
 

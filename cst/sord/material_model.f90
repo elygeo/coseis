@@ -152,15 +152,17 @@ cfl2 = dt * vmax * 3.0 / sqrt(r)
 
 ! output statistics
 if (master) then
-    open (1, file='material.txt', status='replace')
-    write (1, "(2g15.7,'  cfl')") cfl1, cfl2
-    write (1, "(2g15.7,'  rho')") -maxg(1), maxg(8)
-    write (1, "(2g15.7,'  vp')")  -maxg(2), maxg(9)
-    write (1, "(2g15.7,'  vs')")  -maxg(3), maxg(10)
-    write (1, "(2g15.7,'  gam')") -maxg(4), maxg(11)
-    write (1, "(2g15.7,'  lam')") -maxg(5), maxg(12)
-    write (1, "(2g15.7,'  mu')")  -maxg(6), maxg(13)
-    write (1, "(2g15.7,'  nu')")  -maxg(7), maxg(14)
+    open (1, file='material.json', status='replace')
+    write (1,*) '{'
+    write (1,*) '"cfl": [', cfl1,     ', ', cfl2,     '],'
+    write (1,*) '"rho": [', -maxg(1), ', ', maxg(8),  '],'
+    write (1,*) '"vp":  [', -maxg(2), ', ', maxg(9),  '],'
+    write (1,*) '"vs":  [', -maxg(3), ', ', maxg(10), '],'
+    write (1,*) '"gam": [', -maxg(4), ', ', maxg(11), '],'
+    write (1,*) '"lam": [', -maxg(5), ', ', maxg(12), '],'
+    write (1,*) '"mu":  [', -maxg(6), ', ', maxg(13), '],'
+    write (1,*) '"nu":  [', -maxg(7), ', ', maxg(14), '],'
+    write (1,*) '}'
     close (1)
     if (any(maxg(1:7) > 0.0)) stop 'negative moduli'
     if (cfl2 > 1.0) stop 'Courant condition not satisfied!'

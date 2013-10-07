@@ -38,11 +38,10 @@ def test(argv=[]):
 
     # output
     fld = cst.sord.fieldnames()
-    for k in fld['dict']:
-        if k not in fld['fault']:
-            if k not in prm:
-                prm[k] = []
-            prm[k] += [([], '>', k + '.bin')]
+    for k in fld['volume']:
+        if k not in prm:
+            prm[k] = []
+        prm[k] += [([], '>', k + '.bin')]
 
     # master
     prm['rundir'] = d0 = os.path.join('run', 'point_source') + os.sep
