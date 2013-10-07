@@ -48,7 +48,7 @@ ppml: 2                  # PML exponent, 1-4. Generally 2 is best.
 vpml: -1.0               # damping velocity, <0 default to min, max V_s harmonic mean
 
 # Finite source parameters
-source: potency          # potency, moment, force, or non'
+source: potency          # potency, moment, force, or none
 nsource: 0               # number of sub-faults
 
 # Dynamic rupture parameters

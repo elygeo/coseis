@@ -22,7 +22,6 @@ def parameters():
     f = os.path.dirname(__file__)
     f = os.path.join(f, 'parameters.json')
     d = json.load(open(f))
-    d = {str(k): v for k, v in d.items()}
     return d
 
 def fieldnames():
@@ -30,7 +29,6 @@ def fieldnames():
     f = os.path.dirname(__file__)
     f = os.path.join(f, 'fieldnames.json')
     d = json.load(open(f))
-    d = {str(k): v for k, v in d.items()}
     return {
         'dict': d,
         'input':   [k for k in d if '<' in d[k][-1]],
@@ -159,12 +157,13 @@ def stage(args, **kwargs):
     for k, io in fio.items():
         if type(io) != list:
             io = [io]
-        elif isinstance(type(io[1]), basestring):
+        elif isinstance(io[1], basestring):
             io = [io]
         for i, o in enumerate(io):
             if type(o) in (tuple, list):
-                o = (s_[o[0]],) + tuple(o[1:])
-            io[i] = o
+                ii = normalize_slices(o[0])
+                o = (ii,) + tuple(o[1:])
+                io[i] = o
         if len(io) == 1:
             io = io[0]
         fio[k] = io
@@ -176,8 +175,7 @@ def stage(args, **kwargs):
         d = 'f'
     cfg.update({'dtype': np.dtype(d).str})
     prm.update({'nthread': cfg['nthread']})
-    prm = prepare_param(prm)
-    fio = prepare_fieldio(prm, fio)
+    prm, fieldio = prepare_param(prm, fio)
 
     # partition for parallelization
     nx, ny, nz, nt = prm['shape']
@@ -227,22 +225,20 @@ def stage(args, **kwargs):
 
     # save input parameters
     out = ''
-    for i in sorted(prm):
-        out += str(prm[i]) + '\n'
-    out += '%s\n>\n' % len(fio)
-    for i in fio:
-        out += str(i) + '\n'
-    for i in "',[]":
+    for k, i in sorted(prm.items()):
+        out += json.dumps(i) + '\n'
+    out += '~\n'
+    for i in fieldio:
+        out += json.dumps(i) + '\n'
+    for i in '",[]':
         out = out.replace(i, '')
     open('parameters.txt', 'w').write(out)
 
     # metadata
-    # [field, reg, ii, nb, x1, x2, val, tau, op, fname]
     shapes = {}
     deltas = {}
     indices = {}
-    xis = {}
-    for f in fio:
+    for f in fieldio:
         slices, xi, op, k = f[2], f[4], f[-2], f[-1]
         if op[-1] in '<>':
             index = []
@@ -261,27 +257,33 @@ def stage(args, **kwargs):
                         index += [[start, stop]]
                     else:
                         index += [[start, stop, step]]
-            indices[k] = index
             if shape != []:
                 shapes[k] = shape
             if delta != []:
                 deltas[k] = delta
             if '.' in op:
-                xis[k] = xi
+                indices[k] = xi
+            else:
+                indices[k] = index
 
     # save metadata
     meta = {
-        'args' : args,
         'config': cfg,
         'deltas': deltas,
         'fieldio': fio,
         'indices': indices,
-        'param':  prm,
+        'parameters': prm,
         'shapes': shapes,
-        'xis': xis,
     }
-    f = open('meta.json', 'w')
-    json.dump(args, f, indent=4, sort_keys=True)
+    meta = json.dumps(meta, indent=2, sort_keys=True)
+    open('meta.json', 'w').write(meta)
+    try:
+        import yaml
+    except ImportError:
+        pass
+    else:
+        meta = yaml.dump(yaml.load(meta))
+        open('meta.yaml', 'w').write(meta)
 
     os.chdir(cwd)
     return cfg
@@ -295,7 +297,7 @@ def run(args, **kwargs):
     util.launch(cfg)
     return cfg
 
-def prepare_param(prm):
+def prepare_param(prm, fio):
     """
     Prepare input parameters
     """
@@ -383,7 +385,7 @@ def prepare_param(prm):
                 if fname in filenames:
                     raise Exception('Error: duplicate filename: ' + fname)
                 filenames.append(fname)
-                filename = os.path.expanduser(fname)
+                fname = os.path.expanduser(fname)
             else:
                 raise Exception('Error: bad i/o operation: %r' % io)
 
@@ -436,8 +438,9 @@ def prepare_param(prm):
 
     # done
     fieldio = [g for f in sorted(fieldio) for g in f[2]]
+    prm.update({'nfieldio': len(fieldio)})
     del(prm['itbuff'])
-    return fieldio
+    return prm, fieldio
 
 def f90modules(path):
     mods = set()
@@ -469,7 +472,7 @@ def normalize_slices(slices):
     """
     if isinstance(slices, basestring):
         assert(slices[0] + slices[-1] == '[]')
-        slices = slices[1:-1].split(','))
+        slices = slices[1:-1].split(',')
     elif type(slices) in (tuple, list):
         slices = list(slices)
     else:
@@ -489,7 +492,10 @@ def normalize_slices(slices):
             else:
                 s = slice(t[0], t[0])
         elif type(s) in (tuple, list):
-            s = slice(*s)
+            if len(s) == 0:
+                s = slice(None)
+            else:
+                s = slice(*s)
         else:
             s = slice(s, s)
         if s.start == s.stop:
@@ -550,7 +556,10 @@ def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
 
         # convert to slice
         if type(s) in (tuple, list):
-            s = slice(*s)
+            if len(s) == 0:
+                s = slice(None)
+            else:
+                s = slice(*s)
         else:
             s = slice(s, s)
         start, stop, step = s.start, s.stop, s.step

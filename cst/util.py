@@ -276,7 +276,7 @@ def stage(job=None, **kwargs):
     if os.path.exists(f):
         raise Exception('Existing job found')
     f = open(f, 'w')
-    json.dump(job, f, indent=4, sort_keys=True)
+    json.dump(job, f, indent=2, sort_keys=True)
 
     # write submit script
     if job['submit']:
@@ -322,11 +322,11 @@ def launch(job=None, **kwargs):
         job.update(d)
         f = job['name'] + '.conf.json'
         f = open(f, 'w')
-        json.dump(job, f, indent=4, sort_keys=True)
+        json.dump(job, f, indent=2, sort_keys=True)
     elif job['run'] == 'exec':
         f = job['name'] + '.conf.json'
         f = open(f, 'w')
-        json.dump(job, f, indent=4, sort_keys=True)
+        json.dump(job, f, indent=2, sort_keys=True)
         for c in job['pre'], job['launch'], job['post']:
             if c:
                 print(c)
