@@ -126,7 +126,7 @@ def make(force=False):
         subprocess.check_call(['make', '-C', p, 'distclean'])
     configure(force)
     subprocess.check_call(['make', '-C', p, '-j', '4'])
-    cfg = yaml.load(open(p + 'config.json'))
+    cfg = yaml.load(open(p + 'config.yaml'))
     return cfg
 
 def stage(args, **kwargs):
@@ -175,7 +175,6 @@ def stage(args, **kwargs):
     else:
         d = 'f'
     cfg.update({'dtype': np.dtype(d).str})
-    prm.update({'nthread': cfg['nthread']})
     prm, fieldio = prepare_param(prm, fio)
 
     # partition for parallelization
@@ -224,10 +223,27 @@ def stage(args, **kwargs):
     if prm['debug'] > 2:
         os.mkdir('debug')
 
-    # save input parameters
+    # save input parametes
     out = ''
-    for k, i in sorted(prm.items()):
-        out += json.dumps(i) + '\n'
+    for k, v in sorted(prm.items()):
+        out += '%s: %s\n' % (k, json.dumps(v))
+    out += '\n'
+    for k, v in sorted(fio.items()):
+        if type(v) is list and not isinstance(v[1], basestring):
+            out += '%s:\n' % k
+            for i in v:
+                out += '-   %s\n' % json.dumps(i) 
+        else:
+            out += '%s: %s\n' % (k, json.dumps(v))
+    open('parameters.yaml', 'w').write(out)
+
+    # save input parameters for Fortran input
+    del(prm['itbuff'])
+    prm.update({'nthread': cfg['nthread']})
+    prm.update({'nfieldio': len(fieldio)})
+    out = ''
+    for k, v in sorted(prm.items()):
+        out += json.dumps(v) + '\n'
     out += '~\n'
     for i in fieldio:
         out += json.dumps(i) + '\n'
@@ -268,30 +284,16 @@ def stage(args, **kwargs):
                 indices[k] = index
 
     # save metadata
-    meta = '# Simulation Parameters\n'
-    for k, v in sorted(prm.items()):
-        meta += '%s: %s\n' % (k, json.dumps(v))
-    meta += '\n# Field I/O:\n'
-    for k, v in sorted(fio.items()):
-        if type(v) is list and not isinstance(v[1], basestring):
-            meta += '%s:\n' % k
-            for i in v:
-                meta += '-   %s\n' % json.dumps(i) 
-        else:
-            meta += '%s: %s\n' % (k, json.dumps(v))
-    meta += 'indices:\n'
+    out = 'indices:\n'
     for k, v in sorted(indices.items()):
-        meta += '    %s: %s\n' % (k, json.dumps(v))
-    meta += 'shapes:\n'
+        out += '    %s: %s\n' % (k, json.dumps(v))
+    out += 'shapes:\n'
     for k, v in sorted(shapes.items()):
-        meta += '    %s: %s\n' % (k, json.dumps(v))
-    meta += 'deltas:\n'
+        out += '    %s: %s\n' % (k, json.dumps(v))
+    out += 'deltas:\n'
     for k, v in sorted(deltas.items()):
-        meta += '    %s: %s\n' % (k, json.dumps(v))
-    meta += '\n# Configuration\n'
-    for k, v in sorted(cfg.items()):
-        meta += '%s: %s\n' % (k, json.dumps(v))
-    open('meta.yaml', 'w').write(meta)
+        out += '    %s: %s\n' % (k, json.dumps(v))
+    open('meta.yaml', 'w').write(out)
 
     os.chdir(cwd)
     return cfg
@@ -446,8 +448,6 @@ def prepare_param(prm, fio):
 
     # done
     fieldio = [g for f in sorted(fieldio) for g in f[2]]
-    prm.update({'nfieldio': len(fieldio)})
-    del(prm['itbuff'])
     return prm, fieldio
 
 def f90modules(path):

@@ -80,18 +80,31 @@ end if
 ! debugging
 sync = debug > 1
 if (debug > 2) then
-    write (filename, "(a,i6.6,a)") 'debug/db', ip, '.json'
+    write (filename, "(a,i6.6,a)") 'debug/db', ip, '.yaml'
     open (1, file=filename, status='replace')
-    write (1, "(a, i8, ',')") &
-        '"ifn":    ', ifn,    '"irup":   ', irup,   '"ip":     ', ip
-    write (1, "(a, '[', i8, ',', i8, ',', i8, '],')") &
-        '"bc1":    ', bc1,    '"bc2":    ', bc2,    '"ip3":    ', ip3, &
-        '"nhalo":  ', nhalo,  '"nm":     ', nm,     '"nn":     ', nn, &
-        '"nnoff":  ', nnoff,  '"nproc3": ', nproc3, &
-        '"i1bc":   ', i1bc,   '"i1cell": ', i1cell, '"i1core": ', i1core, &
-        '"i1node": ', i1node, '"i1pml":  ', i1pml, &
-        '"i2bc":   ', i2bc,   '"i2cell": ', i2cell, '"i2core": ', i2core, &
-        '"i2node": ', i2node, '"i2pml":  ', i2pml
+    write (1, "(a, i8)") &
+        'ifn:    ', ifn, &
+        'irup":  ', irup, &
+        'ip:     ', ip
+    write (1, "(a, i8, ',', i8, ',', i8)") &
+        'bc1:    [', bc1, ']', &
+        'bc2:    [', bc2, ']', &
+        'ip3:    [', ip3, ']', &
+        'nhalo:  [', nhalo, ']', &
+        'nm:     [', nm, ']', &
+        'nn:     [', nn, ']', &
+        'nnoff:  [', nnoff, ']', &
+        'nproc3: [', nproc3, ']', &
+        'i1bc:   [', i1bc, ']', &
+        'i1cell: [', i1cell, ']', &
+        'i1core: [', i1core, ']', &
+        'i1node: [', i1node, ']', &
+        'i1pml:  [', i1pml, ']', &
+        'i2bc:   [', i2bc, ']', &
+        'i2cell: [', i2cell, ']', &
+        'i2core: [', i2core, ']', &
+        'i2node: [', i2node, ']', &
+        'i2pml:  [', i2pml, ']'
     close (1)
 end if
 

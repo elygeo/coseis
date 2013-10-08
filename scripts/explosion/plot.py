@@ -19,9 +19,9 @@ meta = os.path.join('run', 'meta.yaml')
 meta = yaml.load(open(meta))
 nx, ny, nz, nt = meta['args']['shape']
 dx, dy, dz, dt = meta['args']['delta']
-dtype = meta['config']['dtype']
-ihypo = meta['fields']['p11'][0][0]
-tau = meta['fields']['p11'][0][-1]
+dtype = meta['dtype']
+ihypo = meta['p11'][0]
+tau = meta['p11'][-1]
 
 print 111111, ihypo, tau
 asdf
