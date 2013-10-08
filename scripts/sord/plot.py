@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-import os, json
+import os, yaml
 import numpy as np
 import matplotlib.pyplot as plt
 path = 'run' + os.sep
-meta = json.load(open(path + 'meta.json'))
+meta = yaml.load(open(path + 'meta.yaml'))
 dtype = meta['dtype']
 shape = meta['shape']
 n  = shape[1], shape[0]

@@ -136,7 +136,7 @@ ifeq ($(MACHINE), NICS-Kraken)
 endif
 
 # Rules
-all: config.json parameters.json fieldnames.json
+all: config.json
 
 clean:
 	rm -f *.o *.mod *.x *.lst *.pyc
@@ -158,7 +158,4 @@ collective.mod: collective_$(MODE).o
 
 %.mod: %.o
 	@true
-
-%.json: %.yaml
-	yaml2json $< > $@
 

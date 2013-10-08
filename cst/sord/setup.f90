@@ -82,7 +82,6 @@ sync = debug > 1
 if (debug > 2) then
     write (filename, "(a,i6.6,a)") 'debug/db', ip, '.json'
     open (1, file=filename, status='replace')
-    write (1, '(a)') '{'
     write (1, "(a, i8, ',')") &
         '"ifn":    ', ifn,    '"irup":   ', irup,   '"ip":     ', ip
     write (1, "(a, '[', i8, ',', i8, ',', i8, '],')") &
@@ -93,7 +92,6 @@ if (debug > 2) then
         '"i1node": ', i1node, '"i1pml":  ', i1pml, &
         '"i2bc":   ', i2bc,   '"i2cell": ', i2cell, '"i2core": ', i2core, &
         '"i2node": ', i2node, '"i2pml":  ', i2pml
-    write (1, '(a)') '}'
     close (1)
 end if
 

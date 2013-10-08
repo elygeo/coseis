@@ -2,30 +2,29 @@
 """
 Explosion test plot
 """
-import os, math, json
+import os, math, yaml
 import numpy as np
 import matplotlib.pyplot as plt
 import cst
 
 # material properties
 meta = os.path.join('run', 'material.json')
-meta = json.load(open(meta))
+meta = yaml.load(open(meta))
 rho = meta['rho'][0]
 vp = meta['vp'][0]
 vs = meta['vs'][0]
 
-# source properties
-meta = os.path.join('run', 'args.json')
-meta = json.load(open(meta))
-ihypo = meta['ihypo']
-tau = meta['tau']
-
 # metadata
-meta = os.path.join('run', 'meta.json')
-meta = json.load(open(meta))
-nx, ny, nz, nt = meta['shape']
-dx, dy, dz, dt = meta['delta']
-dtype = meta['dtype']
+meta = os.path.join('run', 'meta.yaml')
+meta = yaml.load(open(meta))
+nx, ny, nz, nt = meta['args']['shape']
+dx, dy, dz, dt = meta['args']['delta']
+dtype = meta['config']['dtype']
+ihypo = meta['fields']['p11'][0][0]
+tau = meta['fields']['p11'][0][-1]
+
+print 111111, ihypo, tau
+asdf
 
 # loop over stations
 for sta in 'p1', 'p2', 'p3', 'p4', 'p5', 'p6':

@@ -68,23 +68,14 @@ class storage(dict):
     #    return self[key]
 
 
-def load(fh):
-    try:
-        import yaml
-        return yaml.load(fh)
-    except ImportError:
-        import json
-        return json.load(fh)
-
-
 def hostname():
-    import os, socket
+    import os, yaml, socket
     h = os.uname()
     g = socket.getfqdn()
     host = ' '.join([h[0], h[4], h[1], g])
     f = os.path.dirname(__file__)
-    f = os.path.join(f, 'conf', 'hostmap.json')
-    d = load(open(f))
+    f = os.path.join(f, 'conf', 'hostmap.yaml')
+    d = yaml.load(open(f))
     for m, h in d:
         if h in host:
             return host, m
@@ -92,13 +83,13 @@ def hostname():
 
 
 def configure(**kwargs):
-    import os, sys, pwd, json, multiprocessing
+    import os, sys, pwd, json, yaml, multiprocessing
 
     # defaults
     path = os.path.dirname(__file__)
     path = os.path.join(path, 'conf') + os.sep
-    f = path + 'default.json'
-    job = load(open(f))
+    f = path + 'default.yaml'
+    job = yaml.load(open(f))
     job = storage(**job)
     job['argv'] = sys.argv[1:]
     job['host'], job['machine'] = hostname()
@@ -119,8 +110,8 @@ def configure(**kwargs):
 
     # merge machine parameters
     if job['machine'] and job['machine'].lower() != 'default':
-        f = path + job['machine'] + '.json'
-        m = load(open(f))
+        f = path + job['machine'] + '.yaml'
+        m = yaml.load(open(f))
         for k in m:
             job[k] = m[k]
     for h, o in job['host_opts'].items():
@@ -276,7 +267,7 @@ def stage(job=None, **kwargs):
     if os.path.exists(f):
         raise Exception('Existing job found')
     f = open(f, 'w')
-    json.dump(job, f, indent=2, sort_keys=True)
+    json.dump(job, f, indent=4, sort_keys=True)
 
     # write submit script
     if job['submit']:
@@ -322,11 +313,11 @@ def launch(job=None, **kwargs):
         job.update(d)
         f = job['name'] + '.conf.json'
         f = open(f, 'w')
-        json.dump(job, f, indent=2, sort_keys=True)
+        json.dump(job, f, indent=4, sort_keys=True)
     elif job['run'] == 'exec':
         f = job['name'] + '.conf.json'
         f = open(f, 'w')
-        json.dump(job, f, indent=2, sort_keys=True)
+        json.dump(job, f, indent=4, sort_keys=True)
         for c in job['pre'], job['launch'], job['post']:
             if c:
                 print(c)

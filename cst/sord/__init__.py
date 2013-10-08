@@ -18,24 +18,26 @@ tfuncs = [
 ]
 
 def parameters():
-    import os, json
-    f = os.path.dirname(__file__)
-    f = os.path.join(f, 'parameters.json')
-    d = json.load(open(f))
-    return d
+    import os, yaml
+    x = os.path.dirname(__file__)
+    x = os.path.join(x, 'parameters.yaml')
+    x = open(x).read()
+    x = yaml.load(x)
+    return x
 
 def fieldnames():
-    import os, json
-    f = os.path.dirname(__file__)
-    f = os.path.join(f, 'fieldnames.json')
-    d = json.load(open(f))
+    import os, yaml
+    x = os.path.dirname(__file__)
+    x = os.path.join(x, 'fieldnames.yaml')
+    x = open(x).read()
+    x = yaml.load(x)
     return {
-        'dict': d,
-        'input':   [k for k in d if '<' in d[k][-1]],
-        'initial': [k for k in d if '0' in d[k][-1]],
-        'cell':    [k for k in d if 'c' in d[k][-1]],
-        'fault':   [k for k in d if 'f' in d[k][-1]],
-        'volume':  [k for k in d if 'f' not in d[k][-1]],
+        'dict': x,
+        'input':   [k for k in x if '<' in x[k][-1]],
+        'initial': [k for k in x if '0' in x[k][-1]],
+        'cell':    [k for k in x if 'c' in x[k][-1]],
+        'fault':   [k for k in x if 'f' in x[k][-1]],
+        'volume':  [k for k in x if 'f' not in x[k][-1]],
     }
 
 def configure(force=False):
@@ -118,13 +120,13 @@ def make(force=False):
     """
     Build SORD code.
     """
-    import os, json, subprocess
+    import os, yaml, subprocess
     p = os.path.dirname(__file__) + os.sep
     if force:
         subprocess.check_call(['make', '-C', p, 'distclean'])
     configure(force)
     subprocess.check_call(['make', '-C', p, '-j', '4'])
-    cfg = json.load(open(p + 'config.json'))
+    cfg = yaml.load(open(p + 'config.json'))
     return cfg
 
 def stage(args, **kwargs):
@@ -149,24 +151,23 @@ def stage(args, **kwargs):
             del(prm[k])
     for k, v in args.items():
         if k in fld:
+            if type(v) != list:
+                v = [v]
+            elif isinstance(v[1], basestring):
+                v = [v]
+            for i, io in enumerate(v):
+                if type(io) in (tuple, list):
+                    ii = normalize_slices(io[0])
+                    io = [ii] + list(io[1:])
+                    v[i] = io
+            if len(v) == 1:
+                v = v[0]
+            args[k] = v
             fio[k] = v
         elif k in prm:
             prm[k] = v
         else:
             cfg[k] = v
-    for k, io in fio.items():
-        if type(io) != list:
-            io = [io]
-        elif isinstance(io[1], basestring):
-            io = [io]
-        for i, o in enumerate(io):
-            if type(o) in (tuple, list):
-                ii = normalize_slices(o[0])
-                o = (ii,) + tuple(o[1:])
-                io[i] = o
-        if len(io) == 1:
-            io = io[0]
-        fio[k] = io
     cfg = util.configure(**cfg)
     cfg.update(**make())
     if cfg['real8']:
@@ -267,23 +268,27 @@ def stage(args, **kwargs):
                 indices[k] = index
 
     # save metadata
-    meta = {
-        'config': cfg,
-        'deltas': deltas,
-        'fieldio': fio,
-        'indices': indices,
-        'parameters': prm,
-        'shapes': shapes,
-    }
-    meta = json.dumps(meta, indent=2, sort_keys=True)
-    open('meta.json', 'w').write(meta)
-    try:
-        import yaml
-    except ImportError:
-        pass
-    else:
-        meta = yaml.dump(yaml.load(meta))
-        open('meta.yaml', 'w').write(meta)
+    meta = '# Simulation Parameters\n'
+    for k, v in sorted(prm.items()):
+        meta += '%s: %s\n' % (k, json.dumps(v))
+    meta += '\n# Field I/O:\n'
+    for k, v in sorted(fio.items()):
+        if type(v) is list and not isinstance(v[1], basestring):
+            meta += '%s:\n' % k
+            for i in v:
+                meta += '-   %s\n' % json.dumps(i) 
+        else:
+            meta += '%s: %s\n' % (k, json.dumps(v))
+    meta += 'shapes:\n'
+    for k, v in sorted(shapes.items()):
+        meta += '    %s: %s\n' % (k, json.dumps(v))
+    meta += 'deltas:\n'
+    for k, v in sorted(deltas.items()):
+        meta += '    %s: %s\n' % (k, json.dumps(v))
+    meta += '\n# Configuration\n'
+    for k, v in sorted(cfg.items()):
+        meta += '%s: %s\n' % (k, json.dumps(v))
+    open('meta.yaml', 'w').write(meta)
 
     os.chdir(cwd)
     return cfg
@@ -496,7 +501,7 @@ def normalize_slices(slices):
                 s = slice(None)
             else:
                 s = slice(*s)
-        else:
+        elif type(s) != slice:
             s = slice(s, s)
         if s.start == s.stop:
             if s.start != None:
