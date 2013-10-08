@@ -139,7 +139,7 @@ endif
 all: config.json
 
 clean:
-	rm -f *.o *.mod *.x *.lst *.pyc
+	rm -f config.json *.o *.mod *.x *.lst *.pyc
 
 distclean: clean
 	rm Makefile

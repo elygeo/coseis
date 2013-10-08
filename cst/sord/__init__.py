@@ -279,6 +279,9 @@ def stage(args, **kwargs):
                 meta += '-   %s\n' % json.dumps(i) 
         else:
             meta += '%s: %s\n' % (k, json.dumps(v))
+    meta += 'indices:\n'
+    for k, v in sorted(indices.items()):
+        meta += '    %s: %s\n' % (k, json.dumps(v))
     meta += 'shapes:\n'
     for k, v in sorted(shapes.items()):
         meta += '    %s: %s\n' % (k, json.dumps(v))

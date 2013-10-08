@@ -4,7 +4,7 @@ def test(argv=[]):
     """
     Test configurations
     """
-    import os
+    import os, json
     import cst
     path = os.path.dirname(cst.__file__)
     path = os.path.join(path, 'conf')
@@ -22,7 +22,7 @@ def test(argv=[]):
             print(80 * '-')
             print(machine)
             for k, v in sorted(job.items()):
-                print('%s: %s' % (k, repr(v)))
+                print('%s: %s' % (k, json.dumps(v)))
         else:
             print(machine)
 
