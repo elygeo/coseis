@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
-exclude = 'ws-meta-in.py',
-include = (
+exclude = []
+include = [
     'setup.py',
     'bin/*',
     'doc/*.py',
     'cst/*.py',
     'cst/*/*.py',
     'scripts/*/*.py',
-)
+]
 
 def test():
     """

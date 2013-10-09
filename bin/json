@@ -3,5 +3,5 @@ import sys, json
 
 for f in sys.argv[1:]:
     d = json.load(open(f))
-    d = json.dumps(d, indent=4, sort_keys=True)
+    d = json.dumps(d, indent=2, sort_keys=True)
     print(d)

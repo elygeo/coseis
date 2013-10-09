@@ -8,23 +8,18 @@ import matplotlib.pyplot as plt
 import cst
 
 # material properties
-meta = os.path.join('run', 'material.json')
-meta = yaml.load(open(meta))
-rho = meta['rho'][0]
-vp = meta['vp'][0]
-vs = meta['vs'][0]
-
-# metadata
-meta = os.path.join('run', 'meta.yaml')
-meta = yaml.load(open(meta))
-nx, ny, nz, nt = meta['args']['shape']
-dx, dy, dz, dt = meta['args']['delta']
+p = os.path.join('run') + os.sep
+meta = open(p + 'jon.config.yaml').read()
+meta += open(p + 'parameters.yaml').read()
+meta = yaml.load(meta)
+nx, ny, nz, nt = meta['shape']
+dx, dy, dz, dt = meta['delta']
 dtype = meta['dtype']
 ihypo = meta['p11'][0]
 tau = meta['p11'][-1]
-
-print 111111, ihypo, tau
-asdf
+rho = meta['rho']
+vp = meta['vp']
+vs = meta['vs']
 
 # loop over stations
 for sta in 'p1', 'p2', 'p3', 'p4', 'p5', 'p6':

@@ -263,12 +263,10 @@ def stage(job=None, **kwargs):
     os.chdir(job['rundir'])
 
     # write configuration
-    f = job['name'] + '.conf.yaml'
+    f = job['name'] + '.conf.json'
     if os.path.exists(f):
         raise Exception('Existing job found')
-    out = ''
-    for k, v in sorted(job.items()):
-        out += '%s: %s\n' % (k, json.dumps(v))
+    out = json.dumps(job, indent=4, sort_keys=True)
     open(f, 'w').write(out)
 
     # write submit script
@@ -313,16 +311,12 @@ def launch(job=None, **kwargs):
             raise Exception('Submit failed')
         d = re.search(job['submit_pattern'], out).groupdict()
         job.update(d)
-        out = ''
-        for k, v in sorted(job.items()):
-            out += '%s: %s\n' % (k, json.dumps(v))
-        f = job['name'] + '.conf.yaml'
+        f = job['name'] + '.conf.json'
+        out = json.dumps(job, indent=4, sort_keys=True)
         open(f, 'w').write(out)
     elif job['run'] == 'exec':
-        out = ''
-        for k, v in sorted(job.items()):
-            out += '%s: %s\n' % (k, json.dumps(v))
-        f = job['name'] + '.conf.yaml'
+        out = json.dumps(job, indent=4, sort_keys=True)
+        f = job['name'] + '.conf.json'
         open(f, 'w').write(out)
         for c in job['pre'], job['launch'], job['post']:
             if c:

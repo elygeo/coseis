@@ -3,7 +3,8 @@ import os, yaml
 import numpy as np
 import matplotlib.pyplot as plt
 path = 'run' + os.sep
-meta = open(path + 'meta.yaml')
+meta = open(path + 'job.config.yaml').read()
+meta += open(path + 'meta.yaml').read()
 meta = yaml.load(meta)
 dtype = meta['dtype']
 shape = meta['shape']

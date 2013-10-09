@@ -3,5 +3,5 @@ import sys, yaml
 
 for f in sys.argv[1:]:
     d = yaml.load(open(f))
-    d = yaml.dump(d, indent=4)
+    d = yaml.dump(d)
     print(d)

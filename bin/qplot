@@ -92,6 +92,8 @@ def plot(*argv):
                     if 'deltas' in meta:
                         if tail in meta['deltas']:
                             delta = meta['deltas'][tail]
+                    elif 'delta' in meta:
+                        delta = meta['delta']
                     break
             fh = open(filename, 'rb')
             npy.read_magic(fh)
@@ -118,9 +120,13 @@ def plot(*argv):
                     if 'deltas' in meta:
                         if tail in meta['deltas']:
                             delta = meta['deltas'][tail]
+                    elif 'delta' in meta:
+                        delta = meta['delta']
                     if 'shapes' in meta:
                         if tail in meta['shapes']:
                             shape = meta['shapes'][tail]
+                    elif 'shape' in meta:
+                        shape = meta['shape']
                     break
             if len(shape) < 3:
                 if shape:

@@ -40,6 +40,18 @@ def fieldnames():
         'volume':  [k for k in x if 'f' not in x[k][-1]],
     }
 
+def f90modules(path):
+    mods = set()
+    deps = set()
+    for line in open(path):
+        tok = line.split()
+        if tok:
+            if tok[0] == 'module':
+                mods.update(tok[1:])
+            elif tok[0] == 'use':
+                deps.update(tok[1:])
+    return list(mods), list(deps)
+
 def configure(force=False):
     """
     Create SORD Makefile.
@@ -126,185 +138,7 @@ def make(force=False):
         subprocess.check_call(['make', '-C', p, 'distclean'])
     configure(force)
     subprocess.check_call(['make', '-C', p, '-j', '4'])
-    cfg = yaml.load(open(p + 'config.yaml'))
-    return cfg
-
-def stage(args, **kwargs):
-    """
-    Stage job
-    """
-    import os, json, shutil
-    import numpy as np
-    from .. import util
-
-    print('SORD: Support Operator Rupture Dynamics')
-
-    # configure and make
-    prm = parameters()
-    fld = fieldnames()['dict']
-    fio = {}
-    cfg = {}
-    args.update(kwargs)
-    for k, v in prm.items():
-        if k in fld:
-            fio[k] = v
-            del(prm[k])
-    for k, v in args.items():
-        if k in fld:
-            if type(v) != list:
-                v = [v]
-            elif isinstance(v[1], basestring):
-                v = [v]
-            for i, io in enumerate(v):
-                if type(io) in (tuple, list):
-                    ii = normalize_slices(io[0])
-                    io = [ii] + list(io[1:])
-                    v[i] = io
-            if len(v) == 1:
-                v = v[0]
-            args[k] = v
-            fio[k] = v
-        elif k in prm:
-            prm[k] = v
-        else:
-            cfg[k] = v
-    cfg = util.configure(**cfg)
-    cfg.update(**make())
-    if cfg['real8']:
-        d = 'd'
-    else:
-        d = 'f'
-    cfg.update({'dtype': np.dtype(d).str})
-    prm, fieldio = prepare_param(prm, fio)
-
-    # partition for parallelization
-    nx, ny, nz, nt = prm['shape']
-    j, k, l = prm['nproc3']
-    nl = [
-        (nx - 1) // j + 1,
-        (ny - 1) // k + 1,
-        (nz - 1) // l + 1,
-    ]
-    i = abs(prm['faultnormal']) - 1
-    if i >= 0:
-        nl[i] = max(nl[i], 2)
-    j = (nx - 1) // nl[0] + 1
-    k = (ny - 1) // nl[1] + 1
-    l = (nz - 1) // nl[2] + 1
-    prm['nproc3'] = [j, k, l]
-    cfg['nproc'] = j * k * l
-    if cfg['nproc'] > 1 and cfg['mode'] != 'mpi':
-        raise('MPI build required for multiprocessing') 
-
-    # resources
-    if prm['oplevel'] in (1, 2):
-        nvars = 20
-    elif prm['oplevel'] in (3, 4, 5):
-        nvars = 23
-    else:
-        nvars = 44
-    nm = (nl[0] + 2) * (nl[1] + 2) * (nl[2] + 2)
-    cfg['pmem'] = 32 + int(1.2 * nm * nvars * int(cfg['dtype'][-1]) / 1024 / 1024)
-    if not cfg['minutes']:
-        cfg['minutes'] = 10 + int((nt + 10) * nm // (40 * cfg['rate']))
-
-    # configure and stage
-    cfg['command'] = os.path.join('.', 'sord.x')
-    cfg = util.prepare(cfg)
-    util.stage(cfg)
-
-    # create run scripts 
-    cwd = os.getcwd()
-    os.chdir(cfg['rundir'])
-    util.archive('coseis.tgz')
-    d = os.path.dirname(__file__)
-    f = os.path.join(d, 'sord.x')
-    shutil.copy2(f, '.')
-    if prm['debug'] > 2:
-        os.mkdir('debug')
-
-    # save input parametes
-    out = ''
-    for k, v in sorted(prm.items()):
-        out += '%s: %s\n' % (k, json.dumps(v))
-    out += '\n'
-    for k, v in sorted(fio.items()):
-        if type(v) is list and not isinstance(v[1], basestring):
-            out += '%s:\n' % k
-            for i in v:
-                out += '-   %s\n' % json.dumps(i) 
-        else:
-            out += '%s: %s\n' % (k, json.dumps(v))
-    open('parameters.yaml', 'w').write(out)
-
-    # save input parameters for Fortran input
-    del(prm['itbuff'])
-    prm.update({'nthread': cfg['nthread']})
-    prm.update({'nfieldio': len(fieldio)})
-    out = ''
-    for k, v in sorted(prm.items()):
-        out += json.dumps(v) + '\n'
-    out += '~\n'
-    for i in fieldio:
-        out += json.dumps(i) + '\n'
-    for i in '",[]':
-        out = out.replace(i, '')
-    open('parameters.txt', 'w').write(out)
-
-    # metadata
-    shapes = {}
-    deltas = {}
-    indices = {}
-    for f in fieldio:
-        slices, xi, op, k = f[2], f[4], f[-2], f[-1]
-        if op[-1] in '<>':
-            index = []
-            shape = []
-            delta = []
-            for i, s in enumerate(slices):
-                start, stop, step = s
-                d = prm['delta'][i] * step
-                n = (stop - start) // step + 1
-                if n == 1:
-                    index += [start]
-                else:
-                    delta += [d]
-                    shape += [n]
-                    if step == 1:
-                        index += [[start, stop]]
-                    else:
-                        index += [[start, stop, step]]
-            if shape != []:
-                shapes[k] = shape
-            if delta != []:
-                deltas[k] = delta
-            if '.' in op:
-                indices[k] = xi
-            else:
-                indices[k] = index
-
-    # save metadata
-    out = 'indices:\n'
-    for k, v in sorted(indices.items()):
-        out += '    %s: %s\n' % (k, json.dumps(v))
-    out += 'shapes:\n'
-    for k, v in sorted(shapes.items()):
-        out += '    %s: %s\n' % (k, json.dumps(v))
-    out += 'deltas:\n'
-    for k, v in sorted(deltas.items()):
-        out += '    %s: %s\n' % (k, json.dumps(v))
-    open('meta.yaml', 'w').write(out)
-
-    os.chdir(cwd)
-    return cfg
-
-def run(args, **kwargs):
-    """
-    Stage and launch job.
-    """
-    from .. import util
-    cfg = stage(args, **kwargs)
-    util.launch(cfg)
+    cfg = yaml.load(open(p + 'config.json'))
     return cfg
 
 def prepare_param(prm, fio):
@@ -357,12 +191,12 @@ def prepare_param(prm, fio):
                 i2[i] = nn[i] - prm['npml'] + 1
             if i1[i] > i2[i]:
                 raise Exception('Error: model too small for PML')
-    prm.update({'i1pml': i1, 'i2pml': i2})
+    prm_fort = {'i1pml': i1, 'i2pml': i2}
 
     # field i/o
     #nt = prm['shape'][-1]
     fld = fieldnames()
-    fieldio = []
+    fio_fort = []
     filenames = []
     for field, ios in sorted(fio.items()):
         if type(ios) in (float, int):
@@ -444,23 +278,188 @@ def prepare_param(prm, fio):
             # append to list
             ios_ += [[field, reg, ii, nb, x1, x2, val, tau, op, fname]]
 
-        fieldio += [(it1, it2, ios_)]
+        fio_fort += [(it1, it2, ios_)]
 
     # done
-    fieldio = [g for f in sorted(fieldio) for g in f[2]]
-    return prm, fieldio
+    fio_fort = [g for f in sorted(fio_fort) for g in f[2]]
+    prm_fort['nfieldio'] = len(fio_fort)
+    del(prm['itbuff'])
+    return prm, prm_fort, fio_fort
 
-def f90modules(path):
-    mods = set()
-    deps = set()
-    for line in open(path):
-        tok = line.split()
-        if tok:
-            if tok[0] == 'module':
-                mods.update(tok[1:])
-            elif tok[0] == 'use':
-                deps.update(tok[1:])
-    return list(mods), list(deps)
+def stage(args, **kwargs):
+    """
+    Stage job
+    """
+    import os, json, shutil
+    import numpy as np
+    from .. import util
+
+    print('SORD: Support Operator Rupture Dynamics')
+
+    # configure and make
+    prm = parameters()
+    fld = fieldnames()['dict']
+    fio = {}
+    cfg = {}
+    args.update(kwargs)
+    for k, v in prm.items():
+        if k in fld:
+            fio[k] = v
+            del(prm[k])
+    for k, v in args.items():
+        if k in fld:
+            if type(v) != list:
+                v = [v]
+            elif isinstance(v[1], basestring):
+                v = [v]
+            for i, io in enumerate(v):
+                if type(io) in (tuple, list):
+                    ii = normalize_slices(io[0])
+                    io = [ii] + list(io[1:])
+                    v[i] = io
+            if len(v) == 1:
+                v = v[0]
+            args[k] = v
+            fio[k] = v
+        elif k in prm:
+            prm[k] = v
+        else:
+            cfg[k] = v
+    cfg = util.configure(**cfg)
+    cfg.update(**make())
+    if cfg['real8']:
+        d = 'd'
+    else:
+        d = 'f'
+    cfg.update({'dtype': np.dtype(d).str})
+    prm, prm_fort, fio_fort = prepare_param(prm, fio)
+
+    # partition for parallelization
+    nx, ny, nz, nt = prm['shape']
+    j, k, l = prm['nproc3']
+    nl = [
+        (nx - 1) // j + 1,
+        (ny - 1) // k + 1,
+        (nz - 1) // l + 1,
+    ]
+    i = abs(prm['faultnormal']) - 1
+    if i >= 0:
+        nl[i] = max(nl[i], 2)
+    j = (nx - 1) // nl[0] + 1
+    k = (ny - 1) // nl[1] + 1
+    l = (nz - 1) // nl[2] + 1
+    prm['nproc3'] = [j, k, l]
+    cfg['nproc'] = n = j * k * l
+    if n > 1 and cfg['mode'] != 'mpi':
+        raise('MPI build required for multiprocessing') 
+
+    # resources
+    if prm['oplevel'] in (1, 2):
+        nvars = 20
+    elif prm['oplevel'] in (3, 4, 5):
+        nvars = 23
+    else:
+        nvars = 44
+    nm = (nl[0] + 2) * (nl[1] + 2) * (nl[2] + 2)
+    cfg['pmem'] = 32 + int(1.2 * nm * nvars * int(cfg['dtype'][-1]) / 1024 / 1024)
+    if not cfg['minutes']:
+        cfg['minutes'] = 10 + int((nt + 10) * nm // (40 * cfg['rate']))
+
+    # configure and stage
+    cfg['command'] = os.path.join('.', 'sord.x')
+    cfg = util.prepare(cfg)
+    util.stage(cfg)
+
+    # create run scripts 
+    cwd = os.getcwd()
+    os.chdir(cfg['rundir'])
+    util.archive('coseis.tgz')
+    d = os.path.dirname(__file__)
+    f = os.path.join(d, 'sord.x')
+    shutil.copy2(f, '.')
+    if prm['debug'] > 2:
+        os.mkdir('debug')
+
+    # save input parametes
+    out = []
+    for k, v in sorted(prm.items()):
+        out.append('"%s": %s' % (k, json.dumps(v)))
+    for k, v in sorted(fio.items()):
+        if type(v) != list or isinstance(v[1], basestring):
+            v = json.dumps(v)
+        else:
+            v = ',\n        '.join(json.dumps(i) for i in v)
+            v = '[\n        ' + v + '\n    ]'
+        out.append('"%s": %s' % (k, v))
+    out = ',\n    '.join(out)
+    out = '{\n    ' + out + '\n}'
+    open('parameters.json', 'w').write(out)
+
+    # save input parameters for Fortran input
+    prm_fort['nthread'] = cfg['nthread']
+    out = ''
+    for k, v in sorted(prm.items() + prm_fort.items()):
+        out += json.dumps(v) + '\n'
+    out += '~\n'
+    for i in fio_fort:
+        out += json.dumps(i) + '\n'
+    for i in '",[]':
+        out = out.replace(i, '')
+    open('parameters.txt', 'w').write(out)
+
+    # metadata
+    shapes = {}
+    deltas = {}
+    indices = {}
+    for f in fio_fort:
+        slices, xi, op, k = f[2], f[4], f[-2], f[-1]
+        if op[-1] in '<>':
+            index = []
+            shape = []
+            delta = []
+            for i, s in enumerate(slices):
+                start, stop, step = s
+                d = prm['delta'][i] * step
+                n = (stop - start) // step + 1
+                if n == 1:
+                    index += [start]
+                else:
+                    delta += [d]
+                    shape += [n]
+                    if step == 1:
+                        index += [[start, stop]]
+                    else:
+                        index += [[start, stop, step]]
+            if shape != []:
+                shapes[k] = shape
+            if delta != []:
+                deltas[k] = delta
+            if '.' in op:
+                indices[k] = xi
+            else:
+                indices[k] = index
+
+    # save metadata
+    meta = {
+        'dtype': cfg['dtype'],
+        'indices': indices,
+        'deltas': deltas,
+        'shapes': shapes,
+    }
+    f = open('meta.json', 'w')
+    json.dump(meta, f, indent=4, sort_keys=True)
+
+    os.chdir(cwd)
+    return cfg
+
+def run(args, **kwargs):
+    """
+    Stage and launch job.
+    """
+    from .. import util
+    cfg = stage(args, **kwargs)
+    util.launch(cfg)
+    return cfg
 
 class get_slices:
     def __getitem__(self, slices):

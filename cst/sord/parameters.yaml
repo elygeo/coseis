@@ -25,10 +25,10 @@ gridnoise: 0.0           # random noise added to mesh, assumes planar fault
 tm0: 0.0                 # initial time
 
 # Material model
-rho: [2670.0]            # density
-vp:  [6000.0]            # P-wave speed
-vs:  [3464.0]            # S-wave speed
-gam: [0.0]               # viscosity
+rho: 2670.0              # density
+vp:  6000.0              # P-wave speed
+vs:  3464.0              # S-wave speed
+gam: 0.0                 # viscosity
 rho1: -1.0               # min density
 rho2: -1.0               # max density
 vp1:  -1.0               # min P-wave speed

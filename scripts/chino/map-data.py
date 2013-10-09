@@ -32,19 +32,19 @@ for c in b.get_paths():
     p += c.to_polygons() + [[[float('nan'), float('nan')]]]
 del p[-1]
 b = np.concatenate(p) * 0.005
-f = os.path.join('run', 'data', 'beachball.npy')
+f = os.path.join('run', 'data', 'Beachball.npy')
 np.save(f, b.astype('f').T)
 
 # coastlines and boarders
 x, y = cst.data.mapdata('coastlines', 'high', extent, 10.0)
 x -= 360.0
-f = os.path.join('run', 'data', 'coastlines.npy')
+f = os.path.join('run', 'data', 'Coastlines.npy')
 np.save(f, np.array([x, y], 'f'))
 
 # topography
 xx, yy, zz = cst.data.dem(extent, mesh=True)
 x, y = cst.plt.contour(xx, yy, zz, [1000])[0]
-f = os.path.join('run', 'data', 'mountains.npy')
+f = os.path.join('run', 'data', 'Mountains.npy')
 np.save(f, np.array([x, y], 'f'))
 
 # surface
@@ -54,7 +54,7 @@ for cvm, vv in [
     ('cvmh', cst.cvmh.extract(xx, yy, zz, 'vs', vs30=None)),
     ('cvms', cst.cvms.extract(xx, yy, zz, 'vs')),
 ]:
-    f = os.path.join('run', 'data', 'surface-vs-%s.npy' % cvm)
+    f = os.path.join('run', 'data', 'Surface-Vs-%s.npy' % cvm)
     np.save(f, vv[0].astype('f'))
 
 # cvm basins
@@ -65,6 +65,6 @@ for cvm, vv in [
 ]:
     v = 2500,
     x, y = cst.plt.contour(xx, yy, vv[0], v)[0]
-    f = os.path.join('run', 'data', 'basins-%s.npy' % cvm)
+    f = os.path.join('run', 'data', 'Basins-%s.npy' % cvm.upper())
     np.save(f, np.array([x, y], 'f'))
 

@@ -3,5 +3,5 @@ import sys, json, yaml
 
 for f in sys.argv[1:]:
     d = json.load(open(f))
-    d = yaml.dump(d, indent=4)
+    d = yaml.dump(d)
     print(d)
