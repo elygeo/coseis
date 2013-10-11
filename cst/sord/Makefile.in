@@ -4,7 +4,7 @@ MODE = serial
 OMP = 1
 DEBUG =    
 PROFILE =
-REAL8 =
+REALSIZE = 4
 
 # Default: GNU Compiler Collection
 CC = gcc
@@ -13,7 +13,7 @@ LD = gfortran
 CFLAGS = $(LDFLAGS) -pedantic
 FFLAGS = $(LDFLAGS) -fimplicit-none
 LDFLAGS = -g -O3 -Wall
-ifdef REAL8
+ifeq ($(REALSIZE), 8)
     FFLAGS += -fdefault-real-8
 endif
 ifdef OMP
@@ -144,7 +144,7 @@ clean:
 distclean: clean
 	rm Makefile
 
-CONFIG = {{ "mode": "$(MODE)", "omp": "$(OMP)", "real8": "$(REAL8)" }}
+CONFIG = {{ "mode": "$(MODE)", "omp": "$(OMP)", "realsize": "$(REALSIZE)" }}
 
 config.json: sord.x
 	echo '$(CONFIG)' > config.json

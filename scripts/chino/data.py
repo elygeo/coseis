@@ -15,12 +15,11 @@ stations = [
 ]
 
 # data directory
-path = os.path.join('run', 'data')
-if not os.path.exists(path):
-    os.makedirs(path)
+path = os.path.join('run', 'data') + os.sep
+os.makedirs(path)
 
 # moment tensor
-f = os.path.join(path, '%s.mts.json' % event_id)
+f = path + '%s.mts.json' % event_id
 if os.path.exists(f):
     mts = json.load(open(f))
 else:
@@ -43,7 +42,7 @@ with cst.scedc.stp('scedc') as stp:
         s = sta.split()[0].split('.')[1]
         if s in stations:
             locations += [sta]
-    f = os.path.join(path, 'station-list.txt')
+    f = path + 'station-list.txt')
     open(f, 'w').writelines(s + '\n' for s in locations)
 
     # download waveforms

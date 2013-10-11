@@ -54,7 +54,7 @@ ifeq ($(MACHINE), NICS-Kraken)
 endif
 
 # Rules
-all: cvms.x conf.json
+all: cvms.x
 
 clean :
 	rm -f *.o *.x *.lst *.pyc
@@ -64,7 +64,4 @@ distclean : clean
 
 cvms.x : io$(MODE).o version{version}.o
 	$(FC) $(FFLAGS) -o $@ $^
-
-%.json: %.yaml
-	yaml2json $< > $@
 

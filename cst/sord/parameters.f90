@@ -9,7 +9,7 @@ contains
 ! so call sub-function and allocate on the stack.
 subroutine read_parameters
 integer :: n
-if (master) inquire (file='parameters.txt', size=n)
+if (master) inquire (file='sord.in', size=n)
 call ibroadcast(n)
 call read_parameters1(n)
 end subroutine
@@ -25,7 +25,7 @@ character(n) :: str
 ! read with master process
 if (master) then
     print *, clock(), 'Read parameters'
-    open (1, file='parameters.txt', recl=n, form='unformatted', access='direct', &
+    open (1, file='sord.in', recl=n, form='unformatted', access='direct', &
         status='old')
     read (1, rec=1) str
     close (1)
@@ -40,9 +40,11 @@ read (str, *) &
     rcrit, rexpand, rho1, rho2, shape_, slipvector, source, svtol, tm0, trelax, &
     vdamp, vp1, vp2, vpml, vrup, vs1, vs2
 
-! find start of fieldio and change file delimeter
-i = scan(str, '~')
+! find start of field i/o
+i = scan(str, new_line('a'))
 str = str(i:)
+
+! change file delimeter
 do
     i = scan(str, '/')
     if (i == 0) exit
@@ -50,6 +52,7 @@ do
 end do
 
 ! field i/o
+io2 = nfieldio
 allocate (io_list(nfieldio))
 do j = 1, nfieldio
     io => io_list(j)
@@ -64,7 +67,6 @@ do j = 1, nfieldio
         io%fname(i:i) = '/'
     end do
 end do
-io2 = nfieldio
 
 end subroutine
 

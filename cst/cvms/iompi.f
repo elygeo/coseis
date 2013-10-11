@@ -8,7 +8,7 @@
       integer :: kerr, ip, np, ifh, info, ierr, i
       character (160) :: file_lon, file_lat, file_dep
       call mpi_init(ierr)
-      open (1, file='cvms-input', status='old')
+      open (1, file='cvms.in', status='old')
       read (1, *) nn8
       read (1, '(a)') file_lon
       read (1, '(a)') file_lat
@@ -65,7 +65,7 @@
       integer (kind=mpi_offset_kind) :: offset
       integer :: kerr, ip, ifh, info, ierr, i
       character (160) :: file_rho, file_alpha, file_beta
-      open (1, file='cvms-input', status='old')
+      open (1, file='cvms.in', status='old')
       read (1, '(a)') file_rho
       read (1, '(a)') file_rho
       read (1, '(a)') file_rho

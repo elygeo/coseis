@@ -4,6 +4,6 @@ import cst
 
 prm = open(sys.argv[1])
 prm = yaml.load(prm)
-argv = sys.argv[2:]
-cst.sord.run(prm, argv=argv)
+del(sys.argv[1])
+cst.sord.run(prm)
 

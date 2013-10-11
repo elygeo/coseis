@@ -59,7 +59,7 @@ def test(argv=[]):
     v = cst.kostrov.slip_rate(rho, vp, vs, vr, dtau, r, t)
 
     # run SORD
-    prm['rundir'] = d = os.path.join('run', 'kostrov') + os.sep
+    prm['rundir'] = d = os.path.join('run', 'sord_kostrov') + os.sep
     os.makedirs(d)
     cfg = cst.sord.run(prm)
 

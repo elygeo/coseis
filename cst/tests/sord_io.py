@@ -45,7 +45,7 @@ def test(argv=[]):
             (ii, '=>', 'io/%s_o0.bin' % k),
         ]
 
-    prm['rundir'] = d = os.path.join('run', 'iomodes') + os.sep
+    prm['rundir'] = d = os.path.join('run', 'sord_io') + os.sep
     os.makedirs(d + 'io')
     for f in infiles:
         np.array([1.0], 'f').tofile(d + f)

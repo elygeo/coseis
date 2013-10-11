@@ -1,16 +1,21 @@
-CC = clang
-LIBS = 
-CFLAGS = -g -O3 -Wall -pedantic \
-    -DNX=32 \
-    -DNY=28 \
-    -DNZ=12 \
-    -DDELTA=4000.0 \
-    -DNPML=2 \
-    -DNTOP=6
+.PHONY: sim
+sim: run/sim
+run/sim: sord.py run/mesh
+	python sord.py
 
-mesh.x : mesh.c Makefile
-	$(CC) $(CFLAGS) -o $@ $< $(LIBS)
+run/mesh: cvm.py run/data
+	python cvm.py
 
-clean :
-	rm -rf run mesh.x mesh.x.dSYM
+.PHONY: map
+map: run/plot/map.pdf
+run/plot/map.pdf: map.py run/map-data
+	python map.py
 
+run/map-data: map-data.py run/data
+	python map-data.py
+
+run/data: data.py
+	python data.py
+
+clean:
+	/bin/rm -rf run

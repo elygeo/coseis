@@ -14,9 +14,9 @@ def test():
         cst.tests.doctests,
         cst.tests.configure,
         cst.tests.hello,
-        cst.tests.point_source,
-        cst.tests.pml_boundary,
-        cst.tests.kostrov,
+        cst.tests.sord_mpi,
+        cst.tests.sord_pml,
+        cst.tests.sord_kostrov,
     ]:
         os.chdir(path)
         c = '%s.test()' % m.__name__

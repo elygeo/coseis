@@ -15,12 +15,12 @@ input_template = """\
 """
 
 def configure(**kwargs):
-    import os, json
+    import os, yaml
     from .. import util
     job = util.configure(**kwargs)
     f = os.path.dirname(__file__)
-    f = os.path.join(f, 'conf.json')
-    job.update(json.load(open(f)))
+    f = os.path.join(f, 'conf.yaml')
+    job.update(yaml.load(open(f)))
     for k, d in job['machine_opts'].items():
         if k in job['machine']:
             for k, v in d.items():
@@ -124,7 +124,7 @@ def stage(**kwargs):
 
     # create input files
     util.skeleton(job)
-    f = os.path.join(job.rundir, 'cvms-input')
+    f = os.path.join(job.rundir, 'cvms.in')
     open(f, 'w').write(input_template.format(**job))
 
     return job

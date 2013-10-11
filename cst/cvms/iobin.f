@@ -6,7 +6,7 @@
       integer :: kerr, nio, i
       character(160) :: file_lon, file_lat, file_dep
       write (0, '(a)') 'SCEC Community Velocity Model'
-      open (1, file='cvms-input', status='old')
+      open (1, file='cvms.in', status='old')
       read (1, *) nn
       read (1, '(a)') file_lon
       read (1, '(a)') file_lat
@@ -48,7 +48,7 @@
       integer :: kerr, nio, i
       character (160) :: file_rho, file_alpha, file_beta
       inquire (iolength=nio) rho(1:nn)
-      open (1, file='cvms-input', status='old')
+      open (1, file='cvms.in', status='old')
       read (1, '(a)') file_rho
       read (1, '(a)') file_rho
       read (1, '(a)') file_rho

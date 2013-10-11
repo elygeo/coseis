@@ -122,7 +122,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         # build mesher
         os.chdir(cwd)
         cfg = cst.util.configure()
-        m = open('Makefile.in').read()
+        m = open('mesh-in.mk').read()
         m = m.format(
             machine = cfg['machine'],
             nx = shape[0],
@@ -132,8 +132,8 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
             ntop = ntop,
             npml = npml
         )
-        open('Makefile', 'w').write(m)
-        subprocess.check_call(['make'])
+        open('mesh.mk', 'w').write(m)
+        subprocess.check_call(['make', '-f', 'mesh.mk'])
 
         # launch mesher
         os.chdir(path)

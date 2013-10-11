@@ -191,12 +191,11 @@ def prepare_param(prm, fio):
                 i2[i] = nn[i] - prm['npml'] + 1
             if i1[i] > i2[i]:
                 raise Exception('Error: model too small for PML')
-    prm_fort = {'i1pml': i1, 'i2pml': i2}
+    prm.update({'i1pml': i1, 'i2pml': i2})
 
     # field i/o
-    #nt = prm['shape'][-1]
     fld = fieldnames()
-    fio_fort = []
+    fio_ = []
     filenames = []
     for field, ios in sorted(fio.items()):
         if type(ios) in (float, int):
@@ -278,13 +277,13 @@ def prepare_param(prm, fio):
             # append to list
             ios_ += [[field, reg, ii, nb, x1, x2, val, tau, op, fname]]
 
-        fio_fort += [(it1, it2, ios_)]
+        fio_ += [(it1, it2, ios_)]
 
     # done
-    fio_fort = [g for f in sorted(fio_fort) for g in f[2]]
-    prm_fort['nfieldio'] = len(fio_fort)
+    fio_ = [g for f in sorted(fio_) for g in f[2]]
     del(prm['itbuff'])
-    return prm, prm_fort, fio_fort
+    prm.update({'nfieldio': len(fio)})
+    return prm, fio_
 
 def stage(args, **kwargs):
     """
@@ -314,7 +313,7 @@ def stage(args, **kwargs):
                 v = [v]
             for i, io in enumerate(v):
                 if type(io) in (tuple, list):
-                    ii = normalize_slices(io[0])
+                    ii = repr_slices(io[0])
                     io = [ii] + list(io[1:])
                     v[i] = io
             if len(v) == 1:
@@ -327,12 +326,10 @@ def stage(args, **kwargs):
             cfg[k] = v
     cfg = util.configure(**cfg)
     cfg.update(**make())
-    if cfg['real8']:
-        d = 'd'
-    else:
-        d = 'f'
-    cfg.update({'dtype': np.dtype(d).str})
-    prm, prm_fort, fio_fort = prepare_param(prm, fio)
+    d = np.dtype('f' +  cfg['realsize']).str
+    cfg.update({'name': 'sord', 'dtype': d})
+    prm.update({'nthread': cfg['nthread']})
+    prm, fio = prepare_param(prm, fio)
 
     # partition for parallelization
     nx, ny, nz, nt = prm['shape']
@@ -380,38 +377,26 @@ def stage(args, **kwargs):
     if prm['debug'] > 2:
         os.mkdir('debug')
 
-    # save input parametes
-    out = []
-    for k, v in sorted(prm.items()):
-        out.append('"%s": %s' % (k, json.dumps(v)))
-    for k, v in sorted(fio.items()):
-        if type(v) != list or isinstance(v[1], basestring):
-            v = json.dumps(v)
-        else:
-            v = ',\n        '.join(json.dumps(i) for i in v)
-            v = '[\n        ' + v + '\n    ]'
-        out.append('"%s": %s' % (k, v))
-    out = ',\n    '.join(out)
-    out = '{\n    ' + out + '\n}'
-    open('parameters.json', 'w').write(out)
-
-    # save input parameters for Fortran input
-    prm_fort['nthread'] = cfg['nthread']
-    out = ''
-    for k, v in sorted(prm.items() + prm_fort.items()):
-        out += json.dumps(v) + '\n'
-    out += '~\n'
-    for i in fio_fort:
+    # fortran parameters
+    out = json.dumps([v for k, v in sorted(prm.items())]) + '\n'
+    for i in fio:
         out += json.dumps(i) + '\n'
     for i in '",[]':
         out = out.replace(i, '')
-    open('parameters.txt', 'w').write(out)
+    open('sord.in', 'w').write(out)
+
+    # save parametes
+    prm.update({'~fieldio': fio})
+    out = json.dumps(prm, sort_keys=True, indent=4)
+    open('sord.json', 'w').write(out)
+    out = json.dumps(args, sort_keys=True, indent=4)
+    open('args.json', 'w').write(out)
 
     # metadata
     shapes = {}
     deltas = {}
     indices = {}
-    for f in fio_fort:
+    for f in fio:
         slices, xi, op, k = f[2], f[4], f[-2], f[-1]
         if op[-1] in '<>':
             index = []
@@ -466,39 +451,18 @@ class get_slices:
         return slices
 s_ = get_slices()
 
-def normalize_slices(slices):
+def repr_slices(slices):
     """
-    >>> normalize_slices('[1:1,:2,3::,::4,::]')
-    [1, (None, 2), (3, None), (None, None, 4), ()]
-
-    >>> normalize_slices([(1,1), (None,2), (3,None), (None,None,4), (None,None,1)])
-    [1, (None, 2), (3, None), (None, None, 4), ()]
-
-    >>> normalize_slices((1, slice(2), slice(None,3), slice(None,None,4), slice()))
-    [1, (None, 2), (3, None), (None, None, 4), ()]
+    String representation of slice object
     """
     if isinstance(slices, basestring):
-        assert(slices[0] + slices[-1] == '[]')
-        slices = slices[1:-1].split(',')
+        return slices
     elif type(slices) in (tuple, list):
         slices = list(slices)
     else:
         slices = [slices]
     for i, s in enumerate(slices):
-        if isinstance(s, basestring):
-            t = []
-            for j in s.split(':'):
-                if j == '':
-                    t.append(None)
-                elif '.' in j:
-                    t.append(float(j))
-                else:
-                    t.append(int(j))
-            if len(t) > 1:
-                s = slice(*t)
-            else:
-                s = slice(t[0], t[0])
-        elif type(s) in (tuple, list):
+        if type(s) in (tuple, list):
             if len(s) == 0:
                 s = slice(None)
             else:
@@ -507,16 +471,18 @@ def normalize_slices(slices):
             s = slice(s, s)
         if s.start == s.stop:
             if s.start != None:
-                s = s.start
+                s = [repr(s.start)]
             elif s.step in (None, 1):
-                s = ()
+                s = ['', '']
             else:
-                s = (None, None, s.step)
+                s = ['', '', repr(s.step)]
         elif s.step in (1, None):
-            s = (s.start, s.stop)
+            s = [repr(s.start), repr(s.stop)]
         else:
-            s = (s.start, s.stop, s.step)
+            s = [repr(s.start), repr(s.stop), repr(s.step)]
+        s = ':'.join(s)
         slices[i] = s
+    slices = '[' + ','.join(slices) + ']'
     return slices
 
 def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
@@ -542,8 +508,16 @@ def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
     [[1, 1, 1], [2, 2, 1], [6, 7, 2], [1, 7, 1]]
     """
 
+    # normalize to list
+    if isinstance(slices, basestring):
+        assert(slices[0] + slices[-1] == '[]')
+        slices = slices[1:-1].split(',')
+    elif type(slices) in (tuple, list):
+        slices = list(slices)
+    else:
+        slices = [slices]
+
     # prep
-    slices = normalize_slices(slices)
     n = len(shape)
     if len(slices) == 0:
         slices = n * [[]]
@@ -562,7 +536,20 @@ def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
     for i, s in enumerate(slices):
 
         # convert to slice
-        if type(s) in (tuple, list):
+        if isinstance(s, basestring):
+            t = []
+            for j in s.split(':'):
+                if j == '':
+                    t.append(None)
+                elif '.' in j:
+                    t.append(float(j))
+                else:
+                    t.append(int(j))
+            if len(t) > 1:
+                s = slice(*t)
+            else:
+                s = slice(t[0], t[0])
+        elif type(s) in (tuple, list):
             if len(s) == 0:
                 s = slice(None)
             else:

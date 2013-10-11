@@ -3,10 +3,10 @@ Testing module
 """
 
 import syntax, configure, doctests, hello, test_suite
-import pml_boundary, point_source, kostrov
+import sord_pml, sord_mpi, sord_kostrov
 import egmm, spectrum
 
 # stop pyflakes errors
 syntax, configure, doctests, hello, test_suite
-pml_boundary, point_source, kostrov
+sord_pml, sord_mpi, sord_kostrov
 egmm, spectrum
