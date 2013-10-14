@@ -113,7 +113,7 @@ for dx, np in runs:
         ]
 
     # run SORD
-    prm['rundir'] = d = os.path.join('run', 'tpv3', '%03.0f' % dx)
+    prm['path'] = d = os.path.join('run', '%03.0f' % dx)
     os.makedirs(d)
     cst.sord.run(prm)
 

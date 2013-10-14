@@ -35,14 +35,14 @@ def test(argv=[]):
     prm['p33'] = [(s_[11,11,11,:], '.', 1e10, 'delta', 1.0)]
 
     # output
-    fld = cst.sord.fieldnames()
-    for k in fld['volume']:
+    fns = cst.sord.fieldnames()
+    for k in fns['volume']:
         if k not in prm:
             prm[k] = []
-        prm[k] += [([], '>',  k + '.bin')]
+        prm[k] += [([], '=>',  k + '.bin')]
 
     # master
-    prm['rundir'] = d0 = os.path.join('run', 'sord_pml') + os.sep
+    prm['path'] = d0 = os.path.join('run', 'sord_pml') + os.sep
     os.makedirs(d0)
     cst.sord.run(prm)
 
@@ -50,13 +50,11 @@ def test(argv=[]):
     max_err_all_ = 0.0
     for i, n in enumerate([[4, 1, 1], [1, 2, 3]]):
         prm['nproc3'] = n
-        prm['rundir'] = d = os.path.join('run', 'sord_pml%s' % i) + os.sep
+        prm['path'] = d = os.path.join('run', 'sord_pml%s' % i) + os.sep
         os.makedirs(d)
         job = cst.sord.run(prm)
         max_err_ = 0.0
-        for k, v in fld.items():
-            if v.fault:
-                continue
+        for k in fns['volume']:
             f1 = d0 + k + '.bin'
             f2 = d + k + '.bin'
             v1 = np.fromfile(f1, job['dtype'])

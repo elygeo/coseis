@@ -30,7 +30,7 @@ script: |
     cd "$PBS_O_WORKDIR"
     env > "{name}.env"
     lfs setstripe -c 1 .
-    [ {nstripe} -ge -1 -a -d {iodir} ] && lfs setstripe -c {nstripe} {iodir}
+    [ {nstripe} -ge -1 -a -d {iopath} ] && lfs setstripe -c {nstripe} {iopath}
     date
     {pre}
     {launch}

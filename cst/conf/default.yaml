@@ -14,8 +14,8 @@ nthread: 0
 nstripe: -2
 minutes: 0
 pmem: 0
-rundir: 'run'
-iodir: ''
+path: 'run'
+iopath: ''
 argv: []
 
 # machine properties
@@ -44,7 +44,7 @@ submit_pattern: (?P<jobid>\d+\S*)\D*$
 # job script
 script: |
     #!/bin/sh
-    cd "${rundir}"
+    cd "${path}"
     env > "{name}.env"
     date
     {pre}

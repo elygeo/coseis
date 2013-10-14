@@ -245,10 +245,10 @@ def prepare_param(prm, fio):
             # cell or node registration
             if field in fns['cell']:
                 reg = 'c'
-                base = 1.5, 1.5, 1.5, 1
+                base = (1.5, 1.5, 1.5, 1)
             else:
                 reg = 'n'
-                base = 1, 1, 1, 1
+                base = (1, 1, 1, 1)
 
             # indices
             nn = prm['shape']
@@ -344,7 +344,7 @@ def stage(args, **kwargs):
         if k in fns:
             if type(v) != list:
                 v = [v]
-            elif isinstance(v[1], basestring):
+            elif len(v) > 1 and isinstance(v[1], basestring):
                 v = [v]
             for i, io in enumerate(v):
                 if type(io) in (tuple, list):
@@ -403,7 +403,7 @@ def stage(args, **kwargs):
 
     # create run files 
     cwd = os.getcwd()
-    os.chdir(job['rundir'])
+    os.chdir(job['path'])
     util.archive('coseis.tgz')
     d = os.path.dirname(__file__)
     f = os.path.join(d, 'sord.x')
@@ -412,7 +412,7 @@ def stage(args, **kwargs):
         os.mkdir('debug')
 
     # fortran parameters
-    out = [v for k, v in sorted(prm.items())]
+    out = [prm[k] for k in sorted(prm)]
     out = json.dumps(out) + '\n'
     for i in fio:
         out += json.dumps(i) + '\n'
@@ -465,20 +465,14 @@ def repr_slices(slices):
                 s = slice(None)
             else:
                 s = slice(*s)
-        elif type(s) != slice:
-            s = slice(s, s)
-        if s.start == s.stop:
-            if s.start != None:
-                s = [repr(s.start)]
-            elif s.step in (None, 1):
-                s = ['', '']
+        if type(s) == slice:
+            if s.step in (1, None):
+                s = '%s:%s' % (s.start, s.stop)
             else:
-                s = ['', '', repr(s.step)]
-        elif s.step in (1, None):
-            s = [repr(s.start), repr(s.stop)]
+                s = '%s:%s:%s' % (s.start, s.stop, s.step)
+            s.replace('None', '')
         else:
-            s = [repr(s.start), repr(s.stop), repr(s.step)]
-        s = ':'.join(s)
+            s = str(s)
         slices[i] = s
     slices = '[' + ','.join(slices) + ']'
     return slices
@@ -509,7 +503,10 @@ def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
     # normalize to list
     if isinstance(slices, basestring):
         assert(slices[0] + slices[-1] == '[]')
-        slices = slices[1:-1].split(',')
+        if slices == '[]':
+            slices = []
+        else:
+            slices = slices[1:-1].split(',')
     elif type(slices) in (tuple, list):
         slices = list(slices)
     else:
@@ -546,6 +543,7 @@ def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
             if len(t) > 1:
                 s = slice(*t)
             else:
+                FIXME
                 s = slice(t[0], t[0])
         elif type(s) in (tuple, list):
             if len(s) == 0:
@@ -553,23 +551,22 @@ def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
             else:
                 s = slice(*s)
         else:
+            FIXME
             s = slice(s, s)
         start, stop, step = s.start, s.stop, s.step
 
-        # handle None
+        # handle None and negative indices
+        wraparound = shape[i] + int(base[i])
         if start is None:
             start = base[i]
+        elif start < 0:
+            start += wraparound
         if stop is None:
-            stop = -base[i]
+            stop = -base[i] + wraparound
+        elif stop < 0:
+            stop += wraparound
         if step is None:
             step = 1
-
-        # handle negative indices
-        wraparound = shape[i] + int(base[i])
-        if start < 0:
-            start += wraparound
-        if stop < 0:
-            stop += wraparound
 
         # convert base
         if new_base[i] != base[i]:

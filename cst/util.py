@@ -249,7 +249,7 @@ def launch(job=None, **kwargs):
     """
     Launch or submit job.
     """
-    import os, re, json, shlex, subprocess
+    import os, re, shlex, subprocess
 
     # prepare job
     if job is None:
@@ -264,7 +264,7 @@ def launch(job=None, **kwargs):
 
     # run directory
     cwd = os.getcwd()
-    os.chdir(job['rundir'])
+    os.chdir(job['path'])
 
     # launch
     if job['run'] == 'submit':

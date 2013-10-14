@@ -182,12 +182,13 @@ td {
 <li><a class="reference internal" href="#publications" id="id2">Publications</a></li>
 <li><a class="reference internal" href="#user-guide" id="id3">User Guide</a><ul>
 <li><a class="reference internal" href="#quick-test" id="id4">Quick test</a></li>
-<li><a class="reference internal" href="#running-sord" id="id5">Running SORD</a></li>
-<li><a class="reference internal" href="#boundary-conditions" id="id6">Boundary Conditions</a></li>
-<li><a class="reference internal" href="#defining-the-fault-rupture-surface" id="id7">Defining the fault rupture surface</a></li>
+<li><a class="reference internal" href="#python-scripting" id="id5">Python Scripting</a></li>
+<li><a class="reference internal" href="#field-i-o" id="id6">Field I/O</a></li>
+<li><a class="reference internal" href="#boundary-conditions" id="id7">Boundary Conditions</a></li>
+<li><a class="reference internal" href="#defining-the-fault-rupture-surface" id="id8">Defining the fault rupture surface</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#memory-usage-and-scaling" id="id8">Memory Usage and Scaling</a></li>
+<li><a class="reference internal" href="#memory-usage-and-scaling" id="id9">Memory Usage and Scaling</a></li>
 </ul>
 </div>
 <div class="section" id="summary">
@@ -234,33 +235,21 @@ heterogeneous media</a>,
 <h1>User Guide</h1>
 <div class="section" id="quick-test">
 <h2>Quick test</h2>
-<p>Run a simple point source explosion test and plot a 2D slice of particle
-velocity:</p>
+<p>Run a simple point source explosion
+test and plot a 2D slice of particle velocity:</p>
 <pre class="literal-block">
 cd scripts/sord
 mkdir run
-sord sord.yaml
+sord parameters.yaml
 python plot.py
 </pre>
 <p>Plotting requires Matplotlib, and the result should look like this:</p>
 <blockquote>
 <img alt="../scripts/sord/example.png" src="../scripts/sord/example.png" />
 </blockquote>
-</div>
-<div class="section" id="running-sord">
-<h2>Running SORD</h2>
-<p>The simplest way to run SORD is to execute the <tt class="docutils literal">sord</tt> command giving a
-parameter file in <a class="reference external" href="http://www.yaml.org">YAML</a> or <a class="reference external" href="http://www.json.org">JSON</a> format. There are three types of parameters:
-(1) job control, (2) simulation, and (2) field I/O parameters. Default job
-control and simulation parameters are specified in <a class="reference external" href="../cst/conf/default.yaml">cst/conf/default.yaml</a> and <a class="reference external" href="../cst/sord/parameters.yaml">cst/sord/parameters.yaml</a>, respectively.  Machine specific job control
-defaults may also be present in the <tt class="docutils literal">cst/conf</tt> directory. Possible field I/O
-parameters (for reading and writing arrays) are listed in
-<a class="reference external" href="../cst/sord/fieldnames.yaml">cst/sord/fieldnames.yaml</a>.</p>
-<p>The more powerful way to run the code is with a Python script. The basic
-procedure it to import the <tt class="docutils literal">cst</tt> module, create a dictionary of parameters,
-and pass that dictionary to the <tt class="docutils literal">cst.sord.run()</tt> function. The
-<tt class="docutils literal">cst/scripts</tt> directory contains many examples including the above quick test
-<a class="reference external" href="../scripts/sord/sord.yaml">sord.yaml</a>:</p>
+<p>This illustrates the simplest way to run SORD, that is to execute the <tt class="docutils literal">sord</tt>
+command giving a parameter file in <a class="reference external" href="http://www.yaml.org">YAML</a> or <a class="reference external" href="http://www.json.org">JSON</a> format. The parameter file
+for this example is as follows:</p>
 <pre class="literal-block">
 # model dimentions [x, y, z, t]
 shape: [61, 61, 61, 60]
@@ -282,47 +271,64 @@ v1: ['[:,:,31,-1]', '=&gt;', 'vx.bin']
 v2: ['[:,:,31,-1]', '=&gt;', 'vy.bin']
 
 </pre>
-<p>In this example, <tt class="docutils literal">rho</tt>, <tt class="docutils literal">vp</tt>, <tt class="docutils literal">vs</tt>, <tt class="docutils literal">v1</tt>, and <tt class="docutils literal">v2</tt> are 3- and 4-D
-fields.  [Note: the <tt class="docutils literal">fieldio</tt> parameter in older versions of the code has
-been removed. Now, each field I/O parameter is a separate list.] Fields may be
-a single value that is assigned to the entire array, or various operations that
-can be performed on array slices:</p>
-<pre class="literal-block">
-f = val                         # Set f to value
-f = ([], '+', val)              # Add value to f
-f = ([], '=', 'rand', val)      # Random numbers in range (0, val)
-f = ([], '=', 'func', val, tau) # Time function with period tau, scaled by val
-f = ([], '&lt;', 'filename')       # Read filename into f
-f = ([], '&gt;', 'filename')       # Write f into filename
-</pre>
-<p>Field variables are categorized in four ways: (1)
-static vs. dynamic, (2) settable vs. output only, (3) node vs. cell
-registration, and (4) volume vs. fault surface.  For example, density <tt class="docutils literal">rho</tt>
-is a static, settable, cell, volume variable. Slip path length <tt class="docutils literal">sl</tt> is a
-dynamic, output, node, fault variable.</p>
-<p>Here we have specified the entire 4D volume for the slice using the shorthand
-notation empty brackets <tt class="docutils literal">[]</tt>. The array slicing notation follows that of
-Python, but is extended here to use integers for node indices and integers +
-0.5 for cell indices (1.5, 2.5, 3.5, ...).  Array indexing starts at 1 for the
-first node, and 1.5 for the first cell.  Negative indices count inward from end
-of the array, starting at -1 for the last node, and -1.5 for the last cell.
-Slices can be specified in one of three ways: with a list, with a string, or
-using the helper function <tt class="docutils literal">cst.sord.get_slices()</tt>. The helper function is
-the only</p>
-<p>slice indices and an operation, followed by other parameters.  The following
-I/O modes are available, where <tt class="docutils literal">'f'</tt> is the field variable name (from the
-list fieldnames.yaml), and <tt class="docutils literal">[]</tt> are the slice indices.:</p>
+</div>
+<div class="section" id="python-scripting">
+<h2>Python Scripting</h2>
+<p>A more powerful way to run the code is with a Python script. The basic
+procedure is to import the <tt class="docutils literal">cst</tt> module, create a dictionary of parameters,
+and pass that dictionary to the <tt class="docutils literal">cst.sord.run()</tt> function. Parameters are
+either job-control or simulation parameters. Defaults for these two types of
+parameters are given in <a class="reference external" href="../cst/conf/default.yaml">cst/conf/default.yaml</a>
+and <a class="reference external" href="../cst/sord/parameters.yaml">cst/sord/parameters.yaml</a>, respectively.
+Machine specific job-control parameters may also be present in the <tt class="docutils literal">cst/conf</tt>
+directory that supersede the defaults.</p>
+<p>I maybe be helpful to look through example applications in the <tt class="docutils literal">cst/scripts</tt>
+directory, and return to this document for further description of the
+simulation parameters.</p>
+</div>
+<div class="section" id="field-i-o">
+<h2>Field I/O</h2>
+<p>[Note about a change from previous versions: The <tt class="docutils literal">fieldio</tt> parameter has been
+removed, and instead each field I/O parameter is a separate list.]</p>
+<p>Multi-dimensional field arrays may be accessed for input and out through a list
+of operations that includes reading from and writing to disk, as well as
+assigning to scalar values or time-dependent functions. In the quick test
+above, <tt class="docutils literal">rho</tt>, <tt class="docutils literal">vp</tt>, <tt class="docutils literal">vs</tt>, <tt class="docutils literal">v1</tt>, and <tt class="docutils literal">v2</tt> are examples of 3- and 4-D
+fields. The full list of available fields is given in <a class="reference external" href="../cst/sord/fieldnames.yaml">cst/sord/fieldnames.yaml</a>.</p>
+<p>Field variables are categorized in four ways: (1) static vs. dynamic, (2)
+settable vs. output only, (3) node vs. cell registration, and (4) volume vs.
+fault surface.  For example, density <tt class="docutils literal">rho</tt> is a static, settable, cell,
+volume variable. Slip path length <tt class="docutils literal">sl</tt> is a dynamic, output, node, fault
+variable.</p>
+<p>Field operations may specify a slice, indicating a subregion of the array.  The
+slicing notation follows that of Python, but is extended here to use integers
+for node indices and integers + 0.5 for cell indices (1.5, 2.5, 3.5, ...).
+Array indexing starts at 1 for the first node, and 1.5 for the first cell.
+Negative indices count inward from end of the array, starting at -1 for the
+last node, and -1.5 for the last cell.  Slices can be specified either with a
+string, or using the helper function <tt class="docutils literal">cst.sord.get_slices()</tt>. Empty brackets
+<tt class="docutils literal">[]</tt> are shorthand for the entire 4D field. Here are some examples:</p>
 <pre class="literal-block">
 s_ = cst.sord.get_slices()
 j = 10
 k = 20
-[]                  # Entire 4D volume
+'[]'                # Entire 4D volume
 '[10.5,20.5,1.5,:]' # Single cell, full time history
 '[:,:,:,-1]'        # Full 3D volume, last time step
-[j,k,1,-1]          # Single node, last time step
+s_[j,k,1,-1]        # Single node, last time step
 s_[j,:,:,::10]      # j=10 node surface, every 10th time step
 </pre>
-<p>A tilde <tt class="docutils literal">~</tt> indicates sub-cell positioning via weighted averaging.  In this
+<p>FIXME: this section is unfinished.:</p>
+<pre class="literal-block">
+f = val                         # Set f to value
+f = ([], '=', val)              # Set f slice to value
+f = ([], '+', val)              # Add value to f slice
+f = ([], '=', 'rand', val)      # Random numbers in range (0, val)
+f = ([], '=', 'func', val, tau) # Time function with period tau, scaled by val
+f = ([], '&lt;=', 'filename')      # Read filename into f
+f = ([], '=&gt;', 'filename')      # Write f into filename
+</pre>
+<p>A dot (<tt class="docutils literal">.</tt>) indicates sub-cell positioning via weighted averaging.  In this
 case the spatial indices are single logical coordinates that may vary
 continuously over the range.  The fractional part of the index determines the
 weights.  For example, an index of 3.2 to the 1D variable f would specify the
@@ -332,11 +338,10 @@ changing index, and t is the slowest changing index.  Mode 'R' extrapolates any
 singleton dimensions to fill the entire array.  This is useful for reading 1D
 or 2D models into 3D simulations, obviating the need to store (possibly very
 large) 3D material and mesh coordinate files.</p>
-<p>All input modes may use '+' instead of '=' to add to, rather than replace,
-preexisting values.  For a list of available time functions, see the
-<tt class="docutils literal">time_function</tt> subroutine in <a class="reference external" href="../cst/sord/src/util.f90">util.f90</a>.  The
-routine can be easily modified to add new time functions.  Time functions can
-be offset in time with the <tt class="docutils literal">tm0</tt> initial time parameter.</p>
+<p>For a list of available time functions, see the <tt class="docutils literal">time_function</tt> subroutine in
+<a class="reference external" href="../cst/sord/src/util.f90">util.f90</a>.  The routine can be easily modified to
+add new time functions.  Time functions can be offset in time with the <tt class="docutils literal">tm0</tt>
+initial time parameter.</p>
 </div>
 <div class="section" id="boundary-conditions">
 <h2>Boundary Conditions</h2>

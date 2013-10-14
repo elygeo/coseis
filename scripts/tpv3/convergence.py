@@ -9,8 +9,8 @@ import scipy.interpolate.RectBivariateSpline as interp2d
 
 # paramters
 degree = 1
-dirs = glob.glob('run/tpv3/[0-9]*')
-dirs = glob.glob('run/tpv3/[0-9]*')[3:]
+dirs = glob.glob('run/[0-9]*')
+dirs = glob.glob('run/[0-9]*')[3:]
 
 # reference solution
 path = dirs[0] + os.sep

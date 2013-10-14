@@ -29,7 +29,7 @@ script: |
     # @ job_type = bluegene
     # @ environment = COPY_ALL
     # @ queue
-    cd "{rundir}"
+    cd "{path}"
     env > "{name}.env"
     date
     {pre}

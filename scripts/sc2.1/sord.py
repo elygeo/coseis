@@ -61,7 +61,7 @@ for i in range(8):
         ]
 
 # run job
-prm['rundir'] = d = os.path.join('run', 'sim', '%.0f' % dx)
+prm['path'] = d = os.path.join('run', 'sim', '%.0f' % dx)
 os.makedirs(d)
 for v in 'rho', 'vp', 'vs':
     os.link(mesh + v + '.bin', d + v + 'bin')

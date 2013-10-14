@@ -92,7 +92,7 @@ prm['u2'] += [(s_[1,k,2:l,:], '.>', 'off-fault.bin')]
 
 # run SORD
 w = weakzone * 100
-prm['rundir'] = os.path.join('run', '%02.0f' % w)
-os.makedirs(prm['rundir'])
+prm['path'] = d = os.path.join('run', '%02.0f' % w)
+os.makedirs(d)
 cst.sord.run(prm)
 

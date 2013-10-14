@@ -25,7 +25,7 @@ def test(argv=[]):
     os.makedirs(d)
     shutil.copy2(path + 'hello.c.x', d)
     cst.util.launch(
-        rundir = d,
+        path = d,
         argv = argv,
         command = './hello.c.x',
         nthread = 2,
@@ -39,7 +39,7 @@ def test(argv=[]):
     os.makedirs(d)
     shutil.copy2(path + 'hello.f.x', d)
     cst.util.launch(
-        rundir = d,
+        path = d,
         argv = argv,
         command = './hello.f.x',
         nthread = 2,

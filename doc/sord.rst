@@ -66,8 +66,7 @@ User Guide
 Quick test
 ----------
 
-The simplest way to run SORD is to execute the ``sord`` command giving a
-parameter file in YAML_ or JSON_ format. Run a simple point source explosion
+Run a simple point source explosion
 test and plot a 2D slice of particle velocity::
 
     cd scripts/sord
@@ -75,79 +74,85 @@ test and plot a 2D slice of particle velocity::
     sord parameters.yaml
     python plot.py
 
+.. _YAML: http://www.yaml.org
+.. _JSON: http://www.json.org
+
 Plotting requires Matplotlib, and the result should look like this:
 
     .. image:: ../scripts/sord/example.png
 
+This illustrates the simplest way to run SORD, that is to execute the ``sord``
+command giving a parameter file in YAML_ or JSON_ format. The parameter file
+for this example is as follows:
 
-.. include:: ../scripts/sord/sord.yaml
+.. include:: ../scripts/sord/parameters.yaml
    :literal:
-
-.. _YAML: http://www.yaml.org
-.. _JSON: http://www.json.org
 
 Python Scripting
 ----------------
 
-There are three types of parameters:
-(1) job control, (2) simulation, and (2) field I/O parameters. Default job
-control and simulation parameters are specified in `cst/conf/default.yaml
-<../cst/conf/default.yaml>`__ and `cst/sord/parameters.yaml
-<../cst/sord/parameters.yaml>`__, respectively.  Machine specific job control
-defaults may also be present in the ``cst/conf`` directory. Possible field I/O
-parameters (for reading and writing arrays) are listed in
-`cst/sord/fieldnames.yaml <../cst/sord/fieldnames.yaml>`__.
+A more powerful way to run the code is with a Python script. The basic
+procedure is to import the ``cst`` module, create a dictionary of parameters,
+and pass that dictionary to the ``cst.sord.run()`` function. Parameters are
+either job-control or simulation parameters. Defaults for these two types of
+parameters are given in `cst/conf/default.yaml <../cst/conf/default.yaml>`__
+and `cst/sord/parameters.yaml <../cst/sord/parameters.yaml>`__, respectively.
+Machine specific job-control parameters may also be present in the ``cst/conf``
+directory that supersede the defaults.
 
-The more powerful way to run the code is with a Python script. The basic
-procedure it to import the ``cst`` module, create a dictionary of parameters,
-and pass that dictionary to the ``cst.sord.run()`` function. The
-``cst/scripts`` directory contains many examples including the above quick test
-`sord.yaml <../scripts/sord/sord.yaml>`__:
+I maybe be helpful to look through example applications in the ``cst/scripts``
+directory, and return to this document for further description of the
+simulation parameters.
 
-In this example, ``rho``, ``vp``, ``vs``, ``v1``, and ``v2`` are 3- and 4-D
-fields.  [Note: the ``fieldio`` parameter in older versions of the code has
-been removed. Now, each field I/O parameter is a separate list.] Fields may be
-a single value that is assigned to the entire array, or various operations that
-can be performed on array slices::
+Field I/O
+---------
 
-    f = val                         # Set f to value
-    f = ([], '+', val)              # Add value to f
-    f = ([], '=', 'rand', val)      # Random numbers in range (0, val)
-    f = ([], '=', 'func', val, tau) # Time function with period tau, scaled by val
-    f = ([], '<', 'filename')       # Read filename into f
-    f = ([], '>', 'filename')       # Write f into filename
+[Note about a change from previous versions: The ``fieldio`` parameter has been
+removed, and instead each field I/O parameter is a separate list.]
 
-Field variables are categorized in four ways: (1)
-static vs. dynamic, (2) settable vs. output only, (3) node vs. cell
-registration, and (4) volume vs. fault surface.  For example, density ``rho``
-is a static, settable, cell, volume variable. Slip path length ``sl`` is a
-dynamic, output, node, fault variable.
+Multi-dimensional field arrays may be accessed for input and out through a list
+of operations that includes reading from and writing to disk, as well as
+assigning to scalar values or time-dependent functions. In the quick test
+above, ``rho``, ``vp``, ``vs``, ``v1``, and ``v2`` are examples of 3- and 4-D
+fields. The full list of available fields is given in `cst/sord/fieldnames.yaml
+<../cst/sord/fieldnames.yaml>`__.
 
-Here we have specified the entire 4D volume for the slice using the shorthand
-notation empty brackets ``[]``. The array slicing notation follows that of
-Python, but is extended here to use integers for node indices and integers +
-0.5 for cell indices (1.5, 2.5, 3.5, ...).  Array indexing starts at 1 for the
-first node, and 1.5 for the first cell.  Negative indices count inward from end
-of the array, starting at -1 for the last node, and -1.5 for the last cell.
-Slices can be specified in one of three ways: with a list, with a string, or
-using the helper function ``cst.sord.get_slices()``. The helper function is
-the only 
+Field variables are categorized in four ways: (1) static vs. dynamic, (2)
+settable vs. output only, (3) node vs. cell registration, and (4) volume vs.
+fault surface.  For example, density ``rho`` is a static, settable, cell,
+volume variable. Slip path length ``sl`` is a dynamic, output, node, fault
+variable.
 
-slice indices and an operation, followed by other parameters.  The following
-I/O modes are available, where ``'f'`` is the field variable name (from the
-list fieldnames.yaml), and ``[]`` are the slice indices.::
+Field operations may specify a slice, indicating a subregion of the array.  The
+slicing notation follows that of Python, but is extended here to use integers
+for node indices and integers + 0.5 for cell indices (1.5, 2.5, 3.5, ...).
+Array indexing starts at 1 for the first node, and 1.5 for the first cell.
+Negative indices count inward from end of the array, starting at -1 for the
+last node, and -1.5 for the last cell.  Slices can be specified either with a
+string, or using the helper function ``cst.sord.get_slices()``. Empty brackets
+``[]`` are shorthand for the entire 4D field. Here are some examples::
 
     s_ = cst.sord.get_slices()
     j = 10
     k = 20
-    []                  # Entire 4D volume
+    '[]'                # Entire 4D volume
     '[10.5,20.5,1.5,:]' # Single cell, full time history
     '[:,:,:,-1]'        # Full 3D volume, last time step
-    [j,k,1,-1]          # Single node, last time step
+    s_[j,k,1,-1]        # Single node, last time step
     s_[j,:,:,::10]      # j=10 node surface, every 10th time step
 
+FIXME: this section is unfinished.::
 
-A tilde ``~`` indicates sub-cell positioning via weighted averaging.  In this
+
+    f = val                         # Set f to value
+    f = ([], '=', val)              # Set f slice to value
+    f = ([], '+', val)              # Add value to f slice
+    f = ([], '=', 'rand', val)      # Random numbers in range (0, val)
+    f = ([], '=', 'func', val, tau) # Time function with period tau, scaled by val
+    f = ([], '<=', 'filename')      # Read filename into f
+    f = ([], '=>', 'filename')      # Write f into filename
+
+A dot (``.``) indicates sub-cell positioning via weighted averaging.  In this
 case the spatial indices are single logical coordinates that may vary
 continuously over the range.  The fractional part of the index determines the
 weights.  For example, an index of 3.2 to the 1D variable f would specify the
@@ -159,11 +164,10 @@ singleton dimensions to fill the entire array.  This is useful for reading 1D
 or 2D models into 3D simulations, obviating the need to store (possibly very
 large) 3D material and mesh coordinate files.
 
-All input modes may use '+' instead of '=' to add to, rather than replace,
-preexisting values.  For a list of available time functions, see the
-``time_function`` subroutine in `util.f90 <../cst/sord/src/util.f90>`__.  The
-routine can be easily modified to add new time functions.  Time functions can
-be offset in time with the ``tm0`` initial time parameter.
+For a list of available time functions, see the ``time_function`` subroutine in
+`util.f90 <../cst/sord/src/util.f90>`__.  The routine can be easily modified to
+add new time functions.  Time functions can be offset in time with the ``tm0``
+initial time parameter.
 
 
 Boundary Conditions

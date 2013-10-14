@@ -8,7 +8,7 @@ stations = 'P1a', 'P2a'
 stations = 'P1b', 'P2b'
 stations = 'P1', 'P2'
 bipath = 'bi/'
-runs = 'run/tpv3/*'
+runs = 'run/*'
 
 # loop over runs
 for path in glob.glob(runs):

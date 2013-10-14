@@ -16,12 +16,12 @@ def test(argv=[]):
     prm['shape'] = [6, 7, 8, 9]
 
     # output
-    fld = cst.sord.fieldnames()
+    fns = cst.sord.fieldnames()
     x1 = [1.1, 1.1, 1.1]
     x2 = [9.9, 9.9, 9.9]
     ii = [4.4, 5.5, 6.6, 1]
     infiles = []
-    for k in fld['dict']:
+    for k in fns['dict']:
         prm[k] = []
     for k in 'a1', 'w11':
         prm[k] += [([], '#')]
@@ -36,16 +36,16 @@ def test(argv=[]):
             f = 'io/%s_i%s.bin' % (k, i)
             infiles.append(f)
             prm[k] += [(ii, op, f)]
-    for k in fld['dict']:
+    for k in fns['dict']:
         ii = [4.4, 5.5, 6.6, 1]
-        if k in fld['initial']:
+        if k in fns['initial']:
             ii = ii[:3]
         prm[k] += [
             (ii, '.>', 'io/%s_o1.bin' % k),
             (ii, '=>', 'io/%s_o0.bin' % k),
         ]
 
-    prm['rundir'] = d = os.path.join('run', 'sord_io') + os.sep
+    prm['path'] = d = os.path.join('run', 'sord_io') + os.sep
     os.makedirs(d + 'io')
     for f in infiles:
         np.array([1.0], 'f').tofile(d + f)
