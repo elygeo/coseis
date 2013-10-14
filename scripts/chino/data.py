@@ -42,7 +42,7 @@ with cst.scedc.stp('scedc') as stp:
         s = sta.split()[0].split('.')[1]
         if s in stations:
             locations += [sta]
-    f = path + 'station-list.txt')
+    f = path + 'station-list.txt'
     open(f, 'w').writelines(s + '\n' for s in locations)
 
     # download waveforms

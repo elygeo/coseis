@@ -151,7 +151,7 @@ def prepare(job=None, **kwargs):
     # misc
     job.update({
         'jobid': '',
-        'rundate': time.strftime('%Y-%m-%d'),
+        'date': time.strftime('%Y-%m-%d'),
     })
 
     # dependency
@@ -245,49 +245,15 @@ def prepare(job=None, **kwargs):
     return job
 
 
-def stage(job=None, **kwargs):
-    """
-    Create run files
-    """
-    import os, json
-
-    # prepare job
-    if job is None:
-        job = prepare(**kwargs)
-    else:
-        for k in kwargs:
-            job[k] = kwargs[k]
-
-    # run directory
-    cwd = os.getcwd()
-    os.chdir(job['rundir'])
-
-    # write configuration
-    f = job['name'] + '.conf.json'
-    if os.path.exists(f):
-        raise Exception('Existing job found')
-    out = json.dumps(job, indent=4, sort_keys=True)
-    open(f, 'w').write(out)
-
-    # write submit script
-    if job['submit']:
-        g = job['name'] + '.sh'
-        open(g, 'w').write(job['script'])
-        os.chmod(g, 0755)
-
-    os.chdir(cwd)
-    return job
-
-
 def launch(job=None, **kwargs):
     """
     Launch or submit job.
     """
-    import os, re, shlex, subprocess, json
+    import os, re, json, shlex, subprocess
 
     # prepare job
     if job is None:
-        job = stage(**kwargs)
+        job = prepare(**kwargs)
     else:
         for k in kwargs:
             job[k] = kwargs[k]
@@ -302,6 +268,9 @@ def launch(job=None, **kwargs):
 
     # launch
     if job['run'] == 'submit':
+        g = job['name'] + '.sh'
+        open(g, 'w').write(job['script'])
+        os.chmod(g, 0755)
         print(job['submit'])
         c = shlex.split(job['submit'])
         p = subprocess.Popen(c, stdout=subprocess.PIPE)
@@ -311,13 +280,7 @@ def launch(job=None, **kwargs):
             raise Exception('Submit failed')
         d = re.search(job['submit_pattern'], out).groupdict()
         job.update(d)
-        f = job['name'] + '.conf.json'
-        out = json.dumps(job, indent=4, sort_keys=True)
-        open(f, 'w').write(out)
     elif job['run'] == 'exec':
-        out = json.dumps(job, indent=4, sort_keys=True)
-        f = job['name'] + '.conf.json'
-        open(f, 'w').write(out)
         for c in job['pre'], job['launch'], job['post']:
             if c:
                 print(c)

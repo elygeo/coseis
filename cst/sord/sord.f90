@@ -3,7 +3,7 @@ program sord
 
 use collective
 use globals
-use parameters
+use input_output
 use setup
 use arrays
 use grid_generation

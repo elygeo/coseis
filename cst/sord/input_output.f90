@@ -1,8 +1,6 @@
-! field input and output
-module field_io_mod
+! input and output module
+module input_output
 implicit none
-integer :: io1 = 1, io2
-integer, private :: itdebug = -1, idebug
 type t_io
     real :: x1(3), x2(3), val, tau
     integer :: ii(3,4), nb, ib, fh
@@ -12,9 +10,85 @@ type t_io
     character(2) :: op             ! '<' read, '>' write, '=' set, '+' add
     character :: reg               ! n: node, c: cell registration
 end type t_io
-type (t_io), pointer :: io
-type (t_io), allocatable, target :: io_list(:)
+type (t_io), private, allocatable, target :: io_list(:)
+integer, private :: io1, io2
 contains
+
+!------------------------------------------------------------------------------!
+
+! not sure how to allocate character arrays on the heap,
+! so call sub-function and allocate on the stack.
+subroutine read_parameters
+use globals
+use collective
+integer :: n
+if (master) inquire (file='sord.in', size=n)
+call ibroadcast(n)
+call read_parameters1(n)
+end subroutine
+
+! read parameters sub-function
+subroutine read_parameters1(n)
+use globals
+use collective
+use utilities
+type (t_io), pointer :: io
+integer, intent(in) :: n
+integer :: i, j, nfieldio
+character(n) :: str
+
+! read with master process
+if (master) then
+    print *, clock(), 'Read parameters'
+    open (1, file='sord.in', recl=n, form='unformatted', access='direct', &
+        status='old')
+    read (1, rec=1) str
+    close (1)
+end if
+call cbroadcast(str)
+
+! read parameters
+read (str, *) &
+    affine, bc1, bc2, debug, delta, faultnormal, faultopening, gam1, gam2, &
+    gridnoise, hourglass, i1pml, i2pml, ihypo, itio, itstats, mpin, mpout, &
+    n1expand, n2expand, nfieldio,  npml, nproc3, nsource, nthread, oplevel, ppml, &
+    rcrit, rexpand, rho1, rho2, shape_, slipvector, source, svtol, tm0, trelax, &
+    vdamp, vp1, vp2, vpml, vrup, vs1, vs2
+
+! find start of field i/o
+i = scan(str, new_line('a'))
+str = str(i:)
+
+! change file delimiter
+do
+    i = scan(str, '/')
+    if (i == 0) exit
+    str(i:i) = '\'
+end do
+
+! field i/o
+allocate (io_list(nfieldio))
+do j = 1, nfieldio
+    io => io_list(j)
+    i = scan(str, new_line('a')) + 1
+    str = str(i:)
+    io%ib = -1
+    read (str, *) io%field, io%reg, io%ii, io%nb, io%x1, io%x2, &
+        io%val, io%tau, io%op, io%fname
+    do
+        i = scan(io%fname, '\')
+        if (i == 0) exit
+        io%fname(i:i) = '/'
+    end do
+end do
+
+! init limits
+io1 = 1
+io2 = nfieldio
+
+end subroutine
+
+!------------------------------------------------------------------------------!
 
 ! field i/o sequence
 subroutine field_io(passes, field, f)
@@ -29,7 +103,9 @@ character(4) :: pass
 character(256) :: filename
 integer :: i1(3), i2(3), i3(3), i4(3), di(3), m(4), n(4), o(4), &
     it1, it2, dit, i, j, k, l, ipass, iloop, io1_, io2_
+integer, save :: itdebug = -1, idebug
 real :: val, xi(3), r
+type (t_io), pointer :: io
 
 ! profiling
 if (sync) call barrier

@@ -1,11 +1,11 @@
-plot : run/example.png
+plot : run/Example.png
 
-run/example.png : run plot.py
+run/Example.png : run plot.py
 	python plot.py
 
-run : sord.yaml
+run : parameters.yaml
 	mkdir run
-	sord sord.yaml
+	sord parameters.yaml
 
 clean :
 	rm -rf run

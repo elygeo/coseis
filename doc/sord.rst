@@ -66,12 +66,13 @@ User Guide
 Quick test
 ----------
 
-Run a simple point source explosion test and plot a 2D slice of particle
-velocity::
+The simplest way to run SORD is to execute the ``sord`` command giving a
+parameter file in YAML_ or JSON_ format. Run a simple point source explosion
+test and plot a 2D slice of particle velocity::
 
     cd scripts/sord
     mkdir run
-    sord sim.yaml
+    sord parameters.yaml
     python plot.py
 
 Plotting requires Matplotlib, and the result should look like this:
@@ -79,30 +80,37 @@ Plotting requires Matplotlib, and the result should look like this:
     .. image:: ../scripts/sord/example.png
 
 
-Running SORD
-------------
-
-The simplest way to run SORD is to execute the ``sord`` command giving a
-parameter file in YAML_ or JSON_ format. The more powerful way to run the code
-is with a Python script. The basic procedure it to import the ``cst`` module,
-create a dictionary of parameters, and pass that dictionary to the
-``cst.sord.run()`` function. The ``cst/scripts`` directory contains many
-examples including the above quick test `sim.yaml
-<../scripts/sord/sim.yaml>`__:
+.. include:: ../scripts/sord/sord.yaml
+   :literal:
 
 .. _YAML: http://www.yaml.org
 .. _JSON: http://www.json.org
-.. include:: ../scripts/sord/sim.yaml
-   :literal:
 
-A complete list of SORD parameters and default values arg given in
-`parameters.yaml <../cst/sord/parameters.yaml>`__ and `fieldnames.yaml
-<../cst/sord/fieldnames.yaml>`__. In this example, ``rho``, ``vp``, ``vs``,
-``v1``, and ``v2`` are 3- and 4-D fields.  Fields may be a single value that is
-assigned to the entire array, or various operations that can be performed on
-array slices::
+Python Scripting
+----------------
 
-    f = val                        # Set f to value
+There are three types of parameters:
+(1) job control, (2) simulation, and (2) field I/O parameters. Default job
+control and simulation parameters are specified in `cst/conf/default.yaml
+<../cst/conf/default.yaml>`__ and `cst/sord/parameters.yaml
+<../cst/sord/parameters.yaml>`__, respectively.  Machine specific job control
+defaults may also be present in the ``cst/conf`` directory. Possible field I/O
+parameters (for reading and writing arrays) are listed in
+`cst/sord/fieldnames.yaml <../cst/sord/fieldnames.yaml>`__.
+
+The more powerful way to run the code is with a Python script. The basic
+procedure it to import the ``cst`` module, create a dictionary of parameters,
+and pass that dictionary to the ``cst.sord.run()`` function. The
+``cst/scripts`` directory contains many examples including the above quick test
+`sord.yaml <../scripts/sord/sord.yaml>`__:
+
+In this example, ``rho``, ``vp``, ``vs``, ``v1``, and ``v2`` are 3- and 4-D
+fields.  [Note: the ``fieldio`` parameter in older versions of the code has
+been removed. Now, each field I/O parameter is a separate list.] Fields may be
+a single value that is assigned to the entire array, or various operations that
+can be performed on array slices::
+
+    f = val                         # Set f to value
     f = ([], '+', val)              # Add value to f
     f = ([], '=', 'rand', val)      # Random numbers in range (0, val)
     f = ([], '=', 'func', val, tau) # Time function with period tau, scaled by val
@@ -125,6 +133,10 @@ Slices can be specified in one of three ways: with a list, with a string, or
 using the helper function ``cst.sord.get_slices()``. The helper function is
 the only 
 
+slice indices and an operation, followed by other parameters.  The following
+I/O modes are available, where ``'f'`` is the field variable name (from the
+list fieldnames.yaml), and ``[]`` are the slice indices.::
+
     s_ = cst.sord.get_slices()
     j = 10
     k = 20
@@ -134,10 +146,6 @@ the only
     [j,k,1,-1]          # Single node, last time step
     s_[j,:,:,::10]      # j=10 node surface, every 10th time step
 
-slice indices and an operation, followed by other parameters.
- The following I/O modes are
-available, where ``'f'`` is the field variable name (from the list
-fieldnames.yaml_), and ``[]`` are the slice indices::
 
 A tilde ``~`` indicates sub-cell positioning via weighted averaging.  In this
 case the spatial indices are single logical coordinates that may vary

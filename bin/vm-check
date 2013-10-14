@@ -7,7 +7,7 @@ import numpy as np
 
 vpmin, vsmin = 1500.0, 500.0
 vpmin, vsmin = 0.0, 0.0
-block = 16*1024*1024
+block = 16 * 1024 * 1024
 dtype = 'f'
 
 nb = np.dtype(dtype).itemsize

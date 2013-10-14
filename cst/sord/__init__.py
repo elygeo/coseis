@@ -1,8 +1,6 @@
 """
 Support Operator Rupture Dynamics
 """
-from ..util import launch
-launch # silence pyflakes warning
 
 tfuncs = [
     'const',
@@ -19,10 +17,12 @@ tfuncs = [
 
 def parameters():
     import os, yaml
+    from .. import util
     x = os.path.dirname(__file__)
     x = os.path.join(x, 'parameters.yaml')
     x = open(x).read()
-    x = yaml.load(x)
+    x = yaml.safe_load(x)
+    x = util.storage(**x)
     return x
 
 def fieldnames():
@@ -30,7 +30,7 @@ def fieldnames():
     x = os.path.dirname(__file__)
     x = os.path.join(x, 'fieldnames.yaml')
     x = open(x).read()
-    x = yaml.load(x)
+    x = yaml.safe_load(x)
     return {
         'dict': x,
         'input':   [k for k in x if '<' in x[k][-1]],
@@ -81,8 +81,7 @@ def configure(force=False):
             'fortran_io.f90',
             'collective_serial.f90',
             'collective_mpi.f90',
-            'field_io_mod.f90',
-            'parameters.f90',
+            'input_output.f90',
             'statistics.f90',
             'setup.f90',
             'grid_generation.f90',
@@ -138,7 +137,7 @@ def make(force=False):
         subprocess.check_call(['make', '-C', p, 'distclean'])
     configure(force)
     subprocess.check_call(['make', '-C', p, '-j', '4'])
-    cfg = yaml.load(open(p + 'config.json'))
+    cfg = yaml.safe_load(open(p + 'config.json'))
     return cfg
 
 def prepare_param(prm, fio):
@@ -194,9 +193,12 @@ def prepare_param(prm, fio):
     prm.update({'i1pml': i1, 'i2pml': i2})
 
     # field i/o
-    fld = fieldnames()
+    fns = fieldnames()
     fio_ = []
     filenames = []
+    shapes = {}
+    deltas = {}
+    indices = {}
     for field, ios in sorted(fio.items()):
         if type(ios) in (float, int):
             ios = [ios]
@@ -205,12 +207,12 @@ def prepare_param(prm, fio):
         ios_ = []
         it1, it2 = prm['shape'][-1] + 1, -1
         for io in ios:
-            x1 = x2 = [0.0, 0.0, 0.0]
             fname, val, tau = 'const', 0.0, 0.0
+            x1, x2 = [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]
             if type(io) in (float, int):
-                ii, op, rhs = [], '=', [io]
+                slices, op, rhs = [], '=', [io]
             else:
-                ii, op, rhs = io[0], io[1], io[2:]
+                slices, op, rhs = io[0], io[1], io[2:]
             if op == '#':
                 pass
             elif op in ['.', '=', '+', '*', '=~', '+~', '*~']:
@@ -235,13 +237,13 @@ def prepare_param(prm, fio):
             # error check
             if len(fname) > 32:
                 raise Exception('File/function name too long: ' + fname)
-            if field in fld['input'] and op == '>':
+            if field in fns['input'] and op == '>':
                 raise Exception('Error: field is ouput only: %r' % field)
-            if field in fld['fault'] and prm['faultnormal'] == 0:
+            if field in fns['fault'] and prm['faultnormal'] == 0:
                 raise Exception('Error: field only for ruptures: %r' % field)
 
             # cell or node registration
-            if field in fld['cell']:
+            if field in fns['cell']:
                 reg = 'c'
                 base = 1.5, 1.5, 1.5, 1
             else:
@@ -250,23 +252,23 @@ def prepare_param(prm, fio):
 
             # indices
             nn = prm['shape']
-            if field in fld['initial']:
+            if field in fns['initial']:
                 nn = nn[:3]
             if '.' in op:
-                x1 = expand_slices(nn, ii, base, round=False)
+                x1 = expand_slices(nn, slices, base, round=False)
                 x1 = [x1[0][0], x1[1][0], x1[2][0]]
-            ii = expand_slices(nn, ii, base)
-            if field in fld['initial']:
-                ii += [[0, 0, 1]]
-            if field in fld['fault']:
+            slices = expand_slices(nn, slices, base)
+            if field in fns['initial']:
+                slices += [[0, 0, 1]]
+            if field in fns['fault']:
                 i = abs(prm['faultnormal']) - 1
-                ii[i] = [irup, irup, 1]
-            it1 = min(it1, ii[-1][0])
-            it2 = max(it2, ii[-1][1])
+                slices[i] = [irup, irup, 1]
+            it1 = min(it1, slices[-1][0])
+            it2 = max(it2, slices[-1][1])
 
             # buffer size
-            shape = [(i[1] - i[0]) // i[2] + 1 for i in ii]
-            nb = (min(prm['itio'], nt) - 1) // ii[3][2] + 1
+            shape = [(i[1] - i[0]) // i[2] + 1 for i in slices]
+            nb = (min(prm['itio'], nt) - 1) // slices[3][2] + 1
             nb = max(1, min(nb, shape[3]))
             n = shape[0] * shape[1] * shape[2]
             if n > (nn[0] + nn[1] + nn[2]) ** 2:
@@ -275,7 +277,35 @@ def prepare_param(prm, fio):
                 nb = min(nb, prm['itbuff'])
 
             # append to list
-            ios_ += [[field, reg, ii, nb, x1, x2, val, tau, op, fname]]
+            #s = '[' + ','.join('%s:%s:%s' % tuple(s) for s in slices) + ']'
+            ios_ += [[field, reg, slices, nb, x1, x2, val, tau, op, fname]]
+
+            # metadata
+            if op[-1] in '<>':
+                index = []
+                shape = []
+                delta = []
+                for i, s in enumerate(slices):
+                    start, stop, step = s
+                    d = prm['delta'][i] * step
+                    n = (stop - start) // step + 1
+                    if n == 1:
+                        index += [start]
+                    else:
+                        delta += [d]
+                        shape += [n]
+                        if step == 1:
+                            index += [[start, stop]]
+                        else:
+                            index += [[start, stop, step]]
+                if shape != []:
+                    shapes[fname] = shape
+                if delta != []:
+                    deltas[fname] = delta
+                if '.' in op:
+                    indices[fname] = xi
+                else:
+                    indices[fname] = index
 
         fio_ += [(it1, it2, ios_)]
 
@@ -283,7 +313,12 @@ def prepare_param(prm, fio):
     fio_ = [g for f in sorted(fio_) for g in f[2]]
     del(prm['itbuff'])
     prm.update({'nfieldio': len(fio)})
-    return prm, fio_
+    meta = {
+        'indices': indices,
+        'deltas': deltas,
+        'shapes': shapes,
+    }
+    return prm, fio_, meta
 
 def stage(args, **kwargs):
     """
@@ -297,16 +332,16 @@ def stage(args, **kwargs):
 
     # configure and make
     prm = parameters()
-    fld = fieldnames()['dict']
+    fns = fieldnames()['dict']
     fio = {}
-    cfg = {}
+    job = {}
     args.update(kwargs)
     for k, v in prm.items():
-        if k in fld:
+        if k in fns:
             fio[k] = v
             del(prm[k])
     for k, v in args.items():
-        if k in fld:
+        if k in fns:
             if type(v) != list:
                 v = [v]
             elif isinstance(v[1], basestring):
@@ -323,13 +358,13 @@ def stage(args, **kwargs):
         elif k in prm:
             prm[k] = v
         else:
-            cfg[k] = v
-    cfg = util.configure(**cfg)
-    cfg.update(**make())
-    d = np.dtype('f' +  cfg['realsize']).str
-    cfg.update({'name': 'sord', 'dtype': d})
-    prm.update({'nthread': cfg['nthread']})
-    prm, fio = prepare_param(prm, fio)
+            job[k] = v
+    job = util.configure(**job)
+    job.update(**make())
+    d = np.dtype('f' +  job['realsize']).str
+    job.update({'name': 'sord', 'dtype': d})
+    prm.update({'nthread': job['nthread']})
+    prm, fio, meta = prepare_param(prm, fio)
 
     # partition for parallelization
     nx, ny, nz, nt = prm['shape']
@@ -346,8 +381,8 @@ def stage(args, **kwargs):
     k = (ny - 1) // nl[1] + 1
     l = (nz - 1) // nl[2] + 1
     prm['nproc3'] = [j, k, l]
-    cfg['nproc'] = n = j * k * l
-    if n > 1 and cfg['mode'] != 'mpi':
+    job['nproc'] = n = j * k * l
+    if n > 1 and job['mode'] != 'mpi':
         raise('MPI build required for multiprocessing') 
 
     # resources
@@ -358,18 +393,17 @@ def stage(args, **kwargs):
     else:
         nvars = 44
     nm = (nl[0] + 2) * (nl[1] + 2) * (nl[2] + 2)
-    cfg['pmem'] = 32 + int(1.2 * nm * nvars * int(cfg['dtype'][-1]) / 1024 / 1024)
-    if not cfg['minutes']:
-        cfg['minutes'] = 10 + int((nt + 10) * nm // (40 * cfg['rate']))
+    job['pmem'] = 32 + int(1.2 * nm * nvars * int(job['dtype'][-1]) / 1024 / 1024)
+    if not job['minutes']:
+        job['minutes'] = 10 + int((nt + 10) * nm // (40 * job['rate']))
 
     # configure and stage
-    cfg['command'] = os.path.join('.', 'sord.x')
-    cfg = util.prepare(cfg)
-    util.stage(cfg)
+    job['command'] = os.path.join('.', 'sord.x')
+    job = util.prepare(job)
 
-    # create run scripts 
+    # create run files 
     cwd = os.getcwd()
-    os.chdir(cfg['rundir'])
+    os.chdir(job['rundir'])
     util.archive('coseis.tgz')
     d = os.path.dirname(__file__)
     f = os.path.join(d, 'sord.x')
@@ -378,7 +412,8 @@ def stage(args, **kwargs):
         os.mkdir('debug')
 
     # fortran parameters
-    out = json.dumps([v for k, v in sorted(prm.items())]) + '\n'
+    out = [v for k, v in sorted(prm.items())]
+    out = json.dumps(out) + '\n'
     for i in fio:
         out += json.dumps(i) + '\n'
     for i in '",[]':
@@ -387,64 +422,27 @@ def stage(args, **kwargs):
 
     # save parametes
     prm.update({'~fieldio': fio})
+    meta.update({'dtype': job['dtype']})
+    out = json.dumps(args, sort_keys=True, indent=4)
+    open('parameters.json', 'w').write(out)
+    out = json.dumps(job, sort_keys=True, indent=4)
+    open('job.json', 'w').write(out)
     out = json.dumps(prm, sort_keys=True, indent=4)
     open('sord.json', 'w').write(out)
-    out = json.dumps(args, sort_keys=True, indent=4)
-    open('args.json', 'w').write(out)
-
-    # metadata
-    shapes = {}
-    deltas = {}
-    indices = {}
-    for f in fio:
-        slices, xi, op, k = f[2], f[4], f[-2], f[-1]
-        if op[-1] in '<>':
-            index = []
-            shape = []
-            delta = []
-            for i, s in enumerate(slices):
-                start, stop, step = s
-                d = prm['delta'][i] * step
-                n = (stop - start) // step + 1
-                if n == 1:
-                    index += [start]
-                else:
-                    delta += [d]
-                    shape += [n]
-                    if step == 1:
-                        index += [[start, stop]]
-                    else:
-                        index += [[start, stop, step]]
-            if shape != []:
-                shapes[k] = shape
-            if delta != []:
-                deltas[k] = delta
-            if '.' in op:
-                indices[k] = xi
-            else:
-                indices[k] = index
-
-    # save metadata
-    meta = {
-        'dtype': cfg['dtype'],
-        'indices': indices,
-        'deltas': deltas,
-        'shapes': shapes,
-    }
-    f = open('meta.json', 'w')
-    json.dump(meta, f, indent=4, sort_keys=True)
+    out = json.dumps(meta, sort_keys=True, indent=4)
+    open('meta.json', 'w').write(out)
 
     os.chdir(cwd)
-    return cfg
+    return job
 
 def run(args, **kwargs):
     """
     Stage and launch job.
     """
     from .. import util
-    cfg = stage(args, **kwargs)
-    util.launch(cfg)
-    return cfg
+    job = stage(args, **kwargs)
+    util.launch(job)
+    return job
 
 class get_slices:
     def __getitem__(self, slices):

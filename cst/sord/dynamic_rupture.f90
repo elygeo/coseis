@@ -9,7 +9,7 @@ use globals
 use collective
 use surf_normals
 use utilities
-use field_io_mod
+use input_output
 use statistics
 real :: rr, xhypo(3), xi(3), w
 integer :: i1(3), i2(3), i, j, k, l, root(3)
@@ -241,7 +241,7 @@ use globals
 use collective
 use boundary_cond
 use utilities
-use field_io_mod
+use input_output
 use statistics
 integer :: i1(3), i2(3), i, j1, k1, l1, j2, k2, l2, j3, k3, l3, j4, k4, l4
 

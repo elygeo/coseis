@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Convert binary files to Numpy
+Convert binary files to NumPy
 """
 import sys, json
 import numpy as np
