@@ -36,9 +36,9 @@ if (faultnormal /= 0) then
 end if
 
 ! read grid
-call field_io('<', 'x1', w1(:,:,:,1))
-call field_io('<', 'x2', w1(:,:,:,2))
-call field_io('<', 'x3', w1(:,:,:,3))
+call field_io('<', 'x', w1(:,:,:,1))
+call field_io('<', 'y', w1(:,:,:,2))
+call field_io('<', 'z', w1(:,:,:,3))
 
 ! add random noise except at boundaries and in pml
 if (gridnoise > 0.0) then
@@ -133,12 +133,12 @@ call set_halo(w2(:,:,:,2), 0.0, i1cell, i2cell)
 call set_halo(w2(:,:,:,3), 0.0, i1cell, i2cell)
 
 ! output
-call field_io('>', 'x1', w1(:,:,:,1))
-call field_io('>', 'x2', w1(:,:,:,2))
-call field_io('>', 'x3', w1(:,:,:,3))
-call field_io('>', 'c1', w2(:,:,:,1))
-call field_io('>', 'c2', w2(:,:,:,2))
-call field_io('>', 'c3', w2(:,:,:,3))
+call field_io('>', 'x', w1(:,:,:,1))
+call field_io('>', 'y', w1(:,:,:,2))
+call field_io('>', 'z', w1(:,:,:,3))
+call field_io('>', 'xc', w2(:,:,:,1))
+call field_io('>', 'yc', w2(:,:,:,2))
+call field_io('>', 'zc', w2(:,:,:,3))
 
 ! boundary surface normals
 !j = nm(1)
@@ -182,8 +182,8 @@ call field_io('>', 'c3', w2(:,:,:,3))
 !end if
 
 ! orthogonality test
-if (oplevel == 0) then
-    oplevel = 6
+if (diffop == 'auto') then
+    diffop = 'save'
     tol = 10.0 * epsilon(tol)
     j1 = i1cell(1); j2 = i2cell(1)
     k1 = i1cell(2); k2 = i2cell(2)
@@ -194,21 +194,21 @@ if (oplevel == 0) then
     sum(abs(w1(:,k1+1:k2+1,:,3) - w1(:,k1:k2,:,3))) < tol .and. &
     sum(abs(w1(:,k1+1:k2+1,:,1) - w1(:,k1:k2,:,1))) < tol .and. &
     sum(abs(w1(:,:,l1+1:l2+1,1) - w1(:,:,l1:l2,1))) < tol .and. &
-    sum(abs(w1(:,:,l1+1:l2+1,2) - w1(:,:,l1:l2,2))) < tol) oplevel = 2
+    sum(abs(w1(:,:,l1+1:l2+1,2) - w1(:,:,l1:l2,2))) < tol) diffop = 'rect'
 end if
 
 ! operators
-select case (oplevel)
-case (1)
-case (2)
+select case (diffop)
+case ('cons')
+case ('rect')
     allocate (dx1(nm(1)), dx2(nm(2)), dx3(nm(3)))
     do i = 1, nm(1)-1; dx1(i) = w1(i+1,3,3,1) - w1(i,3,3,1); end do
     do i = 1, nm(2)-1; dx2(i) = w1(3,i+1,3,2) - w1(3,i,3,2); end do
     do i = 1, nm(3)-1; dx3(i) = w1(3,3,i+1,3) - w1(3,3,i,3); end do
-case (3:5)
+case ('para', 'quad', 'exac')
     allocate (xx(nm(1),nm(2),nm(3),3))
     xx = w1
-case (6)
+case ('save')
     allocate (bb(nm(1),nm(2),nm(3),8,3))
     do i = 1, 3
     h = sign(1.0 / 12.0, product(dx))
@@ -261,7 +261,7 @@ end select
 ! cell volume
 call set_halo(vc, 0.0, i1cell, i2cell)
 do i = 1, 3
-    call diff_nc(vc, w1, i, i, i1cell, i2cell, oplevel, bb, xx, dx1, dx2, dx3, dx)
+    call diff_nc(vc, w1, i, i, i1cell, i2cell, diffop, bb, xx, dx1, dx2, dx3, dx)
     select case (ifn)
     case (1); vc(irup,:,:) = 0.0
     case (2); vc(:,irup,:) = 0.0

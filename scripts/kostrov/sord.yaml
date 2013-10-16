@@ -7,8 +7,8 @@ nproc3: [1, 1, 2]
 nproc3: [1, 1, 1]
 
 # boundary conditions
-bc1: [10, 10, 10]
-bc2: [-1, 1, -2]
+bc1: ['pml', 'pml', 'pml']
+bc2: ['-node', '+node', '-cell']
 
 # material model
 rho: 2670.0

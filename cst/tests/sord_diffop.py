@@ -28,15 +28,14 @@ def test(argv=[]):
     prm['hourglass'] = [1.0, 1.0]
 
     # boundary conditions
-    prm['bc1'] = [0, 0, 0]
-    prm['bc2'] = [0, 0, 0]
+    prm['bc1'] = ['free', 'free', 'free']
+    prm['bc2'] = ['free', 'free', 'free']
 
     # source
-    i = s_[1.5,1.5,1.5,:]
-    i = s_[3.0,1.5,1.5,:]
-    prm['p11'] = [(i, '.', 1e10, 'delta', 1.0)]
-    prm['p22'] = [(i, '.', 1e10, 'delta', 1.0)]
-    prm['p33'] = [(i, '.', 1e10, 'delta', 1.0)]
+    i = s_[0,0,0,:]
+    prm['pxx'] = [(i, '.', 1e10, 'delta', 1.0)]
+    prm['pyy'] = [(i, '.', 1e10, 'delta', 1.0)]
+    prm['pzz'] = [(i, '.', 1e10, 'delta', 1.0)]
 
     # output
     fns = cst.sord.fieldnames()
@@ -46,16 +45,16 @@ def test(argv=[]):
         prm[k] += [([], '=>', k + '.bin')]
 
     # master
-    prm['oplevel'] = i = 5
-    prm['path'] = d0 = os.path.join('run', 'sord_oplevel%s' % i) + os.sep
+    prm['diffop'] = i = 'exac'
+    prm['path'] = d0 = os.path.join('run', 'sord_%s' % i) + os.sep
     os.makedirs(d0)
     cst.sord.run(prm)
 
     # variations
     max_err_all_ = 0.0
-    for i in 6,:
-        prm['oplevel'] = i
-        prm['path'] = d = os.path.join('run', 'sord_oplevel%s' % i) + os.sep
+    for i in ['save']:
+        prm['diffop'] = i
+        prm['path'] = d = os.path.join('run', 'sord_%s' % i) + os.sep
         os.makedirs(d)
         job = cst.sord.run(prm)
         max_err_ = 0.0

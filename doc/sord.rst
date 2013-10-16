@@ -181,15 +181,15 @@ specifying internal slip boundaries. However, for problems with symmetry across
 a slip surface, the fault may be placed at the boundary and combined with an
 anti-mirror symmetry condition.  The following BC types are supported:
 
-**Type 0**: Vacuum free-surface.  Stress is zero in cells outside the boundary.
+**'free'**: Vacuum free-surface.  Stress is zero in cells outside the boundary.
 
     .. image:: bc0.png
 
-**Type 3**: Rigid surface. Displacement is zero at the boundary.
+**'rigid'**: Rigid surface. Displacement is zero at the boundary.
 
     .. image:: bc3.png
 
-**Type 1**: Mirror symmetry at the node.  Normal displacement is zero at the
+**'+node'**: Mirror symmetry at the node.  Normal displacement is zero at the
 boundary.  Useful for a boundary corresponding to (a) the plane orthogonal to
 the two nodal planes of a double-couple point source, (b) the plane normal to
 the mode-III axis of a symmetric rupture, or (c) the zero-width axis of a 2D
@@ -197,38 +197,39 @@ plane strain problem.
 
     .. image:: bc1.png
 
-**Type -1**: Anti-mirror symmetry at the node.  Tangential displacement is zero
-at the boundary.  Useful for a boundary corresponding to (a) the nodal planes
-of a double-couple point source, (b) the plane normal to the mode-II axis of a
-symmetric rupture, or (c) the zero-width axis of a 2D antiplane strain problem.
+**'-node'**: Anti-mirror symmetry at the node.  Tangential displacement is
+zero at the boundary.  Useful for a boundary corresponding to (a) the nodal
+planes of a double-couple point source, (b) the plane normal to the mode-II
+axis of a symmetric rupture, or (c) the zero-width axis of a 2D antiplane
+strain problem.
 
     .. image:: bc-1.png
 
-**Type 2**: Mirror symmetry at the cell. Same as type 1, but centered on the cell.
+**'+cell'**: Mirror symmetry at the cell. Same as type 1, but centered on the cell.
 
     .. image:: bc2.png
 
-**Type -2**: Anti-mirror symmetry at the cell.  Same as type -1, but centered
+**'-cell'**: Anti-mirror symmetry at the cell.  Same as type -1, but centered
 on the cell.  Can additionally be used when the boundary corresponds to the
 slip surface of a symmetric rupture.
 
     .. image:: bc-2.png
 
-**Type 10**: Perfectly match layer (PML) absorbing boundary.
+**'pml'**: Perfectly match layer (PML) absorbing boundary.
 
 Example: a 3D problem with a free surface at Z=0, and PML absorbing boundaries
 on all other boundary faces::
 
     shape = [50, 50, 50, 100]
-    bc1 = [10, 10,  0]
-    bc2 = [10, 10, 10]
+    bc1 = ['pml', 'pml', 'free']
+    bc2 = ['pml', 'pml', 'pml']
 
 Example: a 2D antiplane strain problem with PML absorbing boundaries.  The
 number of nodes is 2 for the zero-width axis::
 
     shape = [50, 50, 2, 100]
-    bc1 = [10, 10, -1]
-    bc2 = [10, 10, -1]
+    bc1 = ['pml', 'pml', '-node']
+    bc2 = ['pml', 'pml', '-node']
 
 
 Defining the fault rupture surface
@@ -250,8 +251,8 @@ up as such::
     faultnormal = 3
     ihypo = [21, 21, 21.5]
     shape  = [41, 41, 42, 100]
-    bc1 = [0, 0, 0]
-    bc2 = [0, 0, 0]
+    bc1 = ['free', 'free', 'free']
+    bc2 = ['free', 'free', 'free']
 
 For problems with symmetry across the rupture surface (where mesh and material
 properties are mirror images), the symmetry may be exploited for computational
@@ -262,14 +263,14 @@ symmetry condition used.  For example, reducing the size of the previous
 example to put the rupture surface along the far z boundary::
 
     shape = [41, 41, 22, 100]
-    bc2 = [0, 0, -2]
+    bc2 = ['free', 'free', '-cell']
 
 Alternatively, put the rupture surface along the near z boundary::
 
     ihypo = [21, 21, 1.5]
     shape = [41, 41, 22, 100]
-    bc1 = [0, 0, -2]
-    bc2 = [0, 0, 0]
+    bc1 = ['free', 'free', '-cell']
+    bc2 = ['free', 'free', 'free']
 
 Further symmetries may present. If our previous problem has slip only in the
 x direction, then we may also use node-centered mirror symmetry along the in-plane
@@ -278,8 +279,8 @@ computations eight-fold::
 
     ihypo = [21, 21, 21.5]
     shape = [21, 21, 22, 100]
-    bc1 = [0, 0, 0]
-    bc2 = [-1, 1, -2]
+    bc1 = ['free', 'free', 'free']
+    bc2 = ['anti-n', 'mirror-n', 'anti-c'
 
 Memory Usage and Scaling
 ========================
@@ -292,17 +293,17 @@ operators require 23 variables per mesh point at the cost of a factor of four
 increase in floating point operations.  As CPU improvement tends to out-pace
 memory bandwidth improvement, in the future, on-the-fly operators may become
 faster than stored operators.  The operator type is controlled by the
-``oplevel`` parameter, but can generally be left alone, as the default is to
+``diffop`` parameter, but can generally be left alone, as the default is to
 automatically detect rectilinear and curvilinear meshes and assign the proper
 operator type for fastest performance. The allowed values are:
 
-    | 0: Auto pick 2 or 6
-    | 1: Mesh with constant spacing dx
-    | 2: Rectangular mesh
-    | 3: Parallelepiped mesh
-    | 4: One-point quadrature
-    | 5: Exactly integrated elements
-    | 6: Saved operators, nearly as fast as 2, but doubles the memory usage
+    | **'cons'**: Mesh with constant mesh step size
+    | **'rect'**: Rectangular mesh
+    | **'para'**: Parallelepiped mesh
+    | **'quad'**: One-point quadrature
+    | **'exac'**: Exactly integrated elements
+    | **'save'**: Saved operators, nearly as fast as 'rect', but doubles the memory usage
+    | **'auto'**: Automatically choose 'rect' or 'save'
 
 On current hardware, computation time is on the order of the one second per
 time step per one million mesh points.  SORD scalability has been benchmarked

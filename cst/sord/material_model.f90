@@ -29,9 +29,9 @@ call rcopy(lam, s1, size(s1))
 call rcopy(mu, s2, size(s2))
 
 ! limits
-call rlimits(mr, rho1, rho2, size(mr))
-call rlimits(s1, vp1, vp2, size(s1))
-call rlimits(s2, vs1, vs2, size(s2))
+call rlimits(mr, rho_min, rho_max, size(mr))
+call rlimits(s1, vp_min, vp_max, size(s1))
+call rlimits(s2, vs_min, vs_max, size(s2))
 
 ! velocity dependent viscosity
 if (vdamp > 0.0) then
@@ -51,7 +51,7 @@ if (vdamp > 0.0) then
 end if
 
 ! limits
-call rlimits(gam, gam1, gam2, size(gam))
+call rlimits(gam, gam_min, gam_max, size(gam))
 
 ! this should be taken care of inside field_io now
 !call scalar_swap_halo(mr,  nhalo)

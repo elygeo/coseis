@@ -49,11 +49,11 @@ call cbroadcast(str)
 
 ! read parameters
 read (str, *) &
-    affine, bc1, bc2, debug, delta, faultnormal, faultopening, gam1, gam2, &
-    gridnoise, hourglass, i1pml, i2pml, ihypo, itio, itstats, mpin, mpout, &
-    n1expand, n2expand, nfieldio,  npml, nproc3, nsource, nthread, oplevel, ppml, &
-    rcrit, rexpand, rho1, rho2, shape_, slipvector, source, svtol, tm0, trelax, &
-    vdamp, vp1, vp2, vpml, vrup, vs1, vs2
+    affine, bc1, bc2, debug, delta, diffop, faultnormal, faultopening, gam_max, &
+    gam_min, gridnoise, hourglass, i1pml, i2pml, ihypo, itio, itstats, mpin, mpout, &
+    n1expand, n2expand, nfieldio,  npml, nproc3, nsource, nthread, ppml, rcrit, &
+    rexpand, rho_max, rho_min, shape_, slipvector, source, svtol, tm0, trelax, &
+    vdamp, vp_max, vp_min, vpml, vrup, vs_max, vs_min
 
 ! find start of field i/o
 i = scan(str, new_line('a'))

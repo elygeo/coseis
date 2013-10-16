@@ -6,12 +6,13 @@ implicit none
 integer :: &
     bc1(3), bc2(3), debug, faultnormal, faultopening, i1pml(3), i2pml(3), itio, &
     itstats, mpin, mpout, n1expand(3), n2expand(3), npml, nproc3(3), nsource, &
-    nthread, oplevel, ppml, shape_(4)
+    nthread, ppml, shape_(4)
 real :: &
-    affine(9), delta(4), gam1, gam2, gridnoise, hourglass(2), ihypo(3), rcrit, &
-    rexpand, rho1, rho2, slipvector(3), svtol, tm0, trelax, vdamp, vp1, vp2, vpml, &
-    vrup, vs1, vs2
+    affine(9), delta(4), gam_max, gam_min, gridnoise, hourglass(2), ihypo(3), &
+    rcrit, rexpand, rho_max, rho_min, slipvector(3), svtol, tm0, trelax, vdamp, &
+    vp_max, vp_min, vpml, vrup, vs_max, vs_min
 character(16) :: source
+character(4) :: diffop
 
 ! miscellaneous parameters
 real :: &

@@ -3,20 +3,21 @@ module diff_cn_op
 implicit none
 contains
 
-subroutine diff_cn(df, f, i, a, i1, i2, oplevel, bb, x, dx1, dx2, dx3, dx)
+subroutine diff_cn(df, f, i, a, i1, i2, diffop, bb, x, dx1, dx2, dx3, dx)
 real, intent(out) :: df(:,:,:)
 real, intent(in) :: f(:,:,:,:), bb(:,:,:,:,:), x(:,:,:,:), &
     dx1(:), dx2(:), dx3(:), dx(3)
-integer, intent(in) :: i, a, i1(3), i2(3), oplevel
+integer, intent(in) :: i, a, i1(3), i2(3)
+character(4), intent(in) :: diffop
 real :: h, b1, b2, b3, b4, b5, b6, b7, b8
 integer :: j, k, l, b, c
 
 if (any(i1 > i2)) return
 
-select case (oplevel)
+select case (diffop)
 
 ! saved b matrix, flops: 8* 7+
-case (6)
+case ('save')
 !$omp parallel do schedule(static) private(j, k, l)
 do l = i1(3), i2(3)
 do k = i1(2), i2(2)
@@ -39,7 +40,7 @@ end do
 !$omp end parallel do
 
 ! constant grid, flops: 1* 7+
-case (1)
+case ('cons')
 select case (a)
 case (1)
     h = sign(0.25 * dx(2) * dx(3), dx(1))
@@ -89,7 +90,7 @@ case (3)
 end select
 
 ! rectangular grid, flops: 6* 7+
-case (2)
+case ('rect')
 h = sign(0.25, product(dx))
 select case (a)
 case (1)
@@ -131,7 +132,7 @@ case (3)
 end select
 
 ! parallelepiped grid, flops: 33* 47+
-case (3)
+case ('para')
 h = sign(0.25, product(dx))
 b = modulo(a, 3) + 1
 c = modulo(a + 1, 3) + 1
@@ -182,7 +183,7 @@ end do
 !$omp end parallel do
 
 ! general grid one-point quadrature, flops: 33* 119+
-case (4)
+case ('quad')
 h = sign(0.0625, product(dx))
 b = modulo(a, 3) + 1
 c = modulo(a + 1, 3) + 1
@@ -233,7 +234,7 @@ end do
 !$omp end parallel do
 
 ! general grid exact, flops: 57* 119+
-case (5)
+case ('exac')
 h = sign(1.0 / 12.0, product(dx))
 b = modulo(a, 3) + 1
 c = modulo(a + 1, 3) + 1

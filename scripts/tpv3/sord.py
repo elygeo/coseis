@@ -34,14 +34,9 @@ runs = [[ 50.0, [1, 1, 1]]]
 runs = [[300.0, [1, 1, 1]]]
 runs = [[150.0, [1, 1, 2]]]
 
-# near side boundary conditions:
-# PML absorbing boundaries for the x, y and z boundaries
-prm['bc1'] = [10, 10, 10]
-
-# far side boundary conditions:
-# anti-mirror symmetry for the x and z boundaries
-# mirror symmetry for the y boundary
-prm['bc2'] = [-1, 1, -2]
+# boundary conditions:
+prm['bc1'] = ['pml', 'pml', 'pml']
+prm['bc2'] = ['-node', '+node', '-cell']
 
 # loop over multiple runs
 cwd = os.getcwd()
@@ -65,25 +60,25 @@ for dx, np in runs:
 
     # fault properties
     prm['faultnormal'] = 3
-    prm['ihypo'] = [-1, -1, -1.5]
+    prm['ihypo'] = [-1.0, -1.0, -1.5]
     prm['dc']  = 0.4
     prm['mud'] = 0.525
     prm['tn']  = -120.0e+6
 
     # static friction for slipping patch
-    j = -15000.0 / dx
-    k =  -7500.0 / dx
+    j = -int(15000.0 / dx + 0.5)
+    k =  -int(7500.0 / dx + 0.5)
     prm['mus'] = [10000.0, (s_[j:,k:,:], '=', 0.677)]
 
     # viscosity lower in slipping patch
-    j = -15000.0 / dx - 0.5
-    k =  -7500.0 / dx - 0.5
-    l =  -3000.0 / dx - 0.5
+    j = -int(15000.0 / dx + 0.5)
+    k =  -int(7500.0 / dx + 0.5)
+    l =  -int(3000.0 / dx + 0.5)
     prm['gam'] = [0.2, (s_[j:,k:,l:], '=', 0.02)]
 
     # nucleation patch
-    i0 = -1500.0 / dx
-    i1 = -1500.0 / dx - 1
+    i0 = -int(1500.0 / dx + 0.5)
+    i1 = -int(1500.0 / dx + 1.5)
     prm['ts'] = [
         70.0e+6,
         (s_[i1:,i1:,:], '=', 72.9e+6),
@@ -93,18 +88,18 @@ for dx, np in runs:
     ]
 
     # fault plane output
-    prm['x1']   = (s_[j:,k:,-2], '>', 'x1.bin')
-    prm['x2']   = (s_[j:,k:,-2], '>', 'x2.bin')
+    prm['x']    = (s_[j:,k:,-2], '>', 'x.bin')
+    prm['y']    = (s_[j:,k:,-2], '>', 'y.bin')
     prm['psv']  = (s_[j:,k:,:,-1], '>', 'psv.bin')
     prm['trup'] = (s_[j:,k:,:,-1], '>', 'trup.bin')
-    prm['su1']  = [(s_[j:,k:,:,-1], '>', 'su1.bin')]
-    prm['su2']  = [(s_[j:,k:,:,-1], '>', 'su2.bin')]
+    prm['sux']  = [(s_[j:,k:,:,-1], '>', 'sux.bin')]
+    prm['suy']  = [(s_[j:,k:,:,-1], '>', 'suy.bin')]
 
     # slip, slip velocity, and shear traction time histories
     j, k, l = prm['ihypo']
     j -= 7500.0 / dx
     k -= 6000.0 / dx
-    for f in 'su1', 'su2', 'sv1', 'sv2', 'ts1', 'ts2':
+    for f in 'sux', 'suy', 'svx', 'svy', 'tsx', 'tsy':
         if f not in prm:
             prm[f] = []
         prm[f] += [

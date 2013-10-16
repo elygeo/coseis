@@ -22,24 +22,15 @@ power = range(6) # Challenger
 
 # SORD parameters
 prm = {}
-prm['oplevel'] = 5
 prm['minutes'] = 20
-prm['oplevel'] = 6
+prm['diffop'] = 'exac'
+prm['diffop'] = 'save'
 prm['itstats'] = 9999
 prm['itio'] = 128
 prm['gridnoise'] = 0.1
-prm['debug'] = 0
-prm['delta'] = [100.0, 100.0, 100.0, 0.0075]
-prm['bc1'] = [0, 0, 0]
-prm['bc2'] = [0, 0, 0]
-prm['npml'] = 0
-prm['rho'] = 2670.0
-prm['vp']  = 6000.0
-prm['vs']  = 3464.0
-prm['gam'] = 0.0
-prm['v1'] = (s_[:,:,:,1], '=~', 1.0)
-prm['v2'] = (s_[:,:,:,1], '=~', 1.0)
-prm['v3'] = (s_[:,:,:,1], '=~', 1.0)
+prm['vx'] = (s_[:,:,:,0], '=~', 1.0)
+prm['vy'] = (s_[:,:,:,0], '=~', 1.0)
+prm['vz'] = (s_[:,:,:,0], '=~', 1.0)
 
 for i in power[::-1]:
     n = 2 ** i

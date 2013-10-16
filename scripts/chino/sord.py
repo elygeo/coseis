@@ -76,8 +76,8 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         prm['x3'] = [], '=<', 'hold/z3.bin'
 
     # boundary conditions
-    prm['bc1'] = [10, 10, 0]
-    prm['bc2'] = [10, 10, 10]
+    prm['bc1'] = ['pml', 'pml', 'free']
+    prm['bc2'] = ['pml', 'pml', 'pml']
 
     # source
     mts = os.path.join(cwd, 'run', 'data', '14383980.mts.txt')
@@ -90,21 +90,21 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     # hypocenter location at x/y center
     x, y, z = origin
     x, y = proj(x, y)
-    j = abs(x / dx) + 1.0
-    k = abs(y / dx) + 1.0
-    l = abs(z / dx) + 1.0
+    j = abs(x / dx)
+    k = abs(y / dx)
+    l = abs(z / dx)
     if register:
         l = int(l) + 0.5
     ihypo = [j, k, l]
 
     # moment tensor
     m = mts['double_couple_clvd']
-    prm['m11'] = (s_[j,k,l,:], '.',  m['myy'], 'brune', tau)
-    prm['m22'] = (s_[j,k,l,:], '.',  m['mxx'], 'brune', tau)
-    prm['m33'] = (s_[j,k,l,:], '.',  m['mzz'], 'brune', tau)
-    prm['m23'] = (s_[j,k,l,:], '.', -m['mxz'], 'brune', tau)
-    prm['m31'] = (s_[j,k,l,:], '.', -m['myz'], 'brune', tau)
-    prm['m12'] = (s_[j,k,l,:], '.',  m['mxy'], 'brune', tau)
+    prm['mxx'] = (s_[j,k,l,:], '.',  m['myy'], 'brune', tau)
+    prm['myy'] = (s_[j,k,l,:], '.',  m['mxx'], 'brune', tau)
+    prm['mzz'] = (s_[j,k,l,:], '.',  m['mzz'], 'brune', tau)
+    prm['myz'] = (s_[j,k,l,:], '.', -m['mxz'], 'brune', tau)
+    prm['mzx'] = (s_[j,k,l,:], '.', -m['myz'], 'brune', tau)
+    prm['mxy'] = (s_[j,k,l,:], '.',  m['mxy'], 'brune', tau)
 
     # receivers
     sl = os.path.join(cwd, 'run', 'data', 'station-list.txt')
@@ -112,13 +112,13 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     for s in sl:
         s, y, x = s.split()[:3]
         x, y = proj(float(x), float(y))
-        j = x / dx + 1.0
-        k = y / dx + 1.0
+        j = x / dx
+        k = y / dx
         for f in 'vs', 'v1', 'v2', 'v3':
             if f not in prm:
                 prm[f] = []
             prm[f] += [
-                (s_[j,k,1,:], '=>', 'out/%s-%s.bin' % (s, f)),
+                (s_[j,k,0,:], '=>', 'out/%s-%s.bin' % (s, f)),
             ]
 
     # surface output
@@ -127,17 +127,17 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     mh = max(1, int(0.025 / dt + 0.5))
     ms = max(1, int(0.125 / (dt * mh) + 0.5))
     if surf_out:
-        for f in 'v1', 'v2', 'v3':
+        for f in 'vx', 'vy', 'vz':
             prm[f] += [
-                (s_[::ns,::ns,1,::mh], '=>', 'hold/full-%s.bin' % f),
-                (s_[::ns,::ns,1,::ms], '=>', '#hold/snap-%s.bin' % f),
-                (s_[::nh,::nh,1,::mh], '=>', '#hold/hist-%s.bin' % f),
+                (s_[::ns,::ns,0,::mh], '=>', 'hold/full-%s.bin' % f),
+                (s_[::ns,::ns,0,::ms], '=>', '#hold/snap-%s.bin' % f),
+                (s_[::nh,::nh,0,::mh], '=>', '#hold/hist-%s.bin' % f),
             ]
 
     # cross section output
     if 0:
         j, k, l = ihypo
-        for f in 'v1', 'v2', 'v3', 'rho', 'vp', 'vs', 'gam':
+        for f in 'vx', 'vy', 'vz', 'rho', 'vp', 'vs', 'gam':
             prm[f] += [
                 (s_[j,:,:,::ms], '=>', 'hold/xsec-ns-%s.bin' % f),
                 (s_[:,k,:,::ms], '=>', 'hold/xsec-ew-%s.bin' % f),

@@ -33,17 +33,17 @@ prm['gam'] = 0.5
 prm['hourglass'] = [1.0, 1.0]
 
 # boundary conditions
-prm['bc1'] = [0, -1, -2]
-prm['bc2'] = [10, 10, 10]
+prm['bc1'] = ['free', '-node', '-cell']
+prm['bc2'] = ['pml', 'pml', 'pml']
 
 # nucleation
-prm['ihypo'] = [1.4 / dx + 1.0, 1, 1.5]
+prm['ihypo'] = [1.4 / dx, 0.0, 0.5]
 prm['vrup'] = 15.0
 prm['rcrit'] = 0.4
 prm['trelax'] = 10.0 * dt
 
 # rupture
-j = prm['ihypo'][0]
+j = int(prm['ihypo'][0])
 prm['faultnormal'] = 3
 prm['slipvector'] = [0.0, 1.0, 0.0]
 prm['ts'] = [-730.0]
@@ -55,7 +55,7 @@ prm['mud'] = [1e5, (s_[:j,:,:], '=', 1.85)]
 # weak zone
 weakzone = 0.2
 weakzone = 0.0
-j = weakzone / dx + 1.0
+j = int(weakzone / dx)
 if weakzone:
     prm['ts']  += [(s_[j,:,:], '=', -66.0)]
     prm['mus'] += [(s_[j,:,:], '=', 0.6)]
@@ -64,7 +64,7 @@ if weakzone:
 # accelerometers
 z = 0.03
 z = 0.04
-l = z / dx + 2.0
+l = z / dx
 for s, x, g in [
     [1, 0.92, 0.020074],
     [2, 0.72, 0.019926],
@@ -72,23 +72,23 @@ for s, x, g in [
     [4, 0.22, 0.020166],
     [15, 0.02, 0.020773],
 ]:
-    j = x / dx + 1.0
-    if 'a2' not in prm:
-        prm['a2'] = []
-    prm['a2'] += [
-        (s_[j,1,l,:], '.>', 'sensor%02d.bin' % s),
+    j = x / dx
+    if 'ay' not in prm:
+        prm['ay'] = []
+    prm['ay'] += [
+        (s_[j,0,l,:], '.>', 'sensor%02d.bin' % s),
     ]
 
 # displacement sensor
-prm['u2'] = [
-    (s_[1,1,1,:], '=>', 'sensor16.bin'),
+prm['uy'] = [
+    (s_[0,0,0,:], '=>', 'sensor16.bin'),
 ]
 
 # surface output
 k = prm['ihypo'][1]
-l = 0.8 / dx + 2.0
-prm['u2'] += [(s_[1,k,2:l,:], '.>', 'off-fault.bin')]
-#prm['v2'] = [(s_[:,k,2:l,::10], '.>', 'xsec.bin')]
+l = 0.8 / dx
+prm['uy'] += [(s_[0,k,1:l,:], '.>', 'off-fault.bin')]
+#prm['vy'] = [(s_[:,k,1:l,::10], '.>', 'xsec.bin')]
 
 # run SORD
 w = weakzone * 100

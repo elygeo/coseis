@@ -262,13 +262,13 @@ vs: 3464.0  # S-wave velocity
 gam: 0.3    # viscosity
 
 # potency tensor source time function
-p11: ['[31,31,31,:]', '=', 1.0, 'integral_brune', 0.05]
-p22: ['[31,31,31,:]', '=', 1.0, 'integral_brune', 0.05]
-p33: ['[31,31,31,:]', '=', 1.0, 'integral_brune', 0.05]
+pxx: ['[30,30,30,:]', '=', 1.0, 'integral_brune', 0.05]
+pyy: ['[30,30,30,:]', '=', 1.0, 'integral_brune', 0.05]
+pzz: ['[30,30,30,:]', '=', 1.0, 'integral_brune', 0.05]
 
 # write 2d velocity slice, last time step
-v1: ['[:,:,31,-1]', '=&gt;', 'vx.bin']
-v2: ['[:,:,31,-1]', '=&gt;', 'vy.bin']
+vx: ['[:,:,30,-1]', '=&gt;', 'vx.bin']
+vy: ['[:,:,30,-1]', '=&gt;', 'vy.bin']
 
 </pre>
 </div>
@@ -352,15 +352,15 @@ computations for problems where they are applicable.  These are not used for
 specifying internal slip boundaries. However, for problems with symmetry across
 a slip surface, the fault may be placed at the boundary and combined with an
 anti-mirror symmetry condition.  The following BC types are supported:</p>
-<p><strong>Type 0</strong>: Vacuum free-surface.  Stress is zero in cells outside the boundary.</p>
+<p><strong>'free'</strong>: Vacuum free-surface.  Stress is zero in cells outside the boundary.</p>
 <blockquote>
 <img alt="bc0.png" src="bc0.png" />
 </blockquote>
-<p><strong>Type 3</strong>: Rigid surface. Displacement is zero at the boundary.</p>
+<p><strong>'rigid'</strong>: Rigid surface. Displacement is zero at the boundary.</p>
 <blockquote>
 <img alt="bc3.png" src="bc3.png" />
 </blockquote>
-<p><strong>Type 1</strong>: Mirror symmetry at the node.  Normal displacement is zero at the
+<p><strong>'+node'</strong>: Mirror symmetry at the node.  Normal displacement is zero at the
 boundary.  Useful for a boundary corresponding to (a) the plane orthogonal to
 the two nodal planes of a double-couple point source, (b) the plane normal to
 the mode-III axis of a symmetric rupture, or (c) the zero-width axis of a 2D
@@ -368,37 +368,38 @@ plane strain problem.</p>
 <blockquote>
 <img alt="bc1.png" src="bc1.png" />
 </blockquote>
-<p><strong>Type -1</strong>: Anti-mirror symmetry at the node.  Tangential displacement is zero
-at the boundary.  Useful for a boundary corresponding to (a) the nodal planes
-of a double-couple point source, (b) the plane normal to the mode-II axis of a
-symmetric rupture, or (c) the zero-width axis of a 2D antiplane strain problem.</p>
+<p><strong>'-node'</strong>: Anti-mirror symmetry at the node.  Tangential displacement is
+zero at the boundary.  Useful for a boundary corresponding to (a) the nodal
+planes of a double-couple point source, (b) the plane normal to the mode-II
+axis of a symmetric rupture, or (c) the zero-width axis of a 2D antiplane
+strain problem.</p>
 <blockquote>
 <img alt="bc-1.png" src="bc-1.png" />
 </blockquote>
-<p><strong>Type 2</strong>: Mirror symmetry at the cell. Same as type 1, but centered on the cell.</p>
+<p><strong>'+cell'</strong>: Mirror symmetry at the cell. Same as type 1, but centered on the cell.</p>
 <blockquote>
 <img alt="bc2.png" src="bc2.png" />
 </blockquote>
-<p><strong>Type -2</strong>: Anti-mirror symmetry at the cell.  Same as type -1, but centered
+<p><strong>'-cell'</strong>: Anti-mirror symmetry at the cell.  Same as type -1, but centered
 on the cell.  Can additionally be used when the boundary corresponds to the
 slip surface of a symmetric rupture.</p>
 <blockquote>
 <img alt="bc-2.png" src="bc-2.png" />
 </blockquote>
-<p><strong>Type 10</strong>: Perfectly match layer (PML) absorbing boundary.</p>
+<p><strong>'pml'</strong>: Perfectly match layer (PML) absorbing boundary.</p>
 <p>Example: a 3D problem with a free surface at Z=0, and PML absorbing boundaries
 on all other boundary faces:</p>
 <pre class="literal-block">
 shape = [50, 50, 50, 100]
-bc1 = [10, 10,  0]
-bc2 = [10, 10, 10]
+bc1 = ['pml', 'pml', 'free']
+bc2 = ['pml', 'pml', 'pml']
 </pre>
 <p>Example: a 2D antiplane strain problem with PML absorbing boundaries.  The
 number of nodes is 2 for the zero-width axis:</p>
 <pre class="literal-block">
 shape = [50, 50, 2, 100]
-bc1 = [10, 10, -1]
-bc2 = [10, 10, -1]
+bc1 = ['pml', 'pml', '-node']
+bc2 = ['pml', 'pml', '-node']
 </pre>
 </div>
 <div class="section" id="defining-the-fault-rupture-surface">
@@ -419,8 +420,8 @@ delta = [5.0, 5.0, 5.0, 0.1]
 faultnormal = 3
 ihypo = [21, 21, 21.5]
 shape  = [41, 41, 42, 100]
-bc1 = [0, 0, 0]
-bc2 = [0, 0, 0]
+bc1 = ['free', 'free', 'free']
+bc2 = ['free', 'free', 'free']
 </pre>
 <p>For problems with symmetry across the rupture surface (where mesh and material
 properties are mirror images), the symmetry may be exploited for computational
@@ -431,14 +432,14 @@ symmetry condition used.  For example, reducing the size of the previous
 example to put the rupture surface along the far z boundary:</p>
 <pre class="literal-block">
 shape = [41, 41, 22, 100]
-bc2 = [0, 0, -2]
+bc2 = ['free', 'free', '-cell']
 </pre>
 <p>Alternatively, put the rupture surface along the near z boundary:</p>
 <pre class="literal-block">
 ihypo = [21, 21, 1.5]
 shape = [41, 41, 22, 100]
-bc1 = [0, 0, -2]
-bc2 = [0, 0, 0]
+bc1 = ['free', 'free', '-cell']
+bc2 = ['free', 'free', 'free']
 </pre>
 <p>Further symmetries may present. If our previous problem has slip only in the
 x direction, then we may also use node-centered mirror symmetry along the in-plane
@@ -447,8 +448,8 @@ computations eight-fold:</p>
 <pre class="literal-block">
 ihypo = [21, 21, 21.5]
 shape = [21, 21, 22, 100]
-bc1 = [0, 0, 0]
-bc2 = [-1, 1, -2]
+bc1 = ['free', 'free', 'free']
+bc2 = ['anti-n', 'mirror-n', 'anti-c'
 </pre>
 </div>
 </div>
@@ -462,18 +463,18 @@ operators require 23 variables per mesh point at the cost of a factor of four
 increase in floating point operations.  As CPU improvement tends to out-pace
 memory bandwidth improvement, in the future, on-the-fly operators may become
 faster than stored operators.  The operator type is controlled by the
-<tt class="docutils literal">oplevel</tt> parameter, but can generally be left alone, as the default is to
+<tt class="docutils literal">diffop</tt> parameter, but can generally be left alone, as the default is to
 automatically detect rectilinear and curvilinear meshes and assign the proper
 operator type for fastest performance. The allowed values are:</p>
 <blockquote>
 <div class="line-block">
-<div class="line">0: Auto pick 2 or 6</div>
-<div class="line">1: Mesh with constant spacing dx</div>
-<div class="line">2: Rectangular mesh</div>
-<div class="line">3: Parallelepiped mesh</div>
-<div class="line">4: One-point quadrature</div>
-<div class="line">5: Exactly integrated elements</div>
-<div class="line">6: Saved operators, nearly as fast as 2, but doubles the memory usage</div>
+<div class="line"><strong>'cons'</strong>: Mesh with constant mesh step size</div>
+<div class="line"><strong>'rect'</strong>: Rectangular mesh</div>
+<div class="line"><strong>'para'</strong>: Parallelepiped mesh</div>
+<div class="line"><strong>'quad'</strong>: One-point quadrature</div>
+<div class="line"><strong>'exac'</strong>: Exactly integrated elements</div>
+<div class="line"><strong>'save'</strong>: Saved operators, nearly as fast as 'rect', but doubles the memory usage</div>
+<div class="line"><strong>'auto'</strong>: Automatically choose 'rect' or 'save'</div>
 </div>
 </blockquote>
 <p>On current hardware, computation time is on the order of the one second per

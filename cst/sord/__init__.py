@@ -2,7 +2,27 @@
 Support Operator Rupture Dynamics
 """
 
-tfuncs = [
+difference_operators = [
+    'auto',
+    'cons',
+    'rect',
+    'para',
+    'quad',
+    'exac',
+    'save',
+]
+
+boundary_conditions = {
+    'free': 0,
+    'rigid': 3,
+    '+node': 1,
+    '+cell': 2, 
+    '-node': -1,
+    '-cell': -2, 
+    'pml': 10,
+}
+
+time_functions = [
     'const',
     'delta',
     'step', 'integral_delta',
@@ -158,23 +178,20 @@ def prepare_param(prm, fio):
     nn = prm['shape'][:3]
     xi = prm['ihypo']
     for i in range(3):
-        xi[i] = 0.0 + xi[i]
-        if xi[i] <= -1.0:
-            xi[i] = xi[i] + nn[i] + 1
-        if xi[i] < 1.0 or xi[i] > nn[i]:
+        if xi[i] < 0.0:
+            xi[i] += nn[i]
+        if xi[i] < 0.0 or xi[i] > nn[i] - 1:
             raise Exception('Error: ihypo %s out of bounds' % xi)
 
     # rupture boundary conditions
     nn = prm['shape'][:3]
-    i1 = prm['bc1']
-    i2 = prm['bc2']
     i = abs(prm['faultnormal']) - 1
     if i >= 0:
         irup = int(xi[i])
         if irup == 1:
-            i1[i] = -2
+            prm['bc1'][i] = '-cell'
         if irup == nn[i] - 1:
-            i2[i] = -2
+            prm['bc2'][i] = '-cell'
         if irup < 1 or irup > (nn[i] - 1):
             raise Exception('Error: ihypo %s out of bounds' % xi)
 
@@ -184,13 +201,19 @@ def prepare_param(prm, fio):
     i2 = [nn[0] + 1, nn[1] + 1, nn[2] + 1]
     if prm['npml'] > 0:
         for i in range(3):
-            if prm['bc1'][i] == 10:
+            if prm['bc1'][i] == 'pml':
                 i1[i] = prm['npml']
-            if prm['bc2'][i] == 10:
+            if prm['bc2'][i] == 'pml':
                 i2[i] = nn[i] - prm['npml'] + 1
             if i1[i] > i2[i]:
                 raise Exception('Error: model too small for PML')
     prm.update({'i1pml': i1, 'i2pml': i2})
+
+    # convert boundary conditions to numeric ids
+    for k in 'bc1', 'bc2':
+        for i in 0, 1, 2:
+            if isinstance(prm[k][i], basestring):
+                prm[k][i] = boundary_conditions[prm[k][i]]
 
     # field i/o
     fns = fieldnames()
@@ -243,26 +266,24 @@ def prepare_param(prm, fio):
                 raise Exception('Error: field only for ruptures: %r' % field)
 
             # cell or node registration
+            nx, ny, nz, nt = prm['shape']
+            if field in fns['initial']:
+                nt = 1
             if field in fns['cell']:
                 reg = 'c'
-                base = (1.5, 1.5, 1.5, 1)
+                nn = [nx - 1, ny - 1, nz - 1, nt]
             else:
                 reg = 'n'
-                base = (1, 1, 1, 1)
+                nn = [nx, ny, nz, nt]
 
             # indices
-            nn = prm['shape']
-            if field in fns['initial']:
-                nn = nn[:3]
             if '.' in op:
-                x1 = expand_slices(nn, slices, base, round=False)
-                x1 = [x1[0][0], x1[1][0], x1[2][0]]
-            slices = expand_slices(nn, slices, base)
-            if field in fns['initial']:
-                slices += [[0, 0, 1]]
+                x, y, z = x1 = slices[:3]
+                slices = [int(x), int(y), int(z)] + slice[3:]
+            slices = expand_slices(nn, slices)
             if field in fns['fault']:
                 i = abs(prm['faultnormal']) - 1
-                slices[i] = [irup, irup, 1]
+                slices[i] = [irup, irup + 1, 1]
             it1 = min(it1, slices[-1][0])
             it2 = max(it2, slices[-1][1])
 
@@ -386,9 +407,9 @@ def stage(args, **kwargs):
         raise('MPI build required for multiprocessing') 
 
     # resources
-    if prm['oplevel'] in (1, 2):
+    if prm['diffop'] in ('cons', 'rect'):
         nvars = 20
-    elif prm['oplevel'] in (3, 4, 5):
+    elif prm['diffop'] in ('para', 'quad', 'exac'):
         nvars = 23
     else:
         nvars = 44
@@ -477,27 +498,15 @@ def repr_slices(slices):
     slices = '[' + ','.join(slices) + ']'
     return slices
 
-def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
+def expand_slices(shape, slices=[]):
     """
     >>> shape = [8, 8, 8, 8]
 
     >>> expand_slices(shape, [])
     [[0, 8, 1], [0, 8, 1], [0, 8, 1], [0, 8, 1]]
 
-    >>> expand_slices(shape, [0,1,2,[]], base=0, new_base=1)
-    [[1, 1, 1], [2, 2, 1], [3, 3, 1], [1, 8, 1]]
-
-    >>> expand_slices(shape, '[0.4,0.6,-0.6:-0.4:2,:]', base=0)
-    [[0, 1, 1], [1, 2, 1], [7, 8, 2], [0, 8, 1]]
-
-    >>> expand_slices(shape, '[1.4,1.6,-1.6:-1.4:2,:]', base=1)
-    [[1, 1, 1], [2, 2, 1], [7, 8, 2], [1, 8, 1]]
-
-    >>> expand_slices(shape, '[0.9,1.1,-1.1:-0.9:2,:]', base=0.5)
-    [[0, 1, 1], [1, 2, 1], [6, 7, 2], [0, 7, 1]]
-
-    >>> expand_slices(shape, '[1.9,2.1,-2.1:-1.9:2,:]', base=1.5)
-    [[1, 1, 1], [2, 2, 1], [6, 7, 2], [1, 7, 1]]
+    >>> expand_slices(shape, '[0,:-4,-4:,:]')
+    [[0, 1, 1], [0, 4, 1], [5, 8, 1], [0, 8, 1]]
     """
 
     # normalize to list
@@ -519,14 +528,6 @@ def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
     elif len(slices) != n:
         raise Exception('error in indices: %r' % (slices,))
 
-    # index base
-    if new_base is None:
-        new_base = base
-    if type(base) in (int, float):
-        base = n * [base]
-    if type(new_base) in (int, float):
-        new_base = n * [new_base]
-
     # loop over slices
     for i, s in enumerate(slices):
 
@@ -540,46 +541,21 @@ def expand_slices(shape, slices=[], base=0, new_base=None, round=True):
                     t.append(float(j))
                 else:
                     t.append(int(j))
-            if len(t) > 1:
-                s = slice(*t)
+            if len(t) == 0:
+                s = slice(None)
+            elif len(t) == 1:
+                s = slice(t[0], t[0] + 1)
             else:
-                FIXME
-                s = slice(t[0], t[0])
+                s = slice(*t)
         elif type(s) in (tuple, list):
             if len(s) == 0:
                 s = slice(None)
+            elif len(s) == 1:
+                s = slice(s[0], s[0] + 1)
             else:
                 s = slice(*s)
         else:
-            FIXME
-            s = slice(s, s)
-        start, stop, step = s.start, s.stop, s.step
-
-        # handle None and negative indices
-        wraparound = shape[i] + int(base[i])
-        if start is None:
-            start = base[i]
-        elif start < 0:
-            start += wraparound
-        if stop is None:
-            stop = -base[i] + wraparound
-        elif stop < 0:
-            stop += wraparound
-        if step is None:
-            step = 1
-
-        # convert base
-        if new_base[i] != base[i]:
-            r = new_base[i] - base[i]
-            start += r
-            stop += r - int(r)
-
-        # round and finish
-        if round:
-            r = new_base[i] - int(new_base[i])
-            start = int(start - r + 0.5)
-            stop  = int(stop  - r + 0.5)
-        slices[i] = [start, stop, step]
-
+            s = slice(s, s + 1)
+        slices[i] = s.indices(shape)
     return slices
 

@@ -21,17 +21,17 @@ prm['shape'] = [nx, nx, nx, nt]
 prm['nproc3'] = [1, 1, 2]
 
 # boundary conditions & hypocenter
-prm['bc1'] = [1, 1, 1]; reg = 1.0
-prm['bc1'] = [2, 2, 2]; reg = 1.5
-prm['bc2'] = [10, 10, 10]
+prm['bc1'] = ['+node', '+node', '+node']; reg = 0.0
+prm['bc1'] = ['+cell', '+cell', '+cell']; reg = 0.5
+prm['bc2'] = ['pml', 'pml', 'pml']
 
 # source properties
 i = reg
 val = 1.0
 tau = 0.1
-prm['p11'] = (s_[i,i,i,:], '+', val, 'brune', tau)
-prm['p22'] = (s_[i,i,i,:], '+', val, 'brune', tau)
-prm['p33'] = (s_[i,i,i,:], '+', val, 'brune', tau)
+prm['pxx'] = (s_[i,i,i,:], '.', val, 'brune', tau)
+prm['pyy'] = (s_[i,i,i,:], '.', val, 'brune', tau)
+prm['pzz'] = (s_[i,i,i,:], '.', val, 'brune', tau)
 
 # material
 prm['rho'] = rho = 2670.0
@@ -44,7 +44,7 @@ prm['hourglass'] = [1.0, 1.0]
 j = reg
 k = reg + 3000.0 / dx
 l = reg + 4000.0 / dx
-for f in 'v1', 'v2', 'v3':
+for f in 'vx', 'vy', 'vz':
     prm[f] = [
         (s_[j,j,l,:], '.>', 'p1-%s.bin' % f),
         (s_[j,k,l,:], '.>', 'p2-%s.bin' % f),
@@ -55,7 +55,7 @@ for f in 'v1', 'v2', 'v3':
     ]
 
 # snapshots
-for f in 'v1', 'v2', 'v3':
+for f in 'vx', 'vy', 'vz':
     prm[f] += [
         (s_[j,:,:,::10], '=>', 'snap-%s.bin' % f),
     ]

@@ -28,8 +28,8 @@ def test(argv=[]):
     prm['hourglass'] = [1.0, 1.0]
 
     # boundary conditions
-    prm['bc1'] = [10, 10, 10]
-    prm['bc2'] = [-1, 1, -2]
+    prm['bc1'] = ['pml', 'pml', 'pml']
+    prm['bc2'] = ['-node', '+node', '-cell']
 
     # rupture
     dtau = 10e6

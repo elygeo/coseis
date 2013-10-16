@@ -31,8 +31,8 @@ prm['delta'] = [dx, dy, dz, dt]
 prm['shape'] = [nx, ny, nz, nt]
 
 # boundary conditions
-prm['bc1'] = [10, 10, 0]
-prm['bc2'] = [10, 10, 10]
+prm['bc1'] = ['pml', 'pml', 'free']
+prm['bc2'] = ['pml', 'pml', 'pml']
 
 # material
 prm['rho'] = ([], '=<', 'rho.bin')
@@ -44,20 +44,20 @@ prm['vs1'] = 200.0
 prm['hourglass'] = [1.0, 1.0]
 
 # source
-j = 56000.0 / dx + 1
-k = 40000.0 / dx + 1
-l = 14000.0 / dx + 1
-prm['m12'] = (s_[j,k,l,:], '+', 1e18, 'brune', 0.2)
+j = int(56000.0 / dx)
+k = int(40000.0 / dx)
+l = int(14000.0 / dx)
+prm['mxy'] = (s_[j,k,l,:], '+', 1e18, 'brune', 0.2)
 
 # receivers
 for i in range(8):
-    j = (74000.0 - 6000.0 * i) / dx + 1
-    k = (16000.0 + 8000.0 * i) / dy + 1
-    for f in 'v1', 'v2', 'v3':
+    j = int((74000.0 - 6000.0 * i) / dx)
+    k = int((16000.0 + 8000.0 * i) / dy)
+    for f in 'vx', 'vy', 'vz':
         if f not in prm:
             prm[f] = []
         prm[f] += [
-            (s_[j,k,1,:], '=>', 'p%s-%s.bin' % (i, f)),
+            (s_[j,k,0,:], '=>', 'p%s-%s.bin' % (i, f)),
         ]
 
 # run job

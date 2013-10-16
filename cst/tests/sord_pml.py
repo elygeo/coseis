@@ -26,13 +26,13 @@ def test(argv=[]):
     prm['hourglass'] = [1.0, 1.0]
 
     # boundary conditions
-    prm['bc1'] = [10, 10, 10]
-    prm['bc2'] = [10, 10, 10]
+    prm['bc1'] = ['pml', 'pml', 'pml']
+    prm['bc2'] = ['pml', 'pml', 'pml']
 
     # source
-    prm['p11'] = [(s_[11,11,11,:], '.', 1e10, 'delta', 1.0)]
-    prm['p22'] = [(s_[11,11,11,:], '.', 1e10, 'delta', 1.0)]
-    prm['p33'] = [(s_[11,11,11,:], '.', 1e10, 'delta', 1.0)]
+    prm['pxx'] = [(s_[10,10,10,:], '.', 1e10, 'delta', 1.0)]
+    prm['pyy'] = [(s_[10,10,10,:], '.', 1e10, 'delta', 1.0)]
+    prm['pzz'] = [(s_[10,10,10,:], '.', 1e10, 'delta', 1.0)]
 
     # output
     fns = cst.sord.fieldnames()

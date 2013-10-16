@@ -23,7 +23,7 @@ doid: do iid = 1, 3; id = modulo(ic + iid - 1, 3) + 1
 ! elastic region: g_ij = (u_i + gamma*v_i),j
 i1 = max(i1pml + 1, i1cell)
 i2 = min(i2pml - 2, i2cell)
-call diff_nc(s1, w1, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx)
+call diff_nc(s1, w1, ic, id, i1, i2, diffop, bb, xx, dx1, dx2, dx3, dx)
 
 ! pml region, non-damped directions: g_ij = u_i,j
 do i = 1, 3
@@ -31,11 +31,11 @@ if (id /= i) then
     i1 = i1cell
     i2 = i2cell
     i2(i) = min(i2(i), i1pml(i))
-    call diff_nc(s1, uu, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx)
+    call diff_nc(s1, uu, ic, id, i1, i2, diffop, bb, xx, dx1, dx2, dx3, dx)
     i1 = i1cell
     i2 = i2cell
     i1(i) = max(i1(i), i2pml(i) - 1)
-    call diff_nc(s1, uu, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx)
+    call diff_nc(s1, uu, ic, id, i1, i2, diffop, bb, xx, dx1, dx2, dx3, dx)
 end if
 end do
 
@@ -45,7 +45,7 @@ case (1)
     i1 = i1cell
     i2 = i2cell
     i2(1) = min(i2(1), i1pml(1))
-    call diff_nc(s1, vv, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx)
+    call diff_nc(s1, vv, ic, id, i1, i2, diffop, bb, xx, dx1, dx2, dx3, dx)
     do j = i1(1), i2(1)
         i = j - i1(1) + 1
         p = j + nnoff(1)
@@ -59,7 +59,7 @@ case (1)
     i1 = i1cell
     i2 = i2cell
     i1(1) = max(i1(1), i2pml(1) - 1)
-    call diff_nc(s1, vv, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx)
+    call diff_nc(s1, vv, ic, id, i1, i2, diffop, bb, xx, dx1, dx2, dx3, dx)
     do j = i1(1), i2(1)
         i = i2(1) - j + 1
         p = nn(1) - j - nnoff(1)
@@ -74,7 +74,7 @@ case (2)
     i1 = i1cell
     i2 = i2cell
     i2(2) = min(i2(2), i1pml(2))
-    call diff_nc(s1, vv, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx)
+    call diff_nc(s1, vv, ic, id, i1, i2, diffop, bb, xx, dx1, dx2, dx3, dx)
     do k = i1(2), i2(2)
         i = k - i1(2) + 1
         p = k + nnoff(2)
@@ -88,7 +88,7 @@ case (2)
     i1 = i1cell
     i2 = i2cell
     i1(2) = max(i1(2), i2pml(2) - 1)
-    call diff_nc(s1, vv, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx)
+    call diff_nc(s1, vv, ic, id, i1, i2, diffop, bb, xx, dx1, dx2, dx3, dx)
     do k = i1(2), i2(2)
         i = i2(2) - k + 1
         p = nn(2) - k - nnoff(2)
@@ -103,7 +103,7 @@ case (3)
     i1 = i1cell
     i2 = i2cell
     i2(3) = min(i2(3), i1pml(3))
-    call diff_nc(s1, vv, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx)
+    call diff_nc(s1, vv, ic, id, i1, i2, diffop, bb, xx, dx1, dx2, dx3, dx)
     do l = i1(3), i2(3)
         i = l - i1(3) + 1
         p = l + nnoff(3)
@@ -117,7 +117,7 @@ case (3)
     i1 = i1cell
     i2 = i2cell
     i1(3) = max(i1(3), i2pml(3) - 1)
-    call diff_nc(s1, vv, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx)
+    call diff_nc(s1, vv, ic, id, i1, i2, diffop, bb, xx, dx1, dx2, dx3, dx)
     do l = i1(3), i2(3)
         i = i2(3) - l + 1
         p = nn(3) - l - nnoff(3)
@@ -171,12 +171,12 @@ end do doic
 if (source == 'potency') then
     call finite_source
 end if
-call field_io('<>', 'p11', w1(:,:,:,1))
-call field_io('<>', 'p22', w1(:,:,:,2))
-call field_io('<>', 'p33', w1(:,:,:,3))
-call field_io('<>', 'p23', w2(:,:,:,1))
-call field_io('<>', 'p31', w2(:,:,:,2))
-call field_io('<>', 'p12', w2(:,:,:,3))
+call field_io('<>', 'pxx', w1(:,:,:,1))
+call field_io('<>', 'pyy', w1(:,:,:,2))
+call field_io('<>', 'pzz', w1(:,:,:,3))
+call field_io('<>', 'pyz', w2(:,:,:,1))
+call field_io('<>', 'pzx', w2(:,:,:,2))
+call field_io('<>', 'pxy', w2(:,:,:,3))
 
 ! attenuation
 !do j = 1, 2
@@ -216,12 +216,12 @@ end do
 if (source == 'moment') then
     call finite_source
 end if
-call field_io('<>', 'm11', w1(:,:,:,1))
-call field_io('<>', 'm22', w1(:,:,:,2))
-call field_io('<>', 'm33', w1(:,:,:,3))
-call field_io('<>', 'm23', w2(:,:,:,1))
-call field_io('<>', 'm31', w2(:,:,:,2))
-call field_io('<>', 'm12', w2(:,:,:,3))
+call field_io('<>', 'mxx', w1(:,:,:,1))
+call field_io('<>', 'myy', w1(:,:,:,2))
+call field_io('<>', 'mzz', w1(:,:,:,3))
+call field_io('<>', 'myz', w2(:,:,:,1))
+call field_io('<>', 'mzx', w2(:,:,:,2))
+call field_io('<>', 'mxy', w2(:,:,:,3))
 
 ! stress
 do i = 1, 3
@@ -238,12 +238,12 @@ end do
 end do
 
 ! stress i/o
-call field_io('<>', 'w11', w1(:,:,:,1))
-call field_io('<>', 'w22', w1(:,:,:,2))
-call field_io('<>', 'w33', w1(:,:,:,3))
-call field_io('<>', 'w23', w2(:,:,:,1))
-call field_io('<>', 'w31', w2(:,:,:,2))
-call field_io('<>', 'w12', w2(:,:,:,3))
+call field_io('<>', 'wxx', w1(:,:,:,1))
+call field_io('<>', 'wyy', w1(:,:,:,2))
+call field_io('<>', 'wzz', w1(:,:,:,3))
+call field_io('<>', 'wyz', w2(:,:,:,1))
+call field_io('<>', 'wzx', w2(:,:,:,2))
+call field_io('<>', 'wxy', w2(:,:,:,3))
 if (modulo(it, itstats) == 0) then
     call tensor_norm(s1, w1, w2, i1core, i2core, (/1, 1, 1/))
     call set_halo(s1, -1.0, i1core, i2core)

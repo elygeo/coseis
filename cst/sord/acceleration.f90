@@ -28,10 +28,10 @@ doid: do iid = 1, 3; id = modulo(ic + iid - 2, 3) + 1
 i1 = i1node
 i2 = i2node
 if (ic == id) then
-    call diff_cn(s1, w1, ic, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx)
+    call diff_cn(s1, w1, ic, id, i1, i2, diffop, bb, xx, dx1, dx2, dx3, dx)
 else
     i = 6 - ic - id
-    call diff_cn(s1, w2, i, id, i1, i2, oplevel, bb, xx, dx1, dx2, dx3, dx)
+    call diff_cn(s1, w2, i, id, i1, i2, diffop, bb, xx, dx1, dx2, dx3, dx)
 end if
 
 ! pml region
@@ -216,9 +216,9 @@ if (source == 'force') then
 end if
 
 ! nodal force input
-call field_io('<', 'f1', w1(:,:,:,1))
-call field_io('<', 'f2', w1(:,:,:,2))
-call field_io('<', 'f3', w1(:,:,:,3))
+call field_io('<', 'fx', w1(:,:,:,1))
+call field_io('<', 'fy', w1(:,:,:,2))
+call field_io('<', 'fz', w1(:,:,:,3))
 
 ! boundary conditions
 call vector_bc(w1, bc1, bc2, i1bc, i2bc)
@@ -233,9 +233,9 @@ call vector_swap_halo(w1, nhalo)
 timers(1) = clock() - timers(1)
 
 ! nodal force output
-call field_io('>', 'f1', w1(:,:,:,1))
-call field_io('>', 'f2', w1(:,:,:,2))
-call field_io('>', 'f3', w1(:,:,:,3))
+call field_io('>', 'fx', w1(:,:,:,1))
+call field_io('>', 'fy', w1(:,:,:,2))
+call field_io('>', 'fz', w1(:,:,:,3))
 
 ! Newton's law: a_i = f_i / m
 do i = 1, 3
@@ -251,9 +251,9 @@ do i = 1, 3
 end do
 
 ! acceleration I/O
-call field_io('<>', 'a1', w1(:,:,:,1))
-call field_io('<>', 'a2', w1(:,:,:,2))
-call field_io('<>', 'a3', w1(:,:,:,3))
+call field_io('<>', 'az', w1(:,:,:,1))
+call field_io('<>', 'ay', w1(:,:,:,2))
+call field_io('<>', 'az', w1(:,:,:,3))
 if (modulo(it, itstats) == 0) then
     call vector_norm(s1, w1, i1core, i2core, (/1, 1, 1/))
     call set_halo(s1, -1.0, i1core, i2core)

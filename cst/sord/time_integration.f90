@@ -41,9 +41,9 @@ do i = 1, 3
 end do
 
 ! velocity I/O
-call field_io('<>', 'v1', vv(:,:,:,1))
-call field_io('<>', 'v2', vv(:,:,:,2))
-call field_io('<>', 'v3', vv(:,:,:,3))
+call field_io('<>', 'vx', vv(:,:,:,1))
+call field_io('<>', 'vy', vv(:,:,:,2))
+call field_io('<>', 'vz', vv(:,:,:,3))
 if (modulo(it, itstats) == 0) then
     call vector_norm(s1, vv, i1core, i2core, (/1, 1, 1/))
     call set_halo(s1, -1.0, i1core, i2core)
@@ -53,9 +53,9 @@ end if
 call field_io('>', 'vm2', s1)
 
 ! displacement I/O
-call field_io('<>', 'u1', uu(:,:,:,1))
-call field_io('<>', 'u2', uu(:,:,:,2))
-call field_io('<>', 'u3', uu(:,:,:,3))
+call field_io('<>', 'ux', uu(:,:,:,1))
+call field_io('<>', 'uy', uu(:,:,:,2))
+call field_io('<>', 'uz', uu(:,:,:,3))
 if (modulo(it, itstats) == 0) then
     call vector_norm(s1, uu, i1core, i2core, (/1, 1, 1/))
     call set_halo(s1, -1.0, i1core, i2core)
@@ -91,14 +91,14 @@ if (ifn /= 0) then
     case (3); t2(:,:,1,:) = uu(:,:,irup+1,:) - uu(:,:,irup,:)
     end select
     f2 = sqrt(sum(t2 * t2, 4))
-    call field_io('>', 'sv1',  t1(:,:,:,1))
-    call field_io('>', 'sv2',  t1(:,:,:,2))
-    call field_io('>', 'sv3',  t1(:,:,:,3))
+    call field_io('>', 'svx',  t1(:,:,:,1))
+    call field_io('>', 'svy',  t1(:,:,:,2))
+    call field_io('>', 'svz',  t1(:,:,:,3))
     call field_io('>', 'svm',  f1)
     call field_io('>', 'psv',  psv)
-    call field_io('>', 'su1',  t2(:,:,:,1))
-    call field_io('>', 'su2',  t2(:,:,:,2))
-    call field_io('>', 'su3',  t2(:,:,:,3))
+    call field_io('>', 'sux',  t2(:,:,:,1))
+    call field_io('>', 'suy',  t2(:,:,:,2))
+    call field_io('>', 'suz',  t2(:,:,:,3))
     call field_io('>', 'sum',  f2)
     call field_io('>', 'sl',   sl)
     call field_io('>', 'trup', trup)

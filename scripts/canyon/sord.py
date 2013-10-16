@@ -19,32 +19,32 @@ prm['gam'] = 0.0
 prm['hourglass'] = [1.0, 2.0]
 
 # boundary conditions
-prm['bc1'] = [0,  0, 1]
-prm['bc2'] = [1, -1, 1]
+prm['bc1'] = ['free',  'free',  '+node']
+prm['bc2'] = ['+node', '-node', '+node']
 
 # Ricker wavelet source with 2 s period.
-prm['v2'] = [(s_[-1,161:,:,:], '=', 'ricker1', 1.0, 2.0)]
+prm['vy'] = [(s_[-1,161:,:,:], '=', 'ricker1', 1.0, 2.0)]
 
 # mesh input
-prm['x1'] = (s_[:,:,1], '=<', 'x.bin')
-prm['x2'] = (s_[:,:,1], '=<', 'y.bin')
+prm['x'] = (s_[:,:,0], '=<', 'x.bin')
+prm['y'] = (s_[:,:,0], '=<', 'y.bin')
 
 # velocity output
-prm['v1'] =  [(s_[:,:,1,::10],  '=>', 'snap-v1.bin')]
-prm['v2'] += [(s_[:,:,1,::10],  '=>', 'snap-v2.bin')]
+prm['vx'] =  [(s_[:,:,0,::10],  '=>', 'snap-vx.bin')]
+prm['vy'] += [(s_[:,:,0,::10],  '=>', 'snap-vy.bin')]
 
 # displacement output
-prm['u1'] = [
-    (s_[-1,-1,1,:],   '=>', 'source-u1.bin'),
-    (s_[1,:,1,:],     '=>', 'canyon-u1.bin'),
-    (s_[2:158,1,1,:], '=>', 'flank-u1.bin'),
-    (s_[:,:,1,::10],  '=>', 'snap-u1.bin'),
+prm['ux'] = [
+    (s_[-1,-1,0,:],   '=>', 'source-ux.bin'),
+    (s_[0,:,0,:],     '=>', 'canyon-ux.bin'),
+    (s_[1:158,0,0,:], '=>', 'flank-ux.bin'),
+    (s_[:,:,0,::10],  '=>', 'snap-ux.bin'),
 ]
-prm['u2'] = [
-    (s_[-1,-1,1,:],   '=>', 'source-u2.bin'),
-    (s_[1,:,1,:],     '=>', 'canyon-u2.bin'),
-    (s_[2:158,1,1,:], '=>', 'flank-u2.bin'),
-    (s_[:,:,1,::10],  '=>', 'snap-u2.bin'),
+prm['uy'] = [
+    (s_[-1,-1,0,:],   '=>', 'source-uy.bin'),
+    (s_[0,:,0,:],     '=>', 'canyon-uy.bin'),
+    (s_[1:158,0,0,:], '=>', 'flank-uy.bin'),
+    (s_[:,:,0,::10],  '=>', 'snap-uy.bin'),
 ]
 
 # run job

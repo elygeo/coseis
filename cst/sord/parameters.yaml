@@ -7,8 +7,8 @@ itio: 50                 # interval for writing i/o buffers
 itbuff: 10               # buffer size for time series output
 debug: 0                 # >1 sync, >2 mpi vars, >3 I/O
 
-# Numerical method
-oplevel: 0               # spatial difference operator level
+# Spatial difference operator
+diffop: 'auto'           # cons, rect, para, quad, exac, save, auto
 
 # Mesh parameters
 shape: [41, 41, 41, 41]  # mesh size [nx, ny, nz, nt]
@@ -29,27 +29,27 @@ rho: 2670.0              # density
 vp:  6000.0              # P-wave speed
 vs:  3464.0              # S-wave speed
 gam: 0.0                 # viscosity
-rho1: -1.0               # min density
-rho2: -1.0               # max density
-vp1:  -1.0               # min P-wave speed
-vp2:  -1.0               # max P-wave speed
-vs1:  -1.0               # min S-wave speed
-vs2:  -1.0               # max S-wave speed
-gam1: -1.0               # min viscosity
-gam2: 0.8                # max viscosity
+rho_min: -1.0            # min density
+rho_max: -1.0            # max density
+vp_min:  -1.0            # min P-wave speed
+vp_max:  -1.0            # max P-wave speed
+vs_min:  -1.0            # min S-wave speed
+vs_max:  -1.0            # max S-wave speed
+gam_min: -1.0            # min viscosity
+gam_max: 0.8             # max viscosity
 hourglass: [1.0, 1.0]    # hourglass stiffness (1) and viscosity (2)
 vdamp: -1.0              # Vs dependent damping
 
 # Boundary conditions
-bc1: [0, 0, 0]           # boundary condition - near side
-bc2: [0, 0, 0]           # boundary condition - far side
+bc1: [free, free, free]  # near x, y, z surface
+bc2: [free, free, free]  # far x, y, z surface
 npml: 10                 # number of PML damping nodes
 ppml: 2                  # PML exponent, 1-4. Generally 2 is best.
 vpml: -1.0               # damping velocity, <0 default to min, max V_s harmonic mean
 
 # Finite source parameters
-source: "potency"        # potency, moment, force, or none
 nsource: 0               # number of sub-faults
+source: potency          # potency, moment, force, or none
 
 # Dynamic rupture parameters
 ihypo: [1.0, 1.0, 1.0]   # hypocenter indices for nucleation
