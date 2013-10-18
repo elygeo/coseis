@@ -189,7 +189,7 @@ def prepare_param(prm, fio):
                 i1[i] += prm['npml']
             if prm['bc2'][i] == 'pml':
                 i2[i] -= prm['npml']
-            if i1[i] => i2[i]:
+            if i1[i] >= i2[i]:
                 raise Exception('Error: model too small for PML')
     prm.update({'i1pml': i1, 'i2pml': i2})
 
@@ -262,28 +262,18 @@ def prepare_param(prm, fio):
             if prm['faultnormal'] == 'none' and reg == 'f':
                 raise Exception('Error: field only for ruptures: %r' % field)
 
-            # sub-cell interp
-            if '.' in op:
-                if reg == 'f':
-                    x1 = slices[:2]
-                    for i in 0, 1:
-                        x1[i] %= shape[i]
-                        assert(x1[i] <= shape[i] - 1)
-                        slices[i] = int(x1[i])
-                    x1.insert(ifn, irup + 0.5)
-                else:
-                    x1 = slices[:3]
-                    for i in 0, 1, 2:
-                        x1[i] %= shape[i]
-                        assert(x1[i] <= shape[i] - 1)
-                        slices[i] = int(x1[i])
-
             # slices
             slices = expand_slices(shape, slices)
             if reg == 'f':
                 slices.insert(ifn, [irup, irup+1, 1])
             if static:
-                slices.append([0, 1, 1])
+                slices.append([-1, 0, 1])
+            if '.' in op:
+                for i in 0, 1, 2:
+                    x1[i] = slices[i][0]
+                    assert(x1[i] <= shape[i] - 1)
+                    slices[i][0] = int(slices[i][0])
+                    slices[i][1] = int(slices[i][1])
             it1 = min(it1, slices[-1][0])
             it2 = max(it2, slices[-1][1])
 
@@ -324,7 +314,7 @@ def prepare_param(prm, fio):
                 if dd != []:
                     deltas[fname] = dd
                 if '.' in op:
-                    indices[fname] = xi
+                    indices[fname] = x1
                 else:
                     indices[fname] = ii
 
@@ -380,6 +370,7 @@ def stage(args, **kwargs):
             prm[k] = v
         else:
             job[k] = v
+
     job = util.configure(**job)
     job.update(**make())
     d = np.dtype('f' +  job['realsize']).str
@@ -396,7 +387,7 @@ def stage(args, **kwargs):
         (nz - 1) // l + 1,
     ]
     i = prm['faultnormal'][1:]
-    i = {'': None, 'x': 0, 'y': 1, 'z': 2}[i]
+    i = {'one': None, 'x': 0, 'y': 1, 'z': 2}[i]
     if i:
         nl[i] = max(nl[i], 2)
     j = (nx - 1) // nl[0] + 1
@@ -492,7 +483,7 @@ def repr_slices(slices):
                 s = '%s:%s' % (s.start, s.stop)
             else:
                 s = '%s:%s:%s' % (s.start, s.stop, s.step)
-            s.replace('None', '')
+            s = s.replace('None', '')
         else:
             s = str(s)
         slices[i] = s
@@ -540,6 +531,7 @@ def expand_slices(shape, slices=[]):
                     t.append(float(j))
                 else:
                     t.append(int(j))
+            s = t
         if type(s) in (tuple, list):
             if len(s) == 0:
                 s = slice(None)
@@ -548,10 +540,10 @@ def expand_slices(shape, slices=[]):
             else:
                 s = slice(*s)
         if type(s) == slice:
-            s = s.indices(shape[i])
+            s = list(s.indices(shape[i]))
         else:
             s %= shape[i]
-            s = (s, s + 1, 1)
+            s = [s, s + 1, 1]
         slices[i] = s
 
     return slices

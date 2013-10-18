@@ -22,7 +22,7 @@ nt = max(shape_(4), 0)
 
 ! fault normal
 select case (faultnormal(2:2))
-case (''); ifn = 0
+case ('o'); ifn = 0
 case ('x'); ifn = 1
 case ('y'); ifn = 2
 case ('z'); ifn = 3

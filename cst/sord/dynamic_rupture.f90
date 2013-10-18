@@ -14,7 +14,7 @@ use statistics
 real :: rr, xhypo(3), xi(3), w
 integer :: i1(3), i2(3), i, j, k, l, root(3)
 
-if (faultnormal == '') return
+if (faultnormal == 'no') return
 if (sync) call barrier
 if (master) print *, clock(), 'Rupture initialization'
 if (ifn == 0) return
