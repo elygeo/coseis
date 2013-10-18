@@ -15,7 +15,7 @@ meta = yaml.load(meta)
 nx, ny, nz, nt = meta['shape']
 dx, dy, dz, dt = meta['delta']
 dtype = meta['dtype']
-ihypo = meta['p11'][0]
+hypo = meta['p11'][0]
 tau = meta['p11'][-1]
 rho = meta['rho']
 vp = meta['vp']
@@ -33,9 +33,9 @@ for sta in 'p1', 'p2', 'p3', 'p4', 'p5', 'p6':
 
     # source receiver radius
     xi, yi, zi = meta['xis'][sta + '-v1.bin']
-    x = (xi - ihypo[0]) * dx,
-    y = (yi - ihypo[1]) * dy,
-    z = (zi - ihypo[2]) * dz,
+    x = (xi - hypo[0]) * dx,
+    y = (yi - hypo[1]) * dy,
+    z = (zi - hypo[2]) * dz,
     r = math.sqrt(x * x + y * y + z * z)
 
     # rotation to radial coordinates

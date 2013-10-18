@@ -90,21 +90,21 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     # hypocenter location at x/y center
     x, y, z = origin
     x, y = proj(x, y)
-    j = abs(x / dx)
-    k = abs(y / dx)
-    l = abs(z / dx)
+    x /= abs(dx)
+    y /= abs(dy)
+    z /= abs(dz)
     if register:
-        l = int(l) + 0.5
-    ihypo = [j, k, l]
+        z = int(z) + 0.5
+    hypo = [x, y, z]
 
     # moment tensor
     m = mts['double_couple_clvd']
-    prm['mxx'] = (s_[j,k,l,:], '.',  m['myy'], 'brune', tau)
-    prm['myy'] = (s_[j,k,l,:], '.',  m['mxx'], 'brune', tau)
-    prm['mzz'] = (s_[j,k,l,:], '.',  m['mzz'], 'brune', tau)
-    prm['myz'] = (s_[j,k,l,:], '.', -m['mxz'], 'brune', tau)
-    prm['mzx'] = (s_[j,k,l,:], '.', -m['myz'], 'brune', tau)
-    prm['mxy'] = (s_[j,k,l,:], '.',  m['mxy'], 'brune', tau)
+    prm['mxx'] = (s_[x,y,z,:], '.',  m['myy'], 'brune', tau)
+    prm['myy'] = (s_[x,y,z,:], '.',  m['mxx'], 'brune', tau)
+    prm['mzz'] = (s_[x,y,z,:], '.',  m['mzz'], 'brune', tau)
+    prm['myz'] = (s_[x,y,z,:], '.', -m['mxz'], 'brune', tau)
+    prm['mzx'] = (s_[x,y,z,:], '.', -m['myz'], 'brune', tau)
+    prm['mxy'] = (s_[x,y,z,:], '.',  m['mxy'], 'brune', tau)
 
     # receivers
     sl = os.path.join(cwd, 'run', 'data', 'station-list.txt')
@@ -112,13 +112,13 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     for s in sl:
         s, y, x = s.split()[:3]
         x, y = proj(float(x), float(y))
-        j = x / dx
-        k = y / dx
+        x /= dx
+        y /= dx
         for f in 'vs', 'v1', 'v2', 'v3':
             if f not in prm:
                 prm[f] = []
             prm[f] += [
-                (s_[j,k,0,:], '=>', 'out/%s-%s.bin' % (s, f)),
+                (s_[x,y,0.0,:], '=>', 'out/%s-%s.bin' % (s, f)),
             ]
 
     # surface output
@@ -136,7 +136,8 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
 
     # cross section output
     if 0:
-        j, k, l = ihypo
+        j = int(hypo[0] + 0.5)
+        k = int(hypo[1] + 0.5)
         for f in 'vx', 'vy', 'vz', 'rho', 'vp', 'vs', 'gam':
             prm[f] += [
                 (s_[j,:,:,::ms], '=>', 'hold/xsec-ns-%s.bin' % f),

@@ -44,9 +44,9 @@ prm['vs1'] = 200.0
 prm['hourglass'] = [1.0, 1.0]
 
 # source
-j = int(56000.0 / dx)
-k = int(40000.0 / dx)
-l = int(14000.0 / dx)
+j = int(56000.0 / dx + 0.5)
+k = int(40000.0 / dx + 0.5)
+l = int(14000.0 / dx + 0.5)
 prm['mxy'] = (s_[j,k,l,:], '+', 1e18, 'brune', 0.2)
 
 # receivers

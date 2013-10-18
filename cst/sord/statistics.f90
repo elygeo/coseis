@@ -29,7 +29,7 @@ timers(3) = clock()
 if (init) then
     init = .false.
     allocate(prof(4,itio))
-    if (faultnormal > 0) then
+    if (faultnormal /= '') then
         allocate (maxl(12,itio), maxg(12,itio), suml(3,itio), sumg(3,itio))
         suml = 0.0
         sumg = 0.0
@@ -58,7 +58,7 @@ if (modulo(it, itstats) == 0) then
         write (0,*) 'wmax:', wmaxloc + nnoff, wmax
         stop
     end if
-    if (faultnormal > 0) then
+    if (faultnormal /= '') then
         maxl(5,j) = samax
         maxl(6,j) = svmax
         maxl(7,j) = sumax
@@ -76,7 +76,7 @@ end if
 ! write stats
 if (j > 0 .and. (modulo(it, itio) == 0 .or. it == nt)) then
     call rreduce2(maxg, maxl, 'max')
-    if (faultnormal > 0) then
+    if (faultnormal /= '') then
         call rreduce2(sumg, suml, 'sum')
     end if
     if (master) then
@@ -87,7 +87,7 @@ if (j > 0 .and. (modulo(it, itio) == 0 .or. it == nt)) then
         call rio1(fh(2), maxg(2,:j), 'w', 'stats-vmax.bin', m, o, mpout)
         call rio1(fh(3), maxg(3,:j), 'w', 'stats-umax.bin', m, o, mpout)
         call rio1(fh(4), maxg(4,:j), 'w', 'stats-wmax.bin', m, o, mpout)
-        if (faultnormal > 0) then
+        if (faultnormal /= '') then
             maxg(10,:j) = -maxg(10,:j)
             call rio1(fh(5),  maxg(5,:j),  'w', 'stats-samax.bin',   m, o, mpout)
             call rio1(fh(6),  maxg(6,:j),  'w', 'stats-svmax.bin',   m, o, mpout)

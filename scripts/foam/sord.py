@@ -37,34 +37,34 @@ prm['bc1'] = ['free', '-node', '-cell']
 prm['bc2'] = ['pml', 'pml', 'pml']
 
 # nucleation
-prm['ihypo'] = [1.4 / dx, 0.0, 0.5]
+x = 1.4 / dx
+j = int(x)
 prm['vrup'] = 15.0
 prm['rcrit'] = 0.4
 prm['trelax'] = 10.0 * dt
 
 # rupture
-j = int(prm['ihypo'][0])
-prm['faultnormal'] = 3
+prm['faultnormal'] = '+z'
+prm['hypocenter'] = [x, 0.0, 0.5]
 prm['slipvector'] = [0.0, 1.0, 0.0]
 prm['ts'] = [-730.0]
 prm['tn'] = [-330.0]
 prm['dc'] = 0.001
-prm['mus'] = [1e5, (s_[:j,:,:], '=', 2.4)]
-prm['mud'] = [1e5, (s_[:j,:,:], '=', 1.85)]
+prm['mus'] = [1e5, (s_[:j+1,:], '=', 2.4)]
+prm['mud'] = [1e5, (s_[:j+1,:], '=', 1.85)]
 
 # weak zone
 weakzone = 0.2
 weakzone = 0.0
 j = int(weakzone / dx)
 if weakzone:
-    prm['ts']  += [(s_[j,:,:], '=', -66.0)]
-    prm['mus'] += [(s_[j,:,:], '=', 0.6)]
-    prm['mud'] += [(s_[j,:,:], '=', 0.6)]
+    prm['ts']  += [(s_[:j+1,:], '=', -66.0)]
+    prm['mus'] += [(s_[:j+1,:], '=', 0.6)]
+    prm['mud'] += [(s_[:j+1,:], '=', 0.6)]
 
 # accelerometers
-z = 0.03
-z = 0.04
-l = z / dx
+z = 0.03 / dx
+z = 0.04 / dx
 for s, x, g in [
     [1, 0.92, 0.020074],
     [2, 0.72, 0.019926],
@@ -72,11 +72,11 @@ for s, x, g in [
     [4, 0.22, 0.020166],
     [15, 0.02, 0.020773],
 ]:
-    j = x / dx
+    x /= dx
     if 'ay' not in prm:
         prm['ay'] = []
     prm['ay'] += [
-        (s_[j,0,l,:], '.>', 'sensor%02d.bin' % s),
+        (s_[x,0.0,z,:], '.>', 'sensor%02d.bin' % s),
     ]
 
 # displacement sensor
@@ -85,10 +85,10 @@ prm['uy'] = [
 ]
 
 # surface output
-k = prm['ihypo'][1]
-l = 0.8 / dx
-prm['uy'] += [(s_[0,k,1:l,:], '.>', 'off-fault.bin')]
-#prm['vy'] = [(s_[:,k,1:l,::10], '.>', 'xsec.bin')]
+k = int(prm['hypocenter'][1])
+l = int(0.8 / dx)
+prm['uy'] += [(s_[0,k,1:l+1,:], '=>', 'off-fault.bin')]
+#prm['vy'] = [(s_[:,k,1:l+1,::10], '=>', 'xsec.bin')]
 
 # run SORD
 w = weakzone * 100

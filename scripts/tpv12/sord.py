@@ -37,48 +37,46 @@ prm['affine'] = [
 ]
 
 # hypocenter
-k = 12000.0 / dx
-l = nz // 2 + 0.5
-prm['ihypo'] = ihypo = [0, k, l]
+y = 12000.0 / dx
+z = nz // 2 - 0.5
+prm['hypocenter'] = hypo = [0.0, y, z]
 
 # near-fault volume
-j = int(15000.0 / dx + 0.5)
-k = int(15000.0 / dx + 0.5)
-l0 = l - 3000.0 / dx + 0.5
-l1 = l + 3000.0 / dx + 0.5
+i = int(15000.0 / dx + 0.5)
+l0 = int(z - 3000.0 / dx + 0.5)
+l1 = int(z + 3000.0 / dx + 0.5)
 
 # material properties
 prm['rho'] = 2700.0
 prm['vp']  = 5716.0
 prm['vs']  = 3300.0
-prm['gam'] = [0.2, (s_[:j+1,:k+1,l0:l1+1], '=', 0.02)]
+prm['gam'] = [0.2, (s_[:i,:i,l0:l1], '=', 0.02)]
 prm['hourglass'] = [1.0, 2.0]
 
 # fault parameters
-i = int(15000.0 / dx + 1.5)
-prm['faultnormal'] = 3
+prm['faultnormal'] = '+z'
 prm['co'] = 200000.0
 prm['dc'] = 0.5
 prm['mud'] = 0.1
-prm['mus'] = [10000.0, (s_[:i,:i,:], '=', 0.7)]
-prm['sxx'] = (s_[0,:,:], '=>', 'sxx.bin')
-prm['syy'] = (s_[0,:,:], '=>', 'syy.bin')
-prm['szz'] = (s_[0,:,:], '=>', 'szz.bin')
-prm['trup'] = (s_[:i,:i,:,-1], '=>', 'trup.bin')
+prm['mus'] = [10000.0, (s_[:i+1,:i+1], '=', 0.7)]
+prm['sxx'] = (s_[0,:], '=>', 'sxx.bin')
+prm['syy'] = (s_[0,:], '=>', 'syy.bin')
+prm['szz'] = (s_[0,:], '=>', 'szz.bin')
+prm['trup'] = (s_[:i+1,:i+1,-1], '=>', 'trup.bin')
 
 # nucleation
-k = int(ihypo[1])
+k = int(hypo[1])
 m = int(1500.0 / dx + 0.5)
 n = int(1500.0 / dx + 1.5)
 prm['mus'] += [
-    (s_[:n,k-n:k+n+1,:], '=', 0.66),
-    (s_[:n,k-m:k+m+1,:], '=', 0.62),
-    (s_[:m,k-n:k+n+1,:], '=', 0.62),
-    (s_[:m,k-m:k+m+1,:], '=', 0.54),
+    (s_[:n,k-n:k+n+1], '=', 0.66),
+    (s_[:n,k-m:k+m+1], '=', 0.62),
+    (s_[:m,k-n:k+n+1], '=', 0.62),
+    (s_[:m,k-m:k+m+1], '=', 0.54),
 ]
 
 # slip, slip velocity, and shear traction time histories
-for x, y in [
+for j, k in [
     [0, 0],
     [45, 0],
     [120, 0],
@@ -90,17 +88,16 @@ for x, y in [
     [120, 75],
     [0, 120],
 ]:
-    j = x * 100.0 / dx
-    k = y * 100.0 / dx
-    l = ihypo[2]
+    x = j * 100.0 / dx
+    y = k * 100.0 / dx
     for f in 'sux', 'suy', 'suz', 'svx', 'svy', 'svz', 'tsx', 'tsy', 'tsz', 'tnm':
-        s = 'faultst%03ddp%03d-%s.bin' % (x, y, f)
+        s = 'faultst%03ddp%03d-%s.bin' % (j, k, f)
         if f not in prm:
             prm[f] = []
-        prm[f] += [(s_[j,k,l,:], '.>', s)]
+        prm[f] += [(s_[x,y,:], '.>', s)]
 
 # displacement and velocity time histories
-for x, y, z in [
+for j, k, l in [
     [0, 0, -30],
     [0, 0, -20],
     [0, 0, -10],
@@ -114,15 +111,15 @@ for x, y, z in [
     [120, 0, -30],
     [120, 0, 30],
 ]:
-    j = x * 100.0 / dx
-    k = y * 100.0 / dx / alpha
-    l = z * 100.0 / dx + ihypo[2]
+    x = j * 100.0 / dx
+    y = k * 100.0 / dx / alpha
+    z = l * 100.0 / dx + hypo[2]
     for f in 'ux', 'uy', 'uz', 'vx', 'vy', 'vz':
-        s = 'body%03dst%03ddp%03d-%s.bin' % (z, x, y, f)
+        s = 'body%03dst%03ddp%03d-%s.bin' % (j, k, l, f)
         s = s.replace('body-', 'body-0')
         if f not in prm:
             prm[f] = []
-        prm[f] += [(s_[j,k,l,:], '.>', s)]
+        prm[f] += [(s_[x,y,z,:], '.>', s)]
 
 # pre-stress
 d = np.arange(ny) * alpha * dx
@@ -134,10 +131,11 @@ x[k:] = y[k:]
 z[k:] = y[k:]
 
 # run directory
-os.mkdir('run')
-x.astype('f').tofile('run/sxx.bin')
-y.astype('f').tofile('run/syy.bin')
-z.astype('f').tofile('run/szz.bin')
+d = 'run' + os.sep
+os.mkdir(d)
+x.astype('f').tofile(d + 'sxx.bin')
+y.astype('f').tofile(d + 'syy.bin')
+z.astype('f').tofile(d + 'szz.bin')
 
 # run SORD
 cst.sord.run(prm)

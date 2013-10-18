@@ -17,13 +17,14 @@ def test(argv=[]):
 
     # output
     fns = cst.sord.fieldnames()
+    fields = sorted(fns['node']) + sorted(fns['cell'])
     x1 = [1.1, 1.1, 1.1]
     x2 = [9.9, 9.9, 9.9]
     ii = [4.4, 5.5, 6.6, 1]
     infiles = []
-    for k in fns['dict']:
+    for k in fields:
         prm[k] = []
-    for k in 'a1', 'w11':
+    for k in 'ax', 'wxx':
         prm[k] += [([], '#')]
         for op in ['=', '+', '*', '=~', '+~', '*~']:
             prm[k] += [([], op, 2.2)]
@@ -36,7 +37,7 @@ def test(argv=[]):
             f = 'io/%s_i%s.bin' % (k, i)
             infiles.append(f)
             prm[k] += [(ii, op, f)]
-    for k in fns['dict']:
+    for k in fields:
         ii = [4.4, 5.5, 6.6, 1]
         if k in fns['initial']:
             ii = ii[:3]

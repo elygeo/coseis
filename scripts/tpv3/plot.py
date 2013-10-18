@@ -18,7 +18,7 @@ for path in glob.glob(runs):
     meta = json.load(open(path + 'meta.json'))
     shape = meta['shape']
     delta = meta['delta']
-    ihypo = meta['ihypo']
+    hypo  = meta['hypocenter']
     dtype = meta['dtype']
 
     # time histories
@@ -79,8 +79,8 @@ for path in glob.glob(runs):
     y = np.fromfile(path + 'x2.bin', dtype).reshape(n[::-1]).T
     t = np.fromfile(path + 'trup.bin', dtype).reshape(n[::-1]).T
     if 'fixhypo' not in meta:
-        x = x - delta[0] * (ihypo[0] - 1)
-        y = y - delta[1] * (ihypo[1] - 1)
+        x = x - delta[0] * (hypo[0] - 1)
+        y = y - delta[1] * (hypo[1] - 1)
     x *= 0.001
     y *= 0.001
     ax.contour(x, y, t, v, colors='k')

@@ -49,13 +49,14 @@ vpml: -1.0               # damping velocity, <0 default to min, max V_s harmonic
 
 # Finite source parameters
 nsource: 0               # number of sub-faults
-source: potency          # potency, moment, force, or none
+source: potency          # potency, moment, force
 
 # Dynamic rupture parameters
-ihypo: [1.0, 1.0, 1.0]   # hypocenter indices for nucleation
+hypocenter:              # hypocenter logical coordinates
+    [0.0, 0.0, 0.0]
 slipvector:              # shear traction direction for ts1
-     [1.0, 0.0, 0.0]
-faultnormal: 0           # normal direction to fault plane (0=no fault)
+    [1.0, 0.0, 0.0]
+faultnormal: none        # normal direction to fault plane: +x, +y, +z, -x, -y, -z
 faultopening: 0          # 0=not allowed, 1=allowed
 vrup: -1.0               # nucleation rupture velocity, negative = no nucleation
 rcrit: 1000.0            # nucleation critical radius

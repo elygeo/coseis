@@ -14,7 +14,7 @@ use statistics
 real :: rr, xhypo(3), xi(3), w
 integer :: i1(3), i2(3), i, j, k, l, root(3)
 
-if (faultnormal == 0) return
+if (faultnormal == '') return
 if (sync) call barrier
 if (master) print *, clock(), 'Rupture initialization'
 if (ifn == 0) return
@@ -118,7 +118,11 @@ i2 = i2core
 i1(ifn) = irup
 i2(ifn) = irup
 call node_normals(nhat, w1, dx, i1, i2, ifn)
-area = sign(1, faultnormal) * sqrt(sum(nhat * nhat, 4))
+if (faultnormal(1:1) == '+') then
+    area = sqrt(sum(nhat * nhat, 4))
+else
+    area = -sqrt(sum(nhat * nhat, 4))
+end if
 f1 = area
 call rinvert(f1, size(f1))
 do i = 1, 3
@@ -126,9 +130,9 @@ do i = 1, 3
 end do
 call scalar_swap_halo(area,  nhalo)
 call vector_swap_halo(nhat,  nhalo)
-call field_io('>', 'nhatx', nhat(:,:,:,1))
-call field_io('>', 'nhaty', nhat(:,:,:,2))
-call field_io('>', 'nhatz', nhat(:,:,:,3))
+call field_io('>', 'nsx', nhat(:,:,:,1))
+call field_io('>', 'nsy', nhat(:,:,:,2))
+call field_io('>', 'nsz', nhat(:,:,:,3))
 
 ! resolve prestress onto fault
 do i = 1, 3
@@ -171,7 +175,7 @@ end do
 ! hypocentral radius needed if doing nucleation
 if (rcrit > 0.0 .and. vrup > 0.0) then
     xhypo = 0.0
-    xi = ihypo - nnoff
+    xi = hypocenter - nnoff + 1
     i1 = floor(xi)
     if (all(i1 >= 1 .and. i1 < nm)) then
         do l = i1(3), i1(3)+1

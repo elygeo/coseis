@@ -30,8 +30,8 @@ prm['x'] = (s_[:,:,0], '=<', 'x.bin')
 prm['y'] = (s_[:,:,0], '=<', 'y.bin')
 
 # velocity output
-prm['vx'] =  [(s_[:,:,0,::10],  '=>', 'snap-vx.bin')]
-prm['vy'] += [(s_[:,:,0,::10],  '=>', 'snap-vy.bin')]
+prm['vx'] =  [(s_[:,:,0,::10], '=>', 'snap-vx.bin')]
+prm['vy'] += [(s_[:,:,0,::10], '=>', 'snap-vy.bin')]
 
 # displacement output
 prm['ux'] = [

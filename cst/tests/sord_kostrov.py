@@ -34,7 +34,7 @@ def test(argv=[]):
     # rupture
     dtau = 10e6
     prm['faultnormal'] = 3
-    prm['ihypo'] = [-1, -1, -1.5]
+    prm['hypocenter'] = [-1.0, -1.0, -1.5]
     prm['vrup'] = vr = 0.9 * vs
     prm['rcrit'] = 1e9
     prm['trelax'] = 0.0
@@ -46,10 +46,10 @@ def test(argv=[]):
 
     # receivers
     prm['svm'] = [
-        ([ -1,-21,-1,-1], '=>', 'p20a.bin'),
-        ([-13,-17,-1,-1], '=>', 'p20b.bin'),
-        ([-17,-13,-1,-1], '=>', 'p20c.bin'),
-        ([-21, -1,-1,-1], '=>', 'p20d.bin'),
+        ([ -1,-21,-1], '=>', 'p20a.bin'),
+        ([-13,-17,-1], '=>', 'p20b.bin'),
+        ([-17,-13,-1], '=>', 'p20c.bin'),
+        ([-21, -1,-1], '=>', 'p20d.bin'),
     ]
 
     # analytical solution

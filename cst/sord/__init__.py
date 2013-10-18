@@ -51,14 +51,7 @@ def fieldnames():
     x = os.path.join(x, 'fieldnames.yaml')
     x = open(x).read()
     x = yaml.safe_load(x)
-    return {
-        'dict': x,
-        'input':   [k for k in x if '<' in x[k][-1]],
-        'initial': [k for k in x if '0' in x[k][-1]],
-        'cell':    [k for k in x if 'c' in x[k][-1]],
-        'fault':   [k for k in x if 'f' in x[k][-1]],
-        'volume':  [k for k in x if 'f' not in x[k][-1]],
-    }
+    return x
 
 def f90modules(path):
     mods = set()
@@ -167,45 +160,36 @@ def prepare_param(prm, fio):
     import os
 
     # checks
-    if prm['source'] not in ('potency', 'moment', 'force', 'none'):
-        raise Exception('Error: unknown source type %r' % prm['source'])
+    assert(prm['source'] in ('potency', 'moment', 'force', 'none'))
+    assert(prm['faultnormal'] in ('none', '-x', '-y', '-z', '+x', '+y', '+z'))
 
     # intervals
-    nt = prm['shape'][3]
+    nx, ny, nz, nt = shape = prm['shape']
     prm['itio'] = max(1, min(prm['itio'], nt))
 
-    # hypocenter coordinates
-    nn = prm['shape'][:3]
-    xi = prm['ihypo']
-    for i in range(3):
-        if xi[i] < 0.0:
-            xi[i] += nn[i]
-        if xi[i] < 0.0 or xi[i] > nn[i] - 1:
-            raise Exception('Error: ihypo %s out of bounds' % xi)
+    # rupture
+    ifn = prm['faultnormal'][1:]
+    if ifn in 'xyz':
+        ifn = {'x': 0, 'y': 1, 'z': 2}[ifn]
+        for i in 0, 1, 2:
+            prm['hypocenter'][i] %= shape[i]
+            assert(prm['hypocenter'][i] <= shape[i] - 1)
+        irup = int(prm['hypocenter'][ifn])
+        if irup == 0:
+            prm['bc1'][ifn] = '-cell'
+        if irup == shape[ifn] - 2:
+            prm['bc2'][ifn] = '-cell'
 
-    # rupture boundary conditions
-    nn = prm['shape'][:3]
-    i = abs(prm['faultnormal']) - 1
-    if i >= 0:
-        irup = int(xi[i])
-        if irup == 1:
-            prm['bc1'][i] = '-cell'
-        if irup == nn[i] - 1:
-            prm['bc2'][i] = '-cell'
-        if irup < 1 or irup > (nn[i] - 1):
-            raise Exception('Error: ihypo %s out of bounds' % xi)
-
-    # pml region
-    nn = prm['shape'][:3]
+    # pml
     i1 = [0, 0, 0]
-    i2 = [nn[0] + 1, nn[1] + 1, nn[2] + 1]
+    i2 = [nx, ny, nz]
     if prm['npml'] > 0:
-        for i in range(3):
+        for i in 0, 1, 2:
             if prm['bc1'][i] == 'pml':
-                i1[i] = prm['npml']
+                i1[i] += prm['npml']
             if prm['bc2'][i] == 'pml':
-                i2[i] = nn[i] - prm['npml'] + 1
-            if i1[i] > i2[i]:
+                i2[i] -= prm['npml']
+            if i1[i] => i2[i]:
                 raise Exception('Error: model too small for PML')
     prm.update({'i1pml': i1, 'i2pml': i2})
 
@@ -223,12 +207,25 @@ def prepare_param(prm, fio):
     deltas = {}
     indices = {}
     for field, ios in sorted(fio.items()):
+        tags = fns[field][0]
+        reg = tags[0]
+        input_ = '<' in tags
+        static = '~' not in tags
+        nx, ny, nz, nt = prm['shape']
+        it1, it2 = nt + 1, -1
+        if reg == 'c':
+            shape = [nx - 1, ny - 1, nz - 1]
+        else:
+            shape = [nz, ny, nz]
+        if reg == 'f':
+            del(shape[ifn])
+        if not static:
+            shape += [nt]
         if type(ios) in (float, int):
             ios = [ios]
         elif len(ios) > 1 and isinstance(ios[1], basestring):
             ios = [ios]
         ios_ = []
-        it1, it2 = prm['shape'][-1] + 1, -1
         for io in ios:
             fname, val, tau = 'const', 0.0, 0.0
             x1, x2 = [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]
@@ -260,39 +257,42 @@ def prepare_param(prm, fio):
             # error check
             if len(fname) > 32:
                 raise Exception('File/function name too long: ' + fname)
-            if field in fns['input'] and op == '>':
+            if '>' not in op and not input_:
                 raise Exception('Error: field is ouput only: %r' % field)
-            if field in fns['fault'] and prm['faultnormal'] == 0:
+            if prm['faultnormal'] == 'none' and reg == 'f':
                 raise Exception('Error: field only for ruptures: %r' % field)
 
-            # cell or node registration
-            nx, ny, nz, nt = prm['shape']
-            if field in fns['initial']:
-                nt = 1
-            if field in fns['cell']:
-                reg = 'c'
-                nn = [nx - 1, ny - 1, nz - 1, nt]
-            else:
-                reg = 'n'
-                nn = [nx, ny, nz, nt]
-
-            # indices
+            # sub-cell interp
             if '.' in op:
-                x, y, z = x1 = slices[:3]
-                slices = [int(x), int(y), int(z)] + slice[3:]
-            slices = expand_slices(nn, slices)
-            if field in fns['fault']:
-                i = abs(prm['faultnormal']) - 1
-                slices[i] = [irup, irup + 1, 1]
+                if reg == 'f':
+                    x1 = slices[:2]
+                    for i in 0, 1:
+                        x1[i] %= shape[i]
+                        assert(x1[i] <= shape[i] - 1)
+                        slices[i] = int(x1[i])
+                    x1.insert(ifn, irup + 0.5)
+                else:
+                    x1 = slices[:3]
+                    for i in 0, 1, 2:
+                        x1[i] %= shape[i]
+                        assert(x1[i] <= shape[i] - 1)
+                        slices[i] = int(x1[i])
+
+            # slices
+            slices = expand_slices(shape, slices)
+            if reg == 'f':
+                slices.insert(ifn, [irup, irup+1, 1])
+            if static:
+                slices.append([0, 1, 1])
             it1 = min(it1, slices[-1][0])
             it2 = max(it2, slices[-1][1])
 
             # buffer size
-            shape = [(i[1] - i[0]) // i[2] + 1 for i in slices]
+            nn = [(i[1] - i[0] - 1) // i[2] + 1 for i in slices]
             nb = (min(prm['itio'], nt) - 1) // slices[3][2] + 1
-            nb = max(1, min(nb, shape[3]))
-            n = shape[0] * shape[1] * shape[2]
-            if n > (nn[0] + nn[1] + nn[2]) ** 2:
+            nb = max(1, min(nb, nn[3]))
+            n = nn[0] * nn[1] * nn[2]
+            if n > (nx + ny + nz) ** 2:
                 nb = 1
             elif n > 1:
                 nb = min(nb, prm['itbuff'])
@@ -303,30 +303,30 @@ def prepare_param(prm, fio):
 
             # metadata
             if op[-1] in '<>':
-                index = []
-                shape = []
-                delta = []
+                ii = []
+                nn = []
+                dd = []
                 for i, s in enumerate(slices):
                     start, stop, step = s
                     d = prm['delta'][i] * step
-                    n = (stop - start) // step + 1
+                    n = (stop - start - 1) // step + 1
                     if n == 1:
-                        index += [start]
+                        ii += [start]
                     else:
-                        delta += [d]
-                        shape += [n]
+                        dd += [d]
+                        nn += [n]
                         if step == 1:
-                            index += [[start, stop]]
+                            ii += [[start, stop]]
                         else:
-                            index += [[start, stop, step]]
-                if shape != []:
-                    shapes[fname] = shape
-                if delta != []:
-                    deltas[fname] = delta
+                            ii += [[start, stop, step]]
+                if nn != []:
+                    shapes[fname] = nn
+                if dd != []:
+                    deltas[fname] = dd
                 if '.' in op:
                     indices[fname] = xi
                 else:
-                    indices[fname] = index
+                    indices[fname] = ii
 
         fio_ += [(it1, it2, ios_)]
 
@@ -353,7 +353,7 @@ def stage(args, **kwargs):
 
     # configure and make
     prm = parameters()
-    fns = fieldnames()['dict']
+    fns = fieldnames()
     fio = {}
     job = {}
     args.update(kwargs)
@@ -395,8 +395,9 @@ def stage(args, **kwargs):
         (ny - 1) // k + 1,
         (nz - 1) // l + 1,
     ]
-    i = abs(prm['faultnormal']) - 1
-    if i >= 0:
+    i = prm['faultnormal'][1:]
+    i = {'': None, 'x': 0, 'y': 1, 'z': 2}[i]
+    if i:
         nl[i] = max(nl[i], 2)
     j = (nx - 1) // nl[0] + 1
     k = (ny - 1) // nl[1] + 1
@@ -530,8 +531,6 @@ def expand_slices(shape, slices=[]):
 
     # loop over slices
     for i, s in enumerate(slices):
-
-        # convert to slice
         if isinstance(s, basestring):
             t = []
             for j in s.split(':'):
@@ -541,21 +540,19 @@ def expand_slices(shape, slices=[]):
                     t.append(float(j))
                 else:
                     t.append(int(j))
-            if len(t) == 0:
-                s = slice(None)
-            elif len(t) == 1:
-                s = slice(t[0], t[0] + 1)
-            else:
-                s = slice(*t)
-        elif type(s) in (tuple, list):
+        if type(s) in (tuple, list):
             if len(s) == 0:
                 s = slice(None)
             elif len(s) == 1:
-                s = slice(s[0], s[0] + 1)
+                s = s[0]
             else:
                 s = slice(*s)
+        if type(s) == slice:
+            s = s.indices(shape[i])
         else:
-            s = slice(s, s + 1)
-        slices[i] = s.indices(shape)
+            s %= shape[i]
+            s = (s, s + 1, 1)
+        slices[i] = s
+
     return slices
 

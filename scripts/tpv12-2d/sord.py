@@ -35,53 +35,52 @@ prm['n1expand'] = [0, 0, 50]
 prm['n2expand'] = [0, 0, 50]
 
 # hypocenter
-k = 12000.0 / dx
-l = nz // 2
-prm['ihypo'] = ihypo = [1, k, l]
+y = 12000.0 / dx
+z = nz // 2 - 0.5
+prm['hypocenter'] = hypo = [0.0, y, z]
 
 # near-fault volume
-k = 15000.0 / dx + 0.5
-l0 = l - 3000.0 / dx + 0.5
-l1 = l + 3000.0 / dx + 0.5
+k = int(15000.0 / dx + 0.5)
+l0 = int(z - 3000.0 / dx + 0.5)
+l1 = int(z + 3000.0 / dx + 0.5)
 
 # material properties
 prm['rho'] = 2700.0
 prm['vp']  = 5716.0
 prm['vs']  = 3300.0
-prm['gam'] = [0.2, (s_[0,0:k+1,l0:l1+1] == 0.02)]
+prm['gam'] = [0.2, (s_[:,:k,l0:l1] == 0.02)]
 prm['hourglass'] = 1.0, 2.0
 
 # fault parameters
 k = int(15000.0 / dx)
-prm['faultnormal'] = 3
+prm['faultnormal'] = '+z'
 prm['co'] = 200000.0
 prm['dc'] = 0.5
 prm['mud'] = 0.1
-prm['mus'] = [10000.0, (s_[:,:k+1,:], '=', 0.7)]
-prm['sxx'] = (s_[0,:,:], '=<', 'sxx.bin')
-prm['syy'] = (s_[0,:,:], '=<', 'syy.bin')
-prm['szz'] = (s_[0,:,:], '=<', 'szz.bin')
+prm['mus'] = [10000.0, (s_[:,:k+1], '=', 0.7)]
+prm['sxx'] = (s_[0,:], '=<', 'sxx.bin')
+prm['syy'] = (s_[0,:], '=<', 'syy.bin')
+prm['szz'] = (s_[0,:], '=<', 'szz.bin')
 
 # nucleation
-i = 1500.0 / dx
-k = ihypo[1]
+i = int(1500.0 / dx + 0.5)
+k = int(hypo[1])
 prm['mus'] = [
-    (s_[:,k-i  :k+i,  :], '=', 0.62),
-    (s_[:,k-i-1:k+i+1,:], '=', 0.54),
+    (s_[:,k-i  :k+i+1, ], '=', 0.62),
+    (s_[:,k-i-1:k+i+2], '=', 0.54),
 ]
 
 # fault time histories
-l = ihypo[2]
-for y in 0, 15, 30, 45, 75, 120:
-    k = y * 100.0 / dx
+for k in 0, 15, 30, 45, 75, 120:
+    y = k * 100.0 / dx
     for f in 'sux', 'suy', 'suz', 'svx', 'svy', 'svz', 'tsx', 'tsy', 'tsz', 'tnm':
         if f not in prm:
             prm[f] = []
-        s = 'faultst%03ddp000-%s.bin' % (y, f)
-        prm[f] += [(s_[0,k,l,:], '.>', s)]
+        s = 'faultst%03ddp000-%s.bin' % (k, f)
+        prm[f] += [(s_[0.0,y,:], '.>', s)]
 
 # body time histories
-for y, z in [
+for k, l in [
     [0, -30],
     [0, -20],
     [0, -10],
@@ -93,12 +92,12 @@ for y, z in [
     [3,   5],
     [3,  10],
 ]:
-    k = y * 100.0 / dx / alpha
-    l = z * 100.0 / dx + ihypo[2]
+    y = k * 100.0 / dx / alpha
+    z = l * 100.0 / dx + hypo[2]
     for f in 'u1', 'u2', 'u3', 'v1', 'v2', 'v3':
-        s = 'body%03dst000dp%03d-%s.bin' % (z, y, f)
+        s = 'body%03dst000dp%03d-%s.bin' % (l, k, f)
         s = s.replace('body-', 'body-0')
-        prm[f] += [(s_[0,k,l,:], '.>', s)]
+        prm[f] += [(s_[0.0,y,z,:], '.>', s)]
 
 # pre-stress
 d = np.arange(ny) * alpha * dx
@@ -110,10 +109,11 @@ x[k:] = y[k:]
 z[k:] = y[k:]
 
 # run directory
-os.mkdir('run')
-x.astype('f').tofile('run/sxx.bin')
-y.astype('f').tofile('run/syy.bin')
-z.astype('f').tofile('run/szz.bin')
+d = 'run' + os.sep
+os.mkdir(d)
+x.astype('f').tofile(d + 'sxx.bin')
+y.astype('f').tofile(d + 'syy.bin')
+z.astype('f').tofile(d + 'szz.bin')
 
 # run SORD
 cst.sord.run(prm)

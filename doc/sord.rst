@@ -123,23 +123,20 @@ fault surface.  For example, density ``rho`` is a static, settable, cell,
 volume variable. Slip path length ``sl`` is a dynamic, output, node, fault
 variable.
 
-Field operations may specify a slice, indicating a subregion of the array.  The
-slicing notation follows that of Python, but is extended here to use integers
-for node indices and integers + 0.5 for cell indices (1.5, 2.5, 3.5, ...).
-Array indexing starts at 1 for the first node, and 1.5 for the first cell.
-Negative indices count inward from end of the array, starting at -1 for the
-last node, and -1.5 for the last cell.  Slices can be specified either with a
-string, or using the helper function ``cst.sord.get_slices()``. Empty brackets
-``[]`` are shorthand for the entire 4D field. Here are some examples::
+Field operations may specify a slice, indicating a subregion of the array,
+using Python slicing notation.  Indices are 0-based.  Slices can be specified
+either with a string, or using the helper function ``cst.sord.get_slices()``.
+Empty brackets ``[]`` are shorthand for the entire array. Here are some
+examples::
 
     s_ = cst.sord.get_slices()
     j = 10
     k = 20
-    '[]'                # Entire 4D volume
-    '[10.5,20.5,1.5,:]' # Single cell, full time history
-    '[:,:,:,-1]'        # Full 3D volume, last time step
-    s_[j,k,1,-1]        # Single node, last time step
-    s_[j,:,:,::10]      # j=10 node surface, every 10th time step
+    '[]'           # Entire 4D volume
+    '[10,20,1,:]'  # Single cell, full time history
+    '[:,:,:,-1]'   # Full 3D volume, last time step
+    s_[j,k,1,-1]   # Single node, last time step
+    s_[j,:,:,::10] # j=10 node surface, every 10th time step
 
 FIXME: this section is unfinished.::
 
@@ -249,8 +246,8 @@ up as such::
 
     delta = [5.0, 5.0, 5.0, 0.1]
     faultnormal = 3
-    ihypo = [21, 21, 21.5]
-    shape  = [41, 41, 42, 100]
+    shape = [41, 41, 42, 100]
+    hypocenter = [20.0, 20.0, 20.5]
     bc1 = ['free', 'free', 'free']
     bc2 = ['free', 'free', 'free']
 
@@ -263,12 +260,14 @@ symmetry condition used.  For example, reducing the size of the previous
 example to put the rupture surface along the far z boundary::
 
     shape = [41, 41, 22, 100]
+    hypocenter = [20.0, 20.0, 20.5]
+    bc1 = ['free', 'free', 'free']
     bc2 = ['free', 'free', '-cell']
 
 Alternatively, put the rupture surface along the near z boundary::
 
-    ihypo = [21, 21, 1.5]
     shape = [41, 41, 22, 100]
+    hypocenter = [20.0, 20.0, 1.5]
     bc1 = ['free', 'free', '-cell']
     bc2 = ['free', 'free', 'free']
 
@@ -277,8 +276,8 @@ x direction, then we may also use node-centered mirror symmetry along the in-pla
 axis, and node-centered anti-mirror symmetry along the anti-plane axis, to reduce
 computations eight-fold::
 
-    ihypo = [21, 21, 21.5]
     shape = [21, 21, 22, 100]
+    hypocenter = [20.0, 20.0, 20.5]
     bc1 = ['free', 'free', 'free']
     bc2 = ['anti-n', 'mirror-n', 'anti-c'
 

@@ -40,21 +40,22 @@ prm['vs']  = vs = 3464.0
 prm['gam'] = 0.0
 prm['hourglass'] = [1.0, 1.0]
 
-# receivers
-j = reg
-k = reg + 3000.0 / dx
-l = reg + 4000.0 / dx
+# receivers FIXME
+x = reg
+y = reg + 3000.0 / dx
+z = reg + 4000.0 / dx
 for f in 'vx', 'vy', 'vz':
     prm[f] = [
-        (s_[j,j,l,:], '.>', 'p1-%s.bin' % f),
-        (s_[j,k,l,:], '.>', 'p2-%s.bin' % f),
-        (s_[j,j,l,:], '.>', 'p3-%s.bin' % f),
-        (s_[k,k,l,:], '.>', 'p4-%s.bin' % f),
-        (s_[k,j,l,:], '.>', 'p5-%s.bin' % f),
-        (s_[j,j,l,:], '.>', 'p6-%s.bin' % f),
+        (s_[x,x,z,:], '.>', 'p1-%s.bin' % f),
+        (s_[x,y,z,:], '.>', 'p2-%s.bin' % f),
+        (s_[x,x,z,:], '.>', 'p3-%s.bin' % f),
+        (s_[y,y,z,:], '.>', 'p4-%s.bin' % f),
+        (s_[y,x,z,:], '.>', 'p5-%s.bin' % f),
+        (s_[x,x,z,:], '.>', 'p6-%s.bin' % f),
     ]
 
 # snapshots
+j = int(reg + 0.5)
 for f in 'vx', 'vy', 'vz':
     prm[f] += [
         (s_[j,:,:,::10], '=>', 'snap-%s.bin' % f),

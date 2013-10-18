@@ -8,7 +8,6 @@ def test(argv=[]):
     import numpy as np
     import cst
     prm = {}
-    s_ = cst.sord.get_slices()
 
     # parameters
     prm['argv'] = argv
@@ -29,18 +28,16 @@ def test(argv=[]):
     prm['bc1'] = ['free', 'free', 'free']
     prm['bc2'] = ['free', 'free', 'free']
 
-    # source
-    i = s_[0,0,0,:]
-    prm['pxx'] = [(i, '=', 1e10, 'delta', 1.0)]
-    prm['pyy'] = [(i, '=', 1e10, 'delta', 1.0)]
-    prm['pzz'] = [(i, '=', 1e10, 'delta', 1.0)]
-
     # output
     fns = cst.sord.fieldnames()
-    for k in fns['volume']:
-        if k not in prm:
-            prm[k] = []
+    fns = sorted(fns['node']) + sorted(fns['cell'])
+    for k in fns:
         prm[k] += [([], '=>', k + '.bin')]
+
+    # potency source
+    prm['pxx'] += [([0,0,0,0], '=', 1e10)]
+    prm['pyy'] += [([0,0,0,0], '=', 1e10)]
+    prm['pzz'] += [([0,0,0,0], '=', 1e10)]
 
     # master
     prm['path'] = d0 = os.path.join('run', 'sord_mpi') + os.sep
@@ -55,7 +52,7 @@ def test(argv=[]):
         os.makedirs(d)
         job = cst.sord.run(prm)
         max_err_ = 0.0
-        for k in fns['volume']:
+        for k in fns:
             f1 = d0 + k + '.bin'
             f2 = d + k + '.bin'
             v1 = np.fromfile(f1, job['dtype'])

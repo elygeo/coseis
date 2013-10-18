@@ -21,7 +21,13 @@ nn = shape_(1:3)
 nt = max(shape_(4), 0)
 
 ! fault normal
-ifn = abs(faultnormal)
+select case (faultnormal(2:2))
+case (''); ifn = 0
+case ('x'); ifn = 1
+case ('y'); ifn = 2
+case ('z'); ifn = 3
+case default; stop 'Error in faultnormal'
+end select
 
 ! partition for parallelization
 nl3 = (nn - 1) / nproc3 + 1
@@ -44,7 +50,7 @@ master = ip == 0
 nnoff = nl3 * ip3 - nhalo
 
 ! process rank for hypocenter 
-ip3hypo = floor((ihypo - 1.0) / nl3)
+ip3hypo = floor(hypocenter / nl3)
 
 ! size of arrays
 nl = min(nl3, nn - nnoff - nhalo)
@@ -73,14 +79,14 @@ i2pml = i2pml - nnoff
 ! map rupture index to local indices, and test if fault on this process
 irup = 0
 if (ifn /= 0) then
-    irup = floor(ihypo(ifn) + 0.000001) - nnoff(ifn)
+    irup = floor(hypocenter(ifn) + 0.000001) - nnoff(ifn) + 1
     if (irup + 1 < i1core(ifn) .or. irup > i2core(ifn)) ifn = 0
 end if
 
 ! debugging
 sync = debug > 1
 if (debug > 2) then
-    write (filename, "(a,i6.6,a)") 'debug/db', ip, '.yaml'
+    write (filename, "(a,i6.6,a)") 'debug/db', ip, '.json'
     open (1, file=filename, status='replace')
     write (1, '(a)') '{'
     write (1, '(a,i8)') &
@@ -106,6 +112,7 @@ if (debug > 2) then
         '    "i2core": [', i2core, '],', &
         '    "i2node": [', i2node, '],', &
         '    "i2pml":  [', i2pml,  ']'
+    write (1, '(a)') '}'
     close (1)
 end if
 

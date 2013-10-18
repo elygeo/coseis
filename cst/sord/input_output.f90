@@ -6,7 +6,7 @@ type t_io
     integer :: ii(3,4), nb, ib, fh
     real, pointer :: buff(:,:)     ! buffer for storing multiple time steps
     character(32) :: fname         ! file or function nameD on disk for input or output
-    character(5) :: field          ! field variable, see fieldnames.yaml
+    character(4) :: field          ! field variable, see fieldnames.yaml
     character(2) :: op             ! '<' read, '>' write, '=' set, '+' add
     character :: reg               ! n: node, c: cell registration
 end type t_io
@@ -49,11 +49,17 @@ call cbroadcast(str)
 
 ! read parameters
 read (str, *) &
-    affine, bc1, bc2, debug, delta, diffop, faultnormal, faultopening, gam_max, &
-    gam_min, gridnoise, hourglass, i1pml, i2pml, ihypo, itio, itstats, mpin, mpout, &
-    n1expand, n2expand, nfieldio,  npml, nproc3, nsource, nthread, ppml, rcrit, &
-    rexpand, rho_max, rho_min, shape_, slipvector, source, svtol, tm0, trelax, &
+    affine, bc1, bc2, debug, delta, diffop, &
+    faultnormal, faultopening, &
+    gam_max, gam_min, gridnoise, hourglass, hypocenter, &
+    i1pml, i2pml, itio, itstats, mpin, mpout, &
+    n1expand, n2expand, nfieldio, npml, nproc3, nsource, nthread, &
+    ppml, rcrit, rexpand, rho_max, rho_min, &
+    shape_, slipvector, source, svtol, tm0, trelax, &
     vdamp, vp_max, vp_min, vpml, vrup, vs_max, vs_min
+
+! convert indices
+i1pml = i1pml + 1
 
 ! find start of field i/o
 i = scan(str, new_line('a'))
@@ -75,6 +81,9 @@ do j = 1, nfieldio
     io%ib = -1
     read (str, *) io%field, io%reg, io%ii, io%nb, io%x1, io%x2, &
         io%val, io%tau, io%op, io%fname
+    do i = 1, 4
+        io%ii(1,i) = io%ii(1,i) + 1
+    end do
     do
         i = scan(io%fname, '\')
         if (i == 0) exit
@@ -99,7 +108,7 @@ use fortran_io
 use boundary_cond
 character(*), intent(in) :: passes, field
 real, intent(inout) :: f(:,:,:)
-character(4) :: pass
+character(1) :: pass
 character(256) :: filename
 integer :: i1(3), i2(3), i3(3), i4(3), di(3), m(4), n(4), o(4), &
     it1, it2, dit, i, j, k, l, ipass, iloop, io1_, io2_
@@ -145,11 +154,11 @@ if (pass == '>' .and. io%op(2:2) /= '>') cycle loop
 if (io%reg == 'n') then
     i3 = i1node
     i4 = i2node
-    xi = io%x1 - nnoff
+    xi = io%x1 - nnoff + 1.0
 else
     i3 = i1cell
     i4 = i2cell
-    xi = io%x1 - 0.5 - nnoff
+    xi = io%x1 - nnoff + 0.5
 end if
 if (io%op(1:1) == '.') then
     i1 = max(i3, floor(xi))

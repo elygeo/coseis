@@ -26,12 +26,12 @@ i2 = i2node
 do i = i1(1), i2(1); w1(i,:,:,1) = dx(1) * (i + nnoff(1) - 1); end do
 do i = i1(2), i2(2); w1(:,i,:,2) = dx(2) * (i + nnoff(2) - 1); end do
 do i = i1(3), i2(3); w1(:,:,i,3) = dx(3) * (i + nnoff(3) - 1); end do
-if (faultnormal /= 0) then
+if (faultnormal /= '') then
     i1 = max(i1core, irup + 1)
-    select case (abs(faultnormal))
-    case (1); do i = i1(1), i2(1); w1(i,:,:,1) = dx(1) * (i + nnoff(1) - 2); end do
-    case (2); do i = i1(2), i2(2); w1(:,i,:,2) = dx(2) * (i + nnoff(2) - 2); end do
-    case (3); do i = i1(3), i2(3); w1(:,:,i,3) = dx(3) * (i + nnoff(3) - 2); end do
+    select case (faultnormal(2:2))
+    case ('x'); do i = i1(1), i2(1); w1(i,:,:,1) = dx(1) * (i + nnoff(1) - 2); end do
+    case ('y'); do i = i1(2), i2(2); w1(:,i,:,2) = dx(2) * (i + nnoff(2) - 2); end do
+    case ('z'); do i = i1(3), i2(3); w1(:,:,i,3) = dx(3) * (i + nnoff(3) - 2); end do
     end select
 end if
 
@@ -56,10 +56,10 @@ if (gridnoise > 0.0) then
     call set_halo(w2(:,:,:,3), 0.0, i1, i2)
     i1 = max(i1core, irup)
     i2 = min(i2core, irup + 1)
-    select case (abs(faultnormal))
-    case (1); w2(i1(1):i2(1),:,:,:) = 0.0
-    case (2); w2(:,i1(2):i2(2),:,:) = 0.0
-    case (3); w2(:,:,i1(3):i2(3),:) = 0.0
+    select case (faultnormal(2:2))
+    case ('x'); w2(i1(1):i2(1),:,:,:) = 0.0
+    case ('y'); w2(:,i1(2):i2(2),:,:) = 0.0
+    case ('z'); w2(:,:,i1(3):i2(3),:) = 0.0
     end select
     w1 = w1 + w2
 end if

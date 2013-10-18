@@ -59,8 +59,8 @@ for dx, np in runs:
     prm['hourglass'] = [1.0, 2.0]
 
     # fault properties
-    prm['faultnormal'] = 3
-    prm['ihypo'] = [-1.0, -1.0, -1.5]
+    prm['faultnormal'] = '+z'
+    prm['hypocenter'] = [-1.0, -1.0, -1.5]
     prm['dc']  = 0.4
     prm['mud'] = 0.525
     prm['tn']  = -120.0e+6
@@ -81,30 +81,30 @@ for dx, np in runs:
     i1 = -int(1500.0 / dx + 1.5)
     prm['ts'] = [
         70.0e+6,
-        (s_[i1:,i1:,:], '=', 72.9e+6),
-        (s_[i0:,i1:,:], '=', 75.8e+6),
-        (s_[i1:,i0:,:], '=', 75.8e+6),
+        (s_[i1:,i1:], '=', 72.9e+6),
+        (s_[i0:,i1:], '=', 75.8e+6),
+        (s_[i1:,i0:], '=', 75.8e+6),
         # FIXME??? missing one?
     ]
 
     # fault plane output
     prm['x']    = (s_[j:,k:,-2], '>', 'x.bin')
     prm['y']    = (s_[j:,k:,-2], '>', 'y.bin')
-    prm['psv']  = (s_[j:,k:,:,-1], '>', 'psv.bin')
-    prm['trup'] = (s_[j:,k:,:,-1], '>', 'trup.bin')
-    prm['sux']  = [(s_[j:,k:,:,-1], '>', 'sux.bin')]
-    prm['suy']  = [(s_[j:,k:,:,-1], '>', 'suy.bin')]
+    prm['psv']  = (s_[j:,k:,-1], '>', 'psv.bin')
+    prm['trup'] = (s_[j:,k:,-1], '>', 'trup.bin')
+    prm['sux']  = [(s_[j:,k:,-1], '>', 'sux.bin')]
+    prm['suy']  = [(s_[j:,k:,-1], '>', 'suy.bin')]
 
     # slip, slip velocity, and shear traction time histories
-    j, k, l = prm['ihypo']
-    j -= 7500.0 / dx
-    k -= 6000.0 / dx
+    x, y = prm['hypocenter'][:2]
+    x += 7500.0 / dx
+    y += 6000.0 / dx
     for f in 'sux', 'suy', 'svx', 'svy', 'tsx', 'tsy':
         if f not in prm:
             prm[f] = []
         prm[f] += [
-            (s_[j,-1,-2,:], '.>', 'P1-%s.bin' % f), # mode II point
-            (s_[-1,k,-2,:], '.>', 'P2-%s.bin' % f), # mode III point
+            (s_[x,-1,:], '.>', 'P1-%s.bin' % f), # mode II point
+            (s_[-1,y,:], '.>', 'P2-%s.bin' % f), # mode III point
         ]
 
     # run SORD

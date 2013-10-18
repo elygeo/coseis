@@ -252,9 +252,9 @@ def write_sord(path, srf, delta=(1,1,1), proj=None, dbytes=4):
         x, y = proj(x, y)
     else:
         rot = 0.0
-    x = 1.0 + x / delta[0]
-    y = 1.0 + y / delta[1]
-    z = 1.0 + z / delta[2]
+    x /= delta[0]
+    y /= delta[1]
+    z /= delta[2]
     with open(path + 'xi1.bin', 'wb') as f1:
      with open(path + 'xi2.bin', 'wb') as f2:
       with open(path + 'xi3.bin', 'wb') as f3:
