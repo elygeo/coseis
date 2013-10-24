@@ -5,18 +5,16 @@ maxram: 4096
 ppn_range: [1, 2, 4]
 nthread: 1
 queue: default
-queue_opts: [
-    [development, {maxnodes:  8192, maxtime:   30}],
-    [smallblocks, {maxnodes:  1024, maxtime: 1440}],
-    [pset64,      {maxnodes:  4096, maxtime: 1440}],
-    [pset128,     {maxnodes: 12288, maxtime: 1440}],
-    [default,     {maxnodes: 16384, maxtime: 1440}],
-]
+queue_opts:
+    - [development, {maxnodes:  8192, maxtime:   30}]
+    - [smallblocks, {maxnodes:  1024, maxtime: 1440}]
+    - [pset64,      {maxnodes:  4096, maxtime: 1440}]
+    - [pset128,     {maxnodes: 12288, maxtime: 1440}]
+    - [default,     {maxnodes: 16384, maxtime: 1440}]
 launch: mpirun -mode VN -np {nproc} -exe {command}
-submit: llsubmit {submit_flags} "{name}.sh"
-
-script: |
-    #!/bin/sh
+submit: llsubmit {submit_flags} {script}
+script: {name}.sh
+script_header: |
     # @ account_no = {account}
     # @ class = {queue}
     # @ job_name = {name}
@@ -29,10 +27,3 @@ script: |
     # @ job_type = bluegene
     # @ environment = COPY_ALL
     # @ queue
-    cd "{path}"
-    env > "{name}.env"
-    date
-    {pre}
-    {launch}
-    {post}
-    date

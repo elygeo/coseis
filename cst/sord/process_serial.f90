@@ -1,11 +1,11 @@
 ! collective routines - serial version
-module collective
+module process
 implicit none
 integer :: file_null
 contains
 
 ! initialize
-subroutine initialize(master)
+subroutine init_process(master)
 use fortran_io
 logical, intent(out) :: master
 file_null = fio_file_null
@@ -13,7 +13,7 @@ master = .true.
 end subroutine
 
 ! finalize
-subroutine finalize
+subroutine finalize_process
 end subroutine
 
 ! process rank

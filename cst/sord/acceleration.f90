@@ -13,7 +13,7 @@ use dynamic_rupture
 use utilities
 use input_output
 use statistics
-use collective
+use process
 integer :: i1(3), i2(3), i, j, k, l, ic, iid, id, iq, p
 
 ! init

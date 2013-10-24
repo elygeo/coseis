@@ -1,7 +1,8 @@
 ! SORD main program
 program sord
 
-use collective
+use process
+use thread
 use globals
 use input_output
 use setup
@@ -21,9 +22,10 @@ use statistics
 implicit none
 
 call system_clock(clock0, clockrate)
-call initialize(master)
+call init_process(master)
 if (master) print *, clockrate, 'Clock rate'
 call read_parameters
+call init_thread(nthread)
 call setup_dimensions
 call allocate_arrays
 call init_grid
@@ -45,7 +47,7 @@ do it = 1, nt
 end do
 
 if (master) print *, clock(), 'Finished!'
-call finalize
+call finalize_process
 
 end program
 

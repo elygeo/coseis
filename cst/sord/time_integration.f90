@@ -8,7 +8,7 @@ use globals
 use utilities
 use input_output
 use statistics
-use collective
+use process
 integer :: i, j, k, l
 real :: u, v
 

@@ -9,7 +9,7 @@ contains
 ! initialize finite source
 subroutine init_finite_source
 use globals
-use collective
+use process
 use utilities
 integer :: n, i, fh
 if (nsource == 0) return

@@ -6,7 +6,7 @@ contains
 ! rupture initialization
 subroutine init_rupture
 use globals
-use collective
+use process
 use surf_normals
 use utilities
 use input_output
@@ -242,7 +242,7 @@ end subroutine
 ! rupture boundary condition
 subroutine step_rupture
 use globals
-use collective
+use process
 use boundary_cond
 use utilities
 use input_output

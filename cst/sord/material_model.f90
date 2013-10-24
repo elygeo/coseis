@@ -5,7 +5,7 @@ contains
 
 subroutine init_material
 use globals
-use collective
+use process
 use utilities
 use input_output
 real :: maxl(14), maxg(14), vmin, vmax, cfl1, cfl2, r, s

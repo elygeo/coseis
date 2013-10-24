@@ -10,7 +10,7 @@ command: ''
 pre: ''
 post: ''
 nproc: 1
-nthread: 0
+nthread: 1
 nstripe: -2
 minutes: 0
 pmem: 0
@@ -38,16 +38,7 @@ notify_flag: -m abe
 notify_threshold: 4096
 depend_flag: -W depend="afterok:{depend}"
 submit_flags: ''
-submit: qsub {notify_flag} {depend_flag} {submit_flags} "{name}.sh"
+submit: qsub {notify_flag} {depend_flag} {submit_flags} {script}
 submit_pattern: (?P<jobid>\d+\S*)\D*$
-
-# job script
-script: |
-    #!/bin/sh
-    cd "${path}"
-    env > "{name}.env"
-    date
-    {pre}
-    {launch}
-    {post}
-    date
+script: ''
+script_header: ''

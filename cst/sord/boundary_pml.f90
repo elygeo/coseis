@@ -6,7 +6,7 @@ contains
 ! initialize pml
 subroutine init_pml
 use globals
-use collective
+use process
 use utilities
 integer :: i1(3), i2(3), i, j, k, l, j1, k1, l1, j2, k2, l2
 real :: c1, c2, c3, damp, dampn, dampc, tune, r

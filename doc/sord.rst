@@ -100,7 +100,7 @@ and `cst/sord/parameters.yaml <../cst/sord/parameters.yaml>`__, respectively.
 Machine specific job-control parameters may also be present in the ``cst/conf``
 directory that supersede the defaults.
 
-I maybe be helpful to look through example applications in the ``cst/scripts``
+It maybe be helpful to look through example applications in the ``cst/scripts``
 directory, and return to this document for further description of the
 simulation parameters.
 

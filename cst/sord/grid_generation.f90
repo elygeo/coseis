@@ -5,7 +5,7 @@ contains
 
 subroutine init_grid
 use globals
-use collective
+use process
 use boundary_cond
 use utilities
 use diff_nc_op

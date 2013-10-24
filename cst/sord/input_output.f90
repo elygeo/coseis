@@ -20,7 +20,7 @@ contains
 ! so call sub-function and allocate on the stack.
 subroutine read_parameters
 use globals
-use collective
+use process
 integer :: n
 if (master) inquire (file='sord.in', size=n)
 call ibroadcast(n)
@@ -30,7 +30,7 @@ end subroutine
 ! read parameters sub-function
 subroutine read_parameters1(n)
 use globals
-use collective
+use process
 use utilities
 type (t_io), pointer :: io
 integer, intent(in) :: n
@@ -103,7 +103,7 @@ end subroutine
 subroutine field_io(passes, field, f)
 use globals
 use utilities
-use collective
+use process
 use fortran_io
 use boundary_cond
 character(*), intent(in) :: passes, field

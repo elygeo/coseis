@@ -12,7 +12,7 @@ contains
 ! write statistics
 subroutine stats
 use globals
-use collective
+use process
 use utilities
 logical, save :: init = .true.
 integer, save :: fh(20), j = 0

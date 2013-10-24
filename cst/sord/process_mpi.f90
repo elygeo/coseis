@@ -1,5 +1,5 @@
 ! collective routines - MPI version
-module collective
+module process
 implicit none
 integer :: file_null
 integer, private :: np3(3), comm1d(3), comm2d(3), comm3d, itype, rtype
@@ -8,7 +8,7 @@ include 'mpif.h' ! mpi module broken on Blue Gene so include instead
 contains
 
 ! initialize
-subroutine initialize(master)
+subroutine init_process(master)
 logical, intent(out) :: master
 integer :: i, m, n, e
 integer(4) :: i4
@@ -34,7 +34,7 @@ if (m > n) rtype = mpi_real8
 end subroutine
 
 ! finalize
-subroutine finalize
+subroutine finalize_process
 integer :: e
 call mpi_finalize(e)
 end subroutine

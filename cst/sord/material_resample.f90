@@ -5,7 +5,7 @@ contains
 
 subroutine resample_material
 use globals
-use collective
+use process
 use boundary_cond
 use utilities
 integer :: i1(3), i2(3), bc(3)

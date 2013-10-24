@@ -112,8 +112,7 @@ def configure(**kwargs):
     if job['machine'] and job['machine'].lower() != 'default':
         f = path + job['machine'] + '.yaml'
         m = yaml.load(open(f))
-        for k in m:
-            job[k] = m[k]
+        job.update(m)
     for h, o in job['host_opts'].items():
         if h in job['host']:
             for k, v in o.items():

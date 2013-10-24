@@ -5,7 +5,7 @@ contains
 
 subroutine setup_dimensions
 use globals
-use collective
+use process
 use utilities
 integer :: nl(3), i
 character(32) :: filename

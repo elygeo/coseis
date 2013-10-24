@@ -6,33 +6,26 @@ maxcores: 12
 maxram: 16384
 maxtime: 1440
 rate: 1000000
-
-# MPI
-ppn_range: []
 nthread: 1
-launch: aprun -n {nproc} {command}
-
-# MPI + OpenMP
-ppn_range: [1]
-nthread: 12
-launch: OMP_NUM_THREAD={nthread} aprun -d {nthread} -n {nproc} {command}\n
-
-script: |
-    #!/bin/bash
-    #PBS -A {account}
-    #PBS -N {name}
-    #PBS -M {email}
-    #PBS -l size={totalcores}
-    #PBS -l walltime={walltime}
-    #PBS -e {name}.err
-    #PBS -o {name}.out
-    #PBS -m n
-    cd "$PBS_O_WORKDIR"
-    env > "{name}.env"
+ppn_range: []
+openmp:
+    nthread: 12
+    ppn_range: [1]
+launch: aprun -d {nthread} -n {nproc} {command}
+submit:
+    qsub
+    -A {account}
+    -N {name}
+    -M {email}
+    -l size={totalcores}
+    -l walltime={walltime}
+    -e {name}.err
+    -o {name}.out
+    -m n
+    {notify_flag}
+    {depend_flag}
+    {submit_flags}
+    {script}
+script_header: |
     lfs setstripe -c 1 .
     [ {nstripe} -ge -1 -a -d {iopath} ] && lfs setstripe -c {nstripe} {iopath}
-    date
-    {pre}
-    {launch}
-    {post}
-    date

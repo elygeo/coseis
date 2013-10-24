@@ -5,7 +5,7 @@ contains
 
 subroutine allocate_arrays
 use globals
-use collective
+use process
 use utilities
 integer :: j, k, l
 

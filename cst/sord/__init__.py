@@ -92,8 +92,10 @@ def configure(force=False):
             'utilities.f90',
             'arrays.f90',
             'fortran_io.f90',
-            'collective_serial.f90',
-            'collective_mpi.f90',
+            'thread_single.f90',
+            'thread_omp.f90',
+            'process_serial.f90',
+            'process_mpi.f90',
             'input_output.f90',
             'statistics.f90',
             'setup.f90',
@@ -124,7 +126,7 @@ def configure(force=False):
                 rules += [o + ' : ' + d + '\n	$(FC) $(FFLAGS) -c $<']
             else:
                 raise Exception
-            if 'collective' not in o:
+            if 'process' not in o and 'thread' not in o:
                 objects.append(o)
         objects = ' \\\n        '.join(objects)
         rules = '	\n\n'.join(rules)

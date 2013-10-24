@@ -1,7 +1,7 @@
 # Options
 MACHINE = {machine}
-MODE = serial
-OMP = 1
+PROCESS = serial
+THREAD = omp
 DEBUG =    
 PROFILE =
 REALSIZE = 4
@@ -16,7 +16,7 @@ LDFLAGS = -g -O3 -Wall
 ifeq ($(REALSIZE), 8)
     FFLAGS += -fdefault-real-8
 endif
-ifdef OMP
+ifeq ($(THREAD), omp)
     LDFLAGS += -fopenmp
 endif
 ifdef PROFILE
@@ -51,11 +51,11 @@ ifeq ($(MACHINE), ALCF-BGP)
     CFLAGS = $(LDFLAGS) -qlist -qreport
     FFLAGS = $(LDFLAGS) -qlist -qreport
     LDFLAGS = -g -O3 -qsuppress=cmpmsg
-    ifdef REAL8
-        FFLAGS += -qrealsize=8
-    endif
-    ifdef OMP
+    ifeq ($(THREAD), omp)
         LDFLAGS += -qsmp=omp
+    endif
+    ifeq ($(REALSIZE), 8)
+        FFLAGS += -qrealsize=8
     endif
 endif
 
@@ -69,14 +69,14 @@ ifeq ($(MACHINE), ALCF-BGQ)
     FFLAGS = $(LDFLAGS) -qlist -qreport
     LDFLAGS = -g -O3 -qsuppress=cmpmsg
     LIBS = -lSPI_upci_cnk
-    ifdef OMP
+    ifeq ($(THREAD), omp)
         LDFLAGS += -qsmp=omp:noauto
         LIBS += /home/morozov/HPM/lib/libmpihpm_smp.a
     else
         LIBS += /home/morozov/HPM/lib/libmpihpm.a
     endif
     LIBS += /bgsys/drivers/ppcfloor/bgpm/lib/libbgpm.a
-    ifdef REAL8
+    ifeq ($(REALSIZE), 8)
         FFLAGS += -qrealsize=9
     endif
 endif
@@ -91,11 +91,11 @@ ifeq ($(MACHINE), IBM-Wat2Q)
     FFLAGS = $(LDFLAGS) -qlist -qreport
     LDFLAGS = -g -O3 -qsuppress=cmpmsg
     LIBS = -lSPI_upci_cnk /bgsys/drivers/ppcfloor/bgpm/lib/libbgpm.a
-    ifdef REAL8
-        FFLAGS += -qrealsize=8
-    endif
-    ifdef OMP
+    ifeq ($(THREAD), omp)
         LDFLAGS += -qsmp=omp:noauto
+    endif
+    ifeq ($(REALSIZE), 8)
+        FFLAGS += -qrealsize=8
     endif
 endif
 
@@ -121,11 +121,11 @@ ifeq ($(MACHINE), NICS-Kraken)
     FFLAGS = $(LDFLAGS) -Mdclchk
     LDFLAGS = -fast
     LIBS =
-    ifdef REAL8
-        FFLAGS += -Mr8
-    endif
-    ifdef OMP
+    ifeq ($(THREAD), omp)
         LDFLAGS += -mp
+    endif
+    ifeq ($(REALSIZE), 8)
+        FFLAGS += -Mr8
     endif
     ifdef DEBUG
         LDFLAGS += -g -Ktrap=fp -Mbounds -Mchkptr
@@ -144,16 +144,20 @@ clean:
 distclean: clean
 	rm Makefile
 
-CONFIG = {{ "mode": "$(MODE)", "omp": "$(OMP)", "realsize": "$(REALSIZE)" }}
+CONFIG = {{ "process": "$(POCESS)", "thread": "$(THREAD)", "realsize": "$(REALSIZE)" }}
 
 config.json: sord.x
 	echo '$(CONFIG)' > config.json
 
 sord.x: {objects} \
-	collective_$(MODE).o
+	thread_$(THREAD).o \
+	process_$(PROCESS).o
 	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
 
-collective.mod: collective_$(MODE).o
+thread.mod: thread_$(THREAD).o
+	@true   
+
+process.mod: process_$(PROCESS).o
 	@true   
 
 {rules}
