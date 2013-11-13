@@ -73,7 +73,7 @@ cst.cvms.launch(
     nthread = 1,
     nproc = nproc,
     ppn_range = [],
-    depend = job.jobid,
+    depend = job['jobid'],
     nstripe = nstripe,
     nsample = nsample,
 )

@@ -186,7 +186,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         cst.util.launch(
             name = 'cook',
             command = '{python} cook.py',
-            depend = job['jobid'], XXX fixme
+            depend = job['jobid'],
             minutes = m,
         )
 

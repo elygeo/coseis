@@ -242,7 +242,7 @@ def prepare(job=None, **kwargs):
         job['launch'] = job['submit'].format
     if job['script']:
         job['script'] = job['script'].format(**job)
-        job['submission'] = f = job['name'] + '.sh'
+        job['submission'] = job['name'] + '.sh'
 
 
 def stage(job=None, **kwargs):
@@ -257,8 +257,7 @@ def stage(job=None, **kwargs):
 
     # write job script
     if job['script']:
-        XXX chdir
-        f = os.path.join(job['path'] + f)
+        f = job['name'] + '.sh'
         open(f, 'w').write(job['script'])
         os.chmod(f, 0755)
 

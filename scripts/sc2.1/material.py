@@ -63,7 +63,7 @@ job = cst.util.launch(
 cst.cvms.launch(
     iodir = os.path.join('..', 'mesh', '%.0f' % dx),
     nproc = nproc,
-    depend = job.jobid,
+    depend = job['jobid'],
     nsample = nsample,
     version = '2.2',
 )

@@ -153,7 +153,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
             nproc = nproc,
             nstripe = nstripe,
             minutes = 30,
-            depend = job0.jobid,
+            depend = job0['jobid'],
             nsample = ncell,
         )
 
