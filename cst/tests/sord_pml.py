@@ -4,7 +4,7 @@ def test(argv=[]):
     """
     Test SORD parallelization with PML
     """
-    import os
+    import os, subprocess
     import numpy as np
     import cst
     prm = {}
@@ -40,17 +40,24 @@ def test(argv=[]):
     prm['pzz'] += [([10,10,10,0], '=', 1e10)]
 
     # master
-    prm['path'] = d0 = os.path.join('run', 'sord_pml') + os.sep
+    cwd = os.getcwd()
+    d0 = os.path.join('run', 'sord_pml') + os.sep
     os.makedirs(d0)
-    cst.sord.run(prm)
+    os.chdir(d0)
+    job = cst.sord.stage(prm)
+    subprocess.check_call(job['launch'])
+    os.chdir(cwd)
 
     # variations
     max_err_all_ = 0.0
     for i, n in enumerate([[4, 1, 1], [1, 2, 3]]):
         prm['nproc3'] = n
-        prm['path'] = d = os.path.join('run', 'sord_pml%s' % i) + os.sep
+        d = os.path.join('run', 'sord_pml%s' % i) + os.sep
         os.makedirs(d)
-        job = cst.sord.run(prm)
+        os.chdir(d)
+        job = cst.sord.stage(prm)
+        subprocess.check_call(job['launch'])
+        os.chdir(cwd)
         max_err_ = 0.0
         for k in fns:
             f1 = d0 + k + '.bin'

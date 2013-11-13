@@ -49,12 +49,12 @@ all: hello.c.x hello.f.x
 clean:
 	rm -rf *.pyc run hello.?.x hello.?.x.dSYM
 
-distclean : clean
+distclean: clean
 	rm Makefile
 
-hello.c.x : hello.c Makefile
+hello.c.x: hello.c Makefile
 	$(CC) $(CFLAGS) -o $@ $< $(LIBS)
 
-hello.f.x : hello.f90 Makefile
+hello.f.x: hello.f90 Makefile
 	$(FC) $(FFLAGS) -o $@ $< $(LIBS)
 

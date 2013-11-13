@@ -4,7 +4,7 @@ def test(argv=[]):
     """
     Test SORD parallelization with point source
     """
-    import os
+    import os, subprocess
     import numpy as np
     import cst
     prm = {}
@@ -46,11 +46,15 @@ def test(argv=[]):
             (ii, '=>', 'io/%s_o0.bin' % k),
         ]
 
-    prm['path'] = d = os.path.join('run', 'sord_io') + os.sep
+    cwd = os.getcwd()
+    d = os.path.join('run', 'sord_io') + os.sep
     os.makedirs(d + 'io')
+    os.chdir(d)
     for f in infiles:
-        np.array([1.0], 'f').tofile(d + f)
-    cst.sord.run(prm)
+        np.array([1.0], 'f').tofile(f)
+    job = cst.sord.stage(prm)
+    subprocess.check_call(job['launch'])
+    os.chdir(cwd)
 
 # continue if command line
 if __name__ == '__main__':

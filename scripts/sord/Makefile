@@ -1,12 +1,12 @@
-plot : run/Example.png
+plot: run/Example.png
 
-run/Example.png : run plot.py
+run/Example.png: run plot.py
 	python plot.py
 
-run : parameters.yaml
+run: parameters.yaml
 	mkdir run
-	sord parameters.yaml
+	cd run && sord ../parameters.yaml
 
-clean :
+clean:
 	rm -rf run
 

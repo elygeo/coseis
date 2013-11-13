@@ -1,6 +1,6 @@
 all: ../www/index.html ../www/sord.html
 
-../www/%.html : %.rst style.css
+../www/%.html: %.rst style.css
 	rst2html.py \
 	--strict \
 	--no-toc-backlinks \

@@ -6,9 +6,9 @@ CFLAGS = {build_cflags} \
     -DDELTA={delta} \
     -DZSTART={zstart}
 
-mesh.x : mesh.c Makefile
+mesh.x: mesh.c Makefile
 	$(CC) $(CFLAGS) -o $@ $< $(LIBS)
 
-clean :
+clean:
 	rm -rf run mesh.x mesh.x.dSYM
 

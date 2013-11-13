@@ -6,14 +6,17 @@ import cst.tests
 cst.tests.hello.make()
 cst.sord.make()
 
-p = os.path.dirname(__file__) + os.sep
+cwd = os.getcwd()
+p = os.path.dirname(__file__)
+f = os.path.join(p, 'test_suite.py')
 d = os.path.join('run', 'test_suite')
 os.makedirs(d)
-shutil.copy2(p + 'test_suite.py', d)
-cst.util.launch(
-    path = d,
-    launch = "{python} ./test_suite.py",
+os.chdir(d)
+shutil.copy2(f, '.')
+job = cst.util.stage(
+    execute = '{python} ./test_suite.py',
     nproc = 6,
     minutes = 30,
 )
+os.chdir(cwd)
 

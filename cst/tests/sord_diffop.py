@@ -4,7 +4,7 @@ def test(argv=[]):
     """
     Test SORD operators
     """
-    import os
+    import os, subprocess
     import numpy as np
     import cst
     prm = {}
@@ -43,9 +43,13 @@ def test(argv=[]):
 
     # master
     prm['diffop'] = i = 'exac'
-    prm['path'] = d0 = os.path.join('run', 'sord_%s' % i) + os.sep
+    d0 = os.path.join('run', 'sord_%s' % i) + os.sep
+    cwd = os.getcwd()
     os.makedirs(d0)
-    cst.sord.run(prm)
+    os.chdir(d0)
+    job = cst.sord.stage(prm)
+    subprocess.check_call(job['launch'])
+    os.chdir(cwd)
 
     # variations
     max_err_all_ = 0.0
@@ -53,7 +57,10 @@ def test(argv=[]):
         prm['diffop'] = i
         prm['path'] = d = os.path.join('run', 'sord_%s' % i) + os.sep
         os.makedirs(d)
-        job = cst.sord.run(prm)
+        os.chdir(d)
+        job = cst.sord.stage(prm)
+        subprocess.check_call(job['launch'])
+        os.chdir(cwd)
         max_err_ = 0.0
         for k in fns:
             f1 = d0 + k + '.bin'

@@ -2,7 +2,7 @@
 """
 SCEC Code Validation Workshop, Test Problem Version 3
 """
-import os
+import os, subprocess
 import cst
 s_ = cst.sord.get_slices()
 prm = {}
@@ -108,7 +108,10 @@ for dx, np in runs:
         ]
 
     # run SORD
-    prm['path'] = d = os.path.join('run', '%03.0f' % dx)
+    d = os.path.join('run', '%03.0f' % dx)
     os.makedirs(d)
-    cst.sord.run(prm)
+    os.chdir(d)
+    job = cst.sord.stage(prm)
+    subprocess.check_call(job['launch'])
+    os.chdir(cwd)
 

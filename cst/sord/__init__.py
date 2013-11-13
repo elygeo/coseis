@@ -118,12 +118,12 @@ def configure(force=False):
             base, ext = os.path.splitext(s)
             o = base + '.o'
             if ext == '.c':
-                rules += [o + ' : ' + s + '\n	$(CC) $(CFLAGS) -c $<']
+                rules += [o + ': ' + s + '\n	$(CC) $(CFLAGS) -c $<']
             elif ext == '.f90':
                 d = f90modules(s)[1]
                 d = [s] + [k + '.mod' for k in d if k != 'mpi']
                 d = ' \\\n        '.join(d)
-                rules += [o + ' : ' + d + '\n	$(FC) $(FFLAGS) -c $<']
+                rules += [o + ': ' + d + '\n	$(FC) $(FFLAGS) -c $<']
             else:
                 raise Exception
             if 'process' not in o and 'thread' not in o:
@@ -414,7 +414,7 @@ def stage(args, **kwargs):
 
     # configure and stage
     job['command'] = os.path.join('.', 'sord.x')
-    job = util.prepare(job)
+    job = util.stage(job)
 
     # create run files 
     cwd = os.getcwd()

@@ -66,13 +66,11 @@ User Guide
 Quick test
 ----------
 
-Run a simple point source explosion
-test and plot a 2D slice of particle velocity::
+Run a simple point source explosion test and plot a 2D slice of particle
+velocity::
 
     cd scripts/sord
-    mkdir run
-    sord parameters.yaml
-    python plot.py
+    make
 
 .. _YAML: http://www.yaml.org
 .. _JSON: http://www.json.org

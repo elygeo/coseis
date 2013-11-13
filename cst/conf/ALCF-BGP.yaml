@@ -12,15 +12,17 @@ openmp:
     ppn_range: [1]
     nthread: 4
     mode: smp
-launch:
+execute:
     cobalt-mpirun
+    -env TAU_METRICS=BGPTIMERS
     -mode {mode}
     -np {nproc}
     -verbose 2
-    #-env TAU_METRICS=BGPTIMERS
-    {command}
-notify_flag: -M {email}
+    {executable}
+binary_flag: --mode {mode} --proccount {nproc}
+script_flag: --mode script
 depend_flag: --dependenices {depend}
+notify_flag: -M {email}
 submit:
     qsub
     -A {account}
@@ -28,9 +30,9 @@ submit:
     -t {minutes}
     -n {nodes}
     -O {name}
-    --mode {mode}
-    --proccount {nproc}
-    {notify_flag}
+    {binary_flag}
+    {script_flag}
     {depend_flag}
+    {notify_flag}
     {submit_flags}
-    {script}
+    {submittion}

@@ -4,7 +4,7 @@ def test(argv=[]):
     """
     Kostrov circular crack test.
     """
-    import os
+    import os, subprocess
     import numpy as np
     import cst
     prm = {}
@@ -59,14 +59,18 @@ def test(argv=[]):
     v = cst.kostrov.slip_rate(rho, vp, vs, vr, dtau, r, t)
 
     # run SORD
-    prm['path'] = d = os.path.join('run', 'sord_kostrov') + os.sep
+    cwd = os.getcwd()
+    d = os.path.join('run', 'sord_kostrov') + os.sep
     os.makedirs(d)
-    cfg = cst.sord.run(prm)
+    os.chdir(d)
+    job = cst.sord.stage(prm)
+    subprocess.check_call(job['launch'])
+    os.chdir(cwd)
 
     # compare with analytical solution
     for p in 'abcd':
         f = d + 'p20%s.bin' % p
-        dv = v - np.fromfile(f, cfg['dtype'])[-1]
+        dv = v - np.fromfile(f, job['dtype'])[-1]
         err = dv / v
         print(v, err)
         assert abs(err) < 0.015

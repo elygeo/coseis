@@ -1,0 +1,10 @@
+depend_flag: -W depend="afterok:{depend}"
+notify_flag: -m abe
+submit:
+    qsub
+    {binary_flag}
+    {script_flag}
+    {depend_flag}
+    {notify_flag}
+    {submit_flags}
+    {submittion}

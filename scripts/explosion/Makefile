@@ -1,10 +1,10 @@
-plot : run/Explosion.png
+plot: run/Explosion.png
 
-run/Explosion.png : run plot.py
+run/Explosion.png: run plot.py
 	python plot.py
 
-run : sord.py
+run: sord.py
 	python sord.py
 
-clean :
+clean:
 	rm -rf run

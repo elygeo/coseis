@@ -3,7 +3,7 @@
 SCEC Code Validation Workshop, Test Problem 12-2D
 FIXME: prestress not correct
 """
-import os, math
+import os, math, subprocess
 import numpy as np
 import cst
 s_ = cst.sord.get_slices()
@@ -116,5 +116,8 @@ y.astype('f').tofile(d + 'syy.bin')
 z.astype('f').tofile(d + 'szz.bin')
 
 # run SORD
-cst.sord.run(prm)
+os.mkdir('run')
+os.chdir('run')
+job = cst.sord.stage(prm)
+subprocess.check_call(job['launch'])
 

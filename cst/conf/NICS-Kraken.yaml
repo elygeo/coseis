@@ -11,7 +11,7 @@ ppn_range: []
 openmp:
     nthread: 12
     ppn_range: [1]
-launch: aprun -d {nthread} -n {nproc} {command}
+execute: aprun -d {nthread} -n {nproc} {executable}
 submit:
     qsub
     -A {account}
@@ -22,10 +22,12 @@ submit:
     -e {name}.err
     -o {name}.out
     -m n
-    {notify_flag}
     {depend_flag}
+    {notify_flag}
     {submit_flags}
-    {script}
-script_header: |
+    {submittion}
+script: |
+    #!/bin/bash
     lfs setstripe -c 1 .
     [ {nstripe} -ge -1 -a -d {iopath} ] && lfs setstripe -c {nstripe} {iopath}
+    {execute}

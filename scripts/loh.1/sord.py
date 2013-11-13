@@ -7,7 +7,7 @@ http://peer.berkeley.edu/lifelines/lifelines_pre_2006/lifelines_princ_invest_y-7
 http://peer.berkeley.edu/lifelines/lifelines_pre_2006/final_reports/1A01-FR.pdf
 http://www-rohan.sdsu.edu/~steveday/BASINS/Final_Report_1A01.pdf
 """
-import os
+import os, subprocess
 import cst
 s_ = cst.sord.get_slices()
 prm = {}
@@ -51,7 +51,9 @@ for i in range(10):
             (s_[x,y,0.0,:], '.>', 'p%s-%s.bin' % (i, f)),
         ]
 
-# run job
+# run SORD
 os.mkdir('run')
-cst.sord.run(prm)
+os.chdir('run')
+job = cst.sord.stage(prm)
+subprocess.check_call(job['launch'])
 

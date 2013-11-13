@@ -236,19 +236,17 @@ def prepare(job=None, **kwargs):
             print('Warning: exceeding maximum time limit (%02d:00)' % job['maxtime'])
 
     # launch commands
-    job['command'] = job['command'].format(**job)
-    job['launch'] = job['launch'].format(**job)
-    job['script'] = job['script'].format(**job)
-    job['submit'] = job['submit'].format(**job)
+    job['execute'] = job['execute'].format(**job)
+    if job['submitt']:
+        job['submit'] = job['submit'].format(**job)
+        job['launch'] = job['submit'].format
+    if job['script']:
+        job['script'] = job['script'].format(**job)
+        job['submission'] = f = job['name'] + '.sh'
 
-    return job
 
-
-def launch(job=None, **kwargs):
-    """
-    Launch or submit job.
-    """
-    import os, re, shlex, subprocess
+def stage(job=None, **kwargs):
+    import os
 
     # prepare job
     if job is None:
@@ -257,39 +255,12 @@ def launch(job=None, **kwargs):
         for k in kwargs:
             job[k] = kwargs[k]
 
-    # launch command
-    if not job['run']:
-        return job
+    # write job script
+    if job['script']:
+        XXX chdir
+        f = os.path.join(job['path'] + f)
+        open(f, 'w').write(job['script'])
+        os.chmod(f, 0755)
 
-    # run directory
-    cwd = os.getcwd()
-    os.chdir(job['path'])
-
-    # launch
-    if job['run'] == 'submit':
-        g = job['name'] + '.sh'
-        open(g, 'w').write(job['script'])
-        os.chmod(g, 0755)
-        print(job['submit'])
-        c = shlex.split(job['submit'])
-        p = subprocess.Popen(c, stdout=subprocess.PIPE)
-        out = p.communicate()[0]
-        print(out)
-        if p.returncode:
-            raise Exception('Submit failed')
-        d = re.search(job['submit_pattern'], out).groupdict()
-        job.update(d)
-    elif job['run'] == 'exec':
-        for c in job['pre'], job['launch'], job['post']:
-            if c:
-                print(c)
-                if '\n' in c or ';' in c or '|' in c:
-                    subprocess.check_call(c, shell=True)
-                elif c:
-                    subprocess.check_call(shlex.split(c))
-    else:
-        raise Exception("'run' must be 'exec' or 'submit'")
-
-    os.chdir(cwd)
     return job
 

@@ -6,30 +6,12 @@ host_opts:
     vesta: {maxnodes: 1024,  maxtime: 120}
     cetus: {maxnodes: 1024,  maxtime: 120}
     mira:  {maxnodes: 49152, maxtime: 1440}
-mode: c32
 nthread: 1
 ppn_range: [1, 2, 4, 8, 16, 32]
 openmp:
-    mode: c1
     nthread: 32
     ppn_range: [1]
-script:
-    mode: script
-notify_flag: -M {email}
-depend_flag: --dependenices {depend}
-submit:
-    qsub
-    --mode {mode}
-    --env BG_SHAREDMEMSIZE=32MB:PAMID_VERBOSE=1:VPROF_PROFILE=yes
-    -O {name}
-    -A {account}
-    -n {nodes}
-    -t {minutes}
-    {notify_flag}
-    {depend_flag}
-    {submit_flags}
-    {script}
-launch:
+execute:
     runjob
     --verbose=INFO
     --block $COBALT_PARTNAME
@@ -38,4 +20,21 @@ launch:
     --envs BG_SHAREDMEMSIZE=32MB PAMID_VERBOSE=1 VPROF_PROFILE=yes
     -n {nproc}
     -p {ppn}
-    --exe {command}
+    --exe {executable}
+binary_flag: --mode c{ppn} --proccount {nproc}
+script_flag: --mode script
+depend_flag: --dependenices {depend}
+notify_flag: -M {email}
+submit:
+    qsub
+    --env BG_SHAREDMEMSIZE=32MB:PAMID_VERBOSE=1:VPROF_PROFILE=yes
+    -O {name}
+    -A {account}
+    -n {nodes}
+    -t {minutes}
+    {binary_flag}
+    {script_flag}
+    {depend_flag}
+    {notify_flag}
+    {submit_flags}
+    {submittion}

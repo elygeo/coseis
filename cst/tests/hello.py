@@ -15,38 +15,43 @@ def make():
     return
 
 def test(argv=[]):
-    import os, shutil
+    import os, shutil, subprocess
     import cst
+    cwd = os.getcwd()
     path = os.path.dirname(__file__) + os.sep
     make()
 
     # C version
     d = os.path.join('run', 'hello-c')
+    f = os.path.join(path, + 'hello.c.x')
     os.makedirs(d)
-    shutil.copy2(path + 'hello.c.x', d)
-    cst.util.launch(
-        path = d,
-        argv = argv,
-        command = './hello.c.x',
+    os.chdir(d)
+    shutil.copy2(f, '.')
+    job = cst.util.stage(
+        exectutable = './hello.c.x',
         nthread = 2,
         nproc = 2,
         ppn_range = [2],
         minutes = 10,
     )
+    subprocess.check_call(job['launch'])
+    os.chdir(cwd)
 
     # Fortran version
     d = os.path.join('run', 'hello-f')
+    f = os.path.join(path, + 'hello.f.x')
     os.makedirs(d)
-    shutil.copy2(path + 'hello.f.x', d)
-    cst.util.launch(
-        path = d,
-        argv = argv,
-        command = './hello.f.x',
+    os.chdir(d)
+    shutil.copy2(f, '.')
+    job = cst.util.stage(
+        exectutable = './hello.f.x',
         nthread = 2,
         nproc = 2,
         ppn_range = [2],
         minutes = 10,
     )
+    subprocess.check_call(job['launch'])
+    os.chdir(cwd)
 
     return
 

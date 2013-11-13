@@ -1,11 +1,11 @@
-plot : run/Kostrov.pdf
+plot: run/Kostrov.pdf
 
-run/Kostrov.pdf : run plot.py
+run/Kostrov.pdf: run plot.py
 	python plot.py
 
-run : sord.yaml
+run: sord.yaml
 	mkdir run
-	sord sord.yaml
+	cd run && sord ../sord.yaml
 
-clean :
+clean:
 	rm -rf run
