@@ -2,7 +2,7 @@
 """
 SORD simulation
 """
-import os, json, shutil, subprocess
+import os, json, shutil
 import numpy as np
 import pyproj
 import cst
@@ -149,7 +149,6 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     hold = os.path.join(path, 'hold') + os.sep
     os.makedirs(hold)
     os.chdir(path)
-    job = cst.sord.stage(prm)
 
     # save metadata
     os.link(mesh + 'box.txt', 'box.txt')
@@ -173,7 +172,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         os.link(h + f + '.bin', hold + f + '.bin')
 
     # run SORD
-    subprocess.check_call(job['launch'])
+    job = cst.sord.run(prm)
 
     # post-process to compute pgv, pga
     if surf_out:
@@ -185,7 +184,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         shutil.copy2(f, path)
         cst.util.launch(
             name = 'cook',
-            command = '{python} cook.py',
+            execute = '{python} cook.py',
             depend = job['jobid'],
             minutes = m,
         )

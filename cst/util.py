@@ -235,17 +235,28 @@ def prepare(job=None, **kwargs):
         if job['maxtime'] and job['minutes'] == job['maxtime']:
             print('Warning: exceeding maximum time limit (%02d:00)' % job['maxtime'])
 
-    # launch commands
+    # format commands
     job['execute'] = job['execute'].format(**job)
-    if job['submitt']:
-        job['submit'] = job['submit'].format(**job)
-        job['launch'] = job['submit'].format
+    job['submit'] = job['submit'].format(**job)
     if job['script']:
         job['script'] = job['script'].format(**job)
         job['submission'] = job['name'] + '.sh'
+    else:
+        job['submission'] = job['executable']
+        
 
 
-def stage(job=None, **kwargs):
+def launch(job=None, **kwargs):
+"""
+{execute} {executable}
+{submit} {submission}
+If {submit} else {execute}
+If {script} for {submission} only
+
+TODO:
+OpenMP
+binary vs script, how to indicate?
+"""
     import os
 
     # prepare job
@@ -255,11 +266,24 @@ def stage(job=None, **kwargs):
         for k in kwargs:
             job[k] = kwargs[k]
 
-    # write job script
-    if job['script']:
-        f = job['name'] + '.sh'
-        open(f, 'w').write(job['script'])
-        os.chmod(f, 0755)
+    # launch
+    if job['submit']:
+        c = shlex.split(job['submit'])
+        if job['script']:
+            f = job['name'] + '.sh'
+            open(f, 'w').write(job['script'])
+            os.chmod(f, 0755)
+        p = subprocess.Popen(c, stdout=subprocess.PIPE)
+        out = p.communicate()[0]
+        print(out)
+        if p.returncode:
+            raise Exception('Submit failed')
+        d = re.search(job['submit_pattern'], out).groupdict()
+        job.update(d)
+    else:
+        c = shlex.split(job['execute'])
+        subprocess.check_call(c)
+
 
     return job
 

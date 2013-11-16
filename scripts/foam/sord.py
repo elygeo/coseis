@@ -8,7 +8,7 @@ scale-model experiments*, Bull. Seism. Soc. Am., `92(8), 3022-3041
 <http://www.bssaonline.org/cgi/content/abstract/92/8/3022>`__,
 doi:10.1785/0120010273.
 """
-import os, subprocess
+import os
 import cst
 s_ = cst.sord.get_slices()
 prm = {}
@@ -95,6 +95,5 @@ w = weakzone * 100
 d = os.path.join('run', '%02.0f' % w)
 os.makedirs(d)
 os.chdir(d)
-job = cst.sord.stage(prm)
-subprocess.check_call(job['launch'])
+cst.sord.run(prm)
 

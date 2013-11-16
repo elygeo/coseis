@@ -1,16 +1,13 @@
 #!/usr/bin/env python
 
-def test(argv=[]):
+def test(**kwargs):
     """
     Kostrov circular crack test.
     """
-    import os, subprocess
+    import os
     import numpy as np
     import cst
     prm = {}
-
-    # parameters
-    prm['argv'] = argv
 
     # dimensions
     dx, dt = 100.0, 0.0075
@@ -63,8 +60,7 @@ def test(argv=[]):
     d = os.path.join('run', 'sord_kostrov') + os.sep
     os.makedirs(d)
     os.chdir(d)
-    job = cst.sord.stage(prm)
-    subprocess.check_call(job['launch'])
+    cst.sord.run(prm, **kwargs)
     os.chdir(cwd)
 
     # compare with analytical solution
@@ -77,6 +73,5 @@ def test(argv=[]):
 
 # continue if command line
 if __name__ == '__main__':
-    import sys
-    test(sys.argv[1:])
+    test()
 

@@ -6,7 +6,7 @@ SCEC Community Velocity Model, version 2.2 with double-couple point source.
 http://peer.berkeley.edu/lifelines/lifelines_pre_2006/lifelines_princ_invest_y-7.html#day
 http://www-rohan.sdsu.edu/~steveday/BASINS/Final_Report_1A02.pdf
 """
-import os, json, subprocess
+import os, json
 import cst
 s_ = cst.sord.get_slices()
 prm = {}
@@ -66,6 +66,5 @@ os.makedirs(d)
 os.chdir(d)
 for v in 'rho', 'vp', 'vs':
     os.link(mesh + v + '.bin', '.')
-job = cst.sord.stage(prm)
-subprocess.check_call(job['launch'])
+cst.sord.run(prm)
 

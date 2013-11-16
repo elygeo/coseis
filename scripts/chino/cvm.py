@@ -139,11 +139,11 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         os.chdir(path)
         shutil.copy2(cwd + 'mesh.py', '.')
         job0 = cst.util.launch(
+            execute = '{python} mesh.py',
             nthread = 1,
             nproc = 4,
             ppn_range = [4],
             nstripe = nstripe,
-            command = '{python} mesh.py',
             minutes = int(ncell // 120000000),
         )
 
@@ -167,11 +167,11 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         np.save('x.npy', x_.astype('f'))
         np.save('y.npy', y_.astype('f'))
         cst.util.launch(
+            execute = '{python} mesh-cvmh.py',
             nthread = 1,
             nproc = 4,
             ppn_range = [4],
             nstripe = nstripe,
-            command = '{python} mesh-cvmh.py',
             minutes = int(ncell // 120000000), # nearest
             #minutes = int(ncell // 36000000), # linear
         )

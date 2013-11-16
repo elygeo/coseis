@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 
-def test(argv=[]):
+def test(**kwargs):
     """
     Test SORD parallelization with PML
     """
-    import os, subprocess
+    import os
     import numpy as np
     import cst
     prm = {}
 
     # parameters
-    prm['argv'] = argv
     prm['itstats'] = 1
 
     # dimensions
@@ -44,8 +43,7 @@ def test(argv=[]):
     d0 = os.path.join('run', 'sord_pml') + os.sep
     os.makedirs(d0)
     os.chdir(d0)
-    job = cst.sord.stage(prm)
-    subprocess.check_call(job['launch'])
+    job = cst.sord.run(prm, **kwargs)
     os.chdir(cwd)
 
     # variations
@@ -55,8 +53,7 @@ def test(argv=[]):
         d = os.path.join('run', 'sord_pml%s' % i) + os.sep
         os.makedirs(d)
         os.chdir(d)
-        job = cst.sord.stage(prm)
-        subprocess.check_call(job['launch'])
+        cst.sord.run(prm, **kwargs)
         os.chdir(cwd)
         max_err_ = 0.0
         for k in fns:
@@ -76,6 +73,5 @@ def test(argv=[]):
 
 # continue if command line
 if __name__ == '__main__':
-    import sys
-    test(sys.argv[1:])
+    test()
 

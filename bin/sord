@@ -2,12 +2,11 @@
 """
 Launch SORD code from YAML or JSON parameter file
 """
-import sys, yaml, subprocess
+import sys, yaml
 import cst
 
 prm = open(sys.argv[1])
 prm = yaml.load(prm)
 del(sys.argv[1])
-job = cst.sord.stage(prm)
-subprocess.check_call(job['launch'])
+cst.sord.run(prm)
 

@@ -14,8 +14,8 @@ def make():
     os.chdir(cwd)
     return
 
-def test(argv=[]):
-    import os, shutil, subprocess
+def test(**kwargs):
+    import os, shutil
     import cst
     cwd = os.getcwd()
     path = os.path.dirname(__file__) + os.sep
@@ -27,14 +27,14 @@ def test(argv=[]):
     os.makedirs(d)
     os.chdir(d)
     shutil.copy2(f, '.')
-    job = cst.util.stage(
+    job = cst.util.launch(
         exectutable = './hello.c.x',
         nthread = 2,
         nproc = 2,
         ppn_range = [2],
         minutes = 10,
+        **kwargs
     )
-    subprocess.check_call(job['launch'])
     os.chdir(cwd)
 
     # Fortran version
@@ -43,20 +43,19 @@ def test(argv=[]):
     os.makedirs(d)
     os.chdir(d)
     shutil.copy2(f, '.')
-    job = cst.util.stage(
+    cst.util.launch(
         exectutable = './hello.f.x',
         nthread = 2,
         nproc = 2,
         ppn_range = [2],
         minutes = 10,
+        **kwargs
     )
-    subprocess.check_call(job['launch'])
     os.chdir(cwd)
 
     return
 
 # continue if command line
 if __name__ == '__main__':
-    import sys
-    test(sys.argv[1:])
+    test()
 

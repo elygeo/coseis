@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 
-def test(argv=[]):
+def test(**kwargs):
     """
     Test SORD operators
     """
-    import os, subprocess
+    import os
     import numpy as np
     import cst
     prm = {}
 
     # parameters
-    prm['argv'] = argv
     prm['itstats'] = 1
 
     # dimensions
@@ -47,8 +46,7 @@ def test(argv=[]):
     cwd = os.getcwd()
     os.makedirs(d0)
     os.chdir(d0)
-    job = cst.sord.stage(prm)
-    subprocess.check_call(job['launch'])
+    cst.sord.run(prm, **kwargs)
     os.chdir(cwd)
 
     # variations
@@ -58,8 +56,7 @@ def test(argv=[]):
         prm['path'] = d = os.path.join('run', 'sord_%s' % i) + os.sep
         os.makedirs(d)
         os.chdir(d)
-        job = cst.sord.stage(prm)
-        subprocess.check_call(job['launch'])
+        cst.sord.run(prm, **kwargs)
         os.chdir(cwd)
         max_err_ = 0.0
         for k in fns:
@@ -79,6 +76,5 @@ def test(argv=[]):
 
 # continue if command line
 if __name__ == '__main__':
-    import sys
-    test(sys.argv[1:])
+    test()
 

@@ -2,7 +2,7 @@
 """
 Semi-cylindrical canyon with vertically incident P-wave.
 """
-import os, subprocess
+import os
 import cst
 s_ = cst.sord.get_slice()
 prm = {}
@@ -51,6 +51,5 @@ prm['uy'] = [
 # run job
 os.mkdir('run')
 os.chdir('run')
-job = cst.sord.stage(prm)
-subprocess.check_call(job['launch'])
+cst.sord.run(prm)
 

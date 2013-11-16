@@ -13,7 +13,7 @@ d = os.path.join('run', 'test_suite')
 os.makedirs(d)
 os.chdir(d)
 shutil.copy2(f, '.')
-job = cst.util.stage(
+job = cst.util.launch(
     execute = '{python} ./test_suite.py',
     nproc = 6,
     minutes = 30,

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-def test(argv=[]):
+def test(**kwargs):
     """
     Test configurations
     """
@@ -14,9 +14,8 @@ def test(argv=[]):
         machine = os.path.splitext(f)[0]
         job = cst.util.prepare(
             machine = machine,
-            command = 'COMMAND',
             verbose = 0,
-            argv = argv,
+            **kwargs
         )
         if job['verbose']:
             print(80 * '-')
@@ -28,6 +27,5 @@ def test(argv=[]):
 
 # continue if command line
 if __name__ == '__main__':
-    import sys
-    test(sys.argv[1:])
+    test()
 

@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 
-def test(argv=[]):
+def test(**kwargs):
     """
     Test SORD parallelization with point source
     """
-    import os, subprocess
+    import os
     import numpy as np
     import cst
     prm = {}
 
     # parameters
-    prm['argv'] = argv
     prm['itstats'] = 1
     prm['faultnormal'] = 1
     prm['shape'] = [6, 7, 8, 9]
@@ -52,12 +51,10 @@ def test(argv=[]):
     os.chdir(d)
     for f in infiles:
         np.array([1.0], 'f').tofile(f)
-    job = cst.sord.stage(prm)
-    subprocess.check_call(job['launch'])
+    cst.sord.run(prm, **kwargs)
     os.chdir(cwd)
 
 # continue if command line
 if __name__ == '__main__':
-    import sys
-    test(sys.argv[1:])
+    test()
 

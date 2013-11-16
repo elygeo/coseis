@@ -2,7 +2,7 @@
 """
 Explosion test problem
 """
-import os, subprocess
+import os
 import cst
 s_ = cst.sord.get_slices()
 prm = {}
@@ -64,6 +64,5 @@ for f in 'vx', 'vy', 'vz':
 # run sord
 os.mkdir('run')
 os.chdir('run')
-job = cst.sord.stage(prm)
-subprocess.check_call(job['launch'])
+cst.sord.run(prm)
 

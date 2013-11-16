@@ -2,7 +2,7 @@
 """
 Benchmarks
 """
-import os, subprocess
+import os
 import cst
 s_ = cst.sord.get_slices()
 
@@ -40,7 +40,6 @@ for i in power[::-1]:
     d = os.path.joing('run', 'bench%s' % i)
     os.makedirs(d)
     os.chdir(d)
-    job = cst.sord.stage(prm)
-    subprocess.check_call(job['launch'])
+    cst.sord.run(prm)
     os.chdir(cwd)
 
