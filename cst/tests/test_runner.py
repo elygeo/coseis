@@ -14,6 +14,7 @@ os.makedirs(d)
 os.chdir(d)
 shutil.copy2(f, '.')
 job = cst.util.launch(
+    mode = 'script',
     execute = '{python} ./test_suite.py',
     nproc = 6,
     minutes = 30,

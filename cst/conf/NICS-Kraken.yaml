@@ -5,12 +5,10 @@ maxnodes: 8192
 maxcores: 12
 maxram: 16384
 maxtime: 1440
-rate: 1000000
-nthread: 1
-ppn_range: []
-openmp:
-    nthread: 12
-    ppn_range: [1]
+mode: smp
+mode_opts:
+    vn: {nthread: 1, ppn_range: []}
+    smp: {nthread: 12, ppn_range: [1]}
 execute: aprun -d {nthread} -n {nproc} {executable}
 submit:
     qsub
@@ -22,11 +20,11 @@ submit:
     -e {name}.err
     -o {name}.out
     -m n
+    {submit_flags}
     {depend_flag}
     {notify_flag}
-    {submit_flags}
     {submittion}
-script: |
+wrapper: |
     #!/bin/bash
     lfs setstripe -c 1 .
     [ {nstripe} -ge -1 -a -d {iopath} ] && lfs setstripe -c {nstripe} {iopath}

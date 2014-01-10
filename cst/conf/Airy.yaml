@@ -1,5 +1,4 @@
 # MacBook Air
 maxcores: 2 
 maxram: 4096 
-rate: 1400000
-submit: ''
+nthread: 4

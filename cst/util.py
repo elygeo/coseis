@@ -138,7 +138,7 @@ def prepare(job=None, **kwargs):
     """
     Compute and display resource usage
     """
-    import time
+    import os, time
 
     # prepare job
     if job is None:
@@ -152,6 +152,11 @@ def prepare(job=None, **kwargs):
         'jobid': '',
         'date': time.strftime('%Y-%m-%d'),
     })
+
+    # mode options
+    k = job['mode']
+    if k:
+        job.update(job['mode_opts'][k])
 
     # dependency
     if job['depend']:
@@ -189,7 +194,7 @@ def prepare(job=None, **kwargs):
             'walltime': '',
         })
 
-        # MPI parallelization
+        # processes
         r = job['ppn_range']
         if not r:
             r = range(1, job['maxcores'] + 1)
@@ -207,17 +212,21 @@ def prepare(job=None, **kwargs):
         job['ram'] = job['pmem'] * job['ppn']
 
         # SU estimate and wall time limit
-        if job['maxtime']:
-            job['minutes'] = min(job['minutes'], job['maxtime'])
-        job['walltime'] = '%d:%02d:00' % (job['minutes'] // 60, job['minutes'] % 60)
-        sus = job['minutes'] // 60 * job['totalcores'] + 1
+        m = job['maxtime']
+        FIXME
+        job['walltime'] = '%d:%02d:00' % (m // 60, m % 60)
+        sus = m // 60 * job['totalcores'] + 1
 
         # if resources exceeded, try another queue
         if job['ppn_range'] and job['ppn'] > job['ppn_range'][-1]:
             continue
-        if job['maxtime'] and job['minutes'] >= job['maxtime']:
+        if job['maxtime'] and job['minutes'] > job['maxtime']:
             continue
         break
+
+    # threads
+    if job['nthreads'] < 0 and 'OMP_NUM_THREADS' in os.environ:
+        job['nthreads'] = os.environ['OMP_NUM_THREADS']
 
     # messages
     if job['verbose'] > 1:
@@ -232,14 +241,14 @@ def prepare(job=None, **kwargs):
     if job['verbose']:
         if job['ram'] and job['ram'] > job['maxram']:
             print('Warning: exceeding available RAM per node (%sMb)' % job['maxram'])
-        if job['maxtime'] and job['minutes'] == job['maxtime']:
-            print('Warning: exceeding maximum time limit (%02d:00)' % job['maxtime'])
+        if job['minutes'] > job['maxtime']:
+            print('Warning: walltime estimate exceeds limit (%s)' % job['walltime'])
 
     # format commands
     job['execute'] = job['execute'].format(**job)
     job['submit'] = job['submit'].format(**job)
-    if job['script']:
-        job['script'] = job['script'].format(**job)
+    if job['wrapper']:
+        job['wrapper'] = job['wrapper'].format(**job)
         job['submission'] = job['name'] + '.sh'
     else:
         job['submission'] = job['executable']
@@ -247,17 +256,7 @@ def prepare(job=None, **kwargs):
 
 
 def launch(job=None, **kwargs):
-"""
-{execute} {executable}
-{submit} {submission}
-If {submit} else {execute}
-If {script} for {submission} only
-
-TODO:
-OpenMP
-binary vs script, how to indicate?
-"""
-    import os
+    import os, re, shlex, subprocess
 
     # prepare job
     if job is None:
@@ -269,9 +268,9 @@ binary vs script, how to indicate?
     # launch
     if job['submit']:
         c = shlex.split(job['submit'])
-        if job['script']:
+        if job['wrapper']:
             f = job['name'] + '.sh'
-            open(f, 'w').write(job['script'])
+            open(f, 'w').write(job['wrapper'])
             os.chmod(f, 0755)
         p = subprocess.Popen(c, stdout=subprocess.PIPE)
         out = p.communicate()[0]

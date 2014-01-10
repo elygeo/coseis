@@ -2,11 +2,10 @@
 maxnodes: 1024
 maxcores: 16
 maxram: 16384
-nthread: 1
-ppn_range: [1, 2, 4, 8, 16, 32]
-openmp:
-    nthread: 32
-    ppn_range: [1]
+mode: smp
+mode_opts:
+    vn: {nthread: 1, ppn_range: [1, 2, 4, 8, 16, 32]}
+    smp: {nthread: 32, ppn_range: [1]}
 execute:
     runjob
     --verbose=INFO
@@ -17,20 +16,3 @@ execute:
     -n {nproc}
     -p {ppn}
     --exe {executable}
-binary_flag: --mode c{ppn} --proccount {nproc}
-script_flag: --mode script
-depend_flag: --dependenices {depend}
-notify_flag: -M {email}
-submit:
-    qsub
-    --env BG_SHAREDMEMSIZE=32MB:PAMID_VERBOSE=1:VPROF_PROFILE=yes
-    -O {name}
-    -A {account}
-    -n {nodes}
-    -t {minutes}
-    {binary_flag}
-    {script_flag}
-    {depend_flag}
-    {notify_flag}
-    {submit_flags}
-    {submittion}

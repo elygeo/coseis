@@ -6,11 +6,11 @@ host_opts:
     vesta: {maxnodes: 1024,  maxtime: 120}
     cetus: {maxnodes: 1024,  maxtime: 120}
     mira:  {maxnodes: 49152, maxtime: 1440}
-nthread: 1
-ppn_range: [1, 2, 4, 8, 16, 32]
-openmp:
-    nthread: 32
-    ppn_range: [1]
+mode: smp
+mode_opts:
+    vn: {nthread: 1, ppn_range: [1, 2, 4, 8, 16, 32]}
+    smp: {nthread: 32, ppn_range: [1]}
+    script: {submit_flags: script}
 execute:
     runjob
     --verbose=INFO
@@ -21,8 +21,7 @@ execute:
     -n {nproc}
     -p {ppn}
     --exe {executable}
-binary_flag: --mode c{ppn} --proccount {nproc}
-script_flag: --mode script
+submit_flags: c{ppn} --proccount {nproc}
 depend_flag: --dependenices {depend}
 notify_flag: -M {email}
 submit:
@@ -32,9 +31,7 @@ submit:
     -A {account}
     -n {nodes}
     -t {minutes}
-    {binary_flag}
-    {script_flag}
+    --mode {submit_flags}
     {depend_flag}
     {notify_flag}
-    {submit_flags}
     {submittion}

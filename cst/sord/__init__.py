@@ -373,12 +373,13 @@ def stage(args, **kwargs):
         else:
             job[k] = v
 
-    job = util.configure(**job)
-    job.update(**make())
-    d = np.dtype('f' +  job['realsize']).str
-    job.update({'name': 'sord', 'dtype': d})
-    prm.update({'nthread': job['nthread']})
+    cfg = make() # process thread realsize
     prm, fio, meta = prepare_param(prm, fio)
+
+    job = {}
+    job['name'] = 'sord'
+    job['dtype'] = np.dtype('f' +  cfg['realsize']).str
+    job['executable'] = os.path.join('.', 'sord.x')
 
     # partition for parallelization
     nx, ny, nz, nt = prm['shape']
@@ -397,7 +398,7 @@ def stage(args, **kwargs):
     l = (nz - 1) // nl[2] + 1
     prm['nproc3'] = [j, k, l]
     job['nproc'] = n = j * k * l
-    if n > 1 and job['mode'] != 'mpi':
+    if n > 1 and cfg['process'] == 'serial':
         raise('MPI build required for multiprocessing') 
 
     # resources
@@ -407,14 +408,17 @@ def stage(args, **kwargs):
         nvars = 23
     else:
         nvars = 44
+    nb = int(cfg['realsize'])
     nm = (nl[0] + 2) * (nl[1] + 2) * (nl[2] + 2)
-    job['pmem'] = 32 + int(1.2 * nm * nvars * int(job['dtype'][-1]) / 1024 / 1024)
-    if not job['minutes']:
-        job['minutes'] = 10 + int((nt + 10) * nm // (40 * job['rate']))
+    job['pmem'] = (1 + nm * nvars * nb // 30000) * 32
+    m = (1 + (nt + 10) * nm // 420000000) * 10
+    if m > 60:
+        m = (1 + (nt + 10) * nm // 70000000) * 60
+    job['minutes'] = m
 
     # configure and stage
-    job['command'] = os.path.join('.', 'sord.x')
-    job = util.stage(job)
+    job = util.prepare(**job)
+    prm.update({'nthread': job['nthread']})
 
     # create run files 
     cwd = os.getcwd()

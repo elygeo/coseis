@@ -7,8 +7,7 @@ ppn_range: []
 maxnodes: 1
 maxcores: 0
 maxram: 0
-maxtime: 0
-rate: 1000000
+maxtime: 1440
 python: python
 f2py_flags: ''
 
@@ -20,11 +19,11 @@ account: ''
 email: ''
 queue: ''
 nproc: 1
-nthread: 1
+nthread: -1
 nstripe: -2
 minutes: 0
-pmem: 0
 mode: ''
+mode_opts: {}
 executable: ''
 execute: mpiexec -np {nproc} {executable}
 notify_threshold: 4096
@@ -36,4 +35,4 @@ binary_flag: ''
 script_flag: ''
 submit: ''
 submit_pattern: (?P<jobid>\d+\S*)\D*$
-script: ''
+wrapper: ''

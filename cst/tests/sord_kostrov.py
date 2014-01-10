@@ -60,7 +60,7 @@ def test(**kwargs):
     d = os.path.join('run', 'sord_kostrov') + os.sep
     os.makedirs(d)
     os.chdir(d)
-    cst.sord.run(prm, **kwargs)
+    job = cst.sord.run(prm, **kwargs)
     os.chdir(cwd)
 
     # compare with analytical solution

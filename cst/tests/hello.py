@@ -27,7 +27,7 @@ def test(**kwargs):
     os.makedirs(d)
     os.chdir(d)
     shutil.copy2(f, '.')
-    job = cst.util.launch(
+    cst.util.launch(
         exectutable = './hello.c.x',
         nthread = 2,
         nproc = 2,

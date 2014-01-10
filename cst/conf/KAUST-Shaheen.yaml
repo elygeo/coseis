@@ -2,17 +2,19 @@
 account: k68
 maxcores: 4
 maxram: 4096
-ppn_range: [1, 2, 4]
-nthread: 1
 queue_opts:
     - [development, {maxnodes:  8192, maxtime:   30}]
     - [smallblocks, {maxnodes:  1024, maxtime: 1440}]
     - [pset64,      {maxnodes:  4096, maxtime: 1440}]
     - [pset128,     {maxnodes: 12288, maxtime: 1440}]
     - [default,     {maxnodes: 16384, maxtime: 1440}]
-execute: mpirun -mode VN -np {nproc} -exe {executable}
+mode: smp
+mode_opts:
+    vn: {nthread: 1, ppn_range: [1, 2, 4]}
+    smp: {nthread: 4, ppn_range: [1]}
+execute: mpirun -mode {mode} -np {nproc} -exe {executable}
 submit: llsubmit {submit_flags} {submittion}
-script: |
+wrapper: |
     #!/bin/bash
     # @ account_no = {account}
     # @ class = {queue}
