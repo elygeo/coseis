@@ -192,6 +192,7 @@ def prepare(job=None, **kwargs):
             'totalcores': job['nproc'],
             'ram': 0,
             'walltime': '',
+            'submission': '',
         })
 
         # processes
@@ -208,7 +209,7 @@ def prepare(job=None, **kwargs):
 
         # memory
         if not job['pmem']:
-            job['pmem'] = job['maxram'] / job['ppn']
+            job['pmem'] = job['maxram'] // job['ppn']
         job['ram'] = job['pmem'] * job['ppn']
 
         # SU estimate and wall time limit
@@ -225,8 +226,8 @@ def prepare(job=None, **kwargs):
         break
 
     # threads
-    if job['nthreads'] < 0 and 'OMP_NUM_THREADS' in os.environ:
-        job['nthreads'] = os.environ['OMP_NUM_THREADS']
+    if job['nthread'] < 0 and 'OMP_NUM_THREADS' in os.environ:
+        job['nthread'] = os.environ['OMP_NUM_THREADS']
 
     # messages
     if job['verbose'] > 1:
@@ -252,7 +253,8 @@ def prepare(job=None, **kwargs):
         job['submission'] = job['name'] + '.sh'
     else:
         job['submission'] = job['executable']
-        
+
+    return job
 
 
 def launch(job=None, **kwargs):

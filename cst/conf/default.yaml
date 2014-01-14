@@ -22,6 +22,7 @@ nproc: 1
 nthread: -1
 nstripe: -2
 minutes: 0
+pmem: 0
 mode: ''
 mode_opts: {}
 executable: ''

@@ -23,7 +23,7 @@ submit:
     {submit_flags}
     {depend_flag}
     {notify_flag}
-    {submittion}
+    {submission}
 wrapper: |
     #!/bin/bash
     lfs setstripe -c 1 .

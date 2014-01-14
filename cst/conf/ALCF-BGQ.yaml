@@ -34,4 +34,4 @@ submit:
     --mode {submit_flags}
     {depend_flag}
     {notify_flag}
-    {submittion}
+    {submission}

@@ -13,7 +13,7 @@ mode_opts:
     vn: {nthread: 1, ppn_range: [1, 2, 4]}
     smp: {nthread: 4, ppn_range: [1]}
 execute: mpirun -mode {mode} -np {nproc} -exe {executable}
-submit: llsubmit {submit_flags} {submittion}
+submit: llsubmit {submit_flags} {submission}
 wrapper: |
     #!/bin/bash
     # @ account_no = {account}
