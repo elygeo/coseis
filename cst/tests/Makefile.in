@@ -5,7 +5,8 @@ OMP = 1
 # Default: GNU Compiler Collection
 CC = mpicc
 FC = mpif90 
-CFLAGS = $(LDFLAGS) -pedantic
+CFLAGS = $(LDFLAGS)
+# -pedantic
 FFLAGS = $(LDFLAGS) -fimplicit-none
 LDFLAGS = -g -O3 -Wall
 LIBS =

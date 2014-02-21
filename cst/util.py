@@ -213,8 +213,8 @@ def prepare(job=None, **kwargs):
         job['ram'] = job['pmem'] * job['ppn']
 
         # SU estimate and wall time limit
+        # FIXME???
         m = job['maxtime']
-        FIXME
         job['walltime'] = '%d:%02d:00' % (m // 60, m % 60)
         sus = m // 60 * job['totalcores'] + 1
 
