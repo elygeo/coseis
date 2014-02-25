@@ -24,6 +24,7 @@ def test(**kwargs):
                 print('%s: %s' % (k, json.dumps(v)))
         else:
             print(machine)
+    return
 
 # continue if command line
 if __name__ == '__main__':

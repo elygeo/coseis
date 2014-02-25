@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-def test():
+def test(**kwargs):
     import doctest
     import cst.tests
     failed = []

@@ -16,13 +16,14 @@ def test(**kwargs):
 
     # output
     fns = cst.sord.fieldnames()
-    fields = sorted(fns['node']) + sorted(fns['cell'])
     x1 = [1.1, 1.1, 1.1]
     x2 = [9.9, 9.9, 9.9]
     ii = [4.4, 5.5, 6.6, 1]
     infiles = []
-    for k in fields:
-        prm[k] = []
+
+    for k, v in fns.items():
+        if v[0][0] in 'nc':
+            prm[k] = []
     for k in 'ax', 'wxx':
         prm[k] += [([], '#')]
         for op in ['=', '+', '*', '=~', '+~', '*~']:
@@ -36,14 +37,16 @@ def test(**kwargs):
             f = 'io/%s_i%s.bin' % (k, i)
             infiles.append(f)
             prm[k] += [(ii, op, f)]
-    for k in fields:
-        ii = [4.4, 5.5, 6.6, 1]
-        if k in fns['initial']:
-            ii = ii[:3]
-        prm[k] += [
-            (ii, '.>', 'io/%s_o1.bin' % k),
-            (ii, '=>', 'io/%s_o0.bin' % k),
-        ]
+
+    for k, v in fns.items():
+        if v[0][0] in 'nc':
+            ii = [4.4, 5.5, 6.6, 1]
+            if '<' in v[0]:
+                ii = ii[:3]
+            prm[k] += [
+                (ii, '.>', 'io/%s_o1.bin' % k),
+                (ii, '=>', 'io/%s_o0.bin' % k),
+            ]
 
     cwd = os.getcwd()
     d = os.path.join('run', 'sord_io') + os.sep

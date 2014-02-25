@@ -46,7 +46,10 @@ def test(**kwargs):
     cwd = os.getcwd()
     os.makedirs(d0)
     os.chdir(d0)
-    job = cst.sord.run(prm, **kwargs)
+    cst.sord.run(prm, **kwargs)
+    cst.sord.run(prm, **kwargs)
+    meta = open('meta.json')
+    dtype = json.load(meta)['dtype']
     os.chdir(cwd)
 
     # variations
@@ -62,8 +65,8 @@ def test(**kwargs):
         for k in fns:
             f1 = d0 + k + '.bin'
             f2 = d + k + '.bin'
-            v1 = np.fromfile(f1, job['dtype'])
-            v2 = np.fromfile(f2, job['dtype'])
+            v1 = np.fromfile(f1, dtype)
+            v2 = np.fromfile(f2, dtype)
             dv = v1 - v2
             e = np.abs(dv).max()
             if e:

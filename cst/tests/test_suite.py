@@ -23,7 +23,7 @@ def test():
         print('-' * 80)
         print('>>> ' + c)
         try:
-            m.test(submit=False)
+            m.test(submit='')
             passed.append('PASSED: ' + c)
         except Exception as e:
             failed.append('FAILED: %s: %s' % (c, e.message))

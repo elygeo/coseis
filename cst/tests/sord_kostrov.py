@@ -4,7 +4,7 @@ def test(**kwargs):
     """
     Kostrov circular crack test.
     """
-    import os
+    import os, json
     import numpy as np
     import cst
     prm = {}
@@ -30,7 +30,7 @@ def test(**kwargs):
 
     # rupture
     dtau = 10e6
-    prm['faultnormal'] = 3
+    prm['faultnormal'] = '+z'
     prm['hypocenter'] = [-1.0, -1.0, -1.5]
     prm['vrup'] = vr = 0.9 * vs
     prm['rcrit'] = 1e9
@@ -60,13 +60,15 @@ def test(**kwargs):
     d = os.path.join('run', 'sord_kostrov') + os.sep
     os.makedirs(d)
     os.chdir(d)
-    job = cst.sord.run(prm, **kwargs)
+    cst.sord.run(prm, **kwargs)
+    meta = open('meta.json')
+    dtype = json.load(meta)['dtype']
     os.chdir(cwd)
 
     # compare with analytical solution
     for p in 'abcd':
         f = d + 'p20%s.bin' % p
-        dv = v - np.fromfile(f, job['dtype'])[-1]
+        dv = v - np.fromfile(f, dtype)[-1]
         err = dv / v
         print(v, err)
         assert abs(err) < 0.015

@@ -378,7 +378,6 @@ def stage(args, **kwargs):
 
     job = {}
     job['name'] = 'sord'
-    job['dtype'] = np.dtype('f' +  cfg['realsize']).str
     job['executable'] = os.path.join('.', 'sord.x')
 
     # partition for parallelization
@@ -421,8 +420,6 @@ def stage(args, **kwargs):
     prm.update({'nthread': job['nthread']})
 
     # create run files 
-    cwd = os.getcwd()
-    os.chdir(job['path'])
     util.archive('coseis.tgz')
     d = os.path.dirname(__file__)
     f = os.path.join(d, 'sord.x')
@@ -441,7 +438,7 @@ def stage(args, **kwargs):
 
     # save parametes
     prm.update({'~fieldio': fio})
-    meta.update({'dtype': job['dtype']})
+    meta.update({'dtype': np.dtype('f' +  cfg['realsize']).str})
     out = json.dumps(args, sort_keys=True, indent=4)
     open('parameters.json', 'w').write(out)
     out = json.dumps(job, sort_keys=True, indent=4)
@@ -451,7 +448,6 @@ def stage(args, **kwargs):
     out = json.dumps(meta, sort_keys=True, indent=4)
     open('meta.json', 'w').write(out)
 
-    os.chdir(cwd)
     return job
 
 def run(args, **kwargs):

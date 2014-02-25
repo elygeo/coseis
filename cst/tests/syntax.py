@@ -10,7 +10,7 @@ include = [
     'scripts/*/*.py',
 ]
 
-def test():
+def test(**kwargs):
     """
     Test code syntax.
     """
