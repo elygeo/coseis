@@ -19,6 +19,7 @@ TODO
 /cst/data
 /cst/build
 /cst/cvms/*.h
+/cst/cvms/*.patched
 /cst/cvms/version*.f
 /cst/cvms/Makefile
 /cst/sord/Makefile

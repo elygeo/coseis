@@ -47,14 +47,15 @@ ifeq ($(MACHINE), NICS-Kraken)
 endif
 
 # Rules
-cvms.x : io$(MODE).f version$(VERSION).f
-	$(FC) $(FFLAGS) -o $@ $^
+cvms.x : version$(VERSION).f cvms-$(VERSION).patched io$(MODE).f
+	$(FC) $(FFLAGS) -o $@ io$(MODE).f $<
 
-#cvms-$(VERSION).patch
-#	patch -p1 -i $^
+cvms-$(VERSION).patched : cvms-$(VERSION).patch
+	touch $@
+	patch -p1 -i $^
 
 clean :
-	rm -f *.o *.x *.lst *.pyc *.h version*.f
+	rm -f *.o *.x *.lst *.pyc *.h version*.f *.patched *.rej *.orig
 
 distclean : clean
 	rm Makefile
