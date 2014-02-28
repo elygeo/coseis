@@ -50,7 +50,12 @@ def configure(force=False, **kwargs):
 
     # configure
     cfg = yaml.load(open('defaults.yaml'))
-    cfg = util.prepare(defaults=cfg, **kwargs)
+    cfg = util.prepare(
+        defaults = cfg,
+        name = 'cvms',
+        executable = os.path.join('.', 'cvms.x'),
+        **kwargs
+    )
 
     # machine specific options
     for k, d in cfg['machine_opts'].items():
@@ -78,20 +83,15 @@ def configure(force=False, **kwargs):
     open(bld + 'in.h', 'w').write(f)
 
     # makefile
-    if not os.path.exists('Makefile'):
-        m = open('Makefile.in').read()
-        m = m.format(
-            version = ver,
-            machine = cfg['machine'],
-        )
-        open('Makefile', 'w').write(m)
+    m = open('Makefile.in').read()
+    m = m.format(
+        version = ver,
+        machine = cfg['machine'],
+    )
+    open('Makefile', 'w').write(m)
 
     # finished
     os.chdir(cwd)
-
-    # run parameters
-    cfg['name'] = 'cvms'
-    cfg['executable'] = os.path.join('.', 'cvms.x')
 
     return cfg
 
@@ -103,7 +103,6 @@ def make(force=False, **kwargs):
     import os, subprocess
     cfg = configure(force, **kwargs)
     p = os.path.dirname(__file__)
-    p = os.path.join(p, 'build-%s' % cfg['version'])
     if force:
         subprocess.check_call(['make', '-C', p, 'clean'])
     subprocess.check_call(['make', '-C', p, '-j', '2'])
@@ -175,16 +174,13 @@ def extract(lon, lat, dep, prop=['rho', 'vp', 'vs'], **kwargs):
     shape = dep.shape
     nsample = dep.size
 
-    # configure job and build code
-    cfg = make(**kwargs)
-
     # create temp directory
     cwd = os.getcwd()
     os.mkdir('cvms-tmp')
     os.chdir('cvms-tmp')
 
     # save input files
-    job = configure(**kwargs)
+    cfg = configure(**kwargs)
     lon.tofile(cfg['file_lon'])
     lat.tofile(cfg['file_lat'])
     dep.tofile(cfg['file_dep'])
@@ -199,9 +195,9 @@ def extract(lon, lat, dep, prop=['rho', 'vp', 'vs'], **kwargs):
         prop = [prop]
     for v in prop:
         f = {
-            'rho': job['file_rho'],
-            'vp':  job['file_vp'],
-            'vs':  job['file_vs'],
+            'rho': cfg['file_rho'],
+            'vp':  cfg['file_vp'],
+            'vs':  cfg['file_vs'],
         }[v]
         out += [np.fromfile(f, 'f').reshape(shape)]
 
