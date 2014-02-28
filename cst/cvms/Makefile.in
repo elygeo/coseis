@@ -5,8 +5,8 @@ MACHINE = {machine}
 # Default: GNU Compiler Collection
 MODE = bin
 FC = gfortran 
-FFLAGS = $(LDFLAGS) -fimplicit-none
-LDFLAGS = -g -O3 -Wall
+FFLAGS = $(LDFLAGS)
+LDFLAGS = -g -O3 -Wall -Ibuild-$(VERSION)
 
 # MPICH
 ifeq ($(MACHINE), Airy)
@@ -51,5 +51,5 @@ build-$(VERSION)/cvms.x : io$(MODE).o build-$(VERSION)/version$(VERSION).o
 	$(FC) $(FFLAGS) -o $@ $^
 
 clean :
-	rm -rf *.pyc
+	rm -rf *.pyc *.o build-*
 

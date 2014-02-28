@@ -70,7 +70,7 @@ def configure(force=False, **kwargs):
         p = os.path.join(repo, 'CVMS-%s' % ver, 'src') + os.sep
         for f in os.listdir(p):
             shutil.copy2(p + f, bld + f)
-        subprocess.check_call(['patch', '-d', bld, '-p1', '-i', 'cvms-%s.patch' % ver])
+        subprocess.check_call(['patch', '-d', bld, '-p1', '-i', '../cvms-%s.patch' % ver])
 
     # header file
     f = open('in.h.in').read()
@@ -103,7 +103,7 @@ def make(force=False, **kwargs):
     import os, subprocess
     cfg = configure(force, **kwargs)
     p = os.path.dirname(__file__)
-    p = os.path.join(p, 'build')
+    p = os.path.join(p, 'build-%s' % cfg['version'])
     if force:
         subprocess.check_call(['make', '-C', p, 'clean'])
     subprocess.check_call(['make', '-C', p, '-j', '2'])
@@ -140,7 +140,7 @@ def run(**kwargs):
 
     # link executable
     f = os.path.dirname(__file__)
-    f = os.path.join(f, build, 'cvms.x')
+    f = os.path.join(f, 'build-%s' % cfg['version'], 'cvms.x')
     os.link(f, 'cvms.x')
 
     # create input file
