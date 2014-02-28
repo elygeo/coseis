@@ -1,0 +1,21 @@
+# parameters
+version: '4.0'
+nsample: 0
+file_lon: lon.bin
+file_lat: lat.bin
+file_dep: dep.bin
+file_rho: rho.bin
+file_vp: vp.bin
+file_vs: vs.bin
+
+# configuration
+max_samples: 4800000
+minutes: 60
+nthread: 1
+
+# host specific configuration
+machine_opts:
+    alcf_bgq:
+        mode: vn
+    nics_kraken:
+        mode: vn
