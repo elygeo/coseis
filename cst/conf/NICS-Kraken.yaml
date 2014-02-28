@@ -24,8 +24,3 @@ submit:
     {depend_flag}
     {notify_flag}
     {submission}
-wrapper: |
-    #!/bin/bash
-    lfs setstripe -c 1 .
-    [ {nstripe} -ge -1 -a -d {iopath} ] && lfs setstripe -c {nstripe} {iopath}
-    {execute}

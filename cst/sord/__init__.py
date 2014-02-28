@@ -142,18 +142,20 @@ def configure(force=False):
 
     return
 
+
 def make(force=False):
     """
     Build SORD code.
     """
     import os, yaml, subprocess
+    configure(force)
     p = os.path.dirname(__file__) + os.sep
     if force:
-        subprocess.check_call(['make', '-C', p, 'distclean'])
-    configure(force)
+        subprocess.check_call(['make', '-C', p, 'clean'])
     subprocess.check_call(['make', '-C', p, '-j', '4'])
     cfg = yaml.safe_load(open(p + 'config.json'))
     return cfg
+
 
 def prepare_param(prm, fio):
     """
@@ -333,9 +335,9 @@ def prepare_param(prm, fio):
     }
     return prm, fio_, meta
 
-def stage(args, **kwargs):
+def run(args=None, **kwargs):
     """
-    Stage job
+    Stage and launch job.
     """
     import os, json, shutil
     import numpy as np
@@ -343,12 +345,16 @@ def stage(args, **kwargs):
 
     print('SORD: Support Operator Rupture Dynamics')
 
+    # arguments
+    if args == None:
+        args = {}
+    args.update(kwargs)
+
     # configure and make
     prm = parameters()
     fns = fieldnames()
     fio = {}
     job = {}
-    args.update(kwargs)
     for k, v in prm.items():
         if k in fns:
             fio[k] = v
@@ -420,7 +426,6 @@ def stage(args, **kwargs):
     prm.update({'nthread': job['nthread']})
 
     # create run files 
-    util.archive('coseis.tgz')
     d = os.path.dirname(__file__)
     f = os.path.join(d, 'sord.x')
     shutil.copy2(f, '.')
@@ -448,15 +453,10 @@ def stage(args, **kwargs):
     out = json.dumps(meta, sort_keys=True, indent=4)
     open('meta.json', 'w').write(out)
 
-    return job
-
-def run(args, **kwargs):
-    """
-    Stage and launch job.
-    """
-    from .. import util
-    job = stage(args, **kwargs)
+    # save archive and start job
+    util.archive('coseis.tgz')
     util.launch(job)
+
     return job
 
 class get_slices:

@@ -4,7 +4,7 @@ def test(**kwargs):
     """
     Test SORD parallelization with point source
     """
-    import os
+    import os, json
     import numpy as np
     import cst
     prm = {}

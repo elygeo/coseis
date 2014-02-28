@@ -82,10 +82,13 @@ def hostname():
     return host, 'Default'
 
 
-def configure(**kwargs):
+def configure(args=None, defaults=None, **kwargs):
     import os, sys, pwd, json, yaml, multiprocessing
 
     # defaults
+    if args == None:
+        args = {}
+    args.update(kwargs)
     path = os.path.dirname(__file__)
     path = os.path.join(path, 'conf') + os.sep
     f = path + 'default.yaml'
@@ -94,6 +97,8 @@ def configure(**kwargs):
     job['argv'] = sys.argv[1:]
     job['host'], job['machine'] = hostname()
     job['maxcores'] = multiprocessing.cpu_count()
+    if defaults != None:
+        job.update(defaults)
 
     # email
     try:
@@ -104,9 +109,9 @@ def configure(**kwargs):
     except:
         job['email'] = pwd.getpwuid(os.geteuid())[0]
 
-    # merge key-word arguments, 1st pass
-    for k in kwargs:
-        job[k] = kwargs[k]
+    # merge arguments, 1st pass
+    for k in args:
+        job[k] = args[k]
 
     # merge machine parameters
     if job['machine'] and job['machine'].lower() != 'default':
@@ -118,9 +123,9 @@ def configure(**kwargs):
             for k, v in o.items():
                 job[k] = v
 
-    # key-word arguments, 2nd pass
-    for k in kwargs:
-        job[k] = kwargs[k]
+    # arguments, 2nd pass
+    for k in args:
+        job[k] = args[k]
 
     # command line parameters
     for i in job['argv']:

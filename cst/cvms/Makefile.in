@@ -1,8 +1,9 @@
 # CVMS Makefile
+VERSION = {version}
 MACHINE = {machine}
-MODE = bin
 
 # Default: GNU Compiler Collection
+MODE = bin
 FC = gfortran 
 FFLAGS = $(LDFLAGS) -fimplicit-none
 LDFLAGS = -g -O3 -Wall
@@ -11,14 +12,6 @@ LDFLAGS = -g -O3 -Wall
 ifeq ($(MACHINE), Airy)
     MODE = mpi
     FC = mpif90
-endif
-
-# ALCF IBM Blue Gene/P
-ifeq ($(MACHINE), ALCF-BGP)
-    MODE = mpi
-    FC = mpixlf2003_r
-    FFLAGS = $(LDFLAGS) -g -O3 -qfixed
-    LDFLAGS = -g -O3 -qsuppress=cmpmsg
 endif
 
 # ALCF IBM Blue Gene/Q
@@ -54,14 +47,15 @@ ifeq ($(MACHINE), NICS-Kraken)
 endif
 
 # Rules
-all: cvms.x
+cvms.x : io$(MODE).f version$(VERSION).f
+	$(FC) $(FFLAGS) -o $@ $^
+
+#cvms-$(VERSION).patch
+#	patch -p1 -i $^
 
 clean :
-	rm -f *.o *.x *.lst *.pyc
+	rm -f *.o *.x *.lst *.pyc *.h version*.f
 
 distclean : clean
 	rm Makefile
-
-cvms.x : io$(MODE).o version{version}.o
-	$(FC) $(FFLAGS) -o $@ $^
 

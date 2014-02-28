@@ -20,7 +20,6 @@ email: ''
 queue: ''
 nproc: 1
 nthread: -1
-nstripe: -2
 iopath: 'hold'
 minutes: 0
 pmem: 0

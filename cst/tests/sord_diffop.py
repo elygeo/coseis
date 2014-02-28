@@ -4,7 +4,7 @@ def test(**kwargs):
     """
     Test SORD operators
     """
-    import os
+    import os, json
     import numpy as np
     import cst
     prm = {}
