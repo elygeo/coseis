@@ -40,7 +40,7 @@ def download(version):
     return
 
 def configure(force=False, **kwargs):
-    import os, yaml
+    import os, yaml, shutil, subprocess
     from .. import util, repo
 
     # source directory
@@ -59,27 +59,29 @@ def configure(force=False, **kwargs):
                 cfg[k] = v
 
     # download source code
-    assert cfg['version'] in ['2.2', '3.0', '4.0']
-    download(cfg['version'])
+    ver = cfg['version']
+    assert ver in ['2.2', '3.0', '4.0']
+    download(ver)
 
-    # link source files
-    p = os.path.join(repo, 'CVMS-%s' % cfg['version'], 'src')
-    for f in os.listdir(p):
-        if os.path.splitext(f)[1] in ['.f', '.h']:
-            if not os.path.exists(f):
-                g = os.path.join(p, f)
-                os.link(g, f)
+    # build directory
+    bld = 'build-%s' % ver + os.sep
+    if not os.path.exists(bld):
+        os.mkdir(bld)
+        p = os.path.join(repo, 'CVMS-%s' % ver, 'src') + os.sep
+        for f in os.listdir(p):
+            shutil.copy2(p + f, bld + f)
+        subprocess.check_call(['patch', '-d', bld, '-p1', '-i', 'cvms-%s.patch' % ver])
 
     # header file
     f = open('in.h.in').read()
     f = f.format(max_samples=cfg['max_samples'])
-    open('in.h', 'w').write(f)
+    open(bld + 'in.h', 'w').write(f)
 
     # makefile
-    if force or not os.path.exists('Makefile'):
+    if not os.path.exists('Makefile'):
         m = open('Makefile.in').read()
         m = m.format(
-            version = cfg['version'],
+            version = ver,
             machine = cfg['machine'],
         )
         open('Makefile', 'w').write(m)
@@ -100,7 +102,8 @@ def make(force=False, **kwargs):
     """
     import os, subprocess
     cfg = configure(force, **kwargs)
-    p = os.path.dirname(__file__) + os.sep
+    p = os.path.dirname(__file__)
+    p = os.path.join(p, 'build')
     if force:
         subprocess.check_call(['make', '-C', p, 'clean'])
     subprocess.check_call(['make', '-C', p, '-j', '2'])
@@ -137,7 +140,7 @@ def run(**kwargs):
 
     # link executable
     f = os.path.dirname(__file__)
-    f = os.path.join(f, 'cvms.x')
+    f = os.path.join(f, build, 'cvms.x')
     os.link(f, 'cvms.x')
 
     # create input file

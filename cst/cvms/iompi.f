@@ -19,11 +19,11 @@
       call mpi_file_set_errhandler(mpi_file_null,
      $    mpi_errors_are_fatal, ierr)
       if (ip == 0) write (0, '(a)') 'SCEC Community Velocity Model'
-      nnl = nn8 / np
+      nnl = int(nn8 / np)
       np8 = np
       if (modulo(nn8, np8) /= 0) nnl = nnl + 1
       nnl8 = nnl
-      nn = min(nnl8, nn8 - nnl8 * ip)
+      nn = int(min(nnl8, nn8 - nnl8 * ip))
       if (nn > ibig) then
           write (0, *) 'Error: nn greater than ibig', nn, ibig
           stop
