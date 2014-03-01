@@ -62,9 +62,9 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     prm['shape'] = [nx, ny, nz, nt]
 
     # material
-    prm['rho'] = ([], '=<', 'hold/rho.bin')
-    prm['vp'] = ([], '=<', 'hold/vp.bin')
-    prm['vs'] = ([], '=<', 'hold/vs.bin')
+    prm['rho'] = ([], '=<', 'mesh-rho.bin')
+    prm['vp'] = ([], '=<', 'mesh-vp.bin')
+    prm['vs'] = ([], '=<', 'mesh-vs.bin')
     prm['hourglass'] = [1.0, 1.0]
     prm['vp1'] = 1500.0
     prm['vs1'] = 500.0
@@ -73,7 +73,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
 
     # topography
     if surf == 'topo':
-        prm['x3'] = [], '=<', 'hold/z3.bin'
+        prm['x3'] = [], '=<', 'mesh-z3.bin'
 
     # boundary conditions
     prm['bc1'] = ['pml', 'pml', 'free']
@@ -129,9 +129,9 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     if surf_out:
         for f in 'vx', 'vy', 'vz':
             prm[f] += [
-                (s_[::ns,::ns,0,::mh], '=>', 'hold/full-%s.bin' % f),
-                (s_[::ns,::ns,0,::ms], '=>', '#hold/snap-%s.bin' % f),
-                (s_[::nh,::nh,0,::mh], '=>', '#hold/hist-%s.bin' % f),
+                (s_[::ns,::ns,0,::mh], '=>', 'full-%s.bin' % f),
+                (s_[::ns,::ns,0,::ms], '=>', '#snap-%s.bin' % f),
+                (s_[::nh,::nh,0,::mh], '=>', '#hist-%s.bin' % f),
             ]
 
     # cross section output
@@ -140,14 +140,13 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
         k = int(hypo[1] + 0.5)
         for f in 'vx', 'vy', 'vz', 'rho', 'vp', 'vs', 'gam':
             prm[f] += [
-                (s_[j,:,:,::ms], '=>', 'hold/xsec-ns-%s.bin' % f),
-                (s_[:,k,:,::ms], '=>', 'hold/xsec-ew-%s.bin' % f),
+                (s_[j,:,:,::ms], '=>', 'xsec-ns-%s.bin' % f),
+                (s_[:,k,:,::ms], '=>', 'xsec-ew-%s.bin' % f),
             ]
 
     # run directory
     path = os.path.join(cwd, 'run', 'sim', name) + os.sep
-    hold = os.path.join(path, 'hold') + os.sep
-    os.makedirs(hold)
+    os.makedirs(path)
     os.chdir(path)
 
     # save metadata
@@ -166,11 +165,6 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
             s = np.load(mesh + f)
             np.save(f, s[::ns,::ns])
 
-    # link input files
-    h = mesh + 'hold' + os.sep
-    for f in 'z3', 'rho', 'vp', 'vs':
-        os.link(h + f + '.bin', hold + f + '.bin')
-
     # run SORD
     job = cst.sord.run(prm)
 
@@ -178,7 +172,7 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     if surf_out:
         meta = open('meta.json')
         meta = json.load(meta)
-        x, y, t = meta['shapes']['hold/full-v1.bin']
+        x, y, t = meta['shapes']['full-v1.bin']
         m = x * y * t // 60000000
         f = os.path.joing(cwd, 'cook.py')
         shutil.copy2(f, path)

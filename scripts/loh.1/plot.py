@@ -89,6 +89,6 @@ ax[2].plot(t, v[2], 'k--')[0].set_dashes((2,0.5))
 # finish up
 ax[1].legend(['SOM', 'FK'], loc='lower left', frameon=False)
 fig.canvas.draw()
-fig.savefig(path + 'loh.1.pdf')
+fig.savefig(path + 'LOH.1.pdf')
 fig.show()
 

@@ -17,7 +17,7 @@ const int nx = NX, ny = NY, nz = NZ;
 const int npml = NPML, ntop = NTOP;
 const int mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
 const int flags = O_WRONLY | O_CREAT | O_EXCL;
-const char *files[] = {"hold/lon.bin", "hold/lat.bin", "hold/dep.bin", "hold/z3.bin"};
+const char *files[] = {"mesh-lon.bin", "mesh-lat.bin", "mesh-dep.bin", "mesh-z3.bin"};
 const char *path, *path0;
 const size_t nnode = nx * ny;
 const size_t ncell = (nx - 1) * (ny - 1);

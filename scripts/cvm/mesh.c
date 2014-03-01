@@ -16,7 +16,7 @@ const size_t nnode = NNODE;
 const int nz = NZ;
 const int mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
 const int flags = O_WRONLY | O_CREAT | O_EXCL;
-const char *files[] = {"hold/lon.bin", "hold/lat.bin", "hold/dep.bin"};
+const char *files[] = {"mesh-lon.bin", "mesh-lat.bin", "mesh-dep.bin"};
 const char *path, *path0;
 float *buff = (float *)malloc(nnode * sizeof(float));
 FILE *stream;

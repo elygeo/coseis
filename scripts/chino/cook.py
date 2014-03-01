@@ -6,14 +6,13 @@ import os, json
 import numpy as np
 
 # metatdata
-path = 'hold'
 meta = json.load(open('meta.json'))
-dt = meta['deltas'][path + '/full-v1.bin'][-1]
-nfull = meta['shapes'][path + '/full-v1.bin']
-nhist = meta['shapes'][path + '/hist-v1.bin']
-ifull = meta['indices'][path + '/full-v1.bin']
-ihist = meta['indices'][path + '/hist-v1.bin']
-isnap = meta['indices'][path + '/snap-v1.bin']
+dt = meta['deltas']['full-v1.bin'][-1]
+nfull = meta['shapes']['full-v1.bin']
+nhist = meta['shapes']['hist-v1.bin']
+ifull = meta['indices']['full-v1.bin']
+ihist = meta['indices']['hist-v1.bin']
+isnap = meta['indices']['snap-v1.bin']
 dtype = meta['dtype']
 
 # decimation intervals
@@ -31,19 +30,19 @@ pgvh = np.zeros(nn)
 pgdh = np.zeros(nn)
 
 # open full resolution files for reading
-f = os.path.join(path, 'full-v%s.bin')
+f = os.path.join('full-v%s.bin')
 f1 = open(f % 1, 'rb')
 f2 = open(f % 2, 'rb')
 f3 = open(f % 3, 'rb')
 
 # open snapshot files for writing
-f = os.path.join(path, 'snap-v%s.bin')
+f = os.path.join('snap-v%s.bin')
 s1 = open(f % 1, 'wb')
 s2 = open(f % 2, 'wb')
 s3 = open(f % 3, 'wb')
 
 # open time history files for writing
-f = os.path.join(path, 'snap-v%s.bin')
+f = os.path.join('snap-v%s.bin')
 h1 = open(f % 1, 'wb')
 h2 = open(f % 2, 'wb')
 h3 = open(f % 3, 'wb')
@@ -94,13 +93,13 @@ del(v1, v2, v3, u1, u2, u3, pgv, pgd, pgvh, pgdh)
 # transpose time history arrays
 x, y, t = nhist
 n = t, x * y
-f = os.path.join(path, 'hist-v%s.bin')
+f = os.path.join('hist-v%s.bin')
 np.fromfile(f % 1, dtype).reshape(n).T.tofile(f % 1)
 np.fromfile(f % 2, dtype).reshape(n).T.tofile(f % 2)
 np.fromfile(f % 3, dtype).reshape(n).T.tofile(f % 3)
 
 # remove full resolution files
-f = os.path.joing(path, 'full-v%s.bin')
+f = os.path.joing('full-v%s.bin')
 os.unlink(f % 1)
 os.unlink(f % 2)
 os.unlink(f % 3)

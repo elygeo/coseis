@@ -6,12 +6,14 @@ import cst
 
 # parameters
 path = 'run' + os.sep
-meta = open(path + 'meta.json')
-meta = json.load(meta)
-shape = meta['shape']
-delta = meta['delta']
-dtype = meta['dtype']
-vrup = meta['vrup']
+d = open(path + 'meta.json')
+d = json.load(d)
+dtype = d['dtype']
+d = open(path + 'parameters.json')
+d = json.load(d)
+shape = d['shape']
+delta = d['delta']
+vrup = d['vrup']
 rho = 2670.0
 vp = 6000.0
 vs = 3464.0

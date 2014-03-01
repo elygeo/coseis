@@ -106,7 +106,6 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
     path = os.path.join(cwd, 'run', 'mesh', mesh_id)
     os.makedirs(path)
     os.chdir(path)
-    os.mkdir('hold')
 
     # save data
     f = open('meta.json', 'w')
@@ -137,30 +136,29 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
 
         # launch mesher
         os.chdir(path)
+        #subprocess.check_call(['setstripe',  nstripe])
         shutil.copy2(cwd + 'mesh.py', '.')
         job0 = cst.util.launch(
             execute = '{python} mesh.py',
             nthread = 1,
             nproc = 4,
             ppn_range = [4],
-            nstripe = nstripe,
             minutes = int(ncell // 120000000),
         )
 
         # launch cvms
-        job = cst.cvms.launch(
-            iodir = 'hold',
+        job = cst.cvms.run(
+            nsample = ncell,
             nproc = nproc,
-            nstripe = nstripe,
             minutes = 30,
             depend = job0['jobid'],
-            nsample = ncell,
         )
 
     # cvm-h
     else:
 
         # launch mesher + cvmh
+        #subprocess.check_call(['setstripe',  nstripe])
         shutil.copy2(cwd + 'mesh-cvmh.py', '.')
         proj_cvmh = pyproj.Proj(**cst.cvmh.projection)
         x_, y_ = proj_cvmh(x, y)
@@ -171,7 +169,6 @@ for cvm in 'cvms', 'cvmh', 'cvmg':
             nthread = 1,
             nproc = 4,
             ppn_range = [4],
-            nstripe = nstripe,
             minutes = int(ncell // 120000000), # nearest
             #minutes = int(ncell // 36000000), # linear
         )

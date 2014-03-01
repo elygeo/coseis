@@ -182,8 +182,8 @@ if (io%op(2:2) /= '<' .and. io%op(2:2) /= '>') then
     select case (io%op)
     case ('.')
         do l = i1(3), i2(3)
-        do k = i1(2), i3(2)
-        do j = i1(1), i3(1)
+        do k = i1(2), i2(2)
+        do j = i1(1), i2(1)
             r = (1.0-abs(xi(1)-j)) * (1.0-abs(xi(2)-k)) * (1.0-abs(xi(3)-l))
             f(j,k,l) = f(j,k,l) + val * r
         end do

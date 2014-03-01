@@ -19,6 +19,7 @@ nt = int(   3.0 / dt + 1.0001)
 prm['delta'] = [dx, dx, dx, dt]
 prm['shape'] = [nx, nx, nx, nt]
 prm['nproc3'] = [1, 1, 2]
+prm['nproc3'] = [1, 1, 1]
 
 # boundary conditions & hypocenter
 prm['bc1'] = ['+node', '+node', '+node']; reg = 0.0

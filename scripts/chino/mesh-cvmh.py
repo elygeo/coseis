@@ -14,7 +14,6 @@ shape = meta['shape']
 delta = meta['delta']
 npml = meta['npml']
 ntop = meta['ntop']
-hold = 'hold' + os.sep
 
 # variant
 if meta['cvm'] == 'cvmg':
@@ -48,7 +47,7 @@ w = 1.0 - np.r_[np.zeros(ntop), 1.0 / (n - 1) * np.arange(n), np.ones(npml)]
 # node elevation mesh
 mode = os.O_WRONLY | os.O_CREAT | os.O_EXCL
 try:
-    fd = os.open(hold + 'z3.bin', mode)
+    fd = os.open('mesh-z3.bin', mode)
 except OSError:
     pass
 else:
@@ -68,7 +67,7 @@ w = np.r_[np.zeros(ntop), 1.0 / n * (0.5 + np.arange(n)), np.ones(npml)]
 
 # rho extraction
 try:
-    fd = os.open(hold + 'rho.bin', mode)
+    fd = os.open('mesh-rho.bin', mode)
 except OSError:
     pass
 else:
@@ -85,7 +84,7 @@ else:
 
 # vp extraction
 try:
-    fd = os.open(hold + 'vp.bin', mode)
+    fd = os.open('mesh-vp.bin', mode)
 except OSError:
     pass
 else:
@@ -102,7 +101,7 @@ else:
 
 # vs extraction
 try:
-    fd = os.open(hold + 'vs.bin', mode)
+    fd = os.open('mesh-vs.bin', mode)
 except OSError:
     pass
 else:

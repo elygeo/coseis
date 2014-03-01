@@ -34,11 +34,10 @@ z = np.zeros_like(x)
 
 # thread safe exclusive open
 mode = os.O_WRONLY | os.O_CREAT | os.O_EXCL
-hold = 'hold' + os.sep
 
 # write dep file
 try:
-    fd = os.open(hold + 'dep.bin', mode)
+    fd = os.open('mesh-dep.bin', mode)
 except OSError:
     pass
 else:
@@ -48,7 +47,7 @@ else:
 
 # write lon file
 try:
-    fd = os.open(hold + 'lat.bin', mode)
+    fd = os.open('mesh-lat.bin', mode)
 except OSError:
     pass
 else:
@@ -58,7 +57,7 @@ else:
 
 # write lat file
 try:
-    fd = os.open(hold + 'lon.bin', mode)
+    fd = os.open('mesh-lon.bin', mode)
 except OSError:
     pass
 else:

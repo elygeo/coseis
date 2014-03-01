@@ -2,40 +2,44 @@
 """
 Explosion test plot
 """
-import os, math, yaml
+import os, math, json
 import numpy as np
 import matplotlib.pyplot as plt
 import cst
 
-# material properties
-p = os.path.join('run') + os.sep
-meta = open(p + 'jon.config.yaml').read()
-meta += open(p + 'parameters.yaml').read()
-meta = yaml.load(meta)
+path = os.path.join('run') + os.sep
+
+# parameters
+meta = open(path + 'parameters.json')
+meta = json.load(meta)
 nx, ny, nz, nt = meta['shape']
 dx, dy, dz, dt = meta['delta']
-dtype = meta['dtype']
-hypo = meta['p11'][0]
-tau = meta['p11'][-1]
+tau = meta['pxx'][-1]
 rho = meta['rho']
 vp = meta['vp']
 vs = meta['vs']
+
+# metadata
+meta = open(path + 'meta.json')
+meta = json.load(meta)
+dtype = meta['dtype']
+reg = meta['indices']['p1-vx.bin'][0]
 
 # loop over stations
 for sta in 'p1', 'p2', 'p3', 'p4', 'p5', 'p6':
 
     # read time histories
     p = os.path.join('run', sta)
-    v1 = np.fromfile(p + '-v1.bin', dtype)
-    v2 = np.fromfile(p + '-v2.bin', dtype)
-    v3 = np.fromfile(p + '-v3.bin', dtype)
-    v = np.array([v1, v2, v3])
+    vx = np.fromfile(p + '-vx.bin', dtype)
+    vy = np.fromfile(p + '-vy.bin', dtype)
+    vz = np.fromfile(p + '-vz.bin', dtype)
+    v = np.array([vx, vy, vz])
 
     # source receiver radius
-    xi, yi, zi = meta['xis'][sta + '-v1.bin']
-    x = (xi - hypo[0]) * dx,
-    y = (yi - hypo[1]) * dy,
-    z = (zi - hypo[2]) * dz,
+    xi, yi, zi = meta['indices'][sta + '-vx.bin']
+    x = (xi - reg) * dx
+    y = (yi - reg) * dy
+    z = (zi - reg) * dz
     r = math.sqrt(x * x + y * y + z * z)
 
     # rotation to radial coordinates
@@ -62,10 +66,10 @@ for sta in 'p1', 'p2', 'p3', 'p4', 'p5', 'p6':
     #ax.plot(ta - dt, va, 'k--')
     ax.set_xlim(0.5, dt * nt)
     ax.legend(['v_r', 'v_t1', 'v_t2', 'v_a'])
-    ax.set_title(str(tuple(x)))
+    ax.set_title(x)
     if sta == 'p2':
         name = 'Explosion point source'
-        ax.set_title(name + ' ' + str(x, y, z))
+        ax.set_title(name + ' ' + str([x, y, z]))
         f = os.path.join('run', 'Explosion.png')
         fig.savefig(f)
     fig.show()

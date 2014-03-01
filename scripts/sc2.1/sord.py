@@ -35,9 +35,9 @@ prm['bc1'] = ['pml', 'pml', 'free']
 prm['bc2'] = ['pml', 'pml', 'pml']
 
 # material
-prm['rho'] = ([], '=<', 'rho.bin')
-prm['vp']  = ([], '=<', 'vp.bin')
-prm['vs']  = ([], '=<', 'vs.bin')
+prm['rho'] = ([], '=<', 'mesh-rho.bin')
+prm['vp']  = ([], '=<', 'mesh-vp.bin')
+prm['vs']  = ([], '=<', 'mesh-vs.bin')
 prm['gam'] = 0.0
 prm['vp1'] = 600.0
 prm['vs1'] = 200.0
@@ -65,6 +65,6 @@ d = os.path.join('run', 'sim', '%.0f' % dx)
 os.makedirs(d)
 os.chdir(d)
 for v in 'rho', 'vp', 'vs':
-    os.link(mesh + v + '.bin', '.')
+    os.link(mesh + 'mesh-' + v + '.bin', '.')
 cst.sord.run(prm)
 

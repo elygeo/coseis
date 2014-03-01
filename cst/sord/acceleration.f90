@@ -251,7 +251,7 @@ do i = 1, 3
 end do
 
 ! acceleration I/O
-call field_io('<>', 'az', w1(:,:,:,1))
+call field_io('<>', 'ax', w1(:,:,:,1))
 call field_io('<>', 'ay', w1(:,:,:,2))
 call field_io('<>', 'az', w1(:,:,:,3))
 if (modulo(it, itstats) == 0) then

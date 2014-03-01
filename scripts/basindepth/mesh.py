@@ -18,6 +18,7 @@ x = np.arange(x[0], x[1] + dx/2, dx, 'f')
 y = np.arange(y[0], y[1] + dy/2, dy, 'f')
 z = np.arange(z[0], z[1] + dz/2, dz, 'f')
 shape = x.size, y.size, z.size
+nsample = shape[0] * shape[1] * shape[2]
 
 # 2d mesh
 x, y = np.meshgrid(x, y)
@@ -30,30 +31,28 @@ meta = dict(
     dtype = np.dtype('f').str,
 )
 
+# run dir
+p = os.path.join('run', 'mesh')
+os.makedirs(p)
+os.chidir(p)
+
 # save data
-path = os.path.join('run', 'mesh') + os.sep
-os.makedirs(path + 'hold')
-json.dump(open(path + 'meta.json', 'w'), meta)
-np.save(path + 'lon.npy', x)
-np.save(path + 'lat.npy', y)
+json.dump(open('meta.json', 'w'), meta)
+np.save('lon.npy', x)
+np.save('lat.npy', y)
 
 # write input files
-path = os.path.join('run', 'mesh', 'hold') + os.sep
-with open(path + 'lon.bin', 'wb') as f:
+with open('lon.bin', 'wb') as f:
     for i in range(z.size):
         x.tofile(f)
-with open(path + 'lat.bin', 'wb') as f:
+with open('lat.bin', 'wb') as f:
     for i in range(z.size):
         y.tofile(f)
-with open(path + 'dep.bin', 'wb') as f:
+with open('dep.bin', 'wb') as f:
     for i in range(z.size):
         x.fill(z[i])
         x.tofile(f)
 
 # launch CVM-S
-cst.cvms.launch(
-    nsample = shape[0] * shape[1] * shape[2],
-    iodir = os.path.join('..', 'mesh', 'hold'),
-    nproc = nproc,
-)
+cst.cvms.run(nsample = nsample, nproc = nproc)
 

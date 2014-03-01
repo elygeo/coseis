@@ -44,7 +44,7 @@ meta = dict(
 )
 
 # create run directory
-path = os.path.join('run', 'mesh', '%.0f' % dx) + os.sep
+path = os.path.join('run', 'mesh', '%.0f' % dx)
 os.makedirs(path)
 shutil.copy2('mesh.py', path)
 os.chdir(path)
@@ -54,17 +54,16 @@ y.astype('f').T.tofile('lon.bin')
 
 # launch mesher
 job = cst.util.launch(
-    nproc = min(3, nproc),
-    command = '{python} mesh.py',
+    execute = '{python} mesh.py',
     minutes = nsample // 120000000,
+    nproc = min(3, nproc),
 )
 
 # launch CVM-S
-cst.cvms.launch(
-    iodir = os.path.join('..', 'mesh', '%.0f' % dx),
-    nproc = nproc,
-    depend = job['jobid'],
-    nsample = nsample,
+cst.cvms.run(
     version = '2.2',
+    nsample = nsample,
+    depend = job['jobid'],
+    nproc = nproc,
 )
 

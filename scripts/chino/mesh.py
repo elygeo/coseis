@@ -11,7 +11,6 @@ shape = meta['shape']
 delta = meta['delta']
 npml = meta['npml']
 ntop = meta['ntop']
-hold = 'hold' + os.sep
 
 # read data
 dep = np.arange(shape[2]) * delta[2]
@@ -38,7 +37,7 @@ w = 1.0 - np.r_[np.zeros(ntop), 1.0 / (n - 1) * np.arange(n), np.ones(npml)]
 # node elevation mesh
 mode = os.O_WRONLY | os.O_CREAT | os.O_EXCL
 try:
-    fd = os.open(hold + 'z3.bin', mode)
+    fd = os.open('mesh-z3.bin', mode)
 except OSError:
     pass
 else:
@@ -58,7 +57,7 @@ w = np.r_[np.zeros(ntop), 1.0 / n * (0.5 + np.arange(n)), np.ones(npml)]
 
 # write dep file
 try:
-    fd = os.open(hold + 'dep.bin', mode)
+    fd = os.open('mesh-dep.bin', mode)
 except OSError:
     pass
 else:
@@ -68,7 +67,7 @@ else:
 
 # write lon file
 try:
-    fd = os.open(hold + 'lon.bin', mode)
+    fd = os.open('mesh-lon.bin', mode)
 except OSError:
     pass
 else:
@@ -78,7 +77,7 @@ else:
 
 # write lat file
 try:
-    fd = os.open(hold + 'lat.bin', mode)
+    fd = os.open('mesh-lat.bin', mode)
 except OSError:
     pass
 else:

@@ -327,7 +327,7 @@ def prepare_param(prm, fio):
     # done
     fio_ = [g for f in sorted(fio_) for g in f[2]]
     del(prm['itbuff'])
-    prm.update({'nfieldio': len(fio)})
+    prm.update({'nfieldio': len(fio_)})
     meta = {
         'indices': indices,
         'deltas': deltas,

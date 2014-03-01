@@ -49,32 +49,30 @@ subprocess.check_call(['make'])
 
 # create run directory
 path = os.path.join('run', 'mesh') + os.sep
-os.makedirs(path + 'hold')
+os.makedirs(path)
 
 # save files
 shutil.copy2('mesh.x', path)
-x.astype('f').tofile(path + 'lon.bin')
-y.astype('f').tofile(path + 'lat.bin')
+os.chdir(path)
+x.astype('f').tofile('lon.bin')
+y.astype('f').tofile('lat.bin')
+
+# dir path
+#subprocess.check_call(['setstrip', nstripe])
 
 # launch mesher
-os.chdir(path)
 job = cst.util.launch(
     nthread = 1,
     nproc = 4,
     ppn_range = [4],
-    nstripe = nstripe,
     command = os.path.join('.', 'mesh.x'),
     minutes = int(nsample // 1000000000),
 )
 
 # launch cvms
-cst.cvms.launch(
-    iodir = 'hold',
-    nthread = 1,
-    nproc = nproc,
-    ppn_range = [],
-    depend = job['jobid'],
-    nstripe = nstripe,
+cst.cvms.run(
     nsample = nsample,
+    nproc = nproc,
+    depend = job['jobid'],
 )
 
