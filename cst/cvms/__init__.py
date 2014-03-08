@@ -14,13 +14,17 @@ input_template = """\
 {file_vs}
 """
 
-def download(version):
+versions = ['2.2', '3.0', '4.0']
+
+def download(version=None):
     """
     Download CVMS data
     """
     import os, urllib, tarfile, cStringIO
     from .. import repo
 
+    if version == None:
+        version = versions[-1]
     url = 'http://earth.usc.edu/~gely/cvm-data/CVMS-%s.tgz' % version
     path = os.path.join(repo, 'CVMS-%s' % version) + os.sep
 
@@ -65,13 +69,18 @@ def configure(force=False, **kwargs):
 
     # download source code
     ver = cfg['version']
-    assert ver in ['2.2', '3.0', '4.0']
+    if ver == None:
+        cfg['version'] = ver = versions[-1]
+    else:
+        assert ver in versions
     download(ver)
 
     # build directory
     bld = 'build-%s' % ver + os.sep
     if not os.path.exists(bld):
         os.mkdir(bld)
+        shutil.copy2('process_serial.f', bld)
+        shutil.copy2('process_mpi.f', bld)
         p = os.path.join(repo, 'CVMS-%s' % ver, 'src') + os.sep
         for f in os.listdir(p):
             shutil.copy2(p + f, bld + f)
@@ -88,7 +97,7 @@ def configure(force=False, **kwargs):
         version = ver,
         machine = cfg['machine'],
     )
-    open('Makefile', 'w').write(m)
+    open(bld + 'Makefile', 'w').write(m)
 
     # finished
     os.chdir(cwd)
@@ -100,12 +109,15 @@ def make(force=False, **kwargs):
     """
     Build the code
     """
-    import os, subprocess
+    import os, yaml, subprocess
     cfg = configure(force, **kwargs)
-    p = os.path.dirname(__file__)
+    p = os.path.dirname(__file__) + os.sep
+    p = os.path.join(p, 'build-%s' % cfg['version']) + os.sep
     if force:
         subprocess.check_call(['make', '-C', p, 'clean'])
     subprocess.check_call(['make', '-C', p, '-j', '2'])
+    c = yaml.safe_load(open(p + 'config.json'))
+    cfg.update(c)
     return cfg
 
 
@@ -113,7 +125,7 @@ def run(**kwargs):
     """
     Stage and launch job
     """
-    import os, sys
+    import os
     from .. import util, repo
 
     print('CVM-S')
@@ -125,8 +137,14 @@ def run(**kwargs):
     p = (cfg['nsample'] - 1) // cfg['max_samples'] + 1
     n = (cfg['nsample'] - 1) // cfg['nproc'] + 1
     if p > cfg['nproc']:
-        sys.exit('nsample = %s requires nproc >= %s or max_samples >= %s' %
-            (cfg['nsample'], p, n))
+        raise Exception(
+            'nsample = %s requires nproc >= %s or max_samples >= %s' %
+            (cfg['nsample'], p, n)
+        )
+
+    # disable MPI launch
+    if cfg['process'] == 'serial':
+        cfg['execute'] = cfg['executable']
 
     # save source code
     util.archive('coseis.tgz')
@@ -198,7 +216,7 @@ def extract(lon, lat, dep, prop=['rho', 'vp', 'vs'], **kwargs):
             'rho': cfg['file_rho'],
             'vp':  cfg['file_vp'],
             'vs':  cfg['file_vs'],
-        }[v]
+        }[v.lower()]
         out += [np.fromfile(f, 'f').reshape(shape)]
 
     # clean up

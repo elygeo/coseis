@@ -385,6 +385,8 @@ def run(args=None, **kwargs):
     job = {}
     job['name'] = 'sord'
     job['executable'] = os.path.join('.', 'sord.x')
+    if cfg['process'] == 'serial':
+        job['execute'] = job['executable']
 
     # partition for parallelization
     nx, ny, nz, nt = prm['shape']
@@ -403,7 +405,7 @@ def run(args=None, **kwargs):
     l = (nz - 1) // nl[2] + 1
     prm['nproc3'] = [j, k, l]
     job['nproc'] = n = j * k * l
-    if n > 1 and cfg['process'] == 'serial':
+    if cfg['process'] == 'serial' and n > 1:
         raise('MPI build required for multiprocessing') 
 
     # resources

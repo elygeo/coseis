@@ -3,20 +3,20 @@ VERSION = {version}
 MACHINE = {machine}
 
 # Default: GNU Compiler Collection
-MODE = bin
+PROCESS = serial
 FC = gfortran 
 FFLAGS = $(LDFLAGS)
-LDFLAGS = -g -O3 -Wall -Ibuild-$(VERSION)
+LDFLAGS = -g -O3 -Wall
 
 # MPICH
 ifeq ($(MACHINE), Airy)
-    MODE = mpi
+    PROCESS = mpi
     FC = mpif90
 endif
 
 # ALCF IBM Blue Gene/Q
 ifeq ($(MACHINE), ALCF-BGQ)
-    MODE = mpi
+    PROCESS = mpi
     FC = mpixlf2003_r
     FFLAGS = $(LDFLAGS) -g -O3 -qfixed
     LDFLAGS = -g -O3 -qsuppress=cmpmsg
@@ -24,7 +24,7 @@ endif
 
 # Wat2Q IBM Blue Gene/Q
 ifeq ($(MACHINE), IBM-Wat2Q)
-    MODE = mpi
+    PROCESS = mpi
     FC = /bgsys/drivers/ppcfloor/comm/xl/bin/mpixlf2003_r
     FFLAGS = $(LDFLAGS) -qlist -qreport
     LDFLAGS = -g -O3 -qsuppress=cmpmsg
@@ -32,7 +32,7 @@ endif
 
 # KAUST Shaheen: IBM Blue Gene/P
 ifeq ($(MACHINE), KAUST-Shaheen)
-    MODE = mpi
+    PROCESS = mpi
     FC = *FIXME*
     FFLAGS = $(LDFLAGS)
     LDFLAGS = -g -O5 -qarch=450d -qtune=450 -qsuppress=cmpmsg
@@ -40,16 +40,23 @@ endif
 
 # NICS Kraken: Cray XT5
 ifeq ($(MACHINE), NICS-Kraken)
-    MODE = mpi
+    PROCESS = mpi
     FC = ftn
     FFLAGS = $(LDFLAGS) -Mdclchk
     LDFLAGS = -g -fast
 endif
 
-# Rules
-build-$(VERSION)/cvms.x : io$(MODE).o build-$(VERSION)/version$(VERSION).o
-	$(FC) $(FFLAGS) -o $@ $^
+CONFIG = {{ "process": "$(PROCESS)" }}
 
-clean :
-	rm -rf *.pyc *.o build-*
+# Rules
+all: config.json
+
+clean:
+	rm -f config.json *.o *.x *.lst
+
+config.json: cvms.x
+	echo '$(CONFIG)' > config.json
+
+cvms.x: process_$(PROCESS).o version$(VERSION).o
+	$(FC) $(FFLAGS) -o $@ $^
 

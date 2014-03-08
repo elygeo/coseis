@@ -9,14 +9,13 @@ from enthought.mayavi import mlab
 import cst
 
 # parameters
-model = 'cvms'; version = '2.2'
-model = 'cvms'; version = '4.0'
-model = 'cvmh'
-prop, vmin, vmax = 'vs', 500, 4000
-prop, vmin, vmax = 'vp', 1600, 6400
-dx = 200.0; dz = 50.0; nz = 201
+model = 'CVMS'; version = '2.2'
+model = 'CVMS'; version = None
+model = 'CVMH'; version = None
+prop, vmin, vmax = 'Vs', 500, 4000
+prop, vmin, vmax = 'Vp', 1600, 6400
 dx = 400.0; dz = 100.0; nz = 101
-nproc = 2
+dx = 200.0; dz = 50.0; nz = 201
 transpose = False
 
 # projection
@@ -72,10 +71,10 @@ zz, yy = np.meshgrid(z, yy)
 # cvm extraction
 if transpose:
     xx, yy, zz = xx.T, yy.T, zz.T
-if model == 'cvmh':
-    ss = cst.cvmh.extract(xx, yy, zz, prop)[0]
+if model == 'CVMH':
+    ss = cst.cvmh.extract(xx, yy, zz, prop, version=version)[0]
 else:
-    ss = cst.cvms.extract(xx, yy, zz, prop, version=version)[0]
+    ss = cst.cvms.extract(xx, yy, zz, prop, version=version, nproc=2)[0]
 if transpose:
     xx, yy, zz, ss = xx.T, yy.T, zz.T, ss.T
 xx, yy = proj(xx, yy)
@@ -83,7 +82,7 @@ zz *= -3.0
 
 # setup figure
 pixels = 640, 360
-size = pixels[0], pixels[1] + 48
+size = pixels[0], pixels[1] + 63
 fig = mlab.figure(None, size=size, bgcolor=(1,1,1), fgcolor=(0,0,0))
 mlab.clf()
 fig.scene.disable_render = True
@@ -120,10 +119,9 @@ mlab.plot3d(x, y, z, color=(0,0,0), line_width=0.5, tube_radius=None)
 mlab.view(-90, 45, 2e6, (0, 0, -2e4))
 fig.scene.camera.view_angle = 3.3
 fig.scene.light_manager.lights[3].activate = True
-fig.scene.disable_render = False
 if not os.path.exists('run'):
     os.mkdir('run')
-f = os.path.join('run', 'fence-%s-%s.png' % (model, prop))
+f = os.path.join('run', 'Fence-%s-%s.png' % (model, prop))
 print f
 mlab.savefig(f, magnification=1)
 fig.scene.disable_render = False

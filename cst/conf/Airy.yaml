@@ -2,3 +2,5 @@
 maxcores: 2 
 maxram: 4096 
 nthread: 4
+execute: mpiexec -n {nproc} -host airy.local {executable}
+

@@ -1,6 +1,6 @@
 # Options
 MACHINE = {machine}
-OMP = 1
+THREAD = omp
 
 # Default: GNU Compiler Collection
 CC = mpicc
@@ -10,21 +10,8 @@ CFLAGS = $(LDFLAGS)
 FFLAGS = $(LDFLAGS) -fimplicit-none
 LDFLAGS = -g -O3 -Wall
 LIBS =
-ifdef OMP
+ifeq ($(THREAD), omp)
     LDFLAGS += -fopenmp
-endif
-
-# ALCF IBM Blue Gene/P
-ifeq ($(MACHINE), ALCF-BGP)
-    CC = mpixlc_r
-    FC = mpixlf2003_r
-    CFLAGS = $(LDFLAGS) -qlist -qreport
-    FFLAGS = $(LDFLAGS) -qlist -qreport
-    LDFLAGS = -g -O3 -qsuppress=cmpmsg
-    LIBS = /home/morozov/lib/libmpihpm.a
-    ifdef OMP
-        LDFLAGS += -qsmp=omp
-    endif
 endif
 
 # ALCF IBM Blue Gene/Q
@@ -35,7 +22,7 @@ ifeq ($(MACHINE), ALCF-BGQ)
     FFLAGS = $(LDFLAGS) -qlist -qreport
     LDFLAGS = -g -O3 -qsuppress=cmpmsg
     LIBS = -lSPI_upci_cnk
-    ifdef OMP
+    ifeq ($(THREAD), omp)
         LDFLAGS += -qsmp=omp:noauto
         LIBS += /home/morozov/HPM/lib/libmpihpm_smp.a
     else

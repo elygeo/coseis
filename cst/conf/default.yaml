@@ -25,7 +25,7 @@ pmem: 0
 mode: ''
 mode_opts: {}
 executable: ''
-execute: mpiexec -np {nproc} {executable}
+execute: mpiexec -n {nproc} {executable}
 notify_threshold: 4096
 depend: ''
 depend_flag: ''

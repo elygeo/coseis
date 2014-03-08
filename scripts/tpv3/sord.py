@@ -31,8 +31,8 @@ runs = [
     [100.0, [1, 1, 1]],
 ]
 runs = [[ 50.0, [1, 1, 1]]]
-runs = [[300.0, [1, 1, 1]]]
 runs = [[150.0, [1, 1, 2]]]
+runs = [[300.0, [1, 1, 1]]]
 
 # boundary conditions:
 prm['bc1'] = ['pml', 'pml', 'pml']
@@ -84,7 +84,6 @@ for dx, np in runs:
         (s_[i1:,i1:], '=', 72.9e+6),
         (s_[i0:,i1:], '=', 75.8e+6),
         (s_[i1:,i0:], '=', 75.8e+6),
-        # FIXME??? missing one?
     ]
 
     # fault plane output

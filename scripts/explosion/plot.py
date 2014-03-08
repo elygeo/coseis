@@ -63,7 +63,7 @@ for sta in 'p1', 'p2', 'p3', 'p4', 'p5', 'p6':
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.plot(t - dt, v.T, '-')
-    #ax.plot(ta - dt, va, 'k--')
+    ax.plot(ta - dt, va, 'k--')
     ax.set_xlim(0.5, dt * nt)
     ax.legend(['v_r', 'v_t1', 'v_t2', 'v_a'])
     ax.set_title(x)

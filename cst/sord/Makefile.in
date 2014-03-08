@@ -34,31 +34,6 @@ ifeq ($(MACHINE), Airy)
     LD = mpif90
 endif
 
-# ALCF IBM Blue Gene/P
-ifeq ($(MACHINE), ALCF-BGP)
-    PROCESS = mpi
-    ifdef TAU
-        CC = tau_cc.sh
-        FC = tau_f90.sh
-        LD = tau_f90.sh
-        LIBS =
-    else
-        CC = mpixlc_r
-        FC = mpixlf2003_r
-        LD = mpixlf2003_r
-        LIBS = /home/morozov/lib/libmpihpm.a
-    endif
-    CFLAGS = $(LDFLAGS) -qlist -qreport
-    FFLAGS = $(LDFLAGS) -qlist -qreport
-    LDFLAGS = -g -O3 -qsuppress=cmpmsg
-    ifeq ($(THREAD), omp)
-        LDFLAGS += -qsmp=omp
-    endif
-    ifeq ($(REALSIZE), 8)
-        FFLAGS += -qrealsize=8
-    endif
-endif
-
 # ALCF IBM Blue Gene/Q
 ifeq ($(MACHINE), ALCF-BGQ)
     PROCESS = mpi

@@ -9,6 +9,7 @@ projection = {'proj': 'utm', 'zone': 11, 'datum': 'NAD27', 'ellps': 'clrk66'}
 extent = (131000.0, 828000.0), (3431000.0, 4058000.0), (-200000.0, 4900.0)
 prop2d = {'topo': '1', 'base': '2', 'moho': '3'}
 prop3d = {'vp': '1', 'vs': '3', 'tag': '2'}
+versions = ['vx62', 'vx63', '11.2.0', '11.9.0']
 voxet3d = {
     'mantle': ('CVM_CM', False),
     'crust':  ('CVM_LR', [(False, False), (False, False), (True, False)]),
@@ -77,7 +78,7 @@ def ely_vp(f):
     f = 400.0 + 1.4 * f
     return f
 
-def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version='11.9.0'):
+def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version=None):
     """
     Download and read SCEC CVM-H voxet.
 
@@ -85,11 +86,11 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version='11.9.0'):
     ----------
     prop:
         2d property: 'topo', 'base', or 'moho'
-        3d property: 'vp', 'vs', or 'tag'
+        3d property: 'Vp', 'Vs', or 'tag'
     voxet:
         3d voxet: 'mantle', 'crust', or 'lab'
     no_data_value: None, 'nan', or float value. None = filled from below.
-    version: 'vx62', 'vx63', '11.2.0', or '11.9.0'
+    version: 'vx62', 'vx63', '11.2.0', '11.9.0' or None (default)
 
     Returns
     -------
@@ -100,6 +101,8 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version='11.9.0'):
     import os, urllib, tarfile
     from . import gocad
 
+    if version == None:
+        version = versions[-1]
     path = os.path.join(repo, 'CVMH-%s' % version)
     if version[:2] == 'vx':
         url = 'http://structure.harvard.edu/cvm-h/download/%s.tar.bz2' % version
@@ -172,7 +175,8 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version='11.9.0'):
     # load voxet
     if prop is None:
         return gocad.voxet(voxfile)
-    elif prop in prop2d:
+    prop = prop.lower()
+    if prop in prop2d:
         pid = prop2d[prop]
     else:
         pid = prop3d[prop]
@@ -203,7 +207,7 @@ class Model():
     voxet:
         3d voxet list: ['mantle', 'crust', 'lab']
     no_data_value: None, 'nan', or float value. None = filled from below.
-    version: 'vx62', 'vx63', '11.2.0', or '11.9.0'
+    version: 'vx62', 'vx63', '11.2.0', 11.9.0' or None (default)
 
     Call parameters
     ---------------
@@ -215,8 +219,8 @@ class Model():
     -------
     out: Property samples at coordinates (x, y, z)
     """
-    def __init__(self, prop, voxet=['mantle', 'crust'], no_data_value=None, version='11.9.0'):
-        self.prop = prop
+    def __init__(self, prop, voxet=['mantle', 'crust'], no_data_value=None, version=None):
+        self.prop = prop = prop.lower()
         if prop in prop2d:
             self.voxet = [cvmh_voxet(prop, version=version)]
         else:
@@ -355,7 +359,7 @@ def extract(x, y, z, vm=['rho', 'vp', 'vs'], by_depth=True, **kwargs):
     out = []
     f = None
     for v in vm:
-        prop = v
+        prop = v = v.lower()
         if v == 'rho':
             prop = 'vp'
         if not out or prop != f.vm.prop:
