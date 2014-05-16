@@ -160,8 +160,9 @@ def prepare(job=None, **kwargs):
 
     # mode options
     k = job['mode']
-    if k:
-        job.update(job['mode_opts'][k])
+    d = job['mode_opts']
+    if k in d:
+        job.update(d[k])
 
     # dependency
     if job['depend']:

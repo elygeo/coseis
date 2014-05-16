@@ -194,6 +194,8 @@ def extract(lon, lat, dep, prop=['rho', 'vp', 'vs'], **kwargs):
 
     # create temp directory
     cwd = os.getcwd()
+    if os.path.exists('cvms-tmp'):
+        shutil.rmtree('cvms-tmp')
     os.mkdir('cvms-tmp')
     os.chdir('cvms-tmp')
 

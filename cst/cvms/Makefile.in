@@ -9,7 +9,7 @@ FFLAGS = $(LDFLAGS)
 LDFLAGS = -g -O3 -Wall
 
 # MPICH
-ifeq ($(MACHINE), Airy)
+ifeq ($(MACHINE), MPICH)
     PROCESS = mpi
     FC = mpif90
 endif

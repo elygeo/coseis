@@ -7,12 +7,10 @@ cst.tests.hello.make()
 cst.sord.make()
 
 cwd = os.getcwd()
-p = os.path.dirname(__file__)
-f = os.path.join(p, 'test_suite.py')
 d = os.path.join('run', 'test_suite')
 os.makedirs(d)
+shutil.copy2('test_suite.py', d)
 os.chdir(d)
-shutil.copy2(f, '.')
 job = cst.util.launch(
     mode = 'script',
     execute = '{python} ./test_suite.py',
