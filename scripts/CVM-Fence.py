@@ -9,9 +9,9 @@ from enthought.mayavi import mlab
 import cst
 
 # parameters
-model = 'CVMS'; version = '2.2'
-model = 'CVMS'; version = None
-model = 'CVMH'; version = None
+model = 'S'; version = '2.2'
+model = 'S'; version = None
+model = 'H'; version = None
 prop, vmin, vmax = 'Vs', 500, 4000
 prop, vmin, vmax = 'Vp', 1600, 6400
 dx = 400.0; dz = 100.0; nz = 101
@@ -71,7 +71,7 @@ zz, yy = np.meshgrid(z, yy)
 # cvm extraction
 if transpose:
     xx, yy, zz = xx.T, yy.T, zz.T
-if model == 'CVMH':
+if model == 'H':
     ss = cst.cvmh.extract(xx, yy, zz, prop, version=version)[0]
 else:
     ss = cst.cvms.extract(xx, yy, zz, prop, version=version, nproc=2)[0]
@@ -121,7 +121,7 @@ fig.scene.camera.view_angle = 3.3
 fig.scene.light_manager.lights[3].activate = True
 if not os.path.exists('run'):
     os.mkdir('run')
-f = os.path.join('run', 'Fence-%s-%s.png' % (model, prop))
+f = os.path.join('run', 'CVM-Fence-%s-%s.png' % (model, prop))
 print f
 mlab.savefig(f, magnification=1)
 fig.scene.disable_render = False

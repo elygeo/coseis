@@ -93,10 +93,7 @@ def configure(force=False, **kwargs):
 
     # makefile
     m = open('Makefile.in').read()
-    m = m.format(
-        version = ver,
-        machine = cfg['machine'],
-    )
+    m = m.format(machine = cfg['machine'])
     open(bld + 'Makefile', 'w').write(m)
 
     # finished

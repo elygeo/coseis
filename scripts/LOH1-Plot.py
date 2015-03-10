@@ -65,11 +65,11 @@ ax[1].plot(t, v[1], 'k')
 ax[2].plot(t, v[2], 'k')
 
 # read Prose F/K results
-p = 'fk' + os.sep
-t = np.fromfile(p + 'time.bin', '<f')
-v1 =  1e5 * np.fromfile(p + 'v-radial.bin', '<f')
-v2 =  1e5 * np.fromfile(p + 'v-transverse.bin', '<f')
-v3 = -1e5 * np.fromfile(p + 'v-vertical.bin', '<f')
+p = repo + os.sep + 'LOH1-ProseFK-'
+t = np.load(p + 'Time.npy')
+v1 =  1e5 * np.load(p + 'V-Radial.bin')
+v2 =  1e5 * np.load(p + 'V-Transverse.bin')
+v3 = -1e5 * np.load(p + 'V-Vertical.bin')
 v = np.array([v1, v2, v3])
 
 # convolve with Gaussian source

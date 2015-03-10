@@ -118,10 +118,10 @@ def configure(args=None, defaults=None, **kwargs):
         f = path + job['machine'] + '.yaml'
         m = yaml.load(open(f))
         job.update(m)
-    for h, o in job['host_opts'].items():
-        if h in job['host']:
-            for k, v in o.items():
-                job[k] = v
+    #for h, o in job['host_opts'].items():
+    #    if h in job['host']:
+    #        for k, v in o.items():
+    #            job[k] = v
 
     # arguments, 2nd pass
     for k in args:
@@ -275,16 +275,13 @@ def launch(job=None, **kwargs):
 
     # launch
     if job['submit']:
-        c = shlex.split(job['submit'])
         if job['wrapper']:
             f = job['name'] + '.sh'
             open(f, 'w').write(job['wrapper'])
-            os.chmod(f, 0755)
-        p = subprocess.Popen(c, stdout=subprocess.PIPE)
-        out = p.communicate()[0]
+            os.chmod(f, 755)
+        c = shlex.split(job['submit'])
+        out = subprocess.check_output(c)
         print(out)
-        if p.returncode:
-            raise Exception('Submit failed')
         d = re.search(job['submit_pattern'], out).groupdict()
         job.update(d)
     else:

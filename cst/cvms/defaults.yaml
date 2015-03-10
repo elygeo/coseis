@@ -15,7 +15,9 @@ nthread: 1
 
 # host specific configuration
 machine_opts:
-    alcf_bgq:
+    alcf_bgq_dev:
+        mode: vn
+    alcf_bgq_mira:
         mode: vn
     nics_kraken:
         mode: vn

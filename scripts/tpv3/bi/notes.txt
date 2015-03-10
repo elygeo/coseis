@@ -1,8 +1,0 @@
-Boundary integral solutions for TPV3
-
-trup is off by dt compared to the time series
-
-stations locations:
-pa = -0.05,  5.95
-pi =  7.45, -0.05
-

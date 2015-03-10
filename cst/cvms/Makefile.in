@@ -1,5 +1,4 @@
-# CVMS Makefile
-VERSION = {version}
+# Options
 MACHINE = {machine}
 
 # Default: GNU Compiler Collection
@@ -57,6 +56,8 @@ clean:
 config.json: cvms.x
 	echo '$(CONFIG)' > config.json
 
-cvms.x: process_$(PROCESS).o version$(VERSION).o
+cvms.x: process_$(PROCESS).o cvms.o
 	$(FC) $(FFLAGS) -o $@ $^
 
+cvms.o: version{2.2,3.0,4.0}.f
+	$(FC) $(FFLAGS) -c -o $@ $^

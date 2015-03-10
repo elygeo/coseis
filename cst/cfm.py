@@ -647,7 +647,7 @@ def explore(prefix, faults):
             fig.scene.camera.view_angle = view_angle
         elif k in '/?h':
             from .cfm import explore
-            print explore.__doc__
+            print(explore.__doc__)
         fig.scene.disable_render = False
         save[0] = isurf
         return
@@ -657,7 +657,7 @@ def explore(prefix, faults):
     mlab.view(view_azimuth, view_elevation)
     fig.scene.camera.view_angle = view_angle
     fig.scene.disable_render = False
-    print "\nPress H in the figure window for help."
+    print("\nPress H in the figure window for help.")
     mlab.show()
     return
 

@@ -387,7 +387,7 @@ def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0
         lon, lat = extent
         lon = lon[0] % 360, lon[1] % 360
         extent = lon, lat
-    print 'Reading %s resolution %s.' % (resolution, name)
+    print('Reading %s resolution %s.' % (resolution, name))
     xx = []
     yy = []
     ii = 0
@@ -593,7 +593,8 @@ def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
         g = dict(g)[isrc]
         h = srf % (v0, v1, isrc, irup, isrc, irup)
         h = 'ssh', host, 'head -2 %s %s.variation.output' % (h, h)
-        h = subprocess.Popen(h, stdout=subprocess.PIPE).communicate()[0].split()
+        #h = subprocess.Popen(h, stdout=subprocess.PIPE).communicate()[0].split()
+        h = subprocess.check_output(h).split()
         meta = {
             'segment': g,
             'isrc': isrc,
@@ -620,7 +621,8 @@ def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
         g = srf + '.variation-s%04d-h%04d'
         g = g % (v0, v1, isrc, irup, isrc, irup, islip, ihypo)
         g = 'ssh', host, 'gzip -c ' + g
-        g = subprocess.Popen(g, stdout=subprocess.PIPE).communicate()[0]
+        #g = subprocess.Popen(g, stdout=subprocess.PIPE).communicate()[0]
+        g = subprocess.check_output(g)
         open(f, 'wb').write(g)
         g = cStringIO.StringIO(g)
         g = gzip.GzipFile(fileobj=g)

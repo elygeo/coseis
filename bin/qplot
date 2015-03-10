@@ -96,8 +96,8 @@ def plot(*argv):
                         delta = meta['delta']
                     break
             fh = open(filename, 'rb')
-            npy.read_magic(fh)
-            shape, fcont, dtype = npy.read_array_header_1_0(fh)
+            version = npy.read_magic(fh)
+            shape, fcont, dtype = npy._read_array_header(fh, version)
             if not fcont:
                 shape = shape[::-1]
             if len(shape) < 3:

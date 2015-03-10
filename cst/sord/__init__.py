@@ -406,7 +406,7 @@ def run(args=None, **kwargs):
     prm['nproc3'] = [j, k, l]
     job['nproc'] = n = j * k * l
     if cfg['process'] == 'serial' and n > 1:
-        raise('MPI build required for multiprocessing') 
+        raise Exception('MPI build required for multiprocessing') 
 
     # resources
     if prm['diffop'] in ('cons', 'rect'):

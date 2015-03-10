@@ -1,3 +1,5 @@
+# MPI + PBS
+execute: mpiexec -n {nproc} {executable}
 depend_flag: -W depend="afterok:{depend}"
 notify_flag: -m abe
 submit:

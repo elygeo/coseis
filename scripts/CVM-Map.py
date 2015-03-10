@@ -45,7 +45,7 @@ for vs, tag in [
     ax.set_aspect(1.0 / np.cos(33.75 / 180.0 * np.pi))
     ax.set_title('CVM%s %.0f m depth' % (tag, depth))
     ax.axis(lon + lat)
-    f = os.path.join('run', 'Map-CVM%s-%s%.0f.png' % (tag, prop, depth))
+    f = os.path.join('run', 'CVM%s-Map-%s%.0f.png' % (tag, prop, depth))
     print f
     fig.savefig(f)
 

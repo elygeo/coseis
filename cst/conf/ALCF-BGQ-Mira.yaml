@@ -1,11 +1,9 @@
-# ALCF IBM Blue Gene/Q
+# ALCF IBM Blue Gene/Q Mira
+maxnodes: 49152
+maxtime: 1440
 account: GroundMotion_esp
 maxcores: 16
 maxram: 16384
-host_opts:
-    vesta: {maxnodes: 1024,  maxtime: 120}
-    cetus: {maxnodes: 1024,  maxtime: 120}
-    mira:  {maxnodes: 49152, maxtime: 1440}
 mode: smp
 mode_opts:
     vn: {nthread: 1, ppn_range: [1, 2, 4, 8, 16, 32]}

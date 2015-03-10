@@ -15,3 +15,12 @@ First, edit ``sim.py`` to choose the desired resolution and number of
 processors, and then run ``sim.py`` to start the simulations. Use ``plot.py``
 and ``convergence.py`` to plot the results.
 
+
+### Boundary integral solution data
+
+Trup is off by dt compared to the time series
+
+stations locations:
+Pa = -0.05,  5.95
+Pi =  7.45, -0.05
+

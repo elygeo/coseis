@@ -1,7 +1,6 @@
 # machine properties
 machine: ''
 host: ''
-host_opts: {}
 queue_opts: []
 ppn_range: []
 maxnodes: 1
@@ -25,7 +24,7 @@ pmem: 0
 mode: ''
 mode_opts: {}
 executable: ''
-execute: mpiexec -n {nproc} {executable}
+execute: {executable}
 notify_threshold: 4096
 depend: ''
 depend_flag: ''

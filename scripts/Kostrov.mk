@@ -9,3 +9,4 @@ run: sord.yaml
 
 clean:
 	rm -rf run
+

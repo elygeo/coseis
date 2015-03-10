@@ -25,8 +25,8 @@ for filename in args:
     # NumPy file
     if filename.endswith('npy'):
         fh = open(filename, 'rb')
-        npy.read_magic(fh)
-        shape, fcont, dtype = npy.read_array_header_1_0(fh)
+        version = npy.read_magic(fh)
+        shape, fcont, dtype = npy._read_array_header(fh, version)
         n = np.prod(shape)
 
     # raw binary with metadata (if present)
@@ -71,13 +71,16 @@ for filename in args:
         rmax = -np.inf
         rsum = 0.0
         i = 0
+        m = 0
         while i < n:
             b = min(n - i, block)
             r = np.fromfile(fh, dtype=dtype, count=b)
-            rmin = min(rmin, r.min())
-            rmax = max(rmax, r.max())
-            rsum += r.astype('d').sum()
+            j = ~np.isnan(r)
+            rmin = min(rmin, r[j].min().copy())
+            rmax = max(rmax, r[j].max().copy())
+            rsum += r[j].astype('d').sum()
             i += b
-        rmean = rsum / n
+            m += j.sum()
+        rmean = rsum / m
     print('%12g %12g %12g  %s  %s' % (rmin, rmax, rmean, list(shape), filename))
 

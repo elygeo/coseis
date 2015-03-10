@@ -182,7 +182,7 @@ def spectrum(h, dt=1.0, shift=False, tzoom=10.0, db=None, legend=None, title='Fo
         fig.canvas.set_window_title(title)
         fig.subplots_adjust(left=0.125, right=0.975,
             bottom=0.1, top=0.975, wspace=0.3, hspace=0.3)
-        axes = [fig.add_subplot(i) for i in 221, 222, 223, 224]
+        axes = [fig.add_subplot(i) for i in [221, 222, 223, 224]]
 
     ax = axes[0]
     ax.plot(t.T, h.T, '-')

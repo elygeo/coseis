@@ -49,7 +49,7 @@ class stp():
 
     def __init__(self, waveserver='scedc', retry=60):
         import time, struct, socket
-        print 'init'
+        print('init')
         self.sock = socket.socket()
         self.send = self.sock.send
         self.close = self.sock.close
@@ -182,7 +182,7 @@ def mts(eventid):
     clvd = {}
     dc   = {}
     for line in text.readlines():
-        print line
+        print(line)
         line = line.strip()
         if not line:
             continue

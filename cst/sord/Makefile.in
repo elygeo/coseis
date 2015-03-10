@@ -27,7 +27,7 @@ ifdef DEBUG
 endif
 
 # MPICH
-ifeq ($(MACHINE), Airy)
+ifeq ($(MACHINE), MPICH)
     PROCESS = mpi
     CC = mpicc
     FC = mpif90 
@@ -124,7 +124,9 @@ CONFIG = {{ "process": "$(PROCESS)", "thread": "$(THREAD)", "realsize": "$(REALS
 config.json: sord.x
 	echo '$(CONFIG)' > config.json
 
-sord.x: {objects} \
+OBJECTS = {objects}
+
+sord.x: $(OBJECTS) \
 	thread_$(THREAD).o \
 	process_$(PROCESS).o
 	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
@@ -135,8 +137,8 @@ thread.mod: thread_$(THREAD).o
 process.mod: process_$(PROCESS).o
 	@true   
 
-{rules}
-
 %.mod: %.o
 	@true
+
+{rules}
 
