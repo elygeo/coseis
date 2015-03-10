@@ -121,7 +121,7 @@ fig.scene.camera.view_angle = 3.3
 fig.scene.light_manager.lights[3].activate = True
 if not os.path.exists('run'):
     os.mkdir('run')
-f = os.path.join('run', 'CVM-Fence-%s-%s.png' % (model, prop))
+f = os.path.join('run', 'CVM-Fence-%s-%s.png' % (prop, model))
 print f
 mlab.savefig(f, magnification=1)
 fig.scene.disable_render = False

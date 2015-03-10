@@ -10,8 +10,8 @@ from enthought.mayavi import mlab
 import cst
 
 # parameters
-outfile = 'z25.png'; dpi = 150.0
-outfile = 'z25.pdf'; dpi = 300.0
+outfile = 'CVM-Basins.png'; dpi = 150.0
+outfile = 'CVM-Basins.pdf'; dpi = 300.0
 path = os.path.join('run', 'mesh') + os.sep
 proj = pyproj.Proj(proj='tmerc', lon_0=-117.25, lat_0=33.75, k=0.001)
 title = 'SCEC Community\nVelocity Model'

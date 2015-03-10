@@ -63,7 +63,8 @@ for f in 'vx', 'vy', 'vz':
     ]
 
 # run sord
-os.mkdir('run')
-os.chdir('run')
+p = os.path.join('run', 'explosion')
+os.mkdir(p)
+os.chdir(p)
 cst.sord.run(prm)
 

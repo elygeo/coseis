@@ -9,10 +9,7 @@ import cst.tests
 target = sys.argv[1:]
 if target == []:
     cfg = cst.util.configure()
-#   doc = cfg.doc
-#   del(cfg['doc'])
     pprint.pprint(cfg)
-#   print(doc)
 elif target == ['build']:
     cst.interp.build()
     cst.signal.build()

@@ -49,7 +49,8 @@ prm['uy'] = [
 ]
 
 # run job
-os.mkdir('run')
-os.chdir('run')
+p = os.path.join('run', 'canyon')
+os.mkdir(p)
+os.chdir(p)
 cst.sord.run(prm)
 

@@ -43,7 +43,7 @@ if 1:
     ax.set_yticklabels(['0', 0.5, 0.81, '8/9', '1'])
 
     # scan overlay
-    f = 'Kostrov-Cee-Dahlen1974.png'
+    f = '../Images/Kostrov-Cee-Dahlen1974.png'
     if os.path.exists(f):
         img = plt.imread(f)
         img[:,:,0] = 1.0

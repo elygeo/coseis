@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # simulation directory
-path = 'run' + os.sep
+path = os.path.join('run', 'sord-example') + os.sep
 
 # read metadata
 meta = open(path + 'meta.json')

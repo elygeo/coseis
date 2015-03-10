@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 # metadata
 id_ = '00'
 id_ = '20'
-path = os.path.join('run', id_) + os.sep
+path = os.path.join('run', 'foam-' + id_) + os.sep
 meta = json.load(path + 'meta.json')
 dtype = meta.dtype
 

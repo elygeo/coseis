@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cst
 
-path = os.path.join('run') + os.sep
+path = os.path.join('run', 'explosion') + os.sep
 
 # parameters
 meta = open(path + 'parameters.json')

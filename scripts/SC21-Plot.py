@@ -8,10 +8,10 @@ import matplotlib.pyplot as plt
 import cst
 
 # parameters
-path = os.path.join('run', 'sim', '200') + os.sep
-path = os.path.join('run', 'sim', '2000') + os.sep
-path = os.path.join('run', 'sim', '500') + os.sep
-path = os.path.join('run', 'sim', '100') + os.sep
+path = os.path.join('run', 'sc21-sim-200') + os.sep
+path = os.path.join('run', 'sc21-sim-2000') + os.sep
+path = os.path.join('run', 'sc21-sim-500') + os.sep
+path = os.path.join('run', 'sc21-sim-100') + os.sep
 meta = json.load(open(path + 'meta.json'))
 dt = meta['delta'][-1]
 nt = meta['shape'][-1]

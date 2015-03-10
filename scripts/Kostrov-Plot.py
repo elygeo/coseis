@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import cst
 
 # parameters
-path = 'run' + os.sep
+path = os.path.join('run', 'kostrov') + os.sep
 d = open(path + 'meta.json')
 d = json.load(d)
 dtype = d['dtype']

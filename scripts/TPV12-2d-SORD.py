@@ -116,7 +116,8 @@ y.astype('f').tofile(d + 'syy.bin')
 z.astype('f').tofile(d + 'szz.bin')
 
 # run SORD
-os.mkdir('run')
-os.chdir('run')
+p = os.path.join('run', 'tpv12-2d')
+os.mkdir(p)
+os.chdir(p)
 cst.sord.run(prm)
 

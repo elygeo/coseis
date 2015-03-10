@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 import cst
 
 # parameters
-path = 'run' + os.sep
-meta = os.path.join(path, 'meta.json')
+path = os.path.join('run', 'loh1') + os.sep
+meta = path + 'meta.json'
 meta = json.load(open(meta))
 dt = meta['delta'][-1]
 nt = meta['shape'][-1]
