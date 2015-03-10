@@ -4,7 +4,7 @@ SORD
 Support Operator Rupture Dynamics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. image:: ../images/SAF-Surface-Ely.jpg
+.. image:: ../Images/SORD-SAF-Surface.jpg
 
 .. contents::
 
@@ -69,21 +69,21 @@ Quick test
 Run a simple point source explosion test and plot a 2D slice of particle
 velocity::
 
-    cd scripts/sord
-    make
+    cd Scripts
+    make SORD-Example.mk
 
 .. _YAML: http://www.yaml.org
 .. _JSON: http://www.json.org
 
 Plotting requires Matplotlib, and the result should look like this:
 
-    .. image:: ../images/example.png
+    .. image:: ../Images/SORD-Example.png
 
 This illustrates the simplest way to run SORD, that is to execute the ``sord``
 command giving a parameter file in YAML_ or JSON_ format. The parameter file
 for this example is as follows:
 
-.. include:: ../scripts/sord/parameters.yaml
+.. include:: ../Scripts/SORD-Example.yaml
    :literal:
 
 Python Scripting
@@ -98,7 +98,7 @@ and `cst/sord/parameters.yaml <../cst/sord/parameters.yaml>`__, respectively.
 Machine specific job-control parameters may also be present in the ``cst/conf``
 directory that supersede the defaults.
 
-It maybe be helpful to look through example applications in the ``cst/scripts``
+It maybe be helpful to look through example applications in the ``Scripts``
 directory, and return to this document for further description of the
 simulation parameters.
 
@@ -178,11 +178,11 @@ anti-mirror symmetry condition.  The following BC types are supported:
 
 **'free'**: Vacuum free-surface.  Stress is zero in cells outside the boundary.
 
-    .. image:: ../images/SORD-BC0.png
+    .. image:: ../Images/SORD-BC0.png
 
 **'rigid'**: Rigid surface. Displacement is zero at the boundary.
 
-    .. image:: ../images/SORD-BC3.png
+    .. image:: ../Images/SORD-BC3.png
 
 **'+node'**: Mirror symmetry at the node.  Normal displacement is zero at the
 boundary.  Useful for a boundary corresponding to (a) the plane orthogonal to
@@ -190,7 +190,7 @@ the two nodal planes of a double-couple point source, (b) the plane normal to
 the mode-III axis of a symmetric rupture, or (c) the zero-width axis of a 2D
 plane strain problem.
 
-    .. image:: ../images/SORD-BC1.png
+    .. image:: ../Images/SORD-BC1.png
 
 **'-node'**: Anti-mirror symmetry at the node.  Tangential displacement is
 zero at the boundary.  Useful for a boundary corresponding to (a) the nodal
@@ -198,17 +198,17 @@ planes of a double-couple point source, (b) the plane normal to the mode-II
 axis of a symmetric rupture, or (c) the zero-width axis of a 2D antiplane
 strain problem.
 
-    .. image:: ../images/SORD-BC-1.png
+    .. image:: ../Images/SORD-BC-1.png
 
 **'+cell'**: Mirror symmetry at the cell. Same as type 1, but centered on the cell.
 
-    .. image:: ../images/SORD-BC2.png
+    .. image:: ../Images/SORD-BC2.png
 
 **'-cell'**: Anti-mirror symmetry at the cell.  Same as type -1, but centered
 on the cell.  Can additionally be used when the boundary corresponds to the
 slip surface of a symmetric rupture.
 
-    .. image:: ../images/SORD-BC-2.png
+    .. image:: ../Images/SORD-BC-2.png
 
 **'pml'**: Perfectly match layer (PML) absorbing boundary.
 

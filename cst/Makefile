@@ -6,7 +6,7 @@ clean :
 	rm -rf build *.so *.pyc
 
 distclean : clean
-	rm -rf data trinterp_ext.c
+	rm -rf Repository interp_.c
 
 %.c : %.pyx
 	cython $<

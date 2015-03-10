@@ -1,6 +1,7 @@
-======
+******
 Coseis
-======
+******
+
 Computational Seismology Tools
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -45,7 +46,6 @@ Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou.  It is licensed under
 BSD_ terms.
 
 .. _Geoffrey Ely: http://www.alcf.anl.gov/~gely/
-.. _GPLv3:        http://www.gnu.org/licenses/gpl-3.0.html
 .. _BSD:          http://opensource.org/licenses/BSD-2-Clause
 
 .. class:: warning
@@ -57,7 +57,7 @@ BSD_ terms.
 Install
 =======
 
-0.  If on Mac OS X, first install Xcode_ from the App Store. From the Xcode
+1.  If on Mac OS X, first install Xcode_ from the App Store. From the Xcode
     preferences pane, install the Command Line Tools. Then install Homebrew_,
     followed by Git_ and Fortran_ with::
 
@@ -67,24 +67,24 @@ Install
     install either MPICH_ or a newer GCC_ version.  Optionally, install and EPD_
     for visualization and analysis. 
 
-1.  Clone the source code from the `Coseis GitHub repository
+2.  Clone the source code from the `Coseis GitHub repository
     <http://github.com/gely/coseis>`__::
 
         git clone git://github.com/gely/coseis.git
 
-2.  Set path variables for the Python module and executables. For bash shell,
+3.  Set path variables for the Python module and executables. For bash shell,
     with the code located in your home directory (for example) add these lines to
     ``.bash_profile``::
 
         export PYTHONPATH="$HOME/coseis"
         export PATH="$PATH:$HOME/coseis/bin"
 
-3.  Run the ``setup.py`` script to test your configuration. This will display
+4.  Run the ``setup.py`` script to test your configuration. This will display
     all of the configuration parameters::
 
         python setup.py
 
-4.  These parameters may be customized by creating a file ``cst/conf/site.py``.
+5.  These parameters may be customized by creating a file ``cst/conf/site.py``.
     For example, the account for billing of service units, and email address for
     notifications may be specified in ``site.py`` module with::
 
@@ -102,14 +102,12 @@ Install
 Testing
 =======
 
-To run the test suite interactively:
-::
+To run the test suite interactively::
 
     cd cst/tests
     python test_runner.py --run=exec
 
-Or, submit a job for batch processing:
-::
+Or, submit a job for batch processing::
 
     python test_runner.py --run=submit
 
@@ -130,50 +128,48 @@ run/test_suite/test_suite.output)::
 Examples
 ========
 
-CVM depth planes
-----------------
+CVM depth plane
+---------------
 
-.. image:: ../images/CVM-Map-S-Vs500.png
-.. image:: ../images/CVM-Map-H-Vs500.png
+.. image:: ../Images/CVM-Depth-Plane-Vs-S.png
+.. image:: ../Images/CVM-Depth-Plane-Vs-H.png
 
-Extract S-wave velocity at 500 meters depth. Plot using Matplotlib
-::
+Extract S-wave velocity at 500 meters depth. Plot using Matplotlib::
 
-    cd scripts/cvm
-    python map.py
+    cd Scripts
+    python CVM-Depth-Plane.py
 
 Source code:
-`plane.py <../scripts/cvm/map.py>`__
+`CVM-Depth-Plane.py <../Scripts/CVM-Depth-Plane.py>`__
 
 CVM-S fence diagram
 -------------------
 
-.. image:: ../images/CVM-Fence-S-Vp.png
+.. image:: ../Images/CVM-Fence-Vp-S.png
 
 Build a fence diagram similar to Magistrale (2000) figure 10. Plot using
 Mayavi::
 
-    cd scripts
-    python cvm-fence.py
+    python CVM-Fence.py
 
 Source code:
-`fence.py <../scripts/cvm/fence.py>`__
+`CVM-Fence.py <../Scripts/CVM-Fence.py>`__
 
-CVM-S Basin depth
+CVM-S basin depth
 -----------------
 
-.. image:: ../images/cvm-z25.png
+.. image:: ../Images/CVM-Basins.png
 
 Extract 3D mesh and search for the shallowest surface of Vs = 2.5 km/s.
 Plot over topography using Mayavi::
 
-    cd scripts/basindepth
-    python mesh.py
-    python search.py
-    python viz.py
+    python Basins-Mesh.py
+    python Basins-Search.py
+    python Basins-Viz.py
 
 Source code:
-`mesh.py <../scripts/basindepth/mesh.py>`__
-`search.py <../scripts/basindepth/search.py>`__
-`viz.py <../scripts/basindepth/viz.py>`__
+
+| `CVM-Basins-Mesh.py <../Scripts/CVM-Basins-Mesh.py>`__
+| `CVM-Basins-Search.py <../Scripts/CVM-Basins-Search.py>`__
+| `CVM-Basins-Viz.py <../Scripts/CVM-Basins-Viz.py>`__
 
