@@ -6,9 +6,6 @@ CFLAGS = $(LDFLAGS) \
     -DDELTA={delta} \
     -DZSTART={zstart}
 
-mesh.x: mesh.c Makefile
+mesh.x: Mesh.c Mesh.mk
 	$(CC) $(CFLAGS) -o $@ $<
-
-clean:
-	rm -rf run mesh.x mesh.x.dSYM
 

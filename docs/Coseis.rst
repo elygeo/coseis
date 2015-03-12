@@ -131,8 +131,8 @@ Examples
 CVM depth plane
 ---------------
 
-.. image:: ../Images/CVM-Depth-Plane-Vs-S.png
-.. image:: ../Images/CVM-Depth-Plane-Vs-H.png
+.. image:: ../figures/CVM-Depth-Plane-Vs-S.png
+.. image:: ../figures/CVM-Depth-Plane-Vs-H.png
 
 Extract S-wave velocity at 500 meters depth. Plot using Matplotlib::
 
@@ -145,7 +145,7 @@ Source code:
 CVM-S fence diagram
 -------------------
 
-.. image:: ../Images/CVM-Fence-Vp-S.png
+.. image:: ../figures/CVM-Fence-Vp-S.png
 
 Build a fence diagram similar to Magistrale (2000) figure 10. Plot using
 Mayavi::
@@ -158,7 +158,7 @@ Source code:
 CVM-S basin depth
 -----------------
 
-.. image:: ../Images/CVM-Basins.png
+.. image:: ../figures/CVM-Basins.png
 
 Extract 3D mesh and search for the shallowest surface of Vs = 2.5 km/s.
 Plot over topography using Mayavi::

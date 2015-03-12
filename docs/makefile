@@ -1,6 +1,6 @@
-all: ../WWW/index.html ../WWW/sord.html
+all: Coseis.html SORD.html
 
-../WWW/%.html: %.rst style.css
+%.html: %.rst style.css
 	rst2html.py \
 	--strict \
 	--no-toc-backlinks \
@@ -8,3 +8,4 @@ all: ../WWW/index.html ../WWW/sord.html
 	--initial-header-level=3 \
 	--stylesheet-path=style.css \
 	$< | sed 's|<col.*>||; s|</colgroup>||' > $@
+

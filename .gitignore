@@ -1,5 +1,6 @@
 .git
 .DS_Store
+__pycache__
 *.pyc
 *.so
 *.o
@@ -11,16 +12,9 @@
 *.sha1
 *.x
 *.dSYM
-run
-tmp
-TODO
-/dev
-/data
-/cst/data
-/cst/build
+/cst/Repository
 /cst/cvms/build-*
 /cst/cvms/Makefile
+/cst/tests/Makefile
 /cst/sord/Makefile
 /cst/sord/config.json
-/cst/tests/Makefile
-/scripts/cvm/Makefile

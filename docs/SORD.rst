@@ -4,7 +4,7 @@ SORD
 Support Operator Rupture Dynamics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. image:: ../Images/SORD-SAF-Surface.jpg
+.. image:: ../figures/SORD-SAF-Surface.jpg
 
 .. contents::
 
@@ -77,7 +77,7 @@ velocity::
 
 Plotting requires Matplotlib, and the result should look like this:
 
-    .. image:: ../Images/SORD-Example.png
+    .. image:: ../figures/SORD-Example.png
 
 This illustrates the simplest way to run SORD, that is to execute the ``sord``
 command giving a parameter file in YAML_ or JSON_ format. The parameter file
@@ -178,11 +178,11 @@ anti-mirror symmetry condition.  The following BC types are supported:
 
 **'free'**: Vacuum free-surface.  Stress is zero in cells outside the boundary.
 
-    .. image:: ../Images/SORD-BC0.png
+    .. image:: ../figures/SORD-BC0.png
 
 **'rigid'**: Rigid surface. Displacement is zero at the boundary.
 
-    .. image:: ../Images/SORD-BC3.png
+    .. image:: ../figures/SORD-BC3.png
 
 **'+node'**: Mirror symmetry at the node.  Normal displacement is zero at the
 boundary.  Useful for a boundary corresponding to (a) the plane orthogonal to
@@ -190,7 +190,7 @@ the two nodal planes of a double-couple point source, (b) the plane normal to
 the mode-III axis of a symmetric rupture, or (c) the zero-width axis of a 2D
 plane strain problem.
 
-    .. image:: ../Images/SORD-BC1.png
+    .. image:: ../figures/SORD-BC1.png
 
 **'-node'**: Anti-mirror symmetry at the node.  Tangential displacement is
 zero at the boundary.  Useful for a boundary corresponding to (a) the nodal
@@ -198,17 +198,17 @@ planes of a double-couple point source, (b) the plane normal to the mode-II
 axis of a symmetric rupture, or (c) the zero-width axis of a 2D antiplane
 strain problem.
 
-    .. image:: ../Images/SORD-BC-1.png
+    .. image:: ../figures/SORD-BC-1.png
 
 **'+cell'**: Mirror symmetry at the cell. Same as type 1, but centered on the cell.
 
-    .. image:: ../Images/SORD-BC2.png
+    .. image:: ../figures/SORD-BC2.png
 
 **'-cell'**: Anti-mirror symmetry at the cell.  Same as type -1, but centered
 on the cell.  Can additionally be used when the boundary corresponds to the
 slip surface of a symmetric rupture.
 
-    .. image:: ../Images/SORD-BC-2.png
+    .. image:: ../figures/SORD-BC-2.png
 
 **'pml'**: Perfectly match layer (PML) absorbing boundary.
 
@@ -307,6 +307,6 @@ time step per one million mesh points.  SORD scalability has been benchmarked
 up to 64 thousand processors at ALCF.  The following chart
 is the wall-time per step per core (click for PDF):
 
-.. image:: ../images/SORD-MPI-Benchmark.png
-    :target: ../images/SORD-MPI-Benchmark.pdf
+.. image:: ../figures/SORD-MPI-Benchmark.png
+    :target: ../figures/SORD-MPI-Benchmark.pdf
 

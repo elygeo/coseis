@@ -174,7 +174,7 @@ td {
 <h1 class="title">SORD</h1>
 <h2 class="subtitle" id="support-operator-rupture-dynamics">Support Operator Rupture Dynamics</h2>
 
-<img alt="../Images/SORD-SAF-Surface.jpg" src="../Images/SORD-SAF-Surface.jpg" />
+<img alt="../figures/SORD-SAF-Surface.jpg" src="../figures/SORD-SAF-Surface.jpg" />
 <div class="contents topic" id="contents">
 <p class="topic-title first">Contents</p>
 <ul class="simple">
@@ -243,7 +243,7 @@ make SORD-Example.mk
 </pre>
 <p>Plotting requires Matplotlib, and the result should look like this:</p>
 <blockquote>
-<img alt="../Images/SORD-Example.png" src="../Images/SORD-Example.png" />
+<img alt="../figures/SORD-Example.png" src="../figures/SORD-Example.png" />
 </blockquote>
 <p>This illustrates the simplest way to run SORD, that is to execute the <tt class="docutils literal">sord</tt>
 command giving a parameter file in <a class="reference external" href="http://www.yaml.org">YAML</a> or <a class="reference external" href="http://www.json.org">JSON</a> format. The parameter file
@@ -349,11 +349,11 @@ a slip surface, the fault may be placed at the boundary and combined with an
 anti-mirror symmetry condition.  The following BC types are supported:</p>
 <p><strong>'free'</strong>: Vacuum free-surface.  Stress is zero in cells outside the boundary.</p>
 <blockquote>
-<img alt="../Images/SORD-BC0.png" src="../Images/SORD-BC0.png" />
+<img alt="../figures/SORD-BC0.png" src="../figures/SORD-BC0.png" />
 </blockquote>
 <p><strong>'rigid'</strong>: Rigid surface. Displacement is zero at the boundary.</p>
 <blockquote>
-<img alt="../Images/SORD-BC3.png" src="../Images/SORD-BC3.png" />
+<img alt="../figures/SORD-BC3.png" src="../figures/SORD-BC3.png" />
 </blockquote>
 <p><strong>'+node'</strong>: Mirror symmetry at the node.  Normal displacement is zero at the
 boundary.  Useful for a boundary corresponding to (a) the plane orthogonal to
@@ -361,7 +361,7 @@ the two nodal planes of a double-couple point source, (b) the plane normal to
 the mode-III axis of a symmetric rupture, or (c) the zero-width axis of a 2D
 plane strain problem.</p>
 <blockquote>
-<img alt="../Images/SORD-BC1.png" src="../Images/SORD-BC1.png" />
+<img alt="../figures/SORD-BC1.png" src="../figures/SORD-BC1.png" />
 </blockquote>
 <p><strong>'-node'</strong>: Anti-mirror symmetry at the node.  Tangential displacement is
 zero at the boundary.  Useful for a boundary corresponding to (a) the nodal
@@ -369,17 +369,17 @@ planes of a double-couple point source, (b) the plane normal to the mode-II
 axis of a symmetric rupture, or (c) the zero-width axis of a 2D antiplane
 strain problem.</p>
 <blockquote>
-<img alt="../Images/SORD-BC-1.png" src="../Images/SORD-BC-1.png" />
+<img alt="../figures/SORD-BC-1.png" src="../figures/SORD-BC-1.png" />
 </blockquote>
 <p><strong>'+cell'</strong>: Mirror symmetry at the cell. Same as type 1, but centered on the cell.</p>
 <blockquote>
-<img alt="../Images/SORD-BC2.png" src="../Images/SORD-BC2.png" />
+<img alt="../figures/SORD-BC2.png" src="../figures/SORD-BC2.png" />
 </blockquote>
 <p><strong>'-cell'</strong>: Anti-mirror symmetry at the cell.  Same as type -1, but centered
 on the cell.  Can additionally be used when the boundary corresponds to the
 slip surface of a symmetric rupture.</p>
 <blockquote>
-<img alt="../Images/SORD-BC-2.png" src="../Images/SORD-BC-2.png" />
+<img alt="../figures/SORD-BC-2.png" src="../figures/SORD-BC-2.png" />
 </blockquote>
 <p><strong>'pml'</strong>: Perfectly match layer (PML) absorbing boundary.</p>
 <p>Example: a 3D problem with a free surface at Z=0, and PML absorbing boundaries
@@ -478,7 +478,7 @@ operator type for fastest performance. The allowed values are:</p>
 time step per one million mesh points.  SORD scalability has been benchmarked
 up to 64 thousand processors at ALCF.  The following chart
 is the wall-time per step per core (click for PDF):</p>
-<a class="reference external image-reference" href="../images/SORD-MPI-Benchmark.pdf"><img alt="../images/SORD-MPI-Benchmark.png" src="../images/SORD-MPI-Benchmark.png" /></a>
+<a class="reference external image-reference" href="../figures/SORD-MPI-Benchmark.pdf"><img alt="../figures/SORD-MPI-Benchmark.png" src="../figures/SORD-MPI-Benchmark.png" /></a>
 </div>
 </div>
 </body>

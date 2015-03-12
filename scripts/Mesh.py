@@ -44,7 +44,7 @@ m = m.format(
     zstart = 0.0,
     **cfg
 )
-open('Makefile', 'w').write(m)
+open('Mesh.mk', 'w').write(m)
 subprocess.check_call(['make'])
 
 # create run directory
