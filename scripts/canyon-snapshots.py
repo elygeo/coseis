@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Snapshot plots
+Plot snapshots
 """
 import os, json
 import numpy as np
