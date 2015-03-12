@@ -39,21 +39,22 @@ for i in range(1, n1-1):
 vp = 2.0
 dy = y[0,1] - y[0,0]
 dt = dy * 1.5 / vp / math.sqrt(3.0)
-print 'nn = ', (n1, n2)
-print 'nt > ', L / vp / dt
-print 'dt < ', dt
-print 'L = ', L
-print 'L / n = ', L / n
-print 'dx00 = ', (x[1,0]  - x[0,0],  y[0,1]  - y[0,0])
-print 'dx01 = ', (x[0,-2] - x[0,-1], y[1,-1] - y[0,-1])
-print 'dx10 = ', (x[-1,0] - x[-2,0], y[-1,1] - y[-1,0])
-print 'dx11 = ', (x[-1,-2] - x[-1,-1], y[-1,-1] - y[-2,-1])
+print('shape = ', (n1, n2))
+print('nt > ', L / vp / dt)
+print('dt < ', dt)
+print('L = ', L)
+print('L / n = ', L / n)
+print('dx00 = ', (x[1,0]  - x[0,0],  y[0,1]  - y[0,0]))
+print('dx01 = ', (x[0,-2] - x[0,-1], y[1,-1] - y[0,-1]))
+print('dx10 = ', (x[-1,0] - x[-2,0], y[-1,1] - y[-1,0]))
+print('dx11 = ', (x[-1,-2] - x[-1,-1], y[-1,-1] - y[-2,-1]))
 
 # write files
-path = 'run' + os.sep
+path = os.path.join('run', 'Canyon')
 os.mkdir(path)
-x.T.astype('f').tofile(path + 'x.bin')
-y.T.astype('f').tofile(path + 'y.bin')
+os.chdir(path)
+x.T.astype('f').tofile('x.bin')
+y.T.astype('f').tofile('y.bin')
 
 # plot
 import matplotlib.pyplot as plt
@@ -68,6 +69,6 @@ ax.plot(x.T, y.T, 'k-')
 ax.plot(-x.T, y.T, 'k-')
 ax.axis('scaled')
 ax.axis([-2, 2, 2, -0.2])
-fig.savefig(path + 'mesh.pdf')
+fig.savefig('Canyon-Mesh.pdf')
 fig.show()
 

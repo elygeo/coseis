@@ -20,7 +20,7 @@ for path in glob.glob('run/bench[0-9]*'):
         procs.append(n)
         times.append(t[1:-1].mean())
 
-print 'time cores'
+print('time cores')
 for i in np.argsort(procs):
     print('%4.2f %s' % (times[i], procs[i]))
 

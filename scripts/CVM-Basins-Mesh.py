@@ -32,9 +32,9 @@ meta = dict(
 )
 
 # run dir
-p = os.path.join('run', 'mesh')
-os.makedirs(p)
-os.chidir(p)
+p = os.path.join('run', 'cvm-basins')
+os.mkdir(p)
+os.chdir(p)
 
 # save data
 json.dump(open('meta.json', 'w'), meta)

@@ -106,8 +106,8 @@ for surface in [
     cst.plt.compass_rose(ax, x, y, 2000.0)
 
     # save figure
-    f = os.path.join('run', 'plot', 'map%s.pdf' % surface)
-    g = os.path.join('run', 'www', 'map%s.png' % surface)
+    f = os.path.join('run', 'figures', 'Chino-Hills-Map-%s.pdf' % surface)
+    g = os.path.join('run', 'figures', 'Chino-Hills-Map-%s.png' % surface)
     fig.savefig(f, transparent=True)
     fig.savefig(g)
     fig.show()
