@@ -9,7 +9,7 @@ import numpy as np
 val = 2500.0
 cell = 0
 up = 0
-path = os.path.join('run', 'mesh') + os.sep
+path = os.path.join('run', 'CVM-Basins', 'mesh') + os.sep
 meta = json.load(open(path + 'meta.json'))
 delta = meta['delta']
 shape = meta['shape']

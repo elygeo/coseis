@@ -107,8 +107,8 @@ for dx, np in runs:
         ]
 
     # run SORD
-    d = os.path.join('run', 'tpv3-%03.0f' % dx)
-    os.mkdir(d)
+    d = os.path.join('run', 'TPV3-%03.0f' % dx)
+    os.makedirs(d)
     os.chdir(d)
     cst.sord.run(prm)
     os.chdir(cwd)

@@ -32,8 +32,8 @@ meta = dict(
 )
 
 # run dir
-p = os.path.join('run', 'cvm-basins')
-os.mkdir(p)
+p = os.path.join('run', 'CVM-Basins')
+os.makedirs(p)
 os.chdir(p)
 
 # save data

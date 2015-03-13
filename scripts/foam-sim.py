@@ -91,9 +91,8 @@ prm['uy'] += [(s_[0,k,1:l+1,:], '=>', 'off-fault.bin')]
 #prm['vy'] = [(s_[:,k,1:l+1,::10], '=>', 'xsec.bin')]
 
 # run SORD
-w = weakzone * 100
-d = os.path.join('run', 'foam-%02.0f' % w)
-os.mkdir(d)
+d = ps.path.joing('run', 'foam-%02.0f' % (weakzone * 100))
+os.makedirs(d)
 os.chdir(d)
 cst.sord.run(prm)
 

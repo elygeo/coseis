@@ -5,7 +5,7 @@ Computational Seismology Tools
 # data repository
 import os
 repo = os.path.dirname(__file__)
-repo = os.path.join(repo, 'Repository')
+repo = os.path.join(repo, 'repo') + os.sep
 if not os.path.exists(repo):
     f = os.path.dirname(__file__)
     f = os.path.join(f, '..', '..', 'Repository')
@@ -19,6 +19,7 @@ del(os)
 from . import util, viz, plt, mlab
 from . import interp, coord, signal, source, srf, egmm, waveform, kostrov
 from . import data, scedc, vm1d, gocad, cvmh, cfm, sord, cvms
+from .bin2npy import bin2npy
 
 # stop pyflakes errors
 util, viz, plt, mlab

@@ -7,11 +7,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cst
 
-path = os.path.join('run', 'explosion') + os.sep
-
 # parameters
-meta = open(path + 'parameters.json')
-meta = json.load(meta)
+p = os.path.join('run', 'Explosion')
+os.chdir(p)
+meta = json.load(open('parameters.json'))
 nx, ny, nz, nt = meta['shape']
 dx, dy, dz, dt = meta['delta']
 tau = meta['pxx'][-1]
@@ -20,8 +19,7 @@ vp = meta['vp']
 vs = meta['vs']
 
 # metadata
-meta = open(path + 'meta.json')
-meta = json.load(meta)
+meta = json.load(open('meta.json'))
 dtype = meta['dtype']
 reg = meta['indices']['p1-vx.bin'][0]
 
@@ -29,10 +27,9 @@ reg = meta['indices']['p1-vx.bin'][0]
 for sta in 'p1', 'p2', 'p3', 'p4', 'p5', 'p6':
 
     # read time histories
-    p = os.path.join('run', sta)
-    vx = np.fromfile(p + '-vx.bin', dtype)
-    vy = np.fromfile(p + '-vy.bin', dtype)
-    vz = np.fromfile(p + '-vz.bin', dtype)
+    vx = np.fromfile(sta + '-vx.bin', dtype)
+    vy = np.fromfile(sta + '-vy.bin', dtype)
+    vz = np.fromfile(sta + '-vz.bin', dtype)
     v = np.array([vx, vy, vz])
 
     # source receiver radius
@@ -70,7 +67,6 @@ for sta in 'p1', 'p2', 'p3', 'p4', 'p5', 'p6':
     if sta == 'p2':
         name = 'Explosion point source'
         ax.set_title(name + ' ' + str([x, y, z]))
-        f = os.path.join('run', 'Explosion.png')
-        fig.savefig(f)
+        fig.savefig('Explosion.png')
     fig.show()
 

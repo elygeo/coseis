@@ -18,7 +18,7 @@ dx = 100.0;  prm['nproc3'] = [1, 4, 60]
 dx = 500.0;  prm['nproc3'] = [1, 1, 2]
 
 # mesh metadata
-mesh = os.path.join('run', 'sc21-mesh', '%.0f' % dx) + os.sep
+mesh = os.path.join('run', 'SC21', 'mesh', '%.0f' % dx) + os.sep
 meta = json.load(open(mesh + 'meta.json'))
 dx, dy, dz = meta['delta']
 nx, ny, nz = meta['shape']
@@ -61,8 +61,8 @@ for i in range(8):
         ]
 
 # run job
-d = os.path.join('run', 'sc21-sim-', '%.0f' % dx)
-os.mkdir(d)
+d = os.path.join('run', 'SC21-sim-', '%.0f' % dx)
+os.makedirs(d)
 os.chdir(d)
 for v in 'rho', 'vp', 'vs':
     os.link(mesh + 'mesh-' + v + '.bin', '.')

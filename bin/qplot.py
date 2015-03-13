@@ -13,6 +13,8 @@ Options
 -p <exponent>  Eponent power applied to data
 -s <step>      Decimate data
 -t             Transpose data
+
+TODO: move sys.argv out of plot()
 """
 import os, sys, json, getopt
 import numpy as np

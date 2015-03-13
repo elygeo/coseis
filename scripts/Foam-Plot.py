@@ -6,15 +6,16 @@ import matplotlib.pyplot as plt
 # metadata
 id_ = '00'
 id_ = '20'
-path = os.path.join('run', 'foam-' + id_) + os.sep
-meta = json.load(path + 'meta.json')
+p = os.path.join('run', 'Foam-' + id_)
+os.chdir(d)
+meta = json.load(open('meta.json'))
 dtype = meta.dtype
 
 # off-fault displacement plot
 f = 'off-fault.bin'
 n = meta['shapes'][f]
 d = meta['deltas'][f]
-s = np.fromfile(path + f, dtype).reshape(n[::-1]).T
+s = np.fromfile(f, dtype).reshape(n[::-1]).T
 e = np.diff(s[:,-1]) / d[0]
 i = int(0.05 / d[1])
 s = -1000.0 * s[:,i:]
@@ -26,8 +27,7 @@ ax.set_title('Surface displacement (mm)')
 ax.set_xlabel('Distance from fault (cm)')
 ax.set_ylabel('Time (ms)')
 fig.colorbar(im)
-fig.savefig(path + 'foam-%s-off-fault.png' % id_)
-fig.show()
+fig.savefig('Foam-%s-Off-Fault.png' % id_)
 
 # approximate static strain
 x = np.arange(n[0] - 1) * d[0] * 100.0 + d[0] * 50.0
@@ -36,8 +36,7 @@ ax = fig.add_subplot(111)
 ax.plot(x, e, 'k-')
 ax.set_xlabel('Distance from fault (cm)')
 ax.set_ylabel('Strain')
-fig.savefig(path + 'foam-%s-strain.pdf' % id_)
-fig.show()
+fig.savefig('Foam-%s-Strain.pdf' % id_)
 
 # acceleration plots
 fig = plt.figure(figsize=(4.8, 6.4))
@@ -51,7 +50,7 @@ for s, x, g in [
 ]:
     f = 'sensor%02d.bin' % s
     dt = meta['deltas'][f][-1] * 1000.0
-    a = np.fromfile(path + f, dtype) / 9.81
+    a = np.fromfile(f, dtype) / 9.81
     t = np.arange(a.size) * dt
     ax.plot(t, x + a * 0.5, 'k-')
     ax.text(22, x - 1, '%.0f' % abs(a).max())
@@ -60,6 +59,5 @@ for s, x, g in [
     ax.set_title('Acceleration')
     ax.set_xlabel('Time (ms)')
     ax.set_ylabel('Depth along fault (cm)')
-fig.savefig(path + 'foam-%s-acceleration.pdf' % id_)
-fig.show()
+fig.savefig('Foam-%s-Acceleration.pdf' % id_)
 

@@ -44,7 +44,7 @@ meta = dict(
 )
 
 # create run directory
-path = os.path.join('run', 'mesh', '%.0f' % dx)
+path = os.path.join('run', 'SC21', 'mesh', '%.0f' % dx)
 os.makedirs(path)
 shutil.copy2('mesh.py', path)
 os.chdir(path)

@@ -32,14 +32,12 @@ prm['vx'] = (s_[:,:,:,0], '=~', 1.0)
 prm['vy'] = (s_[:,:,:,0], '=~', 1.0)
 prm['vz'] = (s_[:,:,:,0], '=~', 1.0)
 
-cwd = os.getcwd()
 for i in power[::-1]:
     n = 2 ** i
     prm['nproc3'] = [2, n, n]
     prm['shape'] = [points, n * points, n * points, prm['itio']]
-    d = os.path.joing('run', 'benchmark-%s' % i)
+    d = os.path.joing('run', 'Benchmark-SORD-%s' % i)
     os.makedirs(d)
     os.chdir(d)
     cst.sord.run(prm)
-    os.chdir(cwd)
 

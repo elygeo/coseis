@@ -8,9 +8,9 @@ import matplotlib.pyplot as plt
 import cst
 
 # parameters
-path = os.path.join('run', 'loh1') + os.sep
-meta = path + 'meta.json'
-meta = json.load(open(meta))
+p = os.path.join('run', 'LOH1')
+os.chdir(p)
+meta = json.load(open('meta.json'))
 dt = meta['delta'][-1]
 nt = meta['shape'][-1]
 tau = meta['tau']
@@ -44,9 +44,9 @@ for i in 0, 1, 2:
     ax[i].set_yticklabels([-1, '', 0, '', 1])
 
 # read SORD results
-x = np.fromfile(path + 'p9-v1.bin', dtype)
-y = np.fromfile(path + 'p9-v2.bin', dtype)
-z = np.fromfile(path + 'p9-v3.bin', dtype)
+x = np.fromfile('p9-v1.bin', dtype)
+y = np.fromfile('p9-v2.bin', dtype)
+z = np.fromfile('p9-v3.bin', dtype)
 v = np.array([x, y, z])
 t = dt * np.arange(nt)
 
@@ -65,7 +65,7 @@ ax[1].plot(t, v[1], 'k')
 ax[2].plot(t, v[2], 'k')
 
 # read Prose F/K results
-p = repo + os.sep + 'LOH1-ProseFK-'
+p = os.path.join(cst.repo, '..', '..', 'data', 'LOH1-ProseFK-') # FIXME
 t = np.load(p + 'Time.npy')
 v1 =  1e5 * np.load(p + 'V-Radial.bin')
 v2 =  1e5 * np.load(p + 'V-Transverse.bin')
@@ -89,6 +89,6 @@ ax[2].plot(t, v[2], 'k--')[0].set_dashes((2,0.5))
 # finish up
 ax[1].legend(['SOM', 'FK'], loc='lower left', frameon=False)
 fig.canvas.draw()
-fig.savefig(path + 'LOH.1.pdf')
+fig.savefig('LOH1.pdf')
 fig.show()
 

@@ -50,9 +50,9 @@ print('dx10 = ', (x[-1,0] - x[-2,0], y[-1,1] - y[-1,0]))
 print('dx11 = ', (x[-1,-2] - x[-1,-1], y[-1,-1] - y[-2,-1]))
 
 # write files
-path = os.path.join('run', 'Canyon')
-os.mkdir(path)
-os.chdir(path)
+p = os.path.join('run', 'Canyon')
+os.makedirs(p)
+os.chdir(p)
 x.T.astype('f').tofile('x.bin')
 y.T.astype('f').tofile('y.bin')
 

@@ -4,17 +4,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # simulation directory
-path = os.path.join('run', 'sord-example') + os.sep
+p = os.path.join('run', 'SORD-Example')
+os.chdir(p)
 
 # read metadata
-meta = open(path + 'meta.json')
-meta = json.load(meta)
+meta = json.load(open('meta.json'))
 dtype = meta['dtype']
 shape = meta['shapes']['vx.bin']
 
 # read slices
-vx = np.fromfile(path + 'vx.bin', dtype).reshape(shape[::-1])
-vy = np.fromfile(path + 'vy.bin', dtype).reshape(shape[::-1])
+vx = np.fromfile('vx.bin', dtype).reshape(shape[::-1])
+vy = np.fromfile('vy.bin', dtype).reshape(shape[::-1])
 vm = np.sqrt(vx * vx + vy * vy)
 
 # plot figure
@@ -23,4 +23,5 @@ ax = plt.gca()
 #ax.imshow(vm, extent=(-3,3,-3,3), interpolation='nearest', vmax=1)
 ax.imshow(vm, extent=(-3,3,-3,3), interpolation='nearest')
 ax.axis('image')
-fig.savefig(path + 'SORD-Example.png', dpi=80)
+fig.savefig('SORD-Example.png', dpi=80)
+

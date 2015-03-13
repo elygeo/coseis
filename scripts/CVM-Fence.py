@@ -119,9 +119,7 @@ mlab.plot3d(x, y, z, color=(0,0,0), line_width=0.5, tube_radius=None)
 mlab.view(-90, 45, 2e6, (0, 0, -2e4))
 fig.scene.camera.view_angle = 3.3
 fig.scene.light_manager.lights[3].activate = True
-if not os.path.exists('run'):
-    os.mkdir('run')
-f = os.path.join('run', 'CVM-Fence-%s-%s.png' % (prop, model))
+f = 'CVM-Fence-%s-%s.png' % (prop, model)
 print f
 mlab.savefig(f, magnification=1)
 fig.scene.disable_render = False

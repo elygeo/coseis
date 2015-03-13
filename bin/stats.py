@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 """
 Print binary file statistics. Default data type is 4 byte floating point.
+
+TODO: move into a lib funtion
 """
 import os, sys, json
 import numpy as np

@@ -1,14 +1,9 @@
-FIXME
+DIR = repo/SORD-Example
 
-plot: run/Example.png
+$(DIR)/SORD-Example.png: $(DIR) sord-example-plot.py
+	python sord-example-plot.py
 
-run/Example.png: run plot.py
-	python plot.py
-
-run: parameters.yaml
-	mkdir run
-	cd run && sord ../parameters.yaml
-
-clean:
-	rm -rf run
+$(DIR): sord-example-sim.yaml
+	mkdir $(DIR)
+	cd $(DIR) && sord.py FIXME/sord-example-sim.yaml
 

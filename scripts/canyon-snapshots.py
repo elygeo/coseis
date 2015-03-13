@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 # parameters
 exp = 0.5
 clim = 0.0, 0.000001
-p = os.path.join('run', 'canyon')
+p = os.path.join('run', 'Canyon')
 os.chdir(p)
 
 # metadata

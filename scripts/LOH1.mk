@@ -1,10 +1,8 @@
-plot: run/LOH.1.pdf
+DIR = repo/LOH1
 
-run/LOH.1.pdf: run plot.py
-	python plot.py
+$(DIR)/LOH1.pdf: $(DIR) loh1-plot.py
+	python loh1-plot.py
 
-run: sord.py
-	python sord.py
+$(DIR): loh1-sim.py
+	python loh1-sim.py
 
-clean:
-	rm -rf run

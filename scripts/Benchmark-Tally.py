@@ -8,13 +8,14 @@ import numpy as np
 label = 'ACLF BG/Q'
 procs = []
 times = []
+path = os.path.join('run', 'Benchmark-SORD')
 
-for path in glob.glob('run/bench[0-9]*'):
-    path += os.sep
-    meta = json.load(open(path + 'meta.json'))
-    f = path + 'prof-8step.bin'
-    if os.path.exists(f):
-        t = np.fromfile(f, meta.dtype)
+for p in glob.glob(path + '-[0-9]*'):
+    p += os.sep
+    meta = json.load(open(p + 'meta.json'))
+    p = p + 'prof-8step.bin'
+    if os.path.exists(p):
+        t = np.fromfile(p, meta.dtype)
         x, y, z = meta.nproc3
         n = x * y * z
         procs.append(n)
@@ -38,5 +39,5 @@ if 0:
     ax.set_ylabel('Time/step (s)')
     h = 2 * int(np.mean(times) + 0.5)
     ax.axis([0, n-1, 0, h])
-    fig.savefig('run/sord-benchmark.pdf', format='pdf')
+    fig.savefig('Benchmark-SORD.pdf')
 

@@ -1,10 +1,8 @@
-plot: run/Explosion.png
+DIR = repo/Explosion
 
-run/Explosion.png: run plot.py
-	python plot.py
+$(DIR)/Explosion.png: $(DIR) explosion-plot.py
+	python explosion-plot.py
 
-run: sord.py
-	python sord.py
+$(DIR): explosion-sim.py
+	python explosion-sim.py
 
-clean:
-	rm -rf run

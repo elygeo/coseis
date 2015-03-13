@@ -1,9 +1,9 @@
-plot: run/kostrov/Kostrov.pdf
+DIR = repo/Kostrov
 
-run/kostrov/Kostrov.pdf: run plot.py
-	python plot.py
+$(DIR)/Kostrov.pdf: $(DIR) kostrov-plot.py
+	python kostrov-plot.py
 
-run/kostrov: sord.yaml
-	mkdir run/kostrov
-	cd run/kostrov && sord ../../sord.yaml
+$(DIR): kostrov-sim.yaml
+	mkdir $(DIR)
+	cd $(DIR) && sord.py FIXME/kostrov-sim.yaml
 

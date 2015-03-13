@@ -6,17 +6,14 @@ import os, json
 import numpy as np
 
 # parameters
-path = 'run' + os.sep
-meta = json.load(open(path + 'meta.json'))
+p = os.path.join('run', 'TPV12-2D')
+os.chdir(p)
+meta = json.load(open('meta.json'))
 meta.dx = meta['delta'][0]
 meta.dt = meta['delta'][3]
 meta.nt = meta['shape'][3]
 dtype = meta['dtype']
 t = np.arange(meta.nt) * meta.dt
-
-# output directory
-if not os.path.exists(path + 'cvws'):
-    os.mkdir(path + 'cvws')
 
 # formats
 fmt1 = '%20.12f' + 7 * ' %14.6f'
@@ -60,7 +57,7 @@ for sta in meta['deltas']:
     if sta.startswith('fault') and sta.endswith('su1.bin'):
         sta = sta[:-8]
         meta['sta'] = sta
-        f = path + sta + '-%s.bin'
+        f = sta + '-%s.bin'
         su1 = np.fromfile(f % 'su1', dtype)
         y   = np.fromfile(f % 'su2', dtype)
         z   = np.fromfile(f % 'su3', dtype)
@@ -75,7 +72,7 @@ for sta in meta['deltas']:
         tsv = np.sqrt(y * y + z * z) * 1e-6
         tnm = np.fromfile(f % 'tnm', dtype) * 1e-6
         c   = np.array([t, su1, sv1, ts1, suv, svv, tsv, tnm]).T
-        f   = os.path.join(path, 'cvws', sta + '.asc')
+        f   = sta + '.asc'
         with open(f, 'w') as fh:
             fh.write(header % meta)
             fh.write(header1)
@@ -86,7 +83,7 @@ for sta in meta['deltas']:
     if sta.startswith('body') and sta.endswith('u1.bin'):
         sta = sta[:-7]
         meta['sta'] = sta
-        f = path + sta + '-%s.bin'
+        f = sta + '-%s.bin'
         u1 = np.fromfile(f % 'u1', dtype)
         u2 = np.fromfile(f % 'u2', dtype)
         u3 = np.fromfile(f % 'u3', dtype)
@@ -94,7 +91,7 @@ for sta in meta['deltas']:
         v2 = np.fromfile(f % 'v2', dtype)
         v3 = np.fromfile(f % 'v3', dtype)
         c  = np.array([t, u1, v1, u2, v2, u3, v3]).T
-        f  = os.path.join(path, 'cvws', sta + '.asc')
+        f  = sta + '.asc'
         with open(f, 'w') as fh:
             fh.write(header % meta)
             fh.write(header2)

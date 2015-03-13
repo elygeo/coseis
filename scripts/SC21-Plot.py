@@ -7,12 +7,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cst
 
+# sim dir
+p = os.path.join('run', 'sc21-sim-200')
+p = os.path.join('run', 'sc21-sim-2000')
+p = os.path.join('run', 'sc21-sim-500')
+p = os.path.join('run', 'sc21-sim-100')
+os.chdir(p)
+
 # parameters
-path = os.path.join('run', 'sc21-sim-200') + os.sep
-path = os.path.join('run', 'sc21-sim-2000') + os.sep
-path = os.path.join('run', 'sc21-sim-500') + os.sep
-path = os.path.join('run', 'sc21-sim-100') + os.sep
-meta = json.load(open(path + 'meta.json'))
+meta = json.load(open('meta.json'))
 dt = meta['delta'][-1]
 nt = meta['shape'][-1]
 tau = meta['tau']
@@ -20,9 +23,9 @@ dtype = meta['dtype']
 sigma = 0.5
 
 # read time history
-x = np.fromfile(path + 'p4-v1.bin', dtype)
-y = np.fromfile(path + 'p4-v2.bin', dtype)
-z = np.fromfile(path + 'p4-v3.bin', dtype)
+x = np.fromfile('p4-v1.bin', dtype)
+y = np.fromfile('p4-v2.bin', dtype)
+z = np.fromfile('p4-v3.bin', dtype)
 v = np.array([x, y, z])
 t = dt * np.arange(nt)
 
@@ -68,6 +71,6 @@ if 0:
 
 # finish up
 fig.canvas.draw()
-fig.savefig(path + 'sc2.1.pdf', format='pdf')
+fig.savefig('SC21.pdf', format='pdf')
 fig.show()
 

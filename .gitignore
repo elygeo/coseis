@@ -12,7 +12,8 @@ __pycache__
 *.sha1
 *.x
 *.dSYM
-/cst/Repository
+/scripts/repo
+/cst/repo
 /cst/cvms/build-*
 /cst/cvms/Makefile
 /cst/tests/Makefile

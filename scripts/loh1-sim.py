@@ -52,8 +52,8 @@ for i in range(10):
         ]
 
 # run SORD
-p = os.path.join('run', 'loh1')
-os.mkdir(p)
+p = os.path.join('run', 'LOH1')
+os.makedirs(p)
 os.chdir(p)
 cst.sord.run(prm)
 

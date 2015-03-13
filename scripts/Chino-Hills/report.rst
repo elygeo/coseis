@@ -19,7 +19,7 @@ preliminary results show general agreement in amplitude and character among the
 observed and synthetic data (Figs. 13-15). Additional analysis and simulations
 are needed to adequately quantify effects of the new GTL model.
 
-.. figure:: map.pdf
+.. figure:: figures/Chino-Hills-Map.pdf
 
     Station map with basins delineated by dashed contour of `$V_S$` =
     2.5 km/s, at 1 km depth, for CVM-S (red) and CVM-H (blue).

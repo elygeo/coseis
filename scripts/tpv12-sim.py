@@ -131,15 +131,13 @@ x[k:] = y[k:]
 z[k:] = y[k:]
 
 # run directory
-d = 'run' + os.sep
-os.mkdir(d)
-x.astype('f').tofile(d + 'sxx.bin')
-y.astype('f').tofile(d + 'syy.bin')
-z.astype('f').tofile(d + 'szz.bin')
+p = os.path.join('run', 'tpv12')
+os.makedirs(p)
+os.chdir(p)
+x.astype('f').tofile('sxx.bin')
+y.astype('f').tofile('syy.bin')
+z.astype('f').tofile('szz.bin')
 
 # run SORD
-p = os.path.join('run', 'tpv12')
-os.mkdir(p)
-os.chdir(p)
 cst.sord.run(prm)
 
