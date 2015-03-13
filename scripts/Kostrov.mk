@@ -1,9 +1,10 @@
-DIR = repo/Kostrov
+TAG = Kosrov
+DIR = run/$(TAG)
 
-$(DIR)/Kostrov.pdf: $(DIR) kostrov-plot.py
-	python kostrov-plot.py
+$(DIR)/$(TAG).pdf : $(DIR) $(TAG)-plot.py
+	python $(TAG)-plot.py
 
-$(DIR): kostrov-sim.yaml
+$(DIR) : $(TAG)-sim.yaml
 	mkdir $(DIR)
-	cd $(DIR) && sord.py FIXME/kostrov-sim.yaml
+	cd $(DIR) && sord.py $(CURDIR)/$(TAG)-sim.yaml
 

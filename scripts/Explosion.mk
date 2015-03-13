@@ -1,8 +1,9 @@
-DIR = repo/Explosion
+TAG = Explosion
+DIR = run/$(TAG)
 
-$(DIR)/Explosion.png: $(DIR) explosion-plot.py
-	python explosion-plot.py
+$(DIR)/$(TAG).png : $(DIR) $(TAG)-plot.py
+	python $(TAG)-plot.py
 
-$(DIR): explosion-sim.py
-	python explosion-sim.py
+$(DIR) : $(TAG)-sim.py
+	python $(TAG)-sim.py
 

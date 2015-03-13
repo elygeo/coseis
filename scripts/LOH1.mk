@@ -1,8 +1,9 @@
-DIR = repo/LOH1
+TAG = LOH1
+DIR = run/$(TAG)
 
-$(DIR)/LOH1.pdf: $(DIR) loh1-plot.py
-	python loh1-plot.py
+$(DIR)/$(TAG).pdf : $(DIR) $(TAG)-plot.py
+	python $(TAG)-plot.py
 
-$(DIR): loh1-sim.py
-	python loh1-sim.py
+$(DIR) : $(TAG)-sim.py
+	python $(TAG)-sim.py
 

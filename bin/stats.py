@@ -4,6 +4,10 @@ Print binary file statistics. Default data type is 4 byte floating point.
 
 TODO: move into a lib funtion
 """
+
+if __name__ != '__main__':
+    raise Exception('Not a module')
+
 import os, sys, json
 import numpy as np
 from numpy.lib.npyio import format as npy

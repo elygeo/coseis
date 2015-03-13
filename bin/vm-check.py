@@ -1,7 +1,13 @@
 #!/usr/bin/env python
 """
 Velocity model statistics
+
+TODO: move into lib function
 """
+
+if __name__ != '__main__':
+    raise Exception('Not a module')
+
 import os
 import numpy as np
 

@@ -1,9 +1,10 @@
-DIR = repo/SORD-Example
+TAG = SORD-Example
+DIR = run/$(TAG)
 
-$(DIR)/SORD-Example.png: $(DIR) sord-example-plot.py
-	python sord-example-plot.py
+$(DIR)/$(TAG).png : $(DIR) $(TAG)-plot.py
+	python $(TAG)-plot.py
 
-$(DIR): sord-example-sim.yaml
+$(DIR) : $(TAG)-sim.yaml
 	mkdir $(DIR)
-	cd $(DIR) && sord.py FIXME/sord-example-sim.yaml
+	cd $(DIR) && sord.py $(CURDIR)/$(TAG)-sim.yaml
 

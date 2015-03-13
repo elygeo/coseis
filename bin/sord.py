@@ -2,6 +2,10 @@
 """
 Launch SORD code from YAML or JSON parameter file
 """
+
+if __name__ != '__main__':
+    raise Exception('Not a module')
+
 import sys, yaml
 import cst
 

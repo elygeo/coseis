@@ -12,10 +12,11 @@ __pycache__
 *.sha1
 *.x
 *.dSYM
-/scripts/repo
 /cst/repo
 /cst/cvms/build-*
 /cst/cvms/Makefile
 /cst/tests/Makefile
+/cst/tests/run
 /cst/sord/Makefile
 /cst/sord/config.json
+/scripts/run
