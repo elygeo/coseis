@@ -1,4 +1,4 @@
-TAG = Kosrov
+TAG = Kostrov
 DIR = run/$(TAG)
 
 $(DIR)/$(TAG).pdf : $(DIR) $(TAG)-plot.py
