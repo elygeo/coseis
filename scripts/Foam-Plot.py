@@ -9,17 +9,16 @@ id_ = '20'
 p = os.path.join('run', 'Foam-' + id_)
 os.chdir(d)
 meta = json.load(open('meta.json'))
-dtype = meta.dtype
 
 # off-fault displacement plot
-f = 'off-fault.bin'
-n = meta['shapes'][f]
-d = meta['deltas'][f]
-s = np.fromfile(f, dtype).reshape(n[::-1]).T
-e = np.diff(s[:,-1]) / d[0]
-i = int(0.05 / d[1])
+f = 'off-fault'
+dx, dy = meta['deltas'][f + '.bin']
+s = np.load(f + '.npy')
+nx, ny = s.shape
+e = np.diff(s[:,-1]) / dx
+i = int(0.05 / dy)
 s = -1000.0 * s[:,i:]
-extent = 0, (n[0] - 1) * d[0] * 100.0, i * d[1] * 1000.0, (n[1] - 1) * d[1] * 1000.0
+extent = 0, (nx - 1) * dx * 100.0, i * dy * 1000.0, (ny - 1) * dy * 1000.0
 fig = plt.figure(figsize=(4.8, 6.4))
 ax = fig.add_subplot(111)
 im = ax.imshow(s.T, interpolation='nearest', origin='lower', aspect='auto', extent=extent)
@@ -30,7 +29,7 @@ fig.colorbar(im)
 fig.savefig('Foam-%s-Off-Fault.png' % id_)
 
 # approximate static strain
-x = np.arange(n[0] - 1) * d[0] * 100.0 + d[0] * 50.0
+x = np.arange(nx - 1) * dx * 100.0 + dx * 50.0
 fig = plt.figure()
 ax = fig.add_subplot(111)
 ax.plot(x, e, 'k-')
@@ -48,9 +47,9 @@ for s, x, g in [
    (4, 22, 0.020166),
   (15,  2, 0.020773),
 ]:
-    f = 'sensor%02d.bin' % s
-    dt = meta['deltas'][f][-1] * 1000.0
-    a = np.fromfile(f, dtype) / 9.81
+    f = 'sensor%02d' % s
+    dt = meta['deltas'][f + '.bin'][-1] * 1000.0
+    a = np.load(f + '.npy') / 9.81
     t = np.arange(a.size) * dt
     ax.plot(t, x + a * 0.5, 'k-')
     ax.text(22, x - 1, '%.0f' % abs(a).max())

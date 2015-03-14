@@ -1,22 +1,22 @@
 #!/usr/bin/env python
 """
-Mesh generation
+Read 2D lon/lat mesh and extrude the 3D for CVM extraction.
+Convert node coords to cell center coords.
+Etrude PML regions if present.
 """
+
 import os, json
 import numpy as np
 
 # metedata
 meta = json.load(open('meta.json'))
-dtype = meta['dtype']
-shape = meta['shape']
-delta = meta['delta']
 npml = meta['npml']
+nz = meta['shape'][2]
+dz = meta['delta'][2]
 
 # read data
-dep = np.arange(shape[2]) * delta[2]
-n = shape[:2]
-x = np.fromfile('lat.bin', dtype).reshape(n[::-1]).T
-y = np.fromfile('lon.bin', dtype).reshape(n[::-1]).T
+x = np.load('lat.npy')
+y = np.load('lon.npy')
 
 # PML regions are extruded
 for w in x, y:
@@ -27,6 +27,7 @@ for w in x, y:
         w[:,-i]  = w[:,-i-1]
 
 # cell center locations
+dep = np.arange(nz) * dz
 dep = 0.5 * (dep[:-1] + dep[1:])
 x = 0.25 * (x[:-1,:-1] + x[1:,:-1] + x[:-1,1:] + x[1:,1:])
 y = 0.25 * (y[:-1,:-1] + y[1:,:-1] + y[:-1,1:] + y[1:,1:])

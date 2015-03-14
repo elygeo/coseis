@@ -40,21 +40,20 @@ meta = dict(
     bounds = bounds,
     extent = extent,
     npml = 10,
-    dtype = np.dtype('f').str,
 )
 
 # create run directory
 path = os.path.join('run', 'SC21', 'mesh', '%.0f' % dx)
 os.makedirs(path)
-shutil.copy2('mesh.py', path)
+shutil.copy2('../util/mesh-extrude.py', path)
 os.chdir(path)
 json.dump(meta, open('meta.json', 'w'))
-x.astype('f').T.tofile('lat.bin')
-y.astype('f').T.tofile('lon.bin')
+np.save(x.astype('f'), 'lat.npy')
+np.save(y.astype('f'), 'lon.npy')
 
 # launch mesher
 job = cst.util.launch(
-    execute = '{python} mesh.py',
+    execute = '{python} mesh-extrude.py',
     minutes = nsample // 120000000,
     nproc = min(3, nproc),
 )

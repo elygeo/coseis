@@ -35,10 +35,6 @@ axis = -xlim, xlim, -ylim, ylim
 pixels = int(dpi * inches[0]), int(dpi * inches[1])
 point = dpi / 72.0
 ppi = 100
-meta = open(path + 'meta.json')
-meta = json.load(meta)
-shape = meta.shape
-
 
 
 # Matplotlib section
@@ -111,7 +107,6 @@ else:
     over = Image.fromarray(over, 'RGBA')
     over = over.resize(pixels, Image.ANTIALIAS)
 plt.close(0)
-
 
 
 # Mayavi section

@@ -6,41 +6,39 @@ Geoffrey Ely, 2015-03-10
 TODO: make into a library function 
 TODO: adapt for very large files, ala swab.py
 """
-import os, sys, json, glob
+import os, sys, json
 import numpy as np
 
-def bin2npy(filenames=[], delete=False, **meta):
+def bin2npy(files=[], dtype=None, shape=None, shapes=None, delete=False):
 
     # metadata
     if os.path.exists('meta.json'):
-        meta = json.load(open('meta.json')).update(**meta)
-    if 'dtype' in meta:
-        dtype = meta['dtype']
-    else:
-        dtype = 'f'
+        meta = json.load(open('meta.json'))
+        if dtype == None and 'dtype' in meta:
+            dtype = meta['dtype']
+        if shape == None and 'shape' in meta:
+            shape = meta['shape']
+        if shapes == None and 'shapes' in meta:
+            shapes = meta['shapes']
+    if shapes == None:
+        shapes = {}
+    if len(files) == 0:
+        files = shapes.keys()
 
     # process files
-    if len(filenames) == 0:
-        if 'shapes' in meta:
-            filenames = meta['shapes'].keys()
-    elif len(filenames) == 1:
-        filenames = glob.glob(filenames[0])
-    for f in filenames:
+    for f in files:
         f1 = f.replace('.bin', '.npy')
+        if f == f1:
+            raise Exception(f + ': missing .bin extension')
         if os.path.exists(f1):
             continue
-        if f == f1:
-            raise Exception(f + ': missing .bin extention')
-        if 'shapes' in meta and f in meta['shapes']:
-            n = meta['shapes'][f]
-            v = np.fromfile(f, dtype).reshape(n[::-1]).T
-        elif 'shape' in meta:
-            n = meta['shape']
-            v = np.fromfile(f, dtype).reshape(n[::-1]).T
-        else:
-            v = np.fromfile(f, dtype)
-            n = v.shape
-        print(f + ': %s %s' % (dtype, n))
+        v = np.fromfile(f, dtype)
+        if f in shapes:
+            n = shapes[f]
+            v = v.reshape(n[::-1]).T
+        elif shape:
+            v = v.reshape(shape[::-1]).T
+        print(f + ': %s %s' % (dtype, v.shape))
         np.save(f1, v)
         if delete:
             os.unlink(f)
@@ -48,17 +46,16 @@ def bin2npy(filenames=[], delete=False, **meta):
 # continue if command line
 if __name__ == '__main__':
 
-    filenames = []
+    args = {}
+    files = []
     for i in sys.argv[1:]:
         if i.startswith('--'):
             k, v = i[2:].split('=')
-            if k not in ['dtype', 'shape', 'shapes']:
-                raise Exception('Unknown option: ' + k)
             if len(v) and not v[0].isalpha():
                 v = json.loads(v)
-            meta[k] = v
+            args[k] = v
         else:
-            filenames.append(i)
+            files.append(i)
 
-    bin2npy(filenames, **meta)
+    bin2npy(files, **args)
 

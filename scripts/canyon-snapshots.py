@@ -17,12 +17,12 @@ meta = json.load('meta.json')
 shape = meta['shapes']['snap-v1.bin']
 delta = meta['deltas']['snap-v1.bin']
 dtype = meta['dtype']
-
-# read mesh files
 nn = shape[1], shape[0]
 n = shape[0] * shape[1]
-x = np.fromfile('x.bin', dtype).reshape(nn).T
-y = np.fromfile('y.bin', dtype).reshape(nn).T
+
+# read mesh files
+x = np.load('x.npy')
+y = np.load('y.npy')
 
 # open snapshot files
 f1 = open('snap-v1.bin')

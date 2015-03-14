@@ -5,15 +5,14 @@ Prepare output for uploading to the SCEC Code Validation Workshop website.
 import os, json
 import numpy as np
 
+os.chdir(os.path.join('run', 'TPV12-2D'))
+
 # parameters
-p = os.path.join('run', 'TPV12-2D')
-os.chdir(p)
 meta = json.load(open('meta.json'))
-meta.dx = meta['delta'][0]
-meta.dt = meta['delta'][3]
-meta.nt = meta['shape'][3]
-dtype = meta['dtype']
-t = np.arange(meta.nt) * meta.dt
+meta['dx'] = meta['delta'][0]
+meta['dt'] = meta['delta'][3]
+meta['nt'] = meta['shape'][3]
+t = np.arange(meta['nt']) * meta['dt']
 
 # formats
 fmt1 = '%20.12f' + 7 * ' %14.6f'
@@ -54,23 +53,23 @@ t h-disp h-vel v-disp v-vel n-disp n-vel
 
 # fault stations
 for sta in meta['deltas']:
-    if sta.startswith('fault') and sta.endswith('su1.bin'):
+    if sta.startswith('fault') and sta.endswith('su1.npy'):
         sta = sta[:-8]
         meta['sta'] = sta
-        f = sta + '-%s.bin'
-        su1 = np.fromfile(f % 'su1', dtype)
-        y   = np.fromfile(f % 'su2', dtype)
-        z   = np.fromfile(f % 'su3', dtype)
+        f = sta + '-%s.npy'
+        su1 = np.load(f % 'su1')
+        y   = np.load(f % 'su2')
+        z   = np.load(f % 'su3')
         suv = np.sqrt(y * y + z * z)
-        sv1 = np.fromfile(f % 'sv1', dtype)
-        y   = np.fromfile(f % 'sv2', dtype)
-        z   = np.fromfile(f % 'sv3', dtype)
+        sv1 = np.load(f % 'sv1')
+        y   = np.load(f % 'sv2')
+        z   = np.load(f % 'sv3')
         svv = np.sqrt(y * y + z * z)
-        ts1 = np.fromfile(f % 'ts1', dtype) * 1e-6
-        y   = np.fromfile(f % 'ts2', dtype)
-        z   = np.fromfile(f % 'ts3', dtype)
+        ts1 = np.load(f % 'ts1') * 1e-6
+        y   = np.load(f % 'ts2')
+        z   = np.load(f % 'ts3')
         tsv = np.sqrt(y * y + z * z) * 1e-6
-        tnm = np.fromfile(f % 'tnm', dtype) * 1e-6
+        tnm = np.load(f % 'tnm') * 1e-6
         c   = np.array([t, su1, sv1, ts1, suv, svv, tsv, tnm]).T
         f   = sta + '.asc'
         with open(f, 'w') as fh:
@@ -80,16 +79,16 @@ for sta in meta['deltas']:
 
 # body stations
 for sta in meta['deltas']:
-    if sta.startswith('body') and sta.endswith('u1.bin'):
+    if sta.startswith('body') and sta.endswith('u1.npy'):
         sta = sta[:-7]
         meta['sta'] = sta
-        f = sta + '-%s.bin'
-        u1 = np.fromfile(f % 'u1', dtype)
-        u2 = np.fromfile(f % 'u2', dtype)
-        u3 = np.fromfile(f % 'u3', dtype)
-        v1 = np.fromfile(f % 'v1', dtype)
-        v2 = np.fromfile(f % 'v2', dtype)
-        v3 = np.fromfile(f % 'v3', dtype)
+        f = sta + '-%s.npy'
+        u1 = np.load(f % 'u1')
+        u2 = np.load(f % 'u2')
+        u3 = np.load(f % 'u3')
+        v1 = np.load(f % 'v1')
+        v2 = np.load(f % 'v2')
+        v3 = np.load(f % 'v3')
         c  = np.array([t, u1, v1, u2, v2, u3, v3]).T
         f  = sta + '.asc'
         with open(f, 'w') as fh:

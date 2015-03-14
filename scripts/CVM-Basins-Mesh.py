@@ -28,7 +28,6 @@ meta = dict(
     delta = delta,
     shape = shape,
     extent = extent,
-    dtype = np.dtype('f').str,
 )
 
 # run dir
@@ -38,8 +37,8 @@ os.chdir(p)
 
 # save data
 json.dump(open('meta.json', 'w'), meta)
-np.save('lon.npy', x)
-np.save('lat.npy', y)
+np.save('lon.npy', x.astype('f'))
+np.save('lat.npy', y.astype('f'))
 
 # write input files
 with open('lon.bin', 'wb') as f:

@@ -7,12 +7,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cst
 
+os.chdir(os.path.join('run', 'LOH1'))
+
 # parameters
-p = os.path.join('run', 'LOH1')
-os.chdir(p)
 meta = json.load(open('meta.json'))
 dt = meta['delta'][-1]
-nt = meta['shape'][-1]
 tau = meta['tau']
 dtype = meta['dtype']
 sigma = dt * 22.5
@@ -44,11 +43,11 @@ for i in 0, 1, 2:
     ax[i].set_yticklabels([-1, '', 0, '', 1])
 
 # read SORD results
-x = np.fromfile('p9-v1.bin', dtype)
-y = np.fromfile('p9-v2.bin', dtype)
-z = np.fromfile('p9-v3.bin', dtype)
+x = np.load('p9-v1.npy')
+y = np.load('p9-v2.npy')
+z = np.load('p9-v3.npy')
 v = np.array([x, y, z])
-t = dt * np.arange(nt)
+t = np.arange(x.size) * dt
 
 # rotate to radial coordinates
 m = (3, 4, 0), (-4, 3, 0), (0, 0, 5)
@@ -65,7 +64,7 @@ ax[1].plot(t, v[1], 'k')
 ax[2].plot(t, v[2], 'k')
 
 # read Prose F/K results
-p = os.path.join(cst.repo, '..', '..', 'data', 'LOH1-ProseFK-') # FIXME
+p = os.path.join('..', 'cst', 'data', 'LOH1-ProseFK-')
 t = np.load(p + 'Time.npy')
 v1 =  1e5 * np.load(p + 'V-Radial.bin')
 v2 =  1e5 * np.load(p + 'V-Transverse.bin')
@@ -88,7 +87,5 @@ ax[2].plot(t, v[2], 'k--')[0].set_dashes((2,0.5))
 
 # finish up
 ax[1].legend(['SOM', 'FK'], loc='lower left', frameon=False)
-fig.canvas.draw()
 fig.savefig('LOH1.pdf')
-fig.show()
 

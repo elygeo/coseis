@@ -7,11 +7,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cst
 
+# run directory
+os.chdir(os.path.join('run', 'Explosion'))
+
 # parameters
-p = os.path.join('run', 'Explosion')
-os.chdir(p)
 meta = json.load(open('parameters.json'))
-nx, ny, nz, nt = meta['shape']
 dx, dy, dz, dt = meta['delta']
 tau = meta['pxx'][-1]
 rho = meta['rho']
@@ -20,16 +20,16 @@ vs = meta['vs']
 
 # metadata
 meta = json.load(open('meta.json'))
-dtype = meta['dtype']
 reg = meta['indices']['p1-vx.bin'][0]
 
 # loop over stations
 for sta in 'p1', 'p2', 'p3', 'p4', 'p5', 'p6':
 
     # read time histories
-    vx = np.fromfile(sta + '-vx.bin', dtype)
-    vy = np.fromfile(sta + '-vy.bin', dtype)
-    vz = np.fromfile(sta + '-vz.bin', dtype)
+    vx = np.load(sta + '-vx.npy')
+    vy = np.load(sta + '-vy.npy')
+    vz = np.load(sta + '-vz.npy')
+    nt = vz.shape[0]
     v = np.array([vx, vy, vz])
 
     # source receiver radius
