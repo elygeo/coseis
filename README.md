@@ -8,7 +8,7 @@ Computational Seismology Tools
 
 - [Install](#install)
 - [Examples](#examples)
-- [SORD](docs/Sord.html)
+- [SORD](docs/SORD.html)
 - [Code](https://github.com/gely/coseis/)
 
 </nav>
