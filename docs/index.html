@@ -70,7 +70,7 @@ PASSED: cst.tests.kostrov.test()</code></pre>
 <p><img src="../figures/CVM-Slice-Vs-S.png" /> <img src="../figures/CVM-Slice-Vs-H.png" /></p>
 <p>Extract S-wave velocity at 500 meters depth. Plot using Matplotlib::</p>
 <pre><code>cd scripts
-python CVM-Depth-Plane.py</code></pre>
+python CVM-Slice.py</code></pre>
 <p>Source code: <a href="../scripts/CVM-Slice.py">CVM-Slice.py</a></p>
 <h4 id="cvm-s-fence-diagram">CVM-S fence diagram</h4>
 <figure>
@@ -84,9 +84,9 @@ python CVM-Depth-Plane.py</code></pre>
 <img src="../figures/CVM-Basins.png" />
 </figure>
 <p>Extract 3D mesh and search for the shallowest surface of Vs = 2.5 km/s. Plot over topography using Mayavi::</p>
-<pre><code>python Basins-Mesh.py
-python Basins-Search.py
-python Basins-Viz.py</code></pre>
+<pre><code>python CVM-Basins-mesh.py
+python CVM-Basins-search.py
+python CVM-Basins-plot.py</code></pre>
 <p>Source code:<br /><a href="../scripts/CVM-Basins-mesh.py">CVM-Basins-mesh.py</a><br /><a href="../scripts/CVM-Basins-search.py">CVM-Basins-search.py</a><br /><a href="../scripts/CVM-Basins-plot.py">CVM-Basins-plot.py</a></p>
 </div>
 </body>

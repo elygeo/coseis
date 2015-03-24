@@ -121,7 +121,7 @@ After completion, a report is printed to the screen (or saved in
 Extract S-wave velocity at 500 meters depth. Plot using Matplotlib::
 
     cd scripts
-    python CVM-Depth-Plane.py
+    python CVM-Slice.py
 
 Source code: [CVM-Slice.py](../scripts/CVM-Slice.py)
 
@@ -143,9 +143,9 @@ Source code: [CVM-Fence.py](../scripts/CVM-Fence.py)
 Extract 3D mesh and search for the shallowest surface of Vs = 2.5 km/s.
 Plot over topography using Mayavi::
 
-    python Basins-Mesh.py
-    python Basins-Search.py
-    python Basins-Viz.py
+    python CVM-Basins-mesh.py
+    python CVM-Basins-search.py
+    python CVM-Basins-plot.py
 
 Source code:  
 [CVM-Basins-mesh.py](../scripts/CVM-Basins-mesh.py)  
