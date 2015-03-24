@@ -45,7 +45,7 @@ for vs, tag in [
     ax.set_aspect(1.0 / np.cos(33.75 / 180.0 * np.pi))
     ax.set_title('CVM%s %.0f m depth' % (tag, depth))
     ax.axis(lon + lat)
-    f = 'CVM-Depth-Plane-%s-%s.png' % (prop, tag)
+    f = 'CVM-Slice-%s-%s.png' % (prop, tag)
     print f
     fig.savefig(f)
 
