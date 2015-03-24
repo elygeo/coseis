@@ -6,7 +6,7 @@ clean :
 	rm -rf build *.so *.pyc
 
 distclean : clean
-	rm -rf Repository interp_.c
+	rm -rf repo interp_.c
 
 %.c : %.pyx
 	cython $<

@@ -1,485 +1,159 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.12: http://docutils.sourceforge.net/" />
-<title>SORD</title>
-<style type="text/css">
-
-body {
-    max-width: 760px;
-    padding: 0px;
-    margin: 0px auto;
-    background-color: #eee;
-    color: #000;
-    font-family: 'Lucida Grande', Geneva, Verdana, sans-serif;
-    position: relative;
-    line-height: 140%;
-}
-
-div.document {
-    background-color: #fff;
-    padding: 0px 60px;
-    border: 1px solid #ccc;
-}
-
-img {
-    border: none;
-    margin: 10px 0px;
-}
-
-img.plot {
-    margin: 0px -30px;
-}
-
-img.align-left, .figure.align-left {
-    clear: left;
-    float: left;
-    margin-right: 1em
-}
-
-img.align-right, .figure.align-right {
-    clear: right;
-    float: right;
-    margin-left: 1em
-}
-
-img.align-center, .figure.align-center {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-hr {
-    border: none;
-    border-top: 2px solid #ccc;
-}
-
-pre {
-    padding: 10px;
-    border: 1px solid #ccc;
-    background-color: #eee;
-    line-height: 100%;
-}
-
-a {
-    color: #06a;
-    text-decoration: none;
-}
-
-a:hover, a:active {
-    text-decoration: underline;
-}
-
-.section li {
-    padding: 5px;
-}
-
-h1, h1 a, h1 a:hover, h1 a:active {
-    color: #900;
-    text-decoration: none;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-h2.subtitle {
-    font-size: large;
-    font-weight: normal;
-    margin-top: 5px;
-}
-
-h3 {
-    border-top: 2px solid #ccc;
-    padding-top: 10px;
-}
-
-form.search {
-    margin-left: 30px;
-}
-
-ul.navbar {
-    list-style-type: none;
-    padding: 0px;
-}
-
-.navbar li {
-    display: inline;
-}
-
-.navbar a {
-    background-color: #eee;
-    border: 1px solid #ccc;
-    padding: 5px 10px;
-    text-decoration: none;
-}
-
-.navbar a:hover, a:active {
-    background-color: #ccc;
-}
-
-div.box {
-    border: 1px solid #aaa;
-    margin: 30px 0px;
-}
-
-div.box form, div.box p, div.box ul, div.box h4 {
-    margin: 15px 30px;
-}
-
-div.box h3 {
-    background-color: #ccc;
-    padding: 4px 30px;
-    margin: 0px;
-    margin-bottom: 15px;
-    font-size: medium;
-}
-
-p.topic-title {
-    font-size: large;
-    font-weight: bold;
-}
-
-p.warning {
-    padding: 10px;
-    border: 1px solid #ccc;
-    background-color: #ffd;
-}
-
-table {
-    width:100%;
-    border-collapse: collapse;
-    border: 1px solid #aaa;
-    margin: 30px 0px;
-}
-
-th {
-    padding: 4px 30px;
-    background-color: #ccc;
-    border: none;
-    text-align: left;
-}
-
-td {
-    padding: 4px 30px;
-    border: none;
-    border-top: 1px solid #eee;
-}
-
-
-</style>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="document" id="sord">
-<h1 class="title">SORD</h1>
-<h2 class="subtitle" id="support-operator-rupture-dynamics">Support Operator Rupture Dynamics</h2>
-
-<img alt="../figures/SORD-SAF-Surface.jpg" src="../figures/SORD-SAF-Surface.jpg" />
-<div class="contents topic" id="contents">
-<p class="topic-title first">Contents</p>
-<ul class="simple">
-<li><a class="reference internal" href="#summary" id="id1">Summary</a></li>
-<li><a class="reference internal" href="#publications" id="id2">Publications</a></li>
-<li><a class="reference internal" href="#user-guide" id="id3">User Guide</a><ul>
-<li><a class="reference internal" href="#quick-test" id="id4">Quick test</a></li>
-<li><a class="reference internal" href="#python-scripting" id="id5">Python Scripting</a></li>
-<li><a class="reference internal" href="#field-i-o" id="id6">Field I/O</a></li>
-<li><a class="reference internal" href="#boundary-conditions" id="id7">Boundary Conditions</a></li>
-<li><a class="reference internal" href="#defining-the-fault-rupture-surface" id="id8">Defining the fault rupture surface</a></li>
+<div class="document">
+<h1 id="sord">SORD</h1>
+<h2 id="support-operator-rupture-dynamics">Support Operator Rupture Dynamics</h2>
+<p><nav></p>
+<ul>
+<li><a href="#summary">Summary</a></li>
+<li><a href="#publications">Pubs</a></li>
+<li><a href="#user-guide">Docs</a></li>
+<li><a href="#memory-usage-and-scaling">Performance</a></li>
+<li><a href="Coseis.html">Coseis</a></li>
+<li><a href="https://github.com/gely/coseis/tree/gh-pages/cst/sord">Code</a></li>
 </ul>
-</li>
-<li><a class="reference internal" href="#memory-usage-and-scaling" id="id9">Memory Usage and Scaling</a></li>
-</ul>
-</div>
-<div class="section" id="summary">
-<h3>Summary</h3>
-<p>The Support Operator Rupture Dynamics (SORD) code simulates spontaneous rupture
-within a 3D isotropic viscoelastic solid.  Wave motions are computed on a
-logically rectangular hexahedral mesh, using the generalized finite difference
-method of support operators.  Stiffness and viscous hourglass corrections are
-employed to suppress suppress zero-energy grid oscillation modes.  The fault
-surface is modeled by coupled double nodes, where the strength of the coupling
-is determined by a linear slip-weakening friction law.  External boundaries may
-be reflective or absorbing, where absorbing boundaries are handled using the
-method of perfectly matched layers (PML).  The hexahedral mesh can accommodate
-non-planar ruptures and surface topography</p>
-<p>SORD simulations are configured with Python scripts.  Underlying computations
-are coded in Fortran 95 and parallelized for multi-processor execution using
-Message Passing Interface (MPI).  The code is portable and tested with a
-variety of Fortran 95 compilers, MPI implementations, and operating systems
-(Linux, Mac OS X, IBM AIX, SUN Solaris).</p>
-</div>
-<div class="section" id="publications">
-<h3>Publications</h3>
-<p>The first two papers give (for wave propagation and spontaneous rupture,
-respectively) the formulation, numerical algorithm, and verification of the
-SORD method. The third paper presents an application to simulating earthquakes
-in southern California.</p>
-<ol class="arabic simple">
-<li>Ely, G. P., S. M. Day, and J.-B. Minster (2008),
-<a class="reference external" href="http://www.alcf.anl.gov/~gely/pub/Ely2008-GJI.pdf">A support-operator method for visco-elastic wave modeling in 3D
-heterogeneous media</a>,
-<em>Geophys. J. Int.</em>, <em>172</em> (1), 331-344,
-<a class="reference external" href="http://dx.doi.org/10.1111/j.1365-246X.2007.03633.x">doi:10.1111/j.1365-246X.2007.03633.x</a>.</li>
-<li>Ely, G. P., S. M. Day, and J.-B. Minster (2009),
-<a class="reference external" href="http://www.alcf.anl.gov/~gely/pub/Ely2009-GJI.pdf">A support-operator method for 3D rupture dynamics</a>,
-<em>Geophys. J. Int.</em>, <em>177</em> (3), 1140-1150,
-<a class="reference external" href="http://dx.doi.org/10.1111/j.1365-246X.2009.04117.x">doi:10.1111/j.1365-246X.2009.04117.x</a>.</li>
-<li>Ely, G. P., S. M. Day, and J.-B. Minster (2010),
-<a class="reference external" href="http://www.alcf.anl.gov/~gely/pub/Ely2010-BSSA.pdf">Dynamic rupture models for the southern San Andreas fault</a>,
-<em>Bull. Seism. Soc.  Am.</em>, <em>100</em> (1), 131-150,
-<a class="reference external" href="http://dx.doi.org/10.1785/0120090187">doi:10.1785/0120090187</a>.</li>
+<p></nav></p>
+<figure>
+<img src="../figures/SORD-SAF-Surface.jpg" />
+</figure>
+<h3 id="summary">Summary</h3>
+<p>The Support Operator Rupture Dynamics (SORD) code simulates spontaneous rupture within a 3D isotropic viscoelastic solid. Wave motions are computed on a logically rectangular hexahedral mesh, using the generalized finite difference method of support operators. Stiffness and viscous hourglass corrections are employed to suppress suppress zero-energy grid oscillation modes. The fault surface is modeled by coupled double nodes, where the strength of the coupling is determined by a linear slip-weakening friction law. External boundaries may be reflective or absorbing, where absorbing boundaries are handled using the method of perfectly matched layers (PML). The hexahedral mesh can accommodate non-planar ruptures and surface topography</p>
+<p>SORD simulations are configured with Python scripts. Underlying computations are coded in Fortran 95 and parallelized for multi-processor execution using Message Passing Interface (MPI). The code is portable and tested with a variety of Fortran 95 compilers, MPI implementations, and operating systems (Linux, Mac OS X, IBM AIX, SUN Solaris).</p>
+<h3 id="publications">Publications</h3>
+<p>The first two papers give (for wave propagation and spontaneous rupture, respectively) the formulation, numerical algorithm, and verification of the SORD method. The third paper presents an application to simulating earthquakes in southern California.</p>
+<ol type="1">
+<li>Ely, G. P., S. M. Day, and J.-B. Minster (2008), <a href="http://www.alcf.anl.gov/~gely/pub/Ely2008-GJI.pdf">A support-operator method for visco-elastic wave modeling in 3D heterogeneous media</a>, <em>Geophys. J. Int.</em>, <em>172</em> (1), 331-344, <a href="http://dx.doi.org/10.1111/j.1365-246X.2007.03633.x"><a href="doi:10.1111/j.1365-246X.2007.03633.x" class="uri">doi:10.1111/j.1365-246X.2007.03633.x</a></a>.</li>
+<li>Ely, G. P., S. M. Day, and J.-B. Minster (2009), <a href="http://www.alcf.anl.gov/~gely/pub/Ely2009-GJI.pdf">A support-operator method for 3D rupture dynamics</a>, <em>Geophys. J. Int.</em>, <em>177</em> (3), 1140-1150, <a href="http://dx.doi.org/10.1111/j.1365-246X.2009.04117.x"><a href="doi:10.1111/j.1365-246X.2009.04117.x" class="uri">doi:10.1111/j.1365-246X.2009.04117.x</a></a>.</li>
+<li>Ely, G. P., S. M. Day, and J.-B. Minster (2010), <a href="http://www.alcf.anl.gov/~gely/pub/Ely2010-BSSA.pdf">Dynamic rupture models for the southern San Andreas fault</a>, <em>Bull. Seism. Soc. Am.</em>, <em>100</em> (1), 131-150, <a href="http://dx.doi.org/10.1785/0120090187"><a href="doi:10.1785/0120090187" class="uri">doi:10.1785/0120090187</a></a>.</li>
 </ol>
-</div>
-<div class="section" id="user-guide">
-<h3>User Guide</h3>
-<div class="section" id="quick-test">
-<h4>Quick test</h4>
-<p>Run a simple point source explosion test and plot a 2D slice of particle
-velocity:</p>
-<pre class="literal-block">
-cd Scripts
-make SORD-Example.mk
-</pre>
+<h3 id="user-guide">User Guide</h3>
+<h4 id="quick-test">Quick test</h4>
+<p>Run a simple point source explosion test and plot a 2D slice of particle velocity:</p>
+<pre><code>cd Scripts
+make SORD-Example.mk</code></pre>
 <p>Plotting requires Matplotlib, and the result should look like this:</p>
 <blockquote>
-<img alt="../figures/SORD-Example.png" src="../figures/SORD-Example.png" />
+<figure>
+<img src="../figures/SORD-Example.png" />
+</figure>
 </blockquote>
-<p>This illustrates the simplest way to run SORD, that is to execute the <tt class="docutils literal">sord</tt>
-command giving a parameter file in <a class="reference external" href="http://www.yaml.org">YAML</a> or <a class="reference external" href="http://www.json.org">JSON</a> format. The parameter file
-for this example is as follows:</p>
-<pre class="literal-block">
-# model dimentions [x, y, z, t]
-shape: [61, 61, 61, 60]
-delta: [100.0, 100.0, 100.0, 0.0075]
-
-# material properties
-rho: 2670.0 # density
-vp: 6000.0  # P-wave velocity
-vs: 3464.0  # S-wave velocity
-gam: 0.3    # viscosity
-
-# potency tensor source time function
-pxx: ['[30,30,30,:]', '=', 1.0, 'integral_brune', 0.05]
-pyy: ['[30,30,30,:]', '=', 1.0, 'integral_brune', 0.05]
-pzz: ['[30,30,30,:]', '=', 1.0, 'integral_brune', 0.05]
-
-# write 2d velocity slice, last time step
-vx: ['[:,:,30,-1]', '=&gt;', 'vx.bin']
-vy: ['[:,:,30,-1]', '=&gt;', 'vy.bin']
-
-</pre>
-</div>
-<div class="section" id="python-scripting">
-<h4>Python Scripting</h4>
-<p>A more powerful way to run the code is with a Python script. The basic
-procedure is to import the <tt class="docutils literal">cst</tt> module, create a dictionary of parameters,
-and pass that dictionary to the <tt class="docutils literal">cst.sord.run()</tt> function. Parameters are
-either job-control or simulation parameters. Defaults for these two types of
-parameters are given in <a class="reference external" href="../cst/conf/default.yaml">cst/conf/default.yaml</a>
-and <a class="reference external" href="../cst/sord/parameters.yaml">cst/sord/parameters.yaml</a>, respectively.
-Machine specific job-control parameters may also be present in the <tt class="docutils literal">cst/conf</tt>
-directory that supersede the defaults.</p>
-<p>It maybe be helpful to look through example applications in the <tt class="docutils literal">Scripts</tt>
-directory, and return to this document for further description of the
-simulation parameters.</p>
-</div>
-<div class="section" id="field-i-o">
-<h4>Field I/O</h4>
-<p>[Note about a change from previous versions: The <tt class="docutils literal">fieldio</tt> parameter has been
-removed, and instead each field I/O parameter is a separate list.]</p>
-<p>Multi-dimensional field arrays may be accessed for input and out through a list
-of operations that includes reading from and writing to disk, as well as
-assigning to scalar values or time-dependent functions. In the quick test
-above, <tt class="docutils literal">rho</tt>, <tt class="docutils literal">vp</tt>, <tt class="docutils literal">vs</tt>, <tt class="docutils literal">v1</tt>, and <tt class="docutils literal">v2</tt> are examples of 3- and 4-D
-fields. The full list of available fields is given in <a class="reference external" href="../cst/sord/fieldnames.yaml">cst/sord/fieldnames.yaml</a>.</p>
-<p>Field variables are categorized in four ways: (1) static vs. dynamic, (2)
-settable vs. output only, (3) node vs. cell registration, and (4) volume vs.
-fault surface.  For example, density <tt class="docutils literal">rho</tt> is a static, settable, cell,
-volume variable. Slip path length <tt class="docutils literal">sl</tt> is a dynamic, output, node, fault
-variable.</p>
-<p>Field operations may specify a slice, indicating a subregion of the array,
-using Python slicing notation.  Indices are 0-based.  Slices can be specified
-either with a string, or using the helper function <tt class="docutils literal">cst.sord.get_slices()</tt>.
-Empty brackets <tt class="docutils literal">[]</tt> are shorthand for the entire array. Here are some
-examples:</p>
-<pre class="literal-block">
-s_ = cst.sord.get_slices()
+<p>This illustrates the simplest way to run SORD, that is to execute the <code>sord</code> command giving a parameter file in <a href="http://www.yaml.org">YAML</a> or <a href="http://www.json.org">JSON</a> format. The parameter file for this example is as follows:</p>
+<h4 id="python-scripting">Python Scripting</h4>
+<p>A more powerful way to run the code is with a Python script. The basic procedure is to import the <code>cst</code> module, create a dictionary of parameters, and pass that dictionary to the <code>cst.sord.run()</code> function. Parameters are either job-control or simulation parameters. Defaults for these two types of parameters are given in <a href="../cst/conf/default.yaml">cst/conf/default.yaml</a> and <a href="../cst/sord/parameters.yaml">cst/sord/parameters.yaml</a>, respectively. Machine specific job-control parameters may also be present in the <code>cst/conf</code> directory that supersede the defaults.</p>
+<p>It maybe be helpful to look through example applications in the <code>Scripts</code> directory, and return to this document for further description of the simulation parameters.</p>
+<h4 id="field-io">Field I/O</h4>
+<p>[Note about a change from previous versions: The <code>fieldio</code> parameter has been removed, and instead each field I/O parameter is a separate list.]</p>
+<p>Multi-dimensional field arrays may be accessed for input and out through a list of operations that includes reading from and writing to disk, as well as assigning to scalar values or time-dependent functions. In the quick test above, <code>rho</code>, <code>vp</code>, <code>vs</code>, <code>v1</code>, and <code>v2</code> are examples of 3- and 4-D fields. The full list of available fields is given in <a href="../cst/sord/fieldnames.yaml">cst/sord/fieldnames.yaml</a>.</p>
+<p>Field variables are categorized in four ways: (1) static vs. dynamic, (2) settable vs. output only, (3) node vs. cell registration, and (4) volume vs. fault surface. For example, density <code>rho</code> is a static, settable, cell, volume variable. Slip path length <code>sl</code> is a dynamic, output, node, fault variable.</p>
+<p>Field operations may specify a slice, indicating a subregion of the array, using Python slicing notation. Indices are 0-based. Slices can be specified either with a string, or using the helper function <code>cst.sord.get_slices()</code>. Empty brackets <code>[]</code> are shorthand for the entire array. Here are some examples:</p>
+<pre><code>s_ = cst.sord.get_slices()
 j = 10
 k = 20
-'[]'           # Entire 4D volume
-'[10,20,1,:]'  # Single cell, full time history
-'[:,:,:,-1]'   # Full 3D volume, last time step
+&#39;[]&#39;           # Entire 4D volume
+&#39;[10,20,1,:]&#39;  # Single cell, full time history
+&#39;[:,:,:,-1]&#39;   # Full 3D volume, last time step
 s_[j,k,1,-1]   # Single node, last time step
-s_[j,:,:,::10] # j=10 node surface, every 10th time step
-</pre>
+s_[j,:,:,::10] # j=10 node surface, every 10th time step</code></pre>
 <p>FIXME: this section is unfinished.:</p>
-<pre class="literal-block">
-f = val                         # Set f to value
-f = ([], '=', val)              # Set f slice to value
-f = ([], '+', val)              # Add value to f slice
-f = ([], '=', 'rand', val)      # Random numbers in range (0, val)
-f = ([], '=', 'func', val, tau) # Time function with period tau, scaled by val
-f = ([], '&lt;=', 'filename')      # Read filename into f
-f = ([], '=&gt;', 'filename')      # Write f into filename
-</pre>
-<p>A dot (<tt class="docutils literal">.</tt>) indicates sub-cell positioning via weighted averaging.  In this
-case the spatial indices are single logical coordinates that may vary
-continuously over the range.  The fractional part of the index determines the
-weights.  For example, an index of 3.2 to the 1D variable f would specify the
-weighted average: 0.8 * f(3) + 0.2 * f(4).</p>
-<p>Reading and writing to disk uses flat binary files where j is the fastest
-changing index, and t is the slowest changing index.  Mode 'R' extrapolates any
-singleton dimensions to fill the entire array.  This is useful for reading 1D
-or 2D models into 3D simulations, obviating the need to store (possibly very
-large) 3D material and mesh coordinate files.</p>
-<p>For a list of available time functions, see the <tt class="docutils literal">time_function</tt> subroutine in
-<a class="reference external" href="../cst/sord/src/util.f90">util.f90</a>.  The routine can be easily modified to
-add new time functions.  Time functions can be offset in time with the <tt class="docutils literal">tm0</tt>
-initial time parameter.</p>
-</div>
-<div class="section" id="boundary-conditions">
-<h4>Boundary Conditions</h4>
-<p>Boundary conditions for the six faces of the model domain are specified by the
-parameters <tt class="docutils literal">bc1</tt> (near-size, x, y, and z faces) and <tt class="docutils literal">bc2</tt> (far-side, x, y,
-and x faces).  The symmetry boundary conditions can be used to reduce
-computations for problems where they are applicable.  These are not used for
-specifying internal slip boundaries. However, for problems with symmetry across
-a slip surface, the fault may be placed at the boundary and combined with an
-anti-mirror symmetry condition.  The following BC types are supported:</p>
-<p><strong>'free'</strong>: Vacuum free-surface.  Stress is zero in cells outside the boundary.</p>
+<pre><code>f = val                         # Set f to value
+f = ([], &#39;=&#39;, val)              # Set f slice to value
+f = ([], &#39;+&#39;, val)              # Add value to f slice
+f = ([], &#39;=&#39;, &#39;rand&#39;, val)      # Random numbers in range (0, val)
+f = ([], &#39;=&#39;, &#39;func&#39;, val, tau) # Time function with period tau, scaled by val
+f = ([], &#39;&lt;=&#39;, &#39;filename&#39;)      # Read filename into f
+f = ([], &#39;=&gt;&#39;, &#39;filename&#39;)      # Write f into filename</code></pre>
+<p>A dot (<code>.</code>) indicates sub-cell positioning via weighted averaging. In this case the spatial indices are single logical coordinates that may vary continuously over the range. The fractional part of the index determines the weights. For example, an index of 3.2 to the 1D variable f would specify the weighted average: 0.8 * f(3) + 0.2 * f(4).</p>
+<p>Reading and writing to disk uses flat binary files where j is the fastest changing index, and t is the slowest changing index. Mode ‘R’ extrapolates any singleton dimensions to fill the entire array. This is useful for reading 1D or 2D models into 3D simulations, obviating the need to store (possibly very large) 3D material and mesh coordinate files.</p>
+<p>For a list of available time functions, see the <code>time_function</code> subroutine in <a href="../cst/sord/src/util.f90">util.f90</a>. The routine can be easily modified to add new time functions. Time functions can be offset in time with the <code>tm0</code> initial time parameter.</p>
+<h4 id="boundary-conditions">Boundary Conditions</h4>
+<p>Boundary conditions for the six faces of the model domain are specified by the parameters <code>bc1</code> (near-size, x, y, and z faces) and <code>bc2</code> (far-side, x, y, and x faces). The symmetry boundary conditions can be used to reduce computations for problems where they are applicable. These are not used for specifying internal slip boundaries. However, for problems with symmetry across a slip surface, the fault may be placed at the boundary and combined with an anti-mirror symmetry condition. The following BC types are supported:</p>
+<p><strong>‘free’</strong>: Vacuum free-surface. Stress is zero in cells outside the boundary.</p>
 <blockquote>
-<img alt="../figures/SORD-BC0.png" src="../figures/SORD-BC0.png" />
+<figure>
+<img src="../figures/SORD-BC0.png" />
+</figure>
 </blockquote>
-<p><strong>'rigid'</strong>: Rigid surface. Displacement is zero at the boundary.</p>
+<p><strong>‘rigid’</strong>: Rigid surface. Displacement is zero at the boundary.</p>
 <blockquote>
-<img alt="../figures/SORD-BC3.png" src="../figures/SORD-BC3.png" />
+<figure>
+<img src="../figures/SORD-BC3.png" />
+</figure>
 </blockquote>
-<p><strong>'+node'</strong>: Mirror symmetry at the node.  Normal displacement is zero at the
-boundary.  Useful for a boundary corresponding to (a) the plane orthogonal to
-the two nodal planes of a double-couple point source, (b) the plane normal to
-the mode-III axis of a symmetric rupture, or (c) the zero-width axis of a 2D
-plane strain problem.</p>
+<p><strong>‘+node’</strong>: Mirror symmetry at the node. Normal displacement is zero at the boundary. Useful for a boundary corresponding to (a) the plane orthogonal to the two nodal planes of a double-couple point source, (b) the plane normal to the mode-III axis of a symmetric rupture, or (c) the zero-width axis of a 2D plane strain problem.</p>
 <blockquote>
-<img alt="../figures/SORD-BC1.png" src="../figures/SORD-BC1.png" />
+<figure>
+<img src="../figures/SORD-BC1.png" />
+</figure>
 </blockquote>
-<p><strong>'-node'</strong>: Anti-mirror symmetry at the node.  Tangential displacement is
-zero at the boundary.  Useful for a boundary corresponding to (a) the nodal
-planes of a double-couple point source, (b) the plane normal to the mode-II
-axis of a symmetric rupture, or (c) the zero-width axis of a 2D antiplane
-strain problem.</p>
+<p><strong>‘-node’</strong>: Anti-mirror symmetry at the node. Tangential displacement is zero at the boundary. Useful for a boundary corresponding to (a) the nodal planes of a double-couple point source, (b) the plane normal to the mode-II axis of a symmetric rupture, or (c) the zero-width axis of a 2D antiplane strain problem.</p>
 <blockquote>
-<img alt="../figures/SORD-BC-1.png" src="../figures/SORD-BC-1.png" />
+<figure>
+<img src="../figures/SORD-BC-1.png" />
+</figure>
 </blockquote>
-<p><strong>'+cell'</strong>: Mirror symmetry at the cell. Same as type 1, but centered on the cell.</p>
+<p><strong>‘+cell’</strong>: Mirror symmetry at the cell. Same as type 1, but centered on the cell.</p>
 <blockquote>
-<img alt="../figures/SORD-BC2.png" src="../figures/SORD-BC2.png" />
+<figure>
+<img src="../figures/SORD-BC2.png" />
+</figure>
 </blockquote>
-<p><strong>'-cell'</strong>: Anti-mirror symmetry at the cell.  Same as type -1, but centered
-on the cell.  Can additionally be used when the boundary corresponds to the
-slip surface of a symmetric rupture.</p>
+<p><strong>‘-cell’</strong>: Anti-mirror symmetry at the cell. Same as type -1, but centered on the cell. Can additionally be used when the boundary corresponds to the slip surface of a symmetric rupture.</p>
 <blockquote>
-<img alt="../figures/SORD-BC-2.png" src="../figures/SORD-BC-2.png" />
+<figure>
+<img src="../figures/SORD-BC-2.png" />
+</figure>
 </blockquote>
-<p><strong>'pml'</strong>: Perfectly match layer (PML) absorbing boundary.</p>
-<p>Example: a 3D problem with a free surface at Z=0, and PML absorbing boundaries
-on all other boundary faces:</p>
-<pre class="literal-block">
-shape = [50, 50, 50, 100]
-bc1 = ['pml', 'pml', 'free']
-bc2 = ['pml', 'pml', 'pml']
-</pre>
-<p>Example: a 2D antiplane strain problem with PML absorbing boundaries.  The
-number of nodes is 2 for the zero-width axis:</p>
-<pre class="literal-block">
-shape = [50, 50, 2, 100]
-bc1 = ['pml', 'pml', '-node']
-bc2 = ['pml', 'pml', '-node']
-</pre>
-</div>
-<div class="section" id="defining-the-fault-rupture-surface">
-<h4>Defining the fault rupture surface</h4>
-<p>Fault rupture always follows a surface of the (possibly non-planar) logical
-mesh.  The orientation of the fault plane is defined by the <tt class="docutils literal">faultnormal</tt>
-parameter.  This can be either 1, 2, or 3 corresponding to surfaces normal to
-the j, k, or l logical mesh directions. Any other value (typically 0) disables
-rupture altogether. The location of the rupture plane with in the mesh is
-determined by the <tt class="docutils literal">ihypo</tt> parameter, which has a dual purpose of also
-defining the nucleation point. So, the indices of the collocated fault double
-nodes are given by <tt class="docutils literal">int(ihypo[faultnormal])</tt>, and <tt class="docutils literal">int(ihypo[faultnormal]) +
-1</tt>. For example, a 3D problem of dimensions 200.0 x 200.0 x 200.0, with a
-fault plane located at z = 100.0, and double nodes at l = (21, 22), may be set
-up as such:</p>
-<pre class="literal-block">
-delta = [5.0, 5.0, 5.0, 0.1]
+<p><strong>‘pml’</strong>: Perfectly match layer (PML) absorbing boundary.</p>
+<p>Example: a 3D problem with a free surface at Z=0, and PML absorbing boundaries on all other boundary faces:</p>
+<pre><code>shape = [50, 50, 50, 100]
+bc1 = [&#39;pml&#39;, &#39;pml&#39;, &#39;free&#39;]
+bc2 = [&#39;pml&#39;, &#39;pml&#39;, &#39;pml&#39;]</code></pre>
+<p>Example: a 2D antiplane strain problem with PML absorbing boundaries. The number of nodes is 2 for the zero-width axis:</p>
+<pre><code>shape = [50, 50, 2, 100]
+bc1 = [&#39;pml&#39;, &#39;pml&#39;, &#39;-node&#39;]
+bc2 = [&#39;pml&#39;, &#39;pml&#39;, &#39;-node&#39;]</code></pre>
+<h4 id="defining-the-fault-rupture-surface">Defining the fault rupture surface</h4>
+<p>Fault rupture always follows a surface of the (possibly non-planar) logical mesh. The orientation of the fault plane is defined by the <code>faultnormal</code> parameter. This can be either 1, 2, or 3 corresponding to surfaces normal to the j, k, or l logical mesh directions. Any other value (typically 0) disables rupture altogether. The location of the rupture plane with in the mesh is determined by the <code>ihypo</code> parameter, which has a dual purpose of also defining the nucleation point. So, the indices of the collocated fault double nodes are given by <code>int(ihypo[faultnormal])</code>, and <code>int(ihypo[faultnormal]) + 1</code>. For example, a 3D problem of dimensions 200.0 x 200.0 x 200.0, with a fault plane located at z = 100.0, and double nodes at l = (21, 22), may be set up as such:</p>
+<pre><code>delta = [5.0, 5.0, 5.0, 0.1]
 faultnormal = 3
 shape = [41, 41, 42, 100]
 hypocenter = [20.0, 20.0, 20.5]
-bc1 = ['free', 'free', 'free']
-bc2 = ['free', 'free', 'free']
-</pre>
-<p>For problems with symmetry across the rupture surface (where mesh and material
-properties are mirror images), the symmetry may be exploited for computational
-savings by using an appropriate boundary condition and solving the elastic
-equations for only one side of the fault.  In this case, the fault double nodes
-must lie at the model boundary, and the and the cell-centered anti-mirror
-symmetry condition used.  For example, reducing the size of the previous
-example to put the rupture surface along the far z boundary:</p>
-<pre class="literal-block">
-shape = [41, 41, 22, 100]
+bc1 = [&#39;free&#39;, &#39;free&#39;, &#39;free&#39;]
+bc2 = [&#39;free&#39;, &#39;free&#39;, &#39;free&#39;]</code></pre>
+<p>For problems with symmetry across the rupture surface (where mesh and material properties are mirror images), the symmetry may be exploited for computational savings by using an appropriate boundary condition and solving the elastic equations for only one side of the fault. In this case, the fault double nodes must lie at the model boundary, and the and the cell-centered anti-mirror symmetry condition used. For example, reducing the size of the previous example to put the rupture surface along the far z boundary:</p>
+<pre><code>shape = [41, 41, 22, 100]
 hypocenter = [20.0, 20.0, 20.5]
-bc1 = ['free', 'free', 'free']
-bc2 = ['free', 'free', '-cell']
-</pre>
+bc1 = [&#39;free&#39;, &#39;free&#39;, &#39;free&#39;]
+bc2 = [&#39;free&#39;, &#39;free&#39;, &#39;-cell&#39;]</code></pre>
 <p>Alternatively, put the rupture surface along the near z boundary:</p>
-<pre class="literal-block">
-shape = [41, 41, 22, 100]
+<pre><code>shape = [41, 41, 22, 100]
 hypocenter = [20.0, 20.0, 1.5]
-bc1 = ['free', 'free', '-cell']
-bc2 = ['free', 'free', 'free']
-</pre>
-<p>Further symmetries may present. If our previous problem has slip only in the
-x direction, then we may also use node-centered mirror symmetry along the in-plane
-axis, and node-centered anti-mirror symmetry along the anti-plane axis, to reduce
-computations eight-fold:</p>
-<pre class="literal-block">
-shape = [21, 21, 22, 100]
+bc1 = [&#39;free&#39;, &#39;free&#39;, &#39;-cell&#39;]
+bc2 = [&#39;free&#39;, &#39;free&#39;, &#39;free&#39;]</code></pre>
+<p>Further symmetries may present. If our previous problem has slip only in the x direction, then we may also use node-centered mirror symmetry along the in-plane axis, and node-centered anti-mirror symmetry along the anti-plane axis, to reduce computations eight-fold:</p>
+<pre><code>shape = [21, 21, 22, 100]
 hypocenter = [20.0, 20.0, 20.5]
-bc1 = ['free', 'free', 'free']
-bc2 = ['anti-n', 'mirror-n', 'anti-c'
-</pre>
-</div>
-</div>
-<div class="section" id="memory-usage-and-scaling">
-<h3>Memory Usage and Scaling</h3>
-<p>For rectilinear meshes, 23 single precision (four-byte) memory variables are
-required per mesh point.  Curvilinear meshes have two options with a trade-off
-in memory usage vs. floating-point operations.  Stored operators require 44
-variables per mesh point and give the best performance, while on-the-fly
-operators require 23 variables per mesh point at the cost of a factor of four
-increase in floating point operations.  As CPU improvement tends to out-pace
-memory bandwidth improvement, in the future, on-the-fly operators may become
-faster than stored operators.  The operator type is controlled by the
-<tt class="docutils literal">diffop</tt> parameter, but can generally be left alone, as the default is to
-automatically detect rectilinear and curvilinear meshes and assign the proper
-operator type for fastest performance. The allowed values are:</p>
+bc1 = [&#39;free&#39;, &#39;free&#39;, &#39;free&#39;]
+bc2 = [&#39;anti-n&#39;, &#39;mirror-n&#39;, &#39;anti-c&#39;</code></pre>
+<h3 id="memory-usage-and-scaling">Memory Usage and Scaling</h3>
+<p>For rectilinear meshes, 23 single precision (four-byte) memory variables are required per mesh point. Curvilinear meshes have two options with a trade-off in memory usage vs. floating-point operations. Stored operators require 44 variables per mesh point and give the best performance, while on-the-fly operators require 23 variables per mesh point at the cost of a factor of four increase in floating point operations. As CPU improvement tends to out-pace memory bandwidth improvement, in the future, on-the-fly operators may become faster than stored operators. The operator type is controlled by the <code>diffop</code> parameter, but can generally be left alone, as the default is to automatically detect rectilinear and curvilinear meshes and assign the proper operator type for fastest performance. The allowed values are:</p>
 <blockquote>
-<div class="line-block">
-<div class="line"><strong>'cons'</strong>: Mesh with constant mesh step size</div>
-<div class="line"><strong>'rect'</strong>: Rectangular mesh</div>
-<div class="line"><strong>'para'</strong>: Parallelepiped mesh</div>
-<div class="line"><strong>'quad'</strong>: One-point quadrature</div>
-<div class="line"><strong>'exac'</strong>: Exactly integrated elements</div>
-<div class="line"><strong>'save'</strong>: Saved operators, nearly as fast as 'rect', but doubles the memory usage</div>
-<div class="line"><strong>'auto'</strong>: Automatically choose 'rect' or 'save'</div>
-</div>
+<p><strong>‘cons’</strong>: Mesh with constant mesh step size<br /><strong>‘rect’</strong>: Rectangular mesh<br /><strong>‘para’</strong>: Parallelepiped mesh<br /><strong>‘quad’</strong>: One-point quadrature<br /><strong>‘exac’</strong>: Exactly integrated elements<br /><strong>‘save’</strong>: Saved operators, nearly as fast as ‘rect’, but doubles the memory usage<br /><strong>‘auto’</strong>: Automatically choose ‘rect’ or ‘save’</p>
 </blockquote>
-<p>On current hardware, computation time is on the order of the one second per
-time step per one million mesh points.  SORD scalability has been benchmarked
-up to 64 thousand processors at ALCF.  The following chart
-is the wall-time per step per core (click for PDF):</p>
-<a class="reference external image-reference" href="../figures/SORD-MPI-Benchmark.pdf"><img alt="../figures/SORD-MPI-Benchmark.png" src="../figures/SORD-MPI-Benchmark.png" /></a>
-</div>
+<p>On current hardware, computation time is on the order of the one second per time step per one million mesh points. SORD scalability has been benchmarked up to 64 thousand processors at ALCF. The following chart is the wall-time per step per core (click for PDF):</p>
+<p><a href="../figures/SORD-MPI-Benchmark.pdf"><img src="../figures/SORD-MPI-Benchmark.png" /></a></p>
 </div>
 </body>
 </html>

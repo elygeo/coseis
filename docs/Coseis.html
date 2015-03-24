@@ -1,264 +1,62 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.12: http://docutils.sourceforge.net/" />
-<title>Coseis</title>
-<style type="text/css">
-
-body {
-    max-width: 760px;
-    padding: 0px;
-    margin: 0px auto;
-    background-color: #eee;
-    color: #000;
-    font-family: 'Lucida Grande', Geneva, Verdana, sans-serif;
-    position: relative;
-    line-height: 140%;
-}
-
-div.document {
-    background-color: #fff;
-    padding: 0px 60px;
-    border: 1px solid #ccc;
-}
-
-img {
-    border: none;
-    margin: 10px 0px;
-}
-
-img.plot {
-    margin: 0px -30px;
-}
-
-img.align-left, .figure.align-left {
-    clear: left;
-    float: left;
-    margin-right: 1em
-}
-
-img.align-right, .figure.align-right {
-    clear: right;
-    float: right;
-    margin-left: 1em
-}
-
-img.align-center, .figure.align-center {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-hr {
-    border: none;
-    border-top: 2px solid #ccc;
-}
-
-pre {
-    padding: 10px;
-    border: 1px solid #ccc;
-    background-color: #eee;
-    line-height: 100%;
-}
-
-a {
-    color: #06a;
-    text-decoration: none;
-}
-
-a:hover, a:active {
-    text-decoration: underline;
-}
-
-.section li {
-    padding: 5px;
-}
-
-h1, h1 a, h1 a:hover, h1 a:active {
-    color: #900;
-    text-decoration: none;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-h2.subtitle {
-    font-size: large;
-    font-weight: normal;
-    margin-top: 5px;
-}
-
-h3 {
-    border-top: 2px solid #ccc;
-    padding-top: 10px;
-}
-
-form.search {
-    margin-left: 30px;
-}
-
-ul.navbar {
-    list-style-type: none;
-    padding: 0px;
-}
-
-.navbar li {
-    display: inline;
-}
-
-.navbar a {
-    background-color: #eee;
-    border: 1px solid #ccc;
-    padding: 5px 10px;
-    text-decoration: none;
-}
-
-.navbar a:hover, a:active {
-    background-color: #ccc;
-}
-
-div.box {
-    border: 1px solid #aaa;
-    margin: 30px 0px;
-}
-
-div.box form, div.box p, div.box ul, div.box h4 {
-    margin: 15px 30px;
-}
-
-div.box h3 {
-    background-color: #ccc;
-    padding: 4px 30px;
-    margin: 0px;
-    margin-bottom: 15px;
-    font-size: medium;
-}
-
-p.topic-title {
-    font-size: large;
-    font-weight: bold;
-}
-
-p.warning {
-    padding: 10px;
-    border: 1px solid #ccc;
-    background-color: #ffd;
-}
-
-table {
-    width:100%;
-    border-collapse: collapse;
-    border: 1px solid #aaa;
-    margin: 30px 0px;
-}
-
-th {
-    padding: 4px 30px;
-    background-color: #ccc;
-    border: none;
-    text-align: left;
-}
-
-td {
-    padding: 4px 30px;
-    border: none;
-    border-top: 1px solid #eee;
-}
-
-
-</style>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="document" id="coseis">
-<h1 class="title">Coseis</h1>
-<h2 class="subtitle" id="computational-seismology-tools">Computational Seismology Tools</h2>
-
-<ul class="navbar simple">
-<li><a class="reference internal" href="#install">Install</a></li>
-<li><a class="reference internal" href="#examples">Examples</a></li>
-<li><a class="reference external" href="sord.html">SORD</a></li>
-<li><a class="reference external" href="http://scec.usc.edu/websims">WebSims</a></li>
-<li><a class="reference external" href="https://github.com/gely/coseis/">Source Code</a></li>
+<div class="document">
+<h1 id="coseis">Coseis</h1>
+<h2 id="computational-seismology-tools">Computational Seismology Tools</h2>
+<p><nav></p>
+<ul>
+<li><a href="#install">Install</a></li>
+<li><a href="#examples">Examples</a></li>
+<li><a href="Sord.html">SORD</a></li>
+<li><a href="https://github.com/gely/coseis/">Code</a></li>
 </ul>
-<div class="section" id="summary">
-<h3>Summary</h3>
+<p></nav></p>
+<h3 id="summary">Summary</h3>
 <p>Coseis is an open-source toolkit for earthquake simulation featuring:</p>
-<ul class="simple">
-<li>The Support Operator Rupture Dynamics (<a class="reference external" href="sord.html">SORD</a>) code for modeling spontaneous
-rupture and 3D wave propagation.</li>
-<li>SCEC Community Velocity Models (CVM) codes, with MPI parallelization for
-<a class="reference external" href="http://www.data.scec.org/3Dvelocity/">Magistrale version</a> (CVM-S), and new <a class="reference external" href="http://earth.usc.edu/~gely/vs30gtl/">geotechnical layer
-implementation</a> for the <a class="reference external" href="http://structure.harvard.edu/cvm-h/">Harvard version</a> (CVM-H).</li>
-<li><a class="reference external" href="http://scec.usc.edu/websims">WebSims</a> web application for cataloging, exploring, and disseminating large
-numerical simulations data sets.</li>
-<li>Utilities for mesh generation, coordinate projection, and visualization.</li>
+<ul>
+<li><p>The Support Operator Rupture Dynamics (SORD) code for modeling spontaneous rupture and 3D wave propagation.</p></li>
+<li><p>SCEC Community Velocity Models (CVM) codes, with MPI parallelization for <a href="http://www.data.scec.org/3Dvelocity/">Magistrale version</a> (CVM-S), and new <a href="http://earth.usc.edu/~gely/vs30gtl/">geotechnical layer implementation</a> for the <a href="http://structure.harvard.edu/cvm-h/">Harvard version</a> (CVM-H).</p></li>
+<li><p>Utilities for mesh generation, coordinate projection, and visualization.</p></li>
 </ul>
-<p>The primary interface is through a Python module which (for high-performance
-components) wraps Fortran parallelized with hybrid OpenMP and MPI.</p>
-<p>Coseis is written by <a class="reference external" href="http://www.alcf.anl.gov/~gely/">Geoffrey Ely</a> with contributions from Steven Day,
-Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou.  It is licensed under
-<a class="reference external" href="http://opensource.org/licenses/BSD-2-Clause">BSD</a> terms.</p>
-<p class="warning"><strong>WARNING</strong>: Coseis is a research code under active development.  Changes
-are frequent and it has known bugs!</p>
-</div>
-<div class="section" id="install">
-<h3>Install</h3>
-<ol class="arabic">
-<li><p class="first">If on Mac OS X, first install <a class="reference external" href="http://itunes.apple.com/us/app/xcode/id497799835">Xcode</a> from the App Store. From the Xcode
-preferences pane, install the Command Line Tools. Then install <a class="reference external" href="http://mxcl.github.com/homebrew/">Homebrew</a>,
-followed by <a class="reference external" href="http://git-scm.com/">Git</a> and <a class="reference external" href="http://r.research.att.com/tools/">Fortran</a> with:</p>
-<pre class="literal-block">
-brew install git gfortran
-</pre>
-<p>OpenMP is broken in GCC 4.3 on Lion, so if you need multiprocessing speed-up,
-install either <a class="reference external" href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH</a> or a newer <a class="reference external" href="http://gcc.gnu.org/">GCC</a> version.  Optionally, install and <a class="reference external" href="http://www.enthought.com/products/epddownload.php">EPD</a>
-for visualization and analysis.</p>
-</li>
-<li><p class="first">Clone the source code from the <a class="reference external" href="http://github.com/gely/coseis">Coseis GitHub repository</a>:</p>
-<pre class="literal-block">
-git clone git://github.com/gely/coseis.git
-</pre>
-</li>
-<li><p class="first">Set path variables for the Python module and executables. For bash shell,
-with the code located in your home directory (for example) add these lines to
-<tt class="docutils literal">.bash_profile</tt>:</p>
-<pre class="literal-block">
-export PYTHONPATH=&quot;$HOME/coseis&quot;
-export PATH=&quot;$PATH:$HOME/coseis/bin&quot;
-</pre>
-</li>
-<li><p class="first">Run the <tt class="docutils literal">setup.py</tt> script to test your configuration. This will display
-all of the configuration parameters:</p>
-<pre class="literal-block">
-python setup.py
-</pre>
-</li>
-<li><p class="first">These parameters may be customized by creating a file <tt class="docutils literal">cst/conf/site.py</tt>.
-For example, the account for billing of service units, and email address for
-notifications may be specified in <tt class="docutils literal">site.py</tt> module with:</p>
-<pre class="literal-block">
-account = 'your_project_name_here'
-email = 'your.email&#64;address.here'
-</pre>
-</li>
+<p>The primary interface is through a Python module which (for high-performance components) wraps Fortran parallelized with hybrid OpenMP and MPI.</p>
+<p>Coseis is written by <a href="http://earth.usc.edu/~gely/">Geoffrey Ely</a> with contributions from Steven Day, Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou. It is licensed under <a href="http://opensource.org/licenses/BSD-2-Clause">BSD</a> terms.</p>
+<p><strong>WARNING</strong>: Coseis is a research code under active development. Changes are frequent and it has known bugs!</p>
+<h3 id="install">Install</h3>
+<ol type="1">
+<li><p>If on Mac OS X, first install <a href="http://itunes.apple.com/us/app/xcode/id497799835">Xcode</a> from the App Store. From the Xcode preferences pane, install the Command Line Tools. Then install <a href="http://mxcl.github.com/homebrew/">Homebrew</a>, followed by <a href="http://git-scm.com/">Git</a> and <a href="http://r.research.att.com/tools/">Fortran</a> with::</p>
+<pre><code>brew install git gfortran</code></pre>
+<p>OpenMP is broken in GCC 4.3 on Lion, so if you need multiprocessing speed-up, install either <a href="http://www.mcs.anl.gov/research/projects/mpich2/">MPICH</a> or a newer <a href="http://gcc.gnu.org/">GCC</a> version. Optionally, install and <a href="https://store.continuum.io/cshop/anaconda/">Anaconda</a> for visualization and analysis.</p></li>
+<li><p>Clone the source code from the [Coseis GitHub repository] (http://github.com/gely/coseis):</p>
+<pre><code>git clone git://github.com/gely/coseis.git</code></pre></li>
+<li><p>Set path variables for the Python module and executables. For bash shell, with the code located in your home directory (for example) add these lines to</p>
+<pre><code>export PYTHONPATH=&quot;$HOME/coseis&quot;
+export PATH=&quot;$PATH:$HOME/coseis/bin&quot;</code></pre></li>
+<li><p>Run the <code>setup.py</code> script to test your configuration. This will display all of the configuration parameters::</p>
+<pre><code>python setup.py</code></pre></li>
+<li><p>These parameters may be customized by creating a file <code>cst/conf/site.py</code>. For example, the account for billing of service units, and email address for notifications may be specified in <code>site.py</code> module with::</p>
+<pre><code>account = &#39;your_project_name_here&#39;
+email = &#39;your.email@address.here&#39;</code></pre></li>
 </ol>
-</div>
-<div class="section" id="testing">
-<h3>Testing</h3>
-<p>To run the test suite interactively:</p>
-<pre class="literal-block">
-cd cst/tests
-python test_runner.py --run=exec
-</pre>
-<p>Or, submit a job for batch processing:</p>
-<pre class="literal-block">
-python test_runner.py --run=submit
-</pre>
-<p>After completion, a report is printed to the screen (or saved in
-run/test_suite/test_suite.output):</p>
-<pre class="literal-block">
-PASSED: doctest.testmod(cst.util)
+<h3 id="testing">Testing</h3>
+<p>To run the test suite interactively::</p>
+<pre><code>cd cst/tests
+python test_runner.py --run=exec</code></pre>
+<p>Or, submit a job for batch processing::</p>
+<pre><code>python test_runner.py --run=submit</code></pre>
+<p>After completion, a report is printed to the screen (or saved in <code>run/test_suite/test_suite.output</code>)::</p>
+<pre><code>PASSED: doctest.testmod(cst.util)
 PASSED: doctest.testmod(cst.coord)
 PASSED: doctest.testmod(cst.sord)
 PASSED: cst.tests.syntax.test()
@@ -266,52 +64,30 @@ PASSED: cst.tests.configure.test()
 PASSED: cst.tests.hello_mpi.test()
 PASSED: cst.tests.point_source.test()
 PASSED: cst.tests.pml_boundary.test()
-PASSED: cst.tests.kostrov.test()
-</pre>
-</div>
-<div class="section" id="examples">
-<h3>Examples</h3>
-<div class="section" id="cvm-depth-plane">
-<h4>CVM depth plane</h4>
-<img alt="../figures/CVM-Depth-Plane-Vs-S.png" src="../figures/CVM-Depth-Plane-Vs-S.png" />
-<img alt="../figures/CVM-Depth-Plane-Vs-H.png" src="../figures/CVM-Depth-Plane-Vs-H.png" />
-<p>Extract S-wave velocity at 500 meters depth. Plot using Matplotlib:</p>
-<pre class="literal-block">
-cd Scripts
-python CVM-Depth-Plane.py
-</pre>
-<p>Source code:
-<a class="reference external" href="../Scripts/CVM-Depth-Plane.py">CVM-Depth-Plane.py</a></p>
-</div>
-<div class="section" id="cvm-s-fence-diagram">
-<h4>CVM-S fence diagram</h4>
-<img alt="../figures/CVM-Fence-Vp-S.png" src="../figures/CVM-Fence-Vp-S.png" />
-<p>Build a fence diagram similar to Magistrale (2000) figure 10. Plot using
-Mayavi:</p>
-<pre class="literal-block">
-python CVM-Fence.py
-</pre>
-<p>Source code:
-<a class="reference external" href="../Scripts/CVM-Fence.py">CVM-Fence.py</a></p>
-</div>
-<div class="section" id="cvm-s-basin-depth">
-<h4>CVM-S basin depth</h4>
-<img alt="../figures/CVM-Basins.png" src="../figures/CVM-Basins.png" />
-<p>Extract 3D mesh and search for the shallowest surface of Vs = 2.5 km/s.
-Plot over topography using Mayavi:</p>
-<pre class="literal-block">
-python Basins-Mesh.py
+PASSED: cst.tests.kostrov.test()</code></pre>
+<h3 id="examples">Examples</h3>
+<h4 id="cvm-depth-plane">CVM depth plane</h4>
+<p><img src="../figures/CVM-Depth-Plane-Vs-S.png" /> <img src="../figures/CVM-Depth-Plane-Vs-H.png" /></p>
+<p>Extract S-wave velocity at 500 meters depth. Plot using Matplotlib::</p>
+<pre><code>cd Scripts
+python CVM-Depth-Plane.py</code></pre>
+<p>Source code: <a href="../Scripts/CVM-Depth-Plane.py">CVM-Depth-Plane.py</a></p>
+<h4 id="cvm-s-fence-diagram">CVM-S fence diagram</h4>
+<figure>
+<img src="../figures/CVM-Fence-Vp-S.png" />
+</figure>
+<p>Build a fence diagram similar to Magistrale (2000) figure 10. Plot using Mayavi::</p>
+<pre><code>python CVM-Fence.py</code></pre>
+<p>Source code: <a href="../Scripts/CVM-Fence.py">CVM-Fence.py</a></p>
+<h4 id="cvm-s-basin-depth">CVM-S basin depth</h4>
+<figure>
+<img src="../figures/CVM-Basins.png" />
+</figure>
+<p>Extract 3D mesh and search for the shallowest surface of Vs = 2.5 km/s. Plot over topography using Mayavi::</p>
+<pre><code>python Basins-Mesh.py
 python Basins-Search.py
-python Basins-Viz.py
-</pre>
-<p>Source code:</p>
-<div class="line-block">
-<div class="line"><a class="reference external" href="../Scripts/CVM-Basins-Mesh.py">CVM-Basins-Mesh.py</a></div>
-<div class="line"><a class="reference external" href="../Scripts/CVM-Basins-Search.py">CVM-Basins-Search.py</a></div>
-<div class="line"><a class="reference external" href="../Scripts/CVM-Basins-Viz.py">CVM-Basins-Viz.py</a></div>
-</div>
-</div>
-</div>
+python Basins-Viz.py</code></pre>
+<p>Source code:<br /><a href="../Scripts/CVM-Basins-Mesh.py">CVM-Basins-Mesh.py</a><br /><a href="../Scripts/CVM-Basins-Search.py">CVM-Basins-Search.py</a><br /><a href="../Scripts/CVM-Basins-Viz.py">CVM-Basins-Viz.py</a></p>
 </div>
 </body>
 </html>

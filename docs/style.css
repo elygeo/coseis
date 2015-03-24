@@ -15,31 +15,13 @@ div.document {
     border: 1px solid #ccc;
 }
 
+figure {
+    margin: 0px;
+}
+
 img {
     border: none;
     margin: 10px 0px;
-}
-
-img.plot {
-    margin: 0px -30px;
-}
-
-img.align-left, .figure.align-left {
-    clear: left;
-    float: left;
-    margin-right: 1em
-}
-
-img.align-right, .figure.align-right {
-    clear: right;
-    float: right;
-    margin-left: 1em
-}
-
-img.align-center, .figure.align-center {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 hr {
@@ -74,7 +56,7 @@ h1, h1 a, h1 a:hover, h1 a:active {
     margin-bottom: 5px;
 }
 
-h2.subtitle {
+h2 {
     font-size: large;
     font-weight: normal;
     margin-top: 5px;
@@ -85,50 +67,24 @@ h3 {
     padding-top: 10px;
 }
 
-form.search {
-    margin-left: 30px;
-}
-
-ul.navbar {
+nav ul {
     list-style-type: none;
     padding: 0px;
 }
 
-.navbar li {
+nav li {
     display: inline;
 }
 
-.navbar a {
+nav a {
     background-color: #eee;
     border: 1px solid #ccc;
     padding: 5px 10px;
     text-decoration: none;
 }
 
-.navbar a:hover, a:active {
+nav a:hover, a:active {
     background-color: #ccc;
-}
-
-div.box {
-    border: 1px solid #aaa;
-    margin: 30px 0px;
-}
-
-div.box form, div.box p, div.box ul, div.box h4 {
-    margin: 15px 30px;
-}
-
-div.box h3 {
-    background-color: #ccc;
-    padding: 4px 30px;
-    margin: 0px;
-    margin-bottom: 15px;
-    font-size: medium;
-}
-
-p.topic-title {
-    font-size: large;
-    font-weight: bold;
 }
 
 p.warning {

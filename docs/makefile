@@ -1,11 +1,12 @@
 all: Coseis.html SORD.html
 
-%.html: %.rst style.css
-	rst2html.py \
-	--strict \
-	--no-toc-backlinks \
-	--cloak-email-addresses \
-	--initial-header-level=3 \
-	--stylesheet-path=style.css \
-	$< | sed 's|<col.*>||; s|</colgroup>||' > $@
+%.html: %.md style.css makefile
+	pandoc \
+	--smart \
+	--standalone \
+	--write=html5 \
+	--css=style.css \
+	--include-after-body=body-after.html \
+	--include-before-body=body-before.html \
+	$< -o $@
 

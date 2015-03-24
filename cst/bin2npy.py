@@ -20,6 +20,8 @@ def bin2npy(files=[], dtype=None, shape=None, shapes=None, delete=False):
             shape = meta['shape']
         if shapes == None and 'shapes' in meta:
             shapes = meta['shapes']
+    if dtype == None:
+        dtype = 'f'
     if shapes == None:
         shapes = {}
     if len(files) == 0:
