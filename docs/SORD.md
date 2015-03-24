@@ -10,7 +10,7 @@ Support Operator Rupture Dynamics
 - [Pubs](#publications)
 - [Docs](#user-guide)
 - [Performance](#memory-usage-and-scaling)
-- [Coseis](Coseis.html)
+- [Coseis](../README.html)
 - [Code](https://github.com/gely/coseis/tree/gh-pages/cst/sord)
 
 </nav>
@@ -68,7 +68,7 @@ earthquakes in southern California.
 Run a simple point source explosion test and plot a 2D slice of particle
 velocity:
 
-    cd Scripts
+    cd scripts
     make SORD-Example.mk
 
 Plotting requires Matplotlib, and the result should look like this:
@@ -93,7 +93,7 @@ Machine specific job-control parameters may also be present in the
 `cst/conf` directory that supersede the defaults.
 
 It maybe be helpful to look through example applications in the
-`Scripts` directory, and return to this document for further description
+`scripts` directory, and return to this document for further description
 of the simulation parameters.
 
 #### Field I/O

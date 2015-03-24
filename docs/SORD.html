@@ -10,6 +10,7 @@
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="docs/style.css">
 </head>
 <body>
 <div class="document">
@@ -21,7 +22,7 @@
 <li><a href="#publications">Pubs</a></li>
 <li><a href="#user-guide">Docs</a></li>
 <li><a href="#memory-usage-and-scaling">Performance</a></li>
-<li><a href="Coseis.html">Coseis</a></li>
+<li><a href="../README.html">Coseis</a></li>
 <li><a href="https://github.com/gely/coseis/tree/gh-pages/cst/sord">Code</a></li>
 </ul>
 <p></nav></p>
@@ -41,7 +42,7 @@
 <h3 id="user-guide">User Guide</h3>
 <h4 id="quick-test">Quick test</h4>
 <p>Run a simple point source explosion test and plot a 2D slice of particle velocity:</p>
-<pre><code>cd Scripts
+<pre><code>cd scripts
 make SORD-Example.mk</code></pre>
 <p>Plotting requires Matplotlib, and the result should look like this:</p>
 <blockquote>
@@ -52,7 +53,7 @@ make SORD-Example.mk</code></pre>
 <p>This illustrates the simplest way to run SORD, that is to execute the <code>sord</code> command giving a parameter file in <a href="http://www.yaml.org">YAML</a> or <a href="http://www.json.org">JSON</a> format. The parameter file for this example is as follows:</p>
 <h4 id="python-scripting">Python Scripting</h4>
 <p>A more powerful way to run the code is with a Python script. The basic procedure is to import the <code>cst</code> module, create a dictionary of parameters, and pass that dictionary to the <code>cst.sord.run()</code> function. Parameters are either job-control or simulation parameters. Defaults for these two types of parameters are given in <a href="../cst/conf/default.yaml">cst/conf/default.yaml</a> and <a href="../cst/sord/parameters.yaml">cst/sord/parameters.yaml</a>, respectively. Machine specific job-control parameters may also be present in the <code>cst/conf</code> directory that supersede the defaults.</p>
-<p>It maybe be helpful to look through example applications in the <code>Scripts</code> directory, and return to this document for further description of the simulation parameters.</p>
+<p>It maybe be helpful to look through example applications in the <code>scripts</code> directory, and return to this document for further description of the simulation parameters.</p>
 <h4 id="field-io">Field I/O</h4>
 <p>[Note about a change from previous versions: The <code>fieldio</code> parameter has been removed, and instead each field I/O parameter is a separate list.]</p>
 <p>Multi-dimensional field arrays may be accessed for input and out through a list of operations that includes reading from and writing to disk, as well as assigning to scalar values or time-dependent functions. In the quick test above, <code>rho</code>, <code>vp</code>, <code>vs</code>, <code>v1</code>, and <code>v2</code> are examples of 3- and 4-D fields. The full list of available fields is given in <a href="../cst/sord/fieldnames.yaml">cst/sord/fieldnames.yaml</a>.</p>

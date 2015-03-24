@@ -8,7 +8,7 @@ Computational Seismology Tools
 
 - [Install](#install)
 - [Examples](#examples)
-- [SORD](Sord.html)
+- [SORD](docs/Sord.html)
 - [Code](https://github.com/gely/coseis/)
 
 </nav>
@@ -116,30 +116,30 @@ After completion, a report is printed to the screen (or saved in
 
 #### CVM depth plane
 
-![](../figures/CVM-Depth-Plane-Vs-S.png)
-![](../figures/CVM-Depth-Plane-Vs-H.png)
+![](figures/CVM-Depth-Plane-Vs-S.png)
+![](figures/CVM-Depth-Plane-Vs-H.png)
 
 Extract S-wave velocity at 500 meters depth. Plot using Matplotlib::
 
-    cd Scripts
+    cd scripts
     python CVM-Depth-Plane.py
 
-Source code: [CVM-Depth-Plane.py](../Scripts/CVM-Depth-Plane.py)
+Source code: [CVM-Depth-Plane.py](scripts/CVM-Depth-Plane.py)
 
 #### CVM-S fence diagram
 
-![](../figures/CVM-Fence-Vp-S.png)
+![](figures/CVM-Fence-Vp-S.png)
 
 Build a fence diagram similar to Magistrale (2000) figure 10. Plot using
 Mayavi::
 
     python CVM-Fence.py
 
-Source code: [CVM-Fence.py](../Scripts/CVM-Fence.py)
+Source code: [CVM-Fence.py](scripts/CVM-Fence.py)
 
 #### CVM-S basin depth
 
-![](../figures/CVM-Basins.png)
+![](figures/CVM-Basins.png)
 
 Extract 3D mesh and search for the shallowest surface of Vs = 2.5 km/s.
 Plot over topography using Mayavi::
@@ -149,7 +149,7 @@ Plot over topography using Mayavi::
     python Basins-Viz.py
 
 Source code:  
-[CVM-Basins-Mesh.py](../Scripts/CVM-Basins-Mesh.py)  
-[CVM-Basins-Search.py](../Scripts/CVM-Basins-Search.py)  
-[CVM-Basins-Viz.py](../Scripts/CVM-Basins-Viz.py)  
+[CVM-Basins-Mesh.py](scripts/CVM-Basins-Mesh.py)  
+[CVM-Basins-Search.py](scripts/CVM-Basins-Search.py)  
+[CVM-Basins-Viz.py](scripts/CVM-Basins-Viz.py)  
 
