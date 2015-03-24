@@ -8,7 +8,7 @@ Support Operator Rupture Dynamics
 
 - [Summary](#summary)
 - [Pubs](#publications)
-- [Docs](#user-guide)
+- [Guide](#user-guide)
 - [Performance](#memory-usage-and-scaling)
 - [Coseis](index.html)
 - [Code](https://github.com/gely/coseis/tree/gh-pages/cst/sord)
