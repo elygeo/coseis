@@ -116,38 +116,29 @@ After completion, a report is printed to the screen (or saved in
 #### CVM depth plane
 
 ![](../figures/CVM-Slice-Vs-S.png)
+
 ![](../figures/CVM-Slice-Vs-H.png)
 
-Extract S-wave velocity at 500 meters depth. Plot using Matplotlib::
+Extract S-wave velocity at 500 meters depth. Plot using Matplotlib:
 
-    cd scripts
-    python CVM-Slice.py
-
-Source code: [CVM-Slice.py](../scripts/CVM-Slice.py)
+[CVM-Slice.py](../scripts/CVM-Slice.py)
 
 #### CVM-S fence diagram
 
 ![](../figures/CVM-Fence-Vp-S.png)
 
 Build a fence diagram similar to Magistrale (2000) figure 10. Plot using
-Mayavi::
+Mayavi
 
-    python CVM-Fence.py
-
-Source code: [CVM-Fence.py](../scripts/CVM-Fence.py)
+[CVM-Fence.py](../scripts/CVM-Fence.py)
 
 #### CVM-S basin depth
 
 ![](../figures/CVM-Basins.png)
 
-Extract 3D mesh and search for the shallowest surface of Vs = 2.5 km/s.
-Plot over topography using Mayavi::
+Extract 3D mesh and search for the shallowest surface of Vs = 2.5 km/s. Plot
+over topography using Mayavi.
 
-    python CVM-Basins-mesh.py
-    python CVM-Basins-search.py
-    python CVM-Basins-plot.py
-
-Source code:  
 [CVM-Basins-mesh.py](../scripts/CVM-Basins-mesh.py)  
 [CVM-Basins-search.py](../scripts/CVM-Basins-search.py)  
 [CVM-Basins-plot.py](../scripts/CVM-Basins-plot.py)  
