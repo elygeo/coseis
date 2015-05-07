@@ -10,11 +10,74 @@
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
   <link rel="stylesheet" href="style.css">
+  <style type="text/css">
+  body {
+    color: #000;
+    background: #fff;
+    font-size: 18px;
+    font-family: sans-serif;
+    margin: auto;
+    padding: 0px 20px;
+    max-width: 640px;
+    position: relative;
+  }
+  h1 {
+    color: #900;
+  }
+  h3#subtitle {
+    margin-top: -20px;
+  }
+  hr {
+    border: 1px solid #eee;
+    width: 1000%;
+    margin-left: -500%;
+  }
+  img {
+    border: none;
+    margin: 10px 0px;
+  }
+  pre {
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #eee;
+    line-height: 100%;
+  }
+  a {
+    color: #06a;
+    text-decoration: none;
+  }
+  a:hover, a:active {
+    text-decoration: underline;
+  }
+  figure {
+    margin: 0px;
+  }
+  nav ul {
+    list-style-type: none;
+    padding: 0px;
+  }
+  nav li {
+    display: inline;
+  }
+  nav a {
+    background-color: #eee;
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    text-decoration: none;
+  }
+  nav a:hover, a:active {
+    background-color: #ccc;
+  }
+  p.warning {
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #ffd;
+  }
+  </style>
 </head>
 <body>
-<div class="document">
 <h1 id="coseis">Coseis</h1>
-<h2 id="computational-seismology-tools">Computational Seismology Tools</h2>
+<h3 id="subtitle">Computational Seismology Tools</h3>
 <p><nav></p>
 <ul>
 <li><a href="#install">Install</a></li>
@@ -23,7 +86,7 @@
 <li><a href="https://github.com/gely/coseis/">Code</a></li>
 </ul>
 <p></nav></p>
-<h3 id="summary">Summary</h3>
+<h2 id="summary">Summary</h2>
 <p>Coseis is an open-source toolkit for earthquake simulation featuring:</p>
 <ul>
 <li><p>The Support Operator Rupture Dynamics (SORD) code for modeling spontaneous rupture and 3D wave propagation.</p></li>
@@ -33,7 +96,7 @@
 <p>The primary interface is through a Python module which (for high-performance components) wraps Fortran parallelized with hybrid OpenMP and MPI.</p>
 <p>Coseis is written by <a href="http://earth.usc.edu/~gely/">Geoffrey Ely</a> with contributions from Steven Day, Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou. It is licensed under <a href="http://opensource.org/licenses/BSD-2-Clause">BSD</a> terms.</p>
 <p><strong>WARNING</strong>: Coseis is a research code under active development. Changes are frequent and it has known bugs!</p>
-<h3 id="install">Install</h3>
+<h2 id="install">Install</h2>
 <ol type="1">
 <li><p>If on Mac OS X, first install <a href="http://itunes.apple.com/us/app/xcode/id497799835">Xcode</a> from the App Store. From the Xcode preferences pane, install the Command Line Tools. Then install <a href="http://mxcl.github.com/homebrew/">Homebrew</a>, followed by <a href="http://git-scm.com/">Git</a> and <a href="http://r.research.att.com/tools/">Fortran</a> with::</p>
 <pre><code>brew install git gfortran</code></pre>
@@ -49,7 +112,7 @@ export PATH=&quot;$PATH:$HOME/coseis/bin&quot;</code></pre></li>
 <pre><code>account = &#39;your_project_name_here&#39;
 email = &#39;your.email@address.here&#39;</code></pre></li>
 </ol>
-<h3 id="testing">Testing</h3>
+<h2 id="testing">Testing</h2>
 <p>To run the test suite interactively::</p>
 <pre><code>cd cst/tests
 python test_runner.py --run=exec</code></pre>
@@ -65,8 +128,8 @@ PASSED: cst.tests.hello_mpi.test()
 PASSED: cst.tests.point_source.test()
 PASSED: cst.tests.pml_boundary.test()
 PASSED: cst.tests.kostrov.test()</code></pre>
-<h3 id="examples">Examples</h3>
-<h4 id="cvm-depth-plane">CVM depth plane</h4>
+<h2 id="examples">Examples</h2>
+<h3 id="cvm-depth-plane">CVM depth plane</h3>
 <figure>
 <img src="../figures/CVM-Slice-Vs-S.png" />
 </figure>
@@ -75,18 +138,17 @@ PASSED: cst.tests.kostrov.test()</code></pre>
 </figure>
 <p>Extract S-wave velocity at 500 meters depth. Plot using Matplotlib:</p>
 <p><a href="../scripts/CVM-Slice.py">CVM-Slice.py</a></p>
-<h4 id="cvm-s-fence-diagram">CVM-S fence diagram</h4>
+<h3 id="cvm-s-fence-diagram">CVM-S fence diagram</h3>
 <figure>
 <img src="../figures/CVM-Fence-Vp-S.png" />
 </figure>
 <p>Build a fence diagram similar to Magistrale (2000) figure 10. Plot using Mayavi</p>
 <p><a href="../scripts/CVM-Fence.py">CVM-Fence.py</a></p>
-<h4 id="cvm-s-basin-depth">CVM-S basin depth</h4>
+<h3 id="cvm-s-basin-depth">CVM-S basin depth</h3>
 <figure>
 <img src="../figures/CVM-Basins.png" />
 </figure>
 <p>Extract 3D mesh and search for the shallowest surface of Vs = 2.5 km/s. Plot over topography using Mayavi.</p>
 <p><a href="../scripts/CVM-Basins-mesh.py">CVM-Basins-mesh.py</a><br /><a href="../scripts/CVM-Basins-search.py">CVM-Basins-search.py</a><br /><a href="../scripts/CVM-Basins-plot.py">CVM-Basins-plot.py</a></p>
-</div>
 </body>
 </html>

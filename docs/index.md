@@ -1,8 +1,6 @@
-Coseis
-======
+# Coseis
 
-Computational Seismology Tools
-------------------------------
+### Computational Seismology Tools {#subtitle}
 
 <nav>
 
@@ -13,7 +11,7 @@ Computational Seismology Tools
 
 </nav>
 
-### Summary
+## Summary
 
 Coseis is an open-source toolkit for earthquake simulation featuring:
 
@@ -41,7 +39,7 @@ Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou.  It is licensed under
 frequent and it has known bugs!
 
 
-### Install
+## Install
 
 1.  If on Mac OS X, first install [Xcode] from the App Store. From the Xcode
     preferences pane, install the Command Line Tools. Then install [Homebrew],
@@ -86,7 +84,7 @@ frequent and it has known bugs!
 [Anaconda]: https://store.continuum.io/cshop/anaconda/
 
 
-### Testing
+## Testing
 
 To run the test suite interactively::
 
@@ -111,9 +109,9 @@ After completion, a report is printed to the screen (or saved in
     PASSED: cst.tests.kostrov.test()
 
 
-### Examples
+## Examples
 
-#### CVM depth plane
+### CVM depth plane
 
 ![](../figures/CVM-Slice-Vs-S.png)
 
@@ -123,7 +121,7 @@ Extract S-wave velocity at 500 meters depth. Plot using Matplotlib:
 
 [CVM-Slice.py](../scripts/CVM-Slice.py)
 
-#### CVM-S fence diagram
+### CVM-S fence diagram
 
 ![](../figures/CVM-Fence-Vp-S.png)
 
@@ -132,7 +130,7 @@ Mayavi
 
 [CVM-Fence.py](../scripts/CVM-Fence.py)
 
-#### CVM-S basin depth
+### CVM-S basin depth
 
 ![](../figures/CVM-Basins.png)
 

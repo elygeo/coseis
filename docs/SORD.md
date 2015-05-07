@@ -1,8 +1,6 @@
-SORD
-====
+# SORD
 
-Support Operator Rupture Dynamics
----------------------------------
+### Support Operator Rupture Dynamics {#subtitle}
 
 <nav>
 
@@ -17,7 +15,7 @@ Support Operator Rupture Dynamics
 
 ![](../figures/SORD-SAF-Surface.jpg)
 
-### Summary
+## Summary
 
 The Support Operator Rupture Dynamics (SORD) code simulates spontaneous
 rupture within a 3D isotropic viscoelastic solid. Wave motions are
@@ -38,7 +36,7 @@ code is portable and tested with a variety of Fortran 95 compilers, MPI
 implementations, and operating systems (Linux, Mac OS X, IBM AIX, SUN
 Solaris).
 
-### Publications
+## Publications
 
 The first two papers give (for wave propagation and spontaneous rupture,
 respectively) the formulation, numerical algorithm, and verification of
@@ -61,9 +59,9 @@ earthquakes in southern California.
     Seism. Soc. Am.*, *100* (1), 131-150,
     [<doi:10.1785/0120090187>](http://dx.doi.org/10.1785/0120090187).
 
-### User Guide
+## User Guide
 
-#### Quick test
+### Quick test
 
 Run a simple point source explosion test and plot a 2D slice of particle
 velocity:
@@ -80,7 +78,7 @@ This illustrates the simplest way to run SORD, that is to execute the
 [JSON](http://www.json.org) format. The parameter file for this example
 is as follows:
 
-#### Python Scripting
+### Python Scripting
 
 A more powerful way to run the code is with a Python script. The basic
 procedure is to import the `cst` module, create a dictionary of
@@ -96,7 +94,7 @@ It maybe be helpful to look through example applications in the
 `scripts` directory, and return to this document for further description
 of the simulation parameters.
 
-#### Field I/O
+### Field I/O
 
 [Note about a change from previous versions: The `fieldio` parameter has
 been removed, and instead each field I/O parameter is a separate list.]
@@ -157,7 +155,7 @@ subroutine in [util.f90](../cst/sord/src/util.f90). The routine can be
 easily modified to add new time functions. Time functions can be offset
 in time with the `tm0` initial time parameter.
 
-#### Boundary Conditions
+### Boundary Conditions
 
 Boundary conditions for the six faces of the model domain are specified
 by the parameters `bc1` (near-size, x, y, and z faces) and `bc2`
@@ -220,7 +218,7 @@ The number of nodes is 2 for the zero-width axis:
     bc1 = ['pml', 'pml', '-node']
     bc2 = ['pml', 'pml', '-node']
 
-#### Defining the fault rupture surface
+### Defining the fault rupture surface
 
 Fault rupture always follows a surface of the (possibly non-planar)
 logical mesh. The orientation of the fault plane is defined by the
@@ -273,7 +271,7 @@ the anti-plane axis, to reduce computations eight-fold:
     bc1 = ['free', 'free', 'free']
     bc2 = ['anti-n', 'mirror-n', 'anti-c'
 
-### Memory Usage and Scaling
+## Memory Usage and Scaling
 
 For rectilinear meshes, 23 single precision (four-byte) memory variables
 are required per mesh point. Curvilinear meshes have two options with a

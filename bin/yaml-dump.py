@@ -8,8 +8,14 @@ if __name__ != '__main__':
 
 import sys, yaml
 
-for f in sys.argv[1:]:
-    d = yaml.load(open(f))
-    d = yaml.dump(d)
+if len(sys.argv) == 1:
+    d = yaml.load(sys.stdin)
+    d = yaml.dump(d, width=64, allow_unicode=True)
     print(d)
+else:
+    for f in sys.argv[1:]:
+        d = yaml.load(open(f))
+        d = yaml.dump(d, width=64, allow_unicode=True)
+        print(d)
+
 

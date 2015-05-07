@@ -29,9 +29,10 @@ def bin2npy(files=[], dtype=None, shape=None, shapes=None, delete=False):
 
     # process files
     for f in files:
-        f1 = f.replace('.bin', '.npy')
-        if f == f1:
-            raise Exception(f + ': missing .bin extension')
+        if f.endswith('.bin'):
+            f1 = f[:-4] + '.npy'
+        else:
+            f1 = f + '.npy'
         if os.path.exists(f1):
             continue
         v = np.fromfile(f, dtype)
