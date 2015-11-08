@@ -1,8 +1,6 @@
-Installations Notes
-===================
+# Installations Notes
 
-ALCF IBM Blue Gene/Q
---------------------
+## ALCF IBM Blue Gene/Q
 
 Install location:
 mira.alcf.anl.gov:/gpfs/mira-fs0/projects/
@@ -16,8 +14,7 @@ MANPATH += /home/gely/local/${ARCH##*-}/man
 +mpiwrapper-xl
 @default
 
-ALCF IBM Blue Gene/P
---------------------
+## ALCF IBM Blue Gene/P
 
 Install location:
 intrepid.alcf.anl.gov:/intrepid-fs0/$USER/persistent
@@ -34,8 +31,7 @@ PATH += /bgsys/drivers/ppcfloor/comm/xl/bin
 TAU_MAKEFILE = /soft/apps/tau/tau_latest/bgp/lib/Makefile.tau-bgptimers-mpi-pdt
 TAU_OPTIONS = '-optVerbose -optNoRevert -optCompInst'
 
-Wat2Q IBM Blue Gene/Q
----------------------
+## Wat2Q IBM Blue Gene/Q
 
 Install location:
 grotius.watson.ibm.com:/gpfs/DDNgpfs1/kmager/scratch/
@@ -46,8 +42,7 @@ PATH += $HOME/sord/gely-coseis-v3.2-615-g6a39bb8/gely-coseis-6a39bb8/bin
 +mpiwrapper-xl
 @default
 
-KAUST Shaheen: IBM Blue Gene/P
-------------------------------
+## KAUST Shaheen: IBM Blue Gene/P
 
 module unload GNU
 module load IBM

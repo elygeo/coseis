@@ -1,5 +1,4 @@
-SCEC validation problem TPV3
-----------------------------
+# SCEC validation problem TPV3
 
 These scrips reproduce Figures 3, 4 and 5, comparing SORD to boundary integral
 solutions, and Figure 7, testing numerical convergence, from:
@@ -16,7 +15,7 @@ processors, and then run ``sim.py`` to start the simulations. Use ``plot.py``
 and ``convergence.py`` to plot the results.
 
 
-### Boundary integral solution data
+## Boundary integral solution data
 
 Trup is off by dt compared to the time series
 

@@ -3,12 +3,10 @@
 ### Computational Seismology Tools {#subtitle}
 
 <nav>
-
-- [Install](#install)
-- [Examples](#examples)
-- [SORD](SORD.html)
-- [Code](https://github.com/gely/coseis/)
-
+[Install](#install)
+[Examples](#examples)
+[SORD](SORD.html)
+[Code](https://github.com/gely/coseis/)
 </nav>
 
 ## Summary
@@ -35,9 +33,10 @@ Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou.  It is licensed under
 [Geoffrey Ely]: http://earth.usc.edu/~gely/
 [BSD]:          http://opensource.org/licenses/BSD-2-Clause
 
+<div class="warn">
 **WARNING**: Coseis is a research code under active development. Changes are
 frequent and it has known bugs!
-
+</div>
 
 ## Install
 
@@ -83,7 +82,6 @@ frequent and it has known bugs!
 [GCC]:      http://gcc.gnu.org/
 [Anaconda]: https://store.continuum.io/cshop/anaconda/
 
-
 ## Testing
 
 To run the test suite interactively::
@@ -107,7 +105,6 @@ After completion, a report is printed to the screen (or saved in
     PASSED: cst.tests.point_source.test()
     PASSED: cst.tests.pml_boundary.test()
     PASSED: cst.tests.kostrov.test()
-
 
 ## Examples
 

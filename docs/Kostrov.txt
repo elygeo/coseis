@@ -1,13 +1,11 @@
-Kostrov 
-=======
+# Kostrov 
 
 Circular crack with uniform rupture velocity.
 
 cee.py : Test computing of C parameter from Dahlen (1974) Eqn. (44) and Fig. 3,
 use for computing analytical slip velocity function.
 
-References
-----------
+## References
 
 Kostrov, B. V. (1966). Unsteady propagation of longitudinal shear cracks, J.
 Appl. Math. Mech., 30(6), doi:10.1016/0021-8928(66)90087-6.
