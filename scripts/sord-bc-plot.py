@@ -39,14 +39,14 @@ y =  0,  0,  0
 u = -2, -2,  1
 v = -4, -2, -3
 ax = mesh(x, y, u, v, xx, yy)
-ax.figure.savefig('SORD-BC0.png', dpi=60)
+ax.figure.savefig('SORD-BC0.svg', dpi=60)
 
 x = -8, -4,  0
 y =  0,  0,  0
 u = -2, -2,  0
 v = -4, -2,  0
 ax = mesh(x, y, u, v, xx, yy)
-ax.figure.savefig('SORD-BC3.png', dpi=60)
+ax.figure.savefig('SORD-BC3.svg', dpi=60)
 
 x = -8, -4,  0,  4,  8
 y =  0,  0,  0,  0,  0
@@ -56,7 +56,7 @@ ax = mesh(x, y, u, v, xx, yy)
 x = -4,  4, 4, -4
 y = -4, -4, 0,  0
 beachball(ax.figure, x, y)
-ax.figure.savefig('SORD-BC1.png', dpi=60)
+ax.figure.savefig('SORD-BC1.svg', dpi=60)
 
 x = -8, -4,  0,  4,  8
 y =  0,  0,  0,  0,  0
@@ -67,7 +67,7 @@ x = -4,  0, 0, 4, 4, -4
 y = -4, -4, 4, 4, 0,  0
 beachball(ax.figure, x, y)
 ax.plot([-6, 6], [0, 0], 'k--', lw=1.5)
-ax.figure.savefig('SORD-BC-1.png', dpi=60)
+ax.figure.savefig('SORD-BC-1.svg', dpi=60)
 
 xx = -14, -10, -6, -2, 2, 6, 10, 14
 
@@ -79,7 +79,7 @@ ax = mesh(x, y, u, v, xx, yy)
 x = -4,  4, 4, -4
 y = -4, -4, 0,  0
 beachball(ax.figure, x, y)
-ax.figure.savefig('SORD-BC2.png', dpi=60)
+ax.figure.savefig('SORD-BC2.svg', dpi=60)
 
 x = -6, -2,  2,  6
 y =  0,  0,  0,  0
@@ -101,5 +101,5 @@ ax.plot([0, 0], [-6, 6], 'k--', lw=1.5)
 ax.axis('image')
 ax.axis([-6, 6, -6, 6])
 ax.axis('off')
-ax.figure.savefig('SORD-BC-2.png', dpi=60)
+ax.figure.savefig('SORD-BC-2.svg', dpi=60)
 

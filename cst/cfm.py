@@ -477,13 +477,11 @@ def cubit_facet(vtx, tri, geographic=True):
 
 def explore(prefix, faults):
     """
-    CFMX: Community Fault Model Explorer
-    ====================================
+    # CFMX: Community Fault Model Explorer
 
     A simple tool for exploring the CFM
 
-    Keyboard Controls
-    -----------------
+    ## Keyboard Controls
 
     Fault selection                  [ ]
     Fault selection and view         { }

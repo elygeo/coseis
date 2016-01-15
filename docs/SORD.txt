@@ -43,19 +43,19 @@ earthquakes in southern California.
 
 1.  Ely, G. P., S. M. Day, and J.-B. Minster (2008), [A support-operator
     method for visco-elastic wave modeling in 3D heterogeneous
-    media](http://www.alcf.anl.gov/~gely/pub/Ely2008-GJI.pdf), *Geophys.
+    media](http://www.usc.edu/~gely/pub/2008-GJI-Ely+2.pdf), *Geophys.
     J. Int.*, *172* (1), 331-344,
-    [<doi:10.1111/j.1365-246X.2007.03633.x>](http://dx.doi.org/10.1111/j.1365-246X.2007.03633.x).
+    [doi:10.1111/j.1365-246X.2007.03633.x](http://dx.doi.org/10.1111/j.1365-246X.2007.03633.x).
 2.  Ely, G. P., S. M. Day, and J.-B. Minster (2009), [A support-operator
     method for 3D rupture
-    dynamics](http://www.alcf.anl.gov/~gely/pub/Ely2009-GJI.pdf),
+    dynamics](http://www.usc.edu/~gely/pub/2009-GJI_Ely+2.pdf),
     *Geophys. J. Int.*, *177* (3), 1140-1150,
-    [<doi:10.1111/j.1365-246X.2009.04117.x>](http://dx.doi.org/10.1111/j.1365-246X.2009.04117.x).
+    [doi:10.1111/j.1365-246X.2009.04117.x](http://dx.doi.org/10.1111/j.1365-246X.2009.04117.x).
 3.  Ely, G. P., S. M. Day, and J.-B. Minster (2010), [Dynamic rupture
     models for the southern San Andreas
-    fault](http://www.alcf.anl.gov/~gely/pub/Ely2010-BSSA.pdf), *Bull.
+    fault](http://www.usc.edu/~gely/pub/2010-BSSA-Ely+2.pdf), *Bull.
     Seism. Soc. Am.*, *100* (1), 131-150,
-    [<doi:10.1785/0120090187>](http://dx.doi.org/10.1785/0120090187).
+    [doi:10.1785/0120090187](http://dx.doi.org/10.1785/0120090187).
 
 ## User Guide
 
@@ -69,7 +69,7 @@ velocity:
 
 Plotting requires Matplotlib, and the result should look like this:
 
-![](../figures/SORD-Example.png)
+![](../figures/SORD-Example.svg)
 
 This illustrates the simplest way to run SORD, that is to execute the
 `sord` command giving a parameter file in [YAML](http://www.yaml.org) or
@@ -167,11 +167,11 @@ following BC types are supported:
 **'free'**: Vacuum free-surface. Stress is zero in cells outside the
 boundary.
 
-![](../figures/SORD-BC0.png)
+![](../figures/SORD-BC0.svg)
 
 **'rigid'**: Rigid surface. Displacement is zero at the boundary.
 
-![](../figures/SORD-BC3.png)
+![](../figures/SORD-BC3.svg)
 
 **'+node'**: Mirror symmetry at the node. Normal displacement is zero at
 the boundary. Useful for a boundary corresponding to (a) the plane
@@ -179,7 +179,7 @@ orthogonal to the two nodal planes of a double-couple point source, (b)
 the plane normal to the mode-III axis of a symmetric rupture, or (c) the
 zero-width axis of a 2D plane strain problem.
 
-![](../figures/SORD-BC1.png)
+![](../figures/SORD-BC1.svg)
 
 **'-node'**: Anti-mirror symmetry at the node. Tangential displacement
 is zero at the boundary. Useful for a boundary corresponding to (a) the
@@ -187,18 +187,18 @@ nodal planes of a double-couple point source, (b) the plane normal to
 the mode-II axis of a symmetric rupture, or (c) the zero-width axis of a
 2D antiplane strain problem.
 
-![](../figures/SORD-BC-1.png)
+![](../figures/SORD-BC-1.svg)
 
 **'+cell'**: Mirror symmetry at the cell. Same as type 1, but centered
 on the cell.
 
-![](../figures/SORD-BC2.png)
+![](../figures/SORD-BC2.svg)
 
 **'-cell'**: Anti-mirror symmetry at the cell. Same as type -1, but
 centered on the cell. Can additionally be used when the boundary
 corresponds to the slip surface of a symmetric rupture.
 
-![](../figures/SORD-BC-2.png)
+![](../figures/SORD-BC-2.svg)
 
 **'pml'**: Perfectly match layer (PML) absorbing boundary.
 
@@ -284,13 +284,15 @@ parameter, but can generally be left alone, as the default is to
 automatically detect rectilinear and curvilinear meshes and assign the
 proper operator type for fastest performance. The allowed values are:
 
-> **'cons'**: Mesh with constant mesh step size  
-> **'rect'**: Rectangular mesh  
-> **'para'**: Parallelepiped mesh  
-> **'quad'**: One-point quadrature  
-> **'exac'**: Exactly integrated elements  
-> **'save'**: Saved operators, nearly as fast as 'rect', but doubles the memory usage  
-> **'auto'**: Automatically choose 'rect' or 'save'  
+------ -----------------------------------------------------------------------
+`cons` Mesh with constant mesh step size  
+`rect` Rectangular mesh  
+`para` Parallelepiped mesh  
+`quad` One-point quadrature  
+`exac` Exactly integrated elements  
+`save` Saved operators, nearly as fast as `rect`, but doubles the memory usage  
+`auto` Automatically choose `rect` or `save`  
+------ -----------------------------------------------------------------------
 
 On current hardware, computation time is on the order of the one second
 per time step per one million mesh points. SORD scalability has been

@@ -1,4 +1,4 @@
-# Coseis
+# COSEIS
 
 ### Computational Seismology Tools {#subtitle}
 

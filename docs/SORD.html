@@ -11,39 +11,40 @@
   <![endif]-->
   <style type="text/css">
   html {
-      font-family: sans-serif;
-      font-size: 18px;
-      max-width: 36em;
-      margin: 1em auto;
-      line-height: 1.4;
-      -webkit-text-size-adjust: 100%;
+  font-family: sans-serif;
+  font-size: 1.125em;
+  line-height: 1.4;
+  max-width: 36em;
+  margin-left: auto;
+  margin-right: auto;
+  -webkit-text-size-adjust: 100%;
   }
   a { color: #06a; text-decoration: none; }
-  h1 { color: #900; }
-  h3#subtitle { margin-top: -1em; }
+  h1 { color: #900; margin-bottom: 0 }
+  h3#subtitle { margin-top: 0; }
   pre {
-      overflow: auto;
-      padding: 0.5em;
-      border: 1px solid #ccc;
-      background-color: #eee;
-      line-height: 1;
+  padding: 0.5em;
+  border: 1px solid #ccc;
+  background-color: #eee;
+  line-height: 1;
+  overflow: auto;
   }
   figure { margin: 0; }
   img { max-width: 100%; display: block; margin: 1em auto; }
   nav { font-family: sans-serif; }
   nav a {
-      display: inline-block;
-      background-color: #eee;
-      padding: 0.2em 0.6em;
-      margin: 0.1em 0;
-      border: 1px solid #ccc;
-      cursor: pointer;
+  display: inline-block;
+  background-color: #eee;
+  padding: 0.2em 0.6em;
+  margin: 0.1em 0;
+  border: 1px solid #ccc;
+  cursor: pointer;
   }
   nav a:hover, a:active { background-color: #ccc; }
   div.warn p {
-      padding: 0.5em;
-      border: 1px solid #ccc;
-      background-color: #ffd;
+  padding: 0.5em;
+  border: 1px solid #ccc;
+  background-color: #ffd;
   }
   </style>
 </head>
@@ -60,9 +61,9 @@
 <h2 id="publications">Publications</h2>
 <p>The first two papers give (for wave propagation and spontaneous rupture, respectively) the formulation, numerical algorithm, and verification of the SORD method. The third paper presents an application to simulating earthquakes in southern California.</p>
 <ol type="1">
-<li>Ely, G. P., S. M. Day, and J.-B. Minster (2008), <a href="http://www.alcf.anl.gov/~gely/pub/Ely2008-GJI.pdf">A support-operator method for visco-elastic wave modeling in 3D heterogeneous media</a>, <em>Geophys. J. Int.</em>, <em>172</em> (1), 331-344, <a href="http://dx.doi.org/10.1111/j.1365-246X.2007.03633.x">&lt;doi:10.1111/j.1365-246X.2007.03633.x&gt;</a>.</li>
-<li>Ely, G. P., S. M. Day, and J.-B. Minster (2009), <a href="http://www.alcf.anl.gov/~gely/pub/Ely2009-GJI.pdf">A support-operator method for 3D rupture dynamics</a>, <em>Geophys. J. Int.</em>, <em>177</em> (3), 1140-1150, <a href="http://dx.doi.org/10.1111/j.1365-246X.2009.04117.x">&lt;doi:10.1111/j.1365-246X.2009.04117.x&gt;</a>.</li>
-<li>Ely, G. P., S. M. Day, and J.-B. Minster (2010), <a href="http://www.alcf.anl.gov/~gely/pub/Ely2010-BSSA.pdf">Dynamic rupture models for the southern San Andreas fault</a>, <em>Bull. Seism. Soc. Am.</em>, <em>100</em> (1), 131-150, <a href="http://dx.doi.org/10.1785/0120090187">&lt;doi:10.1785/0120090187&gt;</a>.</li>
+<li>Ely, G. P., S. M. Day, and J.-B. Minster (2008), <a href="http://www.usc.edu/~gely/pub/2008-GJI-Ely+2.pdf">A support-operator method for visco-elastic wave modeling in 3D heterogeneous media</a>, <em>Geophys. J. Int.</em>, <em>172</em> (1), 331-344, <a href="http://dx.doi.org/10.1111/j.1365-246X.2007.03633.x">doi:10.1111/j.1365-246X.2007.03633.x</a>.</li>
+<li>Ely, G. P., S. M. Day, and J.-B. Minster (2009), <a href="http://www.usc.edu/~gely/pub/2009-GJI_Ely+2.pdf">A support-operator method for 3D rupture dynamics</a>, <em>Geophys. J. Int.</em>, <em>177</em> (3), 1140-1150, <a href="http://dx.doi.org/10.1111/j.1365-246X.2009.04117.x">doi:10.1111/j.1365-246X.2009.04117.x</a>.</li>
+<li>Ely, G. P., S. M. Day, and J.-B. Minster (2010), <a href="http://www.usc.edu/~gely/pub/2010-BSSA-Ely+2.pdf">Dynamic rupture models for the southern San Andreas fault</a>, <em>Bull. Seism. Soc. Am.</em>, <em>100</em> (1), 131-150, <a href="http://dx.doi.org/10.1785/0120090187">doi:10.1785/0120090187</a>.</li>
 </ol>
 <h2 id="user-guide">User Guide</h2>
 <h3 id="quick-test">Quick test</h3>
@@ -71,7 +72,7 @@
 make SORD-Example.mk</code></pre>
 <p>Plotting requires Matplotlib, and the result should look like this:</p>
 <figure>
-<img src="../figures/SORD-Example.png" alt="" />
+<img src="../figures/SORD-Example.svg" alt="" />
 </figure>
 <p>This illustrates the simplest way to run SORD, that is to execute the <code>sord</code> command giving a parameter file in <a href="http://www.yaml.org">YAML</a> or <a href="http://www.json.org">JSON</a> format. The parameter file for this example is as follows:</p>
 <h3 id="python-scripting">Python Scripting</h3>
@@ -105,27 +106,27 @@ f = ([], &#39;=&gt;&#39;, &#39;filename&#39;)      # Write f into filename</code
 <p>Boundary conditions for the six faces of the model domain are specified by the parameters <code>bc1</code> (near-size, x, y, and z faces) and <code>bc2</code> (far-side, x, y, and x faces). The symmetry boundary conditions can be used to reduce computations for problems where they are applicable. These are not used for specifying internal slip boundaries. However, for problems with symmetry across a slip surface, the fault may be placed at the boundary and combined with an anti-mirror symmetry condition. The following BC types are supported:</p>
 <p><strong>‘free’</strong>: Vacuum free-surface. Stress is zero in cells outside the boundary.</p>
 <figure>
-<img src="../figures/SORD-BC0.png" alt="" />
+<img src="../figures/SORD-BC0.svg" alt="" />
 </figure>
 <p><strong>‘rigid’</strong>: Rigid surface. Displacement is zero at the boundary.</p>
 <figure>
-<img src="../figures/SORD-BC3.png" alt="" />
+<img src="../figures/SORD-BC3.svg" alt="" />
 </figure>
 <p><strong>‘+node’</strong>: Mirror symmetry at the node. Normal displacement is zero at the boundary. Useful for a boundary corresponding to (a) the plane orthogonal to the two nodal planes of a double-couple point source, (b) the plane normal to the mode-III axis of a symmetric rupture, or (c) the zero-width axis of a 2D plane strain problem.</p>
 <figure>
-<img src="../figures/SORD-BC1.png" alt="" />
+<img src="../figures/SORD-BC1.svg" alt="" />
 </figure>
 <p><strong>‘-node’</strong>: Anti-mirror symmetry at the node. Tangential displacement is zero at the boundary. Useful for a boundary corresponding to (a) the nodal planes of a double-couple point source, (b) the plane normal to the mode-II axis of a symmetric rupture, or (c) the zero-width axis of a 2D antiplane strain problem.</p>
 <figure>
-<img src="../figures/SORD-BC-1.png" alt="" />
+<img src="../figures/SORD-BC-1.svg" alt="" />
 </figure>
 <p><strong>‘+cell’</strong>: Mirror symmetry at the cell. Same as type 1, but centered on the cell.</p>
 <figure>
-<img src="../figures/SORD-BC2.png" alt="" />
+<img src="../figures/SORD-BC2.svg" alt="" />
 </figure>
 <p><strong>‘-cell’</strong>: Anti-mirror symmetry at the cell. Same as type -1, but centered on the cell. Can additionally be used when the boundary corresponds to the slip surface of a symmetric rupture.</p>
 <figure>
-<img src="../figures/SORD-BC-2.png" alt="" />
+<img src="../figures/SORD-BC-2.svg" alt="" />
 </figure>
 <p><strong>‘pml’</strong>: Perfectly match layer (PML) absorbing boundary.</p>
 <p>Example: a 3D problem with a free surface at Z=0, and PML absorbing boundaries on all other boundary faces:</p>
@@ -161,15 +162,38 @@ bc1 = [&#39;free&#39;, &#39;free&#39;, &#39;free&#39;]
 bc2 = [&#39;anti-n&#39;, &#39;mirror-n&#39;, &#39;anti-c&#39;</code></pre>
 <h2 id="memory-usage-and-scaling">Memory Usage and Scaling</h2>
 <p>For rectilinear meshes, 23 single precision (four-byte) memory variables are required per mesh point. Curvilinear meshes have two options with a trade-off in memory usage vs. floating-point operations. Stored operators require 44 variables per mesh point and give the best performance, while on-the-fly operators require 23 variables per mesh point at the cost of a factor of four increase in floating point operations. As CPU improvement tends to out-pace memory bandwidth improvement, in the future, on-the-fly operators may become faster than stored operators. The operator type is controlled by the <code>diffop</code> parameter, but can generally be left alone, as the default is to automatically detect rectilinear and curvilinear meshes and assign the proper operator type for fastest performance. The allowed values are:</p>
-<blockquote>
-<p><strong>‘cons’</strong>: Mesh with constant mesh step size<br />
-<strong>‘rect’</strong>: Rectangular mesh<br />
-<strong>‘para’</strong>: Parallelepiped mesh<br />
-<strong>‘quad’</strong>: One-point quadrature<br />
-<strong>‘exac’</strong>: Exactly integrated elements<br />
-<strong>‘save’</strong>: Saved operators, nearly as fast as ‘rect’, but doubles the memory usage<br />
-<strong>‘auto’</strong>: Automatically choose ‘rect’ or ‘save’</p>
-</blockquote>
+<table>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>cons</code></td>
+<td style="text-align: left;">Mesh with constant mesh step size</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>rect</code></td>
+<td style="text-align: left;">Rectangular mesh</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>para</code></td>
+<td style="text-align: left;">Parallelepiped mesh</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>quad</code></td>
+<td style="text-align: left;">One-point quadrature</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>exac</code></td>
+<td style="text-align: left;">Exactly integrated elements</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>save</code></td>
+<td style="text-align: left;">Saved operators, nearly as fast as <code>rect</code>, but doubles the memory usage</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>auto</code></td>
+<td style="text-align: left;">Automatically choose <code>rect</code> or <code>save</code></td>
+</tr>
+</tbody>
+</table>
 <p>On current hardware, computation time is on the order of the one second per time step per one million mesh points. SORD scalability has been benchmarked up to 64 thousand processors at ALCF. The following chart is the wall-time per step per core (click for PDF):</p>
 <p><a href="../figures/SORD-MPI-Benchmark.pdf"><img src="../figures/SORD-MPI-Benchmark.png" alt="" /></a></p>
 </body>

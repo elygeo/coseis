@@ -19,4 +19,5 @@ ax = plt.gca()
 ax.imshow(vm, extent=(-3,3,-3,3), interpolation='nearest')
 ax.axis('image')
 fig.savefig('SORD-Example.png', dpi=80)
+fig.savefig('SORD-Example.svg', dpi=80)
 
