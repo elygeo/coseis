@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 id_ = '00'
 id_ = '20'
 p = os.path.join('run', 'Foam-' + id_)
-os.chdir(d)
+os.chdir(p)
 meta = json.load(open('meta.json'))
 
 # off-fault displacement plot

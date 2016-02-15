@@ -1,0 +1,16 @@
+{
+"account": "TG-MCA03S012",
+"maxcores": 12,
+"maxnodes": 8192,
+"maxram": 16384,
+"maxtime": 1440,
+"mode": "smp",
+"mode_opts": {
+    "vn": {"nthread": 1, "ppn_range": []},
+    "smp": {"nthread": 12, "ppn_range": [1]}
+},
+"execute": "aprun -d {nthread} -n {nproc} {executable}",
+"notify_flag": "-M {email}",
+"submit": "qsub -A {account} -N {name} -l size={totalcores} -l walltime={walltime} -e {name}.err -o {name}.out -m n {submit_flags} {depend_flag} {notify_flag} {submission}"
+"python": "/lustre/scratch/gely/local/bin/python",
+}

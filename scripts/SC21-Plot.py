@@ -5,7 +5,7 @@ PEER Lifelines program task 1A02, Problem SC2.1
 import os, json
 import numpy as np
 import matplotlib.pyplot as plt
-import cst
+import cst.signal
 
 # sim dir
 p = os.path.join('run', 'sc21-sim-200')
@@ -36,7 +36,7 @@ v = np.dot(m, v)
 
 # deconvolve Brune pulse and replace with Gaussian
 v = cst.signal.brune2gauss(v, dt, tau, sigma)
-print np.sqrt(np.sum(v * v, 0).max())
+print(np.sqrt(np.sum(v * v, 0).max()))
 
 # setup figure
 if 0:
@@ -48,7 +48,7 @@ if 0:
     plt.rc('legend', fontsize='medium', handletextpad=0.2)
 fig = plt.figure(None, figsize=(6.4, 6.4), dpi=100)
 fig = plt.figure()
-ax = [fig.add_subplot(3, 1, i) for i in 1, 2, 3]
+ax = [fig.add_subplot(3, 1, i) for i in (1, 2, 3)]
 ax[2].set_xlabel('Time (/s)')
 ax[1].set_ylabel('Velocity (m/s)')
 ax[0].set_title('Radial',     position=(0.98, 0.83), ha='right', va='center')

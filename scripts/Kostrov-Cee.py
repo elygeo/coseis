@@ -2,7 +2,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-import cst
+import cst.kostrov
 
 # Parameters
 b = 0.9 # Vrup / Vs ratio

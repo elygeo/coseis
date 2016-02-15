@@ -1,3 +1,3 @@
 #!/usr/bin/env python
-import os, cst
+import cst.cvms
 cst.cvms.configure(force=True)

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-import os, json
+import os
 import numpy as np
 import matplotlib.pyplot as plt
-import cst
+import cst.bin2npy
 
 # simulation directory
 os.chdir(os.path.join('run', 'SORD-Example'))

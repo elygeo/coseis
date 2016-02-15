@@ -5,7 +5,7 @@ FIXME: prestress not correct
 """
 import os, math
 import numpy as np
-import cst
+import cst.sord
 s_ = cst.sord.get_slices()
 prm = {}
 

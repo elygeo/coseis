@@ -148,46 +148,6 @@ def compass_rose(ax, x, y, r, style='k-', **kwargs):
     ]
     return h
 
-def savefig(fig, fh=None, format=None, distill=False, **kwargs):
-    """
-    Enhanced version of Matplotlib savefig command.
-
-    Takes the same argnuments as savefig.  Saves to disk if a filename is
-    given. Otherwise return a StringIO file descriptor, or a numpy array.  PDF is
-    distilled using Ghostscript to produce smaller files.
-    """
-    import os, cStringIO
-    import numpy as np
-    from . import viz
-    if isinstance(fh, basestring):
-        if format is None:
-            format = fh.split('.')[-1]
-        fh = open(os.path.expanduser(fh), 'wb')
-    else:
-        if format is None:
-            format = 'array'
-    out = cStringIO.StringIO()
-    if format == 'array':
-        if 'dpi' not in kwargs:
-            kwargs['dpi'] = fig.dpi
-        dpi = kwargs['dpi']
-        n = fig.get_size_inches()
-        n = int(n[1] * dpi), int(n[0] * dpi), 4
-        fig.savefig(out, format='raw', **kwargs)
-        out = np.fromstring(out.getvalue(), 'u1').reshape(n)
-    elif distill and format == 'pdf':
-        fig.savefig(out, format='eps', **kwargs)
-        out = viz.distill_eps(out)
-    else:
-        fig.savefig(out, format=format, **kwargs)
-        out.reset()
-    if fh is None:
-        return out
-    else:
-        with fh:
-            fh.write(out.getvalue())
-        return
-
 def digitize(img, xlim=(-1, 1), ylim=(-1, 1), color='r'):
     """
     Digitize points on an image and rectify to a rectangular coordinate system.

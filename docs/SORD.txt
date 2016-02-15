@@ -11,7 +11,7 @@
 [Code](https://github.com/gely/coseis/tree/gh-pages/cst/sord)
 </nav>
 
-![](../figures/SORD-SAF-Surface.jpg)
+![](../Figures/SORD-SAF-Surface.jpg)
 
 ## Summary
 
@@ -69,7 +69,7 @@ velocity:
 
 Plotting requires Matplotlib, and the result should look like this:
 
-![](../figures/SORD-Example.svg)
+![](../Figures/SORD-Example.svg)
 
 This illustrates the simplest way to run SORD, that is to execute the
 `sord` command giving a parameter file in [YAML](http://www.yaml.org) or
@@ -167,11 +167,11 @@ following BC types are supported:
 **'free'**: Vacuum free-surface. Stress is zero in cells outside the
 boundary.
 
-![](../figures/SORD-BC0.svg)
+![](../Figures/SORD-BC0.svg)
 
 **'rigid'**: Rigid surface. Displacement is zero at the boundary.
 
-![](../figures/SORD-BC3.svg)
+![](../Figures/SORD-BC3.svg)
 
 **'+node'**: Mirror symmetry at the node. Normal displacement is zero at
 the boundary. Useful for a boundary corresponding to (a) the plane
@@ -179,7 +179,7 @@ orthogonal to the two nodal planes of a double-couple point source, (b)
 the plane normal to the mode-III axis of a symmetric rupture, or (c) the
 zero-width axis of a 2D plane strain problem.
 
-![](../figures/SORD-BC1.svg)
+![](../Figures/SORD-BC1.svg)
 
 **'-node'**: Anti-mirror symmetry at the node. Tangential displacement
 is zero at the boundary. Useful for a boundary corresponding to (a) the
@@ -187,18 +187,18 @@ nodal planes of a double-couple point source, (b) the plane normal to
 the mode-II axis of a symmetric rupture, or (c) the zero-width axis of a
 2D antiplane strain problem.
 
-![](../figures/SORD-BC-1.svg)
+![](../Figures/SORD-BC-1.svg)
 
 **'+cell'**: Mirror symmetry at the cell. Same as type 1, but centered
 on the cell.
 
-![](../figures/SORD-BC2.svg)
+![](../Figures/SORD-BC2.svg)
 
 **'-cell'**: Anti-mirror symmetry at the cell. Same as type -1, but
 centered on the cell. Can additionally be used when the boundary
 corresponds to the slip surface of a symmetric rupture.
 
-![](../figures/SORD-BC-2.svg)
+![](../Figures/SORD-BC-2.svg)
 
 **'pml'**: Perfectly match layer (PML) absorbing boundary.
 
@@ -299,5 +299,5 @@ per time step per one million mesh points. SORD scalability has been
 benchmarked up to 64 thousand processors at ALCF. The following chart is
 the wall-time per step per core (click for PDF):
 
-[![](../figures/SORD-MPI-Benchmark.png)](../figures/SORD-MPI-Benchmark.pdf)
+[![](../Figures/SORD-MPI-Benchmark.png)](../Figures/SORD-MPI-Benchmark.pdf)
 

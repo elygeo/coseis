@@ -1,3 +1,3 @@
 #!/usr/bin/env python
-import os, cst
+import cst.sord
 cst.sord.configure(force=True)

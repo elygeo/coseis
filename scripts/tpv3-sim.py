@@ -3,7 +3,7 @@
 SCEC Code Validation Workshop, Test Problem Version 3
 """
 import os
-import cst
+import cst.sord
 s_ = cst.sord.get_slices()
 prm = {}
 

@@ -4,7 +4,7 @@ Simple SoCal mesh generation and CVM-S extraction.
 """
 import os, json
 import numpy as np
-import cst
+import cst.cvms
 
 # parameters
 delta = 0.25 / 60.0, 0.25 / 60.0, 20.0;   nproc = 512

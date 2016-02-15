@@ -2,10 +2,9 @@
 """
 Plot a depth plane extracted from the SCEC Community Velocity Model.
 """
-import os
 import numpy as np
 import matplotlib.pyplot as plt
-import cst
+import cst.cvms, cst.cvmh, cst.data
 
 # parameters
 prop = 'rho'
@@ -46,6 +45,6 @@ for vs, tag in [
     ax.set_title('CVM%s %.0f m depth' % (tag, depth))
     ax.axis(lon + lat)
     f = 'CVM-Slice-%s-%s.png' % (prop, tag)
-    print f
+    print(f)
     fig.savefig(f)
 

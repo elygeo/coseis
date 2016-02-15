@@ -5,7 +5,7 @@ LOH.1 - Plot FK/SOM comparison.
 import os, json
 import numpy as np
 import matplotlib.pyplot as plt
-import cst
+import cst.signal
 
 os.chdir(os.path.join('run', 'LOH1'))
 
@@ -27,7 +27,7 @@ plt.rc('legend', fontsize='medium', handletextpad=0.2)
 
 fig = plt.figure(None, figsize=(3.2, 3.2), dpi=200)
 fig.subplots_adjust(left=0.12, right=0.92, top=0.92, bottom=0.12)
-ax = [fig.add_subplot(3, 1, i) for i in 1, 2, 3]
+ax = [fig.add_subplot(3, 1, i) for i in (1, 2, 3)]
 
 # annotations
 ax[0].set_title('Radial',     position=(0.98, 0.75), ha='right', va='center')
@@ -56,7 +56,7 @@ v = np.dot(m, v)
 
 # replace Brune source with Gaussian source
 v = cst.signal.brune2gauss(v, dt, tau, sigma)
-print np.sqrt(np.sum(v * v, 0).max())
+print(np.sqrt(np.sum(v * v, 0).max()))
 
 # plot waveforms
 ax[0].plot(t, v[0], 'k')
@@ -64,7 +64,7 @@ ax[1].plot(t, v[1], 'k')
 ax[2].plot(t, v[2], 'k')
 
 # read Prose F/K results
-p = os.path.join('..', 'cst', 'data', 'LOH1-ProseFK-')
+p = os.path.join('..', 'Data', 'LOH1-ProseFK-')
 t = np.load(p + 'Time.npy')
 v1 =  1e5 * np.load(p + 'V-Radial.bin')
 v2 =  1e5 * np.load(p + 'V-Transverse.bin')
@@ -78,7 +78,7 @@ tt = np.arange(-n, n+1) * dt
 a = 0.5 / (sigma * sigma)
 b = dt * np.exp(-a * tt * tt) * np.sqrt(a / np.pi)
 v = np.apply_along_axis(np.convolve, -1, v, b, 'same')
-print np.sqrt(np.sum(v * v, 0).max())
+print(np.sqrt(np.sum(v * v, 0).max()))
 
 # plot waveforms
 ax[0].plot(t, v[0], 'k--')[0].set_dashes((2,0.5))

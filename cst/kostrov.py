@@ -16,10 +16,8 @@ def cee_integral(a2, b2):
 
 def cee(a, b):
     """
-    Parameters
-    ----------
-    a: Ratio of rupture to P-wave velocity, vrup / vp.
-    b: Ratio of rupture to S-wave velocity, vrup / vs.
+    a: Ratio of rupture to P-wave velocity, vrup/vp.
+    b: Ratio of rupture to S-wave velocity, vrup/vs.
     """
     import numpy as np
     a2 = a * a
@@ -30,8 +28,6 @@ def cee(a, b):
 
 def slip_rate(rho, vp, vs, vrup, dtau, r, t, C=None):
     """
-    Parameters
-    ----------
     rho: density
     vp: P-wave speed
     vs: S-wave speed

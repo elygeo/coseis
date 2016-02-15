@@ -49,8 +49,7 @@ def configure(force=False, **kwargs):
 
     # source directory
     cwd = os.getcwd()
-    path = os.path.dirname(__file__)
-    os.chdir(path)
+    os.chdir(__file__[:-3])
 
     # configure
     cfg = yaml.load(open('defaults.yaml'))
@@ -106,14 +105,13 @@ def make(force=False, **kwargs):
     """
     Build the code
     """
-    import os, yaml, subprocess
+    import os, json, subprocess
     cfg = configure(force, **kwargs)
-    p = os.path.dirname(__file__) + os.sep
-    p = os.path.join(p, 'build-%s' % cfg['version']) + os.sep
+    p = os.path.join(__file__[:-3], 'build-%s' % cfg['version']) + os.sep
     if force:
         subprocess.check_call(['make', '-C', p, 'clean'])
     subprocess.check_call(['make', '-C', p, '-j', '2'])
-    c = yaml.safe_load(open(p + 'config.json'))
+    c = json.load(open(p + 'config.json'))
     cfg.update(c)
     return cfg
 
@@ -153,8 +151,7 @@ def run(**kwargs):
         os.link(g, f)
 
     # link executable
-    f = os.path.dirname(__file__)
-    f = os.path.join(f, 'build-%s' % cfg['version'], 'cvms.x')
+    f = os.path.join(__file__[:-3], 'build-%s' % cfg['version'], 'cvms.x')
     os.link(f, 'cvms.x')
 
     # create input file

@@ -3,7 +3,7 @@
 Semi-cylindrical canyon with vertically incident P-wave.
 """
 import os
-import cst
+import cst.sord
 s_ = cst.sord.get_slice()
 prm = {}
 

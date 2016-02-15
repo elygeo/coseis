@@ -274,13 +274,13 @@ class Extraction():
         import numpy as np
         x = np.asarray(x)
         y = np.asarray(y)
-        if isinstance(vm, basestring):
+        if type(vm) == str:
             vm = Model(vm, **kwargs)
         if vm.prop in prop2d:
             raise Exception('Cannot extract 2D model')
         elif vm.prop == 'tag':
             vs30 = None
-        if isinstance(topo, basestring):
+        if type(topo) == str:
             topo = Model(topo, **kwargs)
         if geographic:
             import pyproj

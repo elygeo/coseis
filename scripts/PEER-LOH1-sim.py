@@ -8,7 +8,7 @@ http://peer.berkeley.edu/lifelines/lifelines_pre_2006/final_reports/1A01-FR.pdf
 http://www-rohan.sdsu.edu/~steveday/BASINS/Final_Report_1A01.pdf
 """
 import os
-import cst
+import cst.sord
 s_ = cst.sord.get_slices()
 prm = {}
 

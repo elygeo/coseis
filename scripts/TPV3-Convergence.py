@@ -63,7 +63,7 @@ for d in dirs[1:]:
 
 # output
 for i in range(len(ttres)):
-    print dirs[i+1], ttres[i], sures[i], svres[i]
+    print(dirs[i+1], ttres[i], sures[i], svres[i])
 
 # plotting
 if 0:

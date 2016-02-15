@@ -3,7 +3,7 @@
 Benchmarks
 """
 import os
-import cst
+import cst.sord
 s_ = cst.sord.get_slices()
 
 # MPI

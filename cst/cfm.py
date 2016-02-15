@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 SCEC Community Fault Model (CFM) tools.
 """
@@ -70,7 +72,7 @@ def search(items, split=1, maxsplit=3):
         n = 0
     else:
         match = set()
-        if isinstance(items, basestring):
+        if type(items) == str:
             items = [items]
         for a in items:
             b = a.split(':')[0].lower()
@@ -511,7 +513,7 @@ def explore(prefix, faults):
     if not faults:
         print('No faults found')
         return
-    single_fault = isinstance(faults, basestring)
+    single_fault = type(faults) == str
 
     # projection
     import pyproj
@@ -578,7 +580,7 @@ def explore(prefix, faults):
                 tsurfs.append(('%s:%s' % (f, i), x.T, j.T))
     else:
         for f in faults:
-            if isinstance(f, basestring):
+            if type(f) == str:
                 x, t = tsurf_merge(read(f))
             else:
                 f, s = f
@@ -658,6 +660,17 @@ def explore(prefix, faults):
     print("\nPress H in the figure window for help.")
     mlab.show()
     return
+
+def command_line():
+    import sys, getopt
+    opts, argv = getopt.getopt(sys.argv[1:], 's:')
+    opts = dict(opts)
+    if '-s' in opts:
+        split = int(opts['-s'])
+        prefix, faults = search(argv, split)
+    else:
+        prefix, faults = search(argv)
+    explore(prefix, faults)
 
 fault_names = [{
 "BNRA": "Basin and Range Fault Area",
@@ -848,3 +861,7 @@ fault_names = [{
 "WEST": "Western",
 "WHIT": "Whittier"
 }]
+
+if __name__ == '__main__':
+    commdan_line()
+

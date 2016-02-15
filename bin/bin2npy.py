@@ -1,1 +1,0 @@
-../cst/bin2npy.py

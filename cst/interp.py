@@ -8,8 +8,15 @@ def build():
         from . import interp_
         interp_
     except ImportError:
-        from . import util
-        util.build_cext('interp_')
+        import os
+        from distutils.core import setup, Extension
+        import numpy as np
+        cwd = os.getcwd()
+        os.chdir(os.path.dirname(__file__))
+        incl = [np.get_include()]
+        ext = [Extension('interp_', ['interp_.c'], include_dirs=incl)]
+        setup(ext_modules=ext, script_args=['build_ext', '--inplace'])
+        os.chdir(cwd)
 try:
     from .interp_ import trinterp
     trinterp
@@ -371,4 +378,7 @@ def solve2(A, b):
         d * A[0,0] * b[1] - d * A[1,0] * b[0],
     ]
     return x
+
+if __name__ != '__main__':
+    build()
 

@@ -2,7 +2,7 @@
 import os, json
 import numpy as np
 import matplotlib.pyplot as plt
-import cst
+import cst.kostrov
 
 p = os.path.join('run', 'Kostrov')
 os.chdir(p)

@@ -110,9 +110,9 @@ After completion, a report is printed to the screen (or saved in
 
 ### CVM depth plane
 
-![](../figures/CVM-Slice-Vs-S.png)
+![](../Figures/CVM-Slice-Vs-S.png)
 
-![](../figures/CVM-Slice-Vs-H.png)
+![](../Figures/CVM-Slice-Vs-H.png)
 
 Extract S-wave velocity at 500 meters depth. Plot using Matplotlib:
 
@@ -120,7 +120,7 @@ Extract S-wave velocity at 500 meters depth. Plot using Matplotlib:
 
 ### CVM-S fence diagram
 
-![](../figures/CVM-Fence-Vp-S.png)
+![](../Figures/CVM-Fence-Vp-S.png)
 
 Build a fence diagram similar to Magistrale (2000) figure 10. Plot using
 Mayavi
@@ -129,7 +129,7 @@ Mayavi
 
 ### CVM-S basin depth
 
-![](../figures/CVM-Basins.png)
+![](../Figures/CVM-Basins.png)
 
 Extract 3D mesh and search for the shallowest surface of Vs = 2.5 km/s. Plot
 over topography using Mayavi.

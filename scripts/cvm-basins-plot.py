@@ -2,12 +2,12 @@
 """
 Visualization using Mayavi and Matplotlib
 """
-import os, json
+import os
 import pyproj, Image
 import numpy as np
 import matplotlib.pyplot as plt
 from enthought.mayavi import mlab
-import cst
+import cst.data, cst.viz, cst.plt
 
 # parameters
 outfile = 'CVM-Basins.png'; dpi = 150.0
@@ -173,7 +173,7 @@ fig.scene.parallel_projection = True
 fig.scene.camera.parallel_scale = axis[3]
 
 # combine overlay and save image
-print outfile
+print(outfile)
 out = cst.mlab.screenshot(fig)
 if outfile.endswith('pdf'):
     out = cst.viz.img2pdf(out, dpi=dpi)

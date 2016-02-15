@@ -2,6 +2,166 @@
 Support Operator Rupture Dynamics
 """
 
+# default simulation parameters
+parameters = {
+    'nproc3': [1, 1, 1], # number of processors in [j, k, l]
+    'mpin': 1, # MPI-IO input: 0=off, 1=collective, -1=non-collective
+    'mpout': 1, # MPI-IO output: 0=off, 1=collective, -1=non-collective
+    'itstats': 10, # interval for calculating statistics
+    'itio': 50, # interval for writing i/o buffers
+    'itbuff': 10, # buffer size for time series output
+    'debug': 0, # >1 sync, >2 MPI vars, >3 I/O
+    'diffop': 'auto', # spatial difference operator
+    'shape': [41, 41, 41, 41], # mesh size [nx, ny, nz, nt]
+    'delta': [100.0, 100.0, 100.0, 0.0075], # step size [dx, dy, dz, dt]
+    'affine': [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]], # transform
+    'rexpand': 1.06, # grid expansion ratio
+    'n1expand': [0, 0, 0], # number of grid expansion nodes - near side
+    'n2expand': [0, 0, 0], # number of grid expansion nodes - far side
+    'gridnoise': 0.0, # random noise added to mesh, assumes planar fault
+    'tm0': 0.0, # initial time
+    'rho': 2670.0, # density
+    'vp':  6000.0, # P-wave speed
+    'vs':  3464.0, # S-wave speed
+    'gam': 0.0, # viscosity
+    'rho_min': -1.0, # min density
+    'rho_max': -1.0, # max density
+    'vp_min': -1.0, # min P-wave speed
+    'vp_max': -1.0, # max P-wave speed
+    'vs_min': -1.0, # min S-wave speed
+    'vs_max': -1.0, # max S-wave speed
+    'gam_min': -1.0, # min viscosity
+    'gam_max': 0.8, # max viscosity
+    'hourglass': [1.0, 1.0], # hourglass stiffness (1) and viscosity (2)
+    'vdamp': -1.0, # Vs dependent damping
+    'bc1': ['free', 'free', 'free'], # boundary cond: near x, y, z surface
+    'bc2': ['free', 'free', 'free'], # boundary cond: far x, y, z surface
+    'npml': 10, # number of PML damping nodes
+    'ppml': 2, # PML exponent, 1-4. Generally 2 is best.
+    'vpml': -1.0, # damping velocity, <0 default to min, max V_s harmonic mean
+    'nsource': 0, # number of finite source sub-faults
+    'source': 'potency', # finite source type: potency, moment, force
+    'hypocenter': [0.0, 0.0, 0.0], # hypocenter logical coordinates
+    'slipvector': [1.0, 0.0, 0.0], # shear traction direction for ts1
+    'faultnormal': 'none', # fault normal direction: +x, +y, +z, -x, -y, -z
+    'faultopening': 0, # 0=not allowed, 1=allowed
+    'vrup': -1.0, # nucleation rupture velocity, negative = no nucleation
+    'rcrit': 1000.0, # nucleation critical radius
+    'trelax': 0.075, # nucleation relaxation time
+    'svtol': 0.001, # slip velocity considered rupturing
+}
+
+# Multi-dimensional field variable names for input and output.
+# n: node registered volume field
+# c: cell registered volume field
+# f: fault rupture field
+# ~: time varying field
+# <: input/output field, otherwise output only.
+# Note: For efficiency, magnitudes of 3D fields [am2, vm2, um2, wm2] are
+# magnitude squared because square roots are computationally expensive. Also
+# stress magnitude (wm2) is the square of the Frobenius Norm, as finding the
+# true stress tensor magnitude requires computing eigenvalues at every
+# location.
+fieldnames = {
+    'x': ['n<', 'x', 'Node coordinate'],
+    'y': ['n<', 'y', 'Node coordinate'],
+    'z': ['n<', 'z', 'Node coordinate'],
+    'fx': ['n~<', 'f_x', 'Force'],
+    'fy': ['n~<', 'f_y', 'Force'],
+    'fz': ['n~<', 'f_z', 'Force'],
+    'ax': ['n~<', 'a_x', 'Acceleration'],
+    'ay': ['n~<', 'a_y', 'Acceleration'],
+    'az': ['n~<', 'a_z', 'Acceleration'],
+    'vx': ['n~<', 'v_x', 'Velocity'],
+    'vy': ['n~<', 'v_y', 'Velocity'],
+    'vz': ['n~<', 'v_z', 'Velocity'],
+    'ux': ['n~<', 'u_x', 'Displacement'],
+    'uy': ['n~<', 'u_y', 'Displacement'],
+    'uz': ['n~<', 'u_z', 'Displacement'],
+    'am2': ['n~', '|a|', 'Acceleration magnitude'],
+    'vm2': ['n~', '|v|', 'Velocity magnitude'],
+    'um2': ['n~', '|u|', 'Displacement magnitude'],
+    'rho': ['c<', '\rho', 'Density'],
+    'vp':  ['c<', 'V_p', 'P-wave velocity'],
+    'vs':  ['c<', 'V_s', 'S-wave velocity'],
+    'gam': ['c<', '\gamma', 'Viscosity'],
+    'xc':  ['c', 'x', 'Cell coordinate'],
+    'yc':  ['c', 'y', 'Cell coordinate'],
+    'zc':  ['c', 'z', 'Cell coordinate'],
+    'vc':  ['c', 'V^C', 'Cell volume'],
+    'nu':  ['c', '\nu', 'Poisson ratio'],
+    'mu':  ['c', '\mu', 'Elastic modulus'],
+    'lam': ['c', '\lambda', 'Elastic modulus'],
+    'pxx': ['c~<', 'p_{xx}', 'Seismic potency'],
+    'pyy': ['c~<', 'p_{yy}', 'Seismic potency'],
+    'pzz': ['c~<', 'p_{zz}', 'Seismic potency'],
+    'pyz': ['c~<', 'p_{yz}', 'Seismic potency'],
+    'pzx': ['c~<', 'p_{zx}', 'Seismic potency'],
+    'pxy': ['c~<', 'p_{xy}', 'Seismic potency'],
+    'mxx': ['c~<', 'm_{xx}', 'Seismic moment'],
+    'myy': ['c~<', 'm_{yy}', 'Seismic moment'],
+    'mzz': ['c~<', 'm_{zz}', 'Seismic moment'],
+    'myz': ['c~<', 'm_{yz}', 'Seismic moment'],
+    'mzx': ['c~<', 'm_{zx}', 'Seismic moment'],
+    'mxy': ['c~<', 'm_{xy}', 'Seismic moment'],
+    'wxx': ['c~<', '\sigma_{xx}', 'Stress'],
+    'wyy': ['c~<', '\sigma_{yy}', 'Stress'],
+    'wzz': ['c~<', '\sigma_{zz}', 'Stress'],
+    'wyz': ['c~<', '\sigma_{yz}', 'Stress'],
+    'wzx': ['c~<', '\sigma_{zx}', 'Stress'],
+    'wxy': ['c~<', '\sigma_{xy}', 'Stress'],
+    'wm2': ['c~', '||\sigma||_F', 'Stress Frobenius norm'],
+    'mus': ['f<', '\mu_s', 'Static friction coefficient'],
+    'mud': ['f<', '\mu_d', 'Dynamic friction coefficient'],
+    'dc':  ['f<', 'D_c', 'Slip weakening distance'],
+    'co':  ['f<', 'co', 'Cohesion'],
+    'tn':  ['f<', '\tau_n', 'Pre-traction normal component'],
+    'ts':  ['f<', '\tau_s', 'Pre-traction strike component'],
+    'td':  ['f<', '\tau_d', 'Pre-traction dip component'],
+    'sxx': ['f<', '\sigma_{xx}', 'Pre-stress'],
+    'syy': ['f<', '\sigma_{yy}', 'Pre-stress'],
+    'szz': ['f<', '\sigma_{zz}', 'Pre-stress'],
+    'syz': ['f<', '\sigma_{yz}', 'Pre-stress'],
+    'szx': ['f<', '\sigma_{zx}', 'Pre-stress'],
+    'sxy': ['f<', '\sigma_{xy}', 'Pre-stress'],
+    'nsx': ['f', 'n_x', 'Fault surface normal'],
+    'nsy': ['f', 'n_y', 'Fault surface normal'],
+    'nsz': ['f', 'n_z', 'Fault surface normal'],
+    '_f0': ['f<', 'f_0', 'Steady state friction at V_0'],
+    '_fw': ['f<', 'f_w', 'Fully weakened fiction'],
+    '_v0': ['f<', 'V_0', 'Reference slip velocity'],
+    '_vw': ['f<', 'V_w', 'Weakening slip velocity'],
+    '_ll': ['f<', 'L', 'State evolution distance'],
+    '_af': ['f<', 'a', 'Direct effect parameter'],
+    '_bf': ['f<', 'b', 'Evolution effect parameter'],
+    'tx':  ['f~', '\tau_x', 'Traction'],
+    'ty':  ['f~', '\tau_y', 'Traction'],
+    'tz':  ['f~', '\tau_z', 'Traction'],
+    'tsx': ['f~', '\tau^s_x', 'Shear traction'],
+    'tsy': ['f~', '\tau^s_y', 'Shear traction'],
+    'tsz': ['f~', '\tau^s_z', 'Shear traction'],
+    'tnm': ['f~', '\tau^n', 'Normal traction'],
+    'tsm': ['f~', '|\tau^s|', 'Shear traction magnitude'],
+    'fr':  ['f~', '\tau_c', 'Friction'],
+    'sax': ['f~', '\ddot s_x', 'Slip acceleration'],
+    'say': ['f~', '\ddot s_y', 'Slip acceleration'],
+    'saz': ['f~', '\ddot s_z', 'Slip acceleration'],
+    'sam': ['f~', '|\ddot s|', 'Slip acceleration magnitude'],
+    'svz': ['f~', '\dot s_x', 'Slip velocity'],
+    'svy': ['f~', '\dot s_y', 'Slip velocity'],
+    'svz': ['f~', '\dot s_z', 'Slip velocity'],
+    'svm': ['f~', '|\dot s|', 'Slip velocity magnitude'],
+    'psv': ['f~', '|\dot s|_{peak}', 'Peak slip velocity'],
+    'sux': ['f~', 's_x', 'Slip'],
+    'suy': ['f~', 's_y', 'Slip'],
+    'suz': ['f~', 's_z', 'Slip'],
+    'sum': ['f~', '|s|', 'Slip magnitude'],
+    'sl':  ['f~', '\ell', 'Slip path length'],
+    'trup': ['f~', 't_{rupture}', 'Rupture time'],
+    'tarr': ['f~', 't_{arrest}', 'Arrest time'],
+    '_psi': ['f~', '\psi', 'State variable'],
+}
+
 difference_operators = [
     'auto',
     'cons',
@@ -35,24 +195,6 @@ time_functions = [
     'ricker2',
 ]
 
-def parameters():
-    import os, yaml
-    from .. import util
-    x = os.path.dirname(__file__)
-    x = os.path.join(x, 'parameters.yaml')
-    x = open(x).read()
-    x = yaml.safe_load(x)
-    x = util.storage(**x)
-    return x
-
-def fieldnames():
-    import os, yaml
-    x = os.path.dirname(__file__)
-    x = os.path.join(x, 'fieldnames.yaml')
-    x = open(x).read()
-    x = yaml.safe_load(x)
-    return x
-
 def f90modules(path):
     mods = set()
     deps = set()
@@ -66,10 +208,8 @@ def f90modules(path):
     return list(mods), list(deps)
 
 def configure(force=False):
-    """
-    Create SORD Makefile.
-    """
     import os
+    
     from .. import util
 
     # source directory
@@ -144,23 +284,17 @@ def configure(force=False):
 
 
 def make(force=False):
-    """
-    Build SORD code.
-    """
-    import os, yaml, subprocess
+    import os, json, subprocess
     configure(force)
-    p = os.path.dirname(__file__) + os.sep
+    p = __file__[:-3] + os.sep
     if force:
         subprocess.check_call(['make', '-C', p, 'clean'])
     subprocess.check_call(['make', '-C', p, '-j', '4'])
-    cfg = yaml.safe_load(open(p + 'config.json'))
+    cfg = json.load(open(p + 'config.json'))
     return cfg
 
 
 def prepare_param(prm, fio):
-    """
-    Prepare input parameters
-    """
     import os
 
     # checks
@@ -200,7 +334,7 @@ def prepare_param(prm, fio):
     # convert boundary conditions to numeric ids
     for k in 'bc1', 'bc2':
         for i in 0, 1, 2:
-            if isinstance(prm[k][i], basestring):
+            if type(prm[k][i]) == str:
                 prm[k][i] = boundary_conditions[prm[k][i]]
 
     # field i/o
@@ -227,7 +361,7 @@ def prepare_param(prm, fio):
             shape += [nt]
         if type(ios) in (float, int):
             ios = [ios]
-        elif len(ios) > 1 and isinstance(ios[1], basestring):
+        elif len(ios) > 1 and type(ios[1]) == str:
             ios = [ios]
         ios_ = []
         for io in ios:
@@ -336,9 +470,6 @@ def prepare_param(prm, fio):
     return prm, fio_, meta
 
 def run(args=None, **kwargs):
-    """
-    Stage and launch job.
-    """
     import os, json, shutil
     import numpy as np
     from .. import util
@@ -351,19 +482,19 @@ def run(args=None, **kwargs):
     args.update(kwargs)
 
     # configure and make
-    prm = parameters()
-    fns = fieldnames()
+    prm = {}
     fio = {}
     job = {}
-    for k, v in prm.items():
-        if k in fns:
+    for k, v in parameters.items():
+        if k in fieldnames:
             fio[k] = v
-            del(prm[k])
+        else:
+            prm[k] = v
     for k, v in args.items():
-        if k in fns:
+        if k in fieldnames:
             if type(v) != list:
                 v = [v]
-            elif len(v) > 1 and isinstance(v[1], basestring):
+            elif len(v) > 1 and type(v[1]) == str:
                 v = [v]
             for i, io in enumerate(v):
                 if type(io) in (tuple, list):
@@ -374,7 +505,10 @@ def run(args=None, **kwargs):
                 v = v[0]
             args[k] = v
             fio[k] = v
-        elif k in prm:
+        elif k in parameters:
+            u = parameters[k]
+            if u != None and v != None and type(u) != type(v):
+                raise TypeError(k, v, u)
             prm[k] = v
         else:
             job[k] = v
@@ -446,17 +580,16 @@ def run(args=None, **kwargs):
     # save parametes
     prm.update({'~fieldio': fio})
     meta.update({'dtype': np.dtype('f' +  cfg['realsize']).str})
-    out = json.dumps(args, sort_keys=True, indent=4)
+    out = json.dumps(args, indent=4, sort_keys=True)
     open('parameters.json', 'w').write(out)
-    out = json.dumps(job, sort_keys=True, indent=4)
+    out = json.dumps(job, indent=4, sort_keys=True)
     open('job.json', 'w').write(out)
-    out = json.dumps(prm, sort_keys=True, indent=4)
+    out = json.dumps(prm, indent=4, sort_keys=True)
     open('sord.json', 'w').write(out)
-    out = json.dumps(meta, sort_keys=True, indent=4)
+    out = json.dumps(meta, indent=4, sort_keys=True)
     open('meta.json', 'w').write(out)
 
     # save archive and start job
-    util.archive('coseis.tgz')
     util.launch(job)
 
     return job
@@ -466,11 +599,9 @@ class get_slices:
         return slices
 s_ = get_slices()
 
+# String representation of slice object
 def repr_slices(slices):
-    """
-    String representation of slice object
-    """
-    if isinstance(slices, basestring):
+    if type(slices) == str:
         return slices
     elif type(slices) in (tuple, list):
         slices = list(slices)
@@ -506,7 +637,7 @@ def expand_slices(shape, slices=[]):
     """
 
     # normalize to list
-    if isinstance(slices, basestring):
+    if type(slices) == str:
         assert(slices[0] + slices[-1] == '[]')
         if slices == '[]':
             slices = []
@@ -526,7 +657,7 @@ def expand_slices(shape, slices=[]):
 
     # loop over slices
     for i, s in enumerate(slices):
-        if isinstance(s, basestring):
+        if type(s) == str:
             t = []
             for j in s.split(':'):
                 if j == '':
@@ -551,4 +682,20 @@ def expand_slices(shape, slices=[]):
         slices[i] = s
 
     return slices
+
+def command_line():
+    import sys
+    files = []
+    args = {}
+    for 
+    import sys, yaml
+    import cst
+
+    prm = open(sys.argv[1])
+    prm = yaml.load(prm)
+    del(sys.argv[1])
+    cst.sord.run(prm)
+
+if __name__ == '__main__':
+    command_line()
 

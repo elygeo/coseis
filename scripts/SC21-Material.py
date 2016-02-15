@@ -4,7 +4,7 @@ Material model extraction from CVM
 """
 import os, json, shutil
 import numpy as np
-import cst
+import cst.util, cst.cvms
 
 # parameters
 dx = 2000.0; nproc = 1

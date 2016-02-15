@@ -5,7 +5,7 @@ Explosion test plot
 import os, math, json
 import numpy as np
 import matplotlib.pyplot as plt
-import cst
+import cst.coord, cst.signal
 
 # run directory
 os.chdir(os.path.join('run', 'Explosion'))

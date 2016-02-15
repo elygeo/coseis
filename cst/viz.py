@@ -2,39 +2,6 @@
 Visualization tools.
 """
 
-def distill_eps(eps):
-    """
-    Distill EPS to PDF using Ghostscript.
-    """
-    from subprocess import Popen, PIPE
-    p = 'ps2pdf', '-dEPSCrop', '-dPDFSETTINGS=/prepress', '-', '-'
-    p = Popen(p, stdin=PIPE, stdout=PIPE).communicate(eps)[0]
-    return p
-
-def pdf2png(pdf, dpi=72):
-    """
-    Rasterize PDF to PNG using Ghostscript.
-    """
-    from subprocess import Popen, PIPE
-    p = 'gs', '-q', '-r%s' % dpi, '-dNOPAUSE', '-dBATCH', '-sDEVICE=pngalpha', '-sOutputFile=-', '-'
-    p = Popen(p, stdin=PIPE, stdout=PIPE).communicate(pdf)[0]
-    return p
-
-def img2pdf(img, dpi=150):
-    """
-    Convert image array to PDF using PIL and ImageMagick.
-    """
-    from subprocess import Popen, PIPE
-    import cStringIO, Image
-    p = cStringIO.StringIO()
-    #img = Image.fromarray(img)
-    #img.save(p, format='png')
-    Image.fromarray(img).save(p, format='png')
-    img = p.getvalue()
-    p = 'convert', '-density', str(dpi), 'png:-', 'pdf:-'
-    p = Popen(p, stdin=PIPE, stdout=PIPE).communicate(img)[0]
-    return p
-
 def pdf_merge(layers):
     """
     Overlay multiple single page PDF file descriptors.

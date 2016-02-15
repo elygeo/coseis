@@ -2,11 +2,10 @@
 """
 Reproduce Magistrale (2000) Fig. 10 fence diagram.
 """
-import os
 import pyproj
 import numpy as np
 from enthought.mayavi import mlab
-import cst
+import cst.cvms, cst.cvmh, cst.data
 
 # parameters
 model = 'S'; version = '2.2'
@@ -120,7 +119,7 @@ mlab.view(-90, 45, 2e6, (0, 0, -2e4))
 fig.scene.camera.view_angle = 3.3
 fig.scene.light_manager.lights[3].activate = True
 f = 'CVM-Fence-%s-%s.png' % (prop, model)
-print f
+print(f)
 mlab.savefig(f, magnification=1)
 fig.scene.disable_render = False
 #mlab.show()
