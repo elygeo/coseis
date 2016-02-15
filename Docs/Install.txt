@@ -1,0 +1,50 @@
+# Installations Notes
+
+## ALCF IBM Blue Gene/Q
+
+Install location:
+mira.alcf.anl.gov:/gpfs/mira-fs0/projects/
+
+.soft:
+PYTHONPATH += $HOME/coseis
+PATH += $HOME/coseis/bin
+PATH += /home/gely/local/${ARCH##*-}/epd/bin
+PATH += /home/gely/local/${ARCH##*-}/bin
+MANPATH += /home/gely/local/${ARCH##*-}/man
++mpiwrapper-xl
+@default
+
+## ALCF IBM Blue Gene/P
+
+Install location:
+intrepid.alcf.anl.gov:/intrepid-fs0/$USER/persistent
+
+.softevnrc:
+PYTHONPATH += $HOME/coseis
+PATH += $HOME/coseis/bin
+PATH += /gpfs/home/projects/epd/$HOSTTYPE/bin
+PATH += /gpfs/home/gely/local/$HOSTTYPE/bin
+MANPATH += /gpfs/home/gely/local/$HOSTTYPE/man
+PATH += /bgsys/drivers/ppcfloor/comm/xl/bin
++git-1.7.6.4
++tau-latest
+TAU_MAKEFILE = /soft/apps/tau/tau_latest/bgp/lib/Makefile.tau-bgptimers-mpi-pdt
+TAU_OPTIONS = '-optVerbose -optNoRevert -optCompInst'
+
+## Wat2Q IBM Blue Gene/Q
+
+Install location:
+grotius.watson.ibm.com:/gpfs/DDNgpfs1/kmager/scratch/
+
+.soft:
+PYTHONPATH += $HOME/sord/gely-coseis-v3.2-615-g6a39bb8/gely-coseis-6a39bb8
+PATH += $HOME/sord/gely-coseis-v3.2-615-g6a39bb8/gely-coseis-6a39bb8/bin
++mpiwrapper-xl
+@default
+
+## KAUST Shaheen: IBM Blue Gene/P
+
+module unload GNU
+module load IBM
+module load numpy
+

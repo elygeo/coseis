@@ -1,0 +1,25 @@
+# SCEC validation problem TPV3
+
+These scrips reproduce Figures 3, 4 and 5, comparing SORD to boundary integral
+solutions, and Figure 7, testing numerical convergence, from:
+
+Ely, G. P., S. M. Day, and J.-B. Minster (2009),
+*A support-operator method for 3D rupture dynamics*,
+Geophys. J. Int.,
+`177(3), 1140-1150 <http://www3.interscience.wiley.com/journal/122267744/abstract>`__,
+doi:10.1111/j.1365-246X.2009.04117.x.
+`[PDF] <http://earth.usc.edu/~gely/pub/ely-sord-20090504.pdf>`__
+
+First, edit ``sim.py`` to choose the desired resolution and number of
+processors, and then run ``sim.py`` to start the simulations. Use ``plot.py``
+and ``convergence.py`` to plot the results.
+
+
+## Boundary integral solution data
+
+Trup is off by dt compared to the time series
+
+stations locations:
+Pa = -0.05,  5.95
+Pi =  7.45, -0.05
+

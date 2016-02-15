@@ -1,0 +1,22 @@
+# Kostrov 
+
+Circular crack with uniform rupture velocity.
+
+cee.py : Test computing of C parameter from Dahlen (1974) Eqn. (44) and Fig. 3,
+use for computing analytical slip velocity function.
+
+## References
+
+Kostrov, B. V. (1966). Unsteady propagation of longitudinal shear cracks, J.
+Appl. Math. Mech., 30(6), doi:10.1016/0021-8928(66)90087-6.
+
+Burridge, R. and Willis, J. R. (1969). The self-similar problem of the
+expanding elliptical crack in an anisotropic solid, Math. Proc. Cambridge,
+66(02), doi:10.1017/S0305004100045199.
+
+Dahlen, F. A. (1974). On the ratio of P-wave to S-wave corner frequencies for
+shallow earthquake sources, BSSA, 64(4).
+
+Day, S. M. (1982). Three-dimensional finite difference simulation of fault
+dynamics: Rectangular faults with fixed rupture velocity, BSSA, 72(3).
+
