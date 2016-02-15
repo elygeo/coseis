@@ -44,7 +44,7 @@ def download(version=None):
     return
 
 def configure(force=False, **kwargs):
-    import os, yaml, shutil, subprocess
+    import os, json, shutil, subprocess
     from . import util, repo
 
     # source directory
@@ -52,7 +52,7 @@ def configure(force=False, **kwargs):
     os.chdir(__file__[:-3])
 
     # configure
-    cfg = yaml.load(open('defaults.yaml'))
+    cfg = json.load(open('defaults.json'))
     cfg = util.prepare(
         defaults = cfg,
         name = 'cvms',

@@ -684,7 +684,9 @@ def expand_slices(shape, slices=[]):
     return slices
 
 def command_line():
-    import sys
+
+FIXME
+    import sys, json, yaml
     files = []
     args = {}
     prm = open(sys.argv[1])

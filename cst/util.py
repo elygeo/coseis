@@ -2,6 +2,13 @@
 Miscellaneous tools.
 """
 
+class storage()
+elif k in parameters:
+            u = parameters[k]
+            if u != None and v != None and type(u) != type(v):
+                raise TypeError(k, v, u)
+
+
 def hostname():
     import os, json, socket
     h = os.uname()
@@ -27,6 +34,8 @@ def configure(args=None, defaults=None, **kwargs):
     path = os.path.join(path, 'conf') + os.sep
     f = path + 'default.json'
     job = json.load(open(f))
+
+FIXME
     job = storage(**job)
     job['argv'] = sys.argv[1:]
     job['host'], job['machine'] = hostname()
