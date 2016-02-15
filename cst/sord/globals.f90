@@ -2,7 +2,7 @@
 module globals
 implicit none
 
-! input parameters, see parameters.yaml for documentation
+! input parameters, see sord.py for documentation
 integer :: &
     bc1(3), bc2(3), debug, faultopening, i1pml(3), i2pml(3), itio, itstats, mpin, &
     mpout, n1expand(3), n2expand(3), npml, nproc3(3), nsource, nthread, ppml, &

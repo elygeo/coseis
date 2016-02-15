@@ -21,7 +21,7 @@ def download(version=None):
     Download CVMS data
     """
     import os, urllib, tarfile, cStringIO
-    from .. import repo
+    from . import repo
 
     if version == None:
         version = versions[-1]
@@ -45,7 +45,7 @@ def download(version=None):
 
 def configure(force=False, **kwargs):
     import os, yaml, shutil, subprocess
-    from .. import util, repo
+    from . import util, repo
 
     # source directory
     cwd = os.getcwd()
@@ -121,7 +121,7 @@ def run(**kwargs):
     Stage and launch job
     """
     import os
-    from .. import util, repo
+    from . import util, repo
 
     print('CVM-S')
 

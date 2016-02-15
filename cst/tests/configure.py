@@ -9,7 +9,7 @@ def test(**kwargs):
     path = os.path.dirname(cst.__file__)
     path = os.path.join(path, 'conf')
     for f in ['DEFAULT'] + os.listdir(path):
-        if f in ('default.yaml', 'hostmap.yaml'):
+        if f in ('default.json', 'hostmap.json'):
             continue 
         machine = os.path.splitext(f)[0]
         job = cst.util.prepare(

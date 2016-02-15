@@ -6,7 +6,7 @@ type t_io
     integer :: ii(3,4), nb, ib, fh
     real, pointer :: buff(:,:)     ! buffer for storing multiple time steps
     character(32) :: fname         ! file or function nameD on disk for input or output
-    character(4) :: field          ! field variable, see fieldnames.yaml
+    character(4) :: field          ! field variable, see sord.py
     character(2) :: op             ! '<' read, '>' write, '=' set, '+' add
     character :: reg               ! n: node, c: cell registration
 end type t_io

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Support Operator Rupture Dynamics
 """
@@ -209,8 +210,7 @@ def f90modules(path):
 
 def configure(force=False):
     import os
-    
-    from .. import util
+    from . import util
 
     # source directory
     cwd = os.getcwd()
@@ -472,7 +472,7 @@ def prepare_param(prm, fio):
 def run(args=None, **kwargs):
     import os, json, shutil
     import numpy as np
-    from .. import util
+    from . import util
 
     print('SORD: Support Operator Rupture Dynamics')
 
@@ -687,10 +687,6 @@ def command_line():
     import sys
     files = []
     args = {}
-    for 
-    import sys, yaml
-    import cst
-
     prm = open(sys.argv[1])
     prm = yaml.load(prm)
     del(sys.argv[1])
