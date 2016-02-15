@@ -21,10 +21,10 @@ parameters = {
     'n2expand': [0, 0, 0], # number of grid expansion nodes - far side
     'gridnoise': 0.0, # random noise added to mesh, assumes planar fault
     'tm0': 0.0, # initial time
-    'rho': 2670.0, # density
-    'vp':  6000.0, # P-wave speed
-    'vs':  3464.0, # S-wave speed
-    'gam': 0.0, # viscosity
+    'rho': [2670.0], # density
+    'vp':  [6000.0], # P-wave speed
+    'vs':  [3464.0], # S-wave speed
+    'gam': [0.0], # viscosity
     'rho_min': -1.0, # min density
     'rho_max': -1.0, # max density
     'vp_min': -1.0, # min P-wave speed
@@ -196,6 +196,12 @@ time_functions = [
     'ricker2',
 ]
 
+class typed_dict(dict):
+    def __setitem__(self, k, v):
+        if type(v) != type(self[k]):
+            raise TypeError(key, self[k], v)
+        dict.__setitem__(self, k, v)
+
 def f90modules(path):
     mods = set()
     deps = set()
@@ -338,14 +344,13 @@ def prepare_param(prm, fio):
                 prm[k][i] = boundary_conditions[prm[k][i]]
 
     # field i/o
-    fns = fieldnames()
     fio_ = []
     filenames = []
     shapes = {}
     deltas = {}
     indices = {}
     for field, ios in sorted(fio.items()):
-        tags = fns[field][0]
+        tags = fieldnames[field][0]
         reg = tags[0]
         input_ = '<' in tags
         static = '~' not in tags
@@ -684,8 +689,6 @@ def expand_slices(shape, slices=[]):
     return slices
 
 def command_line():
-
-FIXME
     import sys, json, yaml
     files = []
     args = {}

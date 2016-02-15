@@ -2,12 +2,11 @@
 Miscellaneous tools.
 """
 
-class storage()
-elif k in parameters:
-            u = parameters[k]
-            if u != None and v != None and type(u) != type(v):
-                raise TypeError(k, v, u)
-
+class typed_dict(dict):
+    def __setitem__(self, k, v):
+        if type(v) != type(self[k]):
+            raise TypeError(key, self[k], v)
+        dict.__setitem__(self, k, v)
 
 def hostname():
     import os, json, socket
@@ -34,9 +33,7 @@ def configure(args=None, defaults=None, **kwargs):
     path = os.path.join(path, 'conf') + os.sep
     f = path + 'default.json'
     job = json.load(open(f))
-
-FIXME
-    job = storage(**job)
+    job = typed_dict(job)
     job['argv'] = sys.argv[1:]
     job['host'], job['machine'] = hostname()
     job['maxcores'] = multiprocessing.cpu_count()
