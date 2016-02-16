@@ -9,8 +9,8 @@ scale-model experiments*, Bull. Seism. Soc. Am., `92(8), 3022-3041
 doi:10.1785/0120010273.
 """
 import os
-import cst.sord
-s_ = cst.sord.get_slices()
+from cst import sord
+s_ = sord.get_slices()
 prm = {}
 
 # dimentions
@@ -91,8 +91,8 @@ prm['uy'] += [(s_[0,k,1:l+1,:], '=>', 'off-fault.bin')]
 #prm['vy'] = [(s_[:,k,1:l+1,::10], '=>', 'xsec.bin')]
 
 # run SORD
-d = os.path.joing('run', 'foam-%02.0f' % (weakzone * 100))
+d = os.path.join('run', 'foam-%02.0f' % (weakzone * 100))
 os.makedirs(d)
 os.chdir(d)
-cst.sord.run(prm)
+sord.run(prm)
 

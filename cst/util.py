@@ -22,53 +22,32 @@ def hostname():
     return host, 'Default'
 
 
-def configure(args=None, defaults=None, **kwargs):
+def configure(*args, **kwargs):
     import os, sys, pwd, json, multiprocessing
 
     # defaults
-    if args == None:
-        args = {}
-    args.update(kwargs)
     path = os.path.dirname(__file__)
     path = os.path.join(path, 'conf') + os.sep
     f = path + 'default.json'
     job = json.load(open(f))
     job = typed_dict(job)
-    job['argv'] = sys.argv[1:]
     job['host'], job['machine'] = hostname()
     job['maxcores'] = multiprocessing.cpu_count()
-    if defaults != None:
-        job.update(defaults)
 
-    # merge arguments, 1st pass
-    for k in args:
-        job[k] = args[k]
-
-    # merge machine parameters
+    # merge arguments and machine specific parameters
+    d = {}
+    for a in args:
+        d.update(a)
+    d.update(kwargs)
     if job['machine'] and job['machine'].lower() != 'default':
         f = path + job['machine'] + '.json'
-        m = json.load(open(f))
-        job.update(m)
-    #for h, o in job['host_opts'].items():
-    #    if h in job['host']:
-    #        for k, v in o.items():
-    #            job[k] = v
-
-    # arguments, 2nd pass
-    for k in args:
-        job[k] = args[k]
-
-    # command line parameters
-    for i in job['argv']:
-        if not i.startswith('--'):
-            raise Exception('Bad argument ' + i)
-        k, v = i[2:].split('=')
-        if len(v) and not v[0].isalpha():
-            v = json.loads(v)
+        d.update(json.load(open(f)))
+    for a in args:
+        d.update(a)
+    for k, v in d.items():
         job[k] = v
 
     return job
-
 
 def prepare(job=None, **kwargs):
     """
@@ -80,8 +59,8 @@ def prepare(job=None, **kwargs):
     if job is None:
         job = configure(**kwargs)
     else:
-        for k in kwargs:
-            job[k] = kwargs[k]
+        for k, v in kwargs.items():
+            job[k] = v]
 
     # misc
     job.update({
@@ -97,13 +76,13 @@ def prepare(job=None, **kwargs):
 
     # dependency
     if job['depend']:
-        job['depend_flag'] = job['depend_flag'].format(depend=job['depend'])
+        job['depend_flag'] = job['depend_flag'].format(**job)
     else:
         job['depend_flag'] = ''
 
     # notification
-    if job['email']:
-        job['notify_flag'] = job['notify_flag'].format(email=job['email'])
+    if job['notify']:
+        job['notify_flag'] = job['notify_flag'].format(**job)
     else:
         job['notify_flag'] = ''
 
@@ -201,8 +180,8 @@ def launch(job=None, **kwargs):
     if job is None:
         job = prepare(**kwargs)
     else:
-        for k in kwargs:
-            job[k] = kwargs[k]
+        for k, v in kwargs.items():
+            job[k] = v
 
     # launch
     if job['submit']:

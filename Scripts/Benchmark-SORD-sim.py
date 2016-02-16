@@ -1,10 +1,6 @@
 #!/usr/bin/env python
-"""
-Benchmarks
-"""
 import os
-import cst.sord
-s_ = cst.sord.get_slices()
+from cst import sord
 
 # MPI
 power = range(7, 10) # Mira
@@ -21,16 +17,17 @@ points = 400
 power = range(6) # Challenger
 
 # SORD parameters
-prm = {}
-prm['minutes'] = 20
-prm['diffop'] = 'exac'
-prm['diffop'] = 'save'
-prm['itstats'] = 9999
-prm['itio'] = 128
-prm['gridnoise'] = 0.1
-prm['vx'] = (s_[:,:,:,0], '=~', 1.0)
-prm['vy'] = (s_[:,:,:,0], '=~', 1.0)
-prm['vz'] = (s_[:,:,:,0], '=~', 1.0)
+prm = {
+    'minutes': 20
+    'diffop': 'exac'
+    'diffop': 'save'
+    'itstats': 9999
+    'itio': 128
+    'gridnoise': 0.1
+    'vx': ('[:,:,:,0]', '=~', 1.0)
+    'vy': ('[:,:,:,0]', '=~', 1.0)
+    'vz': ('[:,:,:,0]', '=~', 1.0)
+}
 
 for i in power[::-1]:
     n = 2 ** i
@@ -39,5 +36,5 @@ for i in power[::-1]:
     d = os.path.joing('run', 'Benchmark-SORD-%s' % i)
     os.makedirs(d)
     os.chdir(d)
-    cst.sord.run(prm)
+    sord.run(prm)
 

@@ -3,8 +3,8 @@
 SCEC Code Validation Workshop, Test Problem Version 3
 """
 import os
-import cst.sord
-s_ = cst.sord.get_slices()
+from cst import sord
+s_ = sord.get_slices()
 prm = {}
 
 # list of runs:
@@ -110,6 +110,6 @@ for dx, np in runs:
     d = os.path.join('run', 'TPV3-%03.0f' % dx)
     os.makedirs(d)
     os.chdir(d)
-    cst.sord.run(prm)
+    sord.run(prm)
     os.chdir(cwd)
 

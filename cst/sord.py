@@ -697,6 +697,16 @@ def command_line():
     del(sys.argv[1])
     cst.sord.run(prm)
 
+    # command line parameters
+    for i in job['argv']:
+        if not i.startswith('--'):
+            raise Exception('Bad argument ' + i)
+        k, v = i[2:].split('=')
+        if len(v) and not v[0].isalpha():
+            v = json.loads(v)
+        job[k] = v
+
+
 if __name__ == '__main__':
     command_line()
 

@@ -8,8 +8,8 @@ http://peer.berkeley.edu/lifelines/lifelines_pre_2006/final_reports/1A01-FR.pdf
 http://www-rohan.sdsu.edu/~steveday/BASINS/Final_Report_1A01.pdf
 """
 import os
-import cst.sord
-s_ = cst.sord.get_slices()
+from cst import sord
+s_ = sord.get_slices()
 prm = {}
 
 # number of processors in each dimension
@@ -55,5 +55,5 @@ for i in range(10):
 p = os.path.join('run', 'LOH1')
 os.makedirs(p)
 os.chdir(p)
-cst.sord.run(prm)
+sord.run(prm)
 

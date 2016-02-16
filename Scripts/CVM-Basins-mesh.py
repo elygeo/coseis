@@ -4,7 +4,7 @@ Simple SoCal mesh generation and CVM-S extraction.
 """
 import os, json
 import numpy as np
-import cst.cvms
+from cst import cvms
 
 # parameters
 delta = 0.25 / 60.0, 0.25 / 60.0, 20.0;   nproc = 512
@@ -24,11 +24,11 @@ nsample = shape[0] * shape[1] * shape[2]
 x, y = np.meshgrid(x, y)
 
 # metadata
-meta = dict(
-    delta = delta,
-    shape = shape,
-    extent = extent,
-)
+meta = {
+    'delta': delta,
+    'shape': shape,
+    'extent': extent,
+}
 
 # run dir
 p = os.path.join('run', 'CVM-Basins')
@@ -53,5 +53,5 @@ with open('dep.bin', 'wb') as f:
         x.tofile(f)
 
 # launch CVM-S
-cst.cvms.run(nsample = nsample, nproc = nproc)
+cvms.run(nsample=nsample, nproc=nproc)
 

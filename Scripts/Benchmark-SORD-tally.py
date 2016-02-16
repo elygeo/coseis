@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-"""
-Tally benchmarks
-"""
 import os, json, glob
 import numpy as np
 

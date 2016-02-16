@@ -7,8 +7,8 @@ http://peer.berkeley.edu/lifelines/lifelines_pre_2006/lifelines_princ_invest_y-7
 http://www-rohan.sdsu.edu/~steveday/BASINS/Final_Report_1A02.pdf
 """
 import os, json
-import cst.sord
-s_ = cst.sord.get_slices()
+from cst import sord
+s_ = sord.get_slices()
 prm = {}
 
 # parameters
@@ -66,5 +66,5 @@ os.makedirs(d)
 os.chdir(d)
 for v in 'rho', 'vp', 'vs':
     os.link(mesh + 'mesh-' + v + '.bin', '.')
-cst.sord.run(prm)
+sord.run(prm)
 

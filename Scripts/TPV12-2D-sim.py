@@ -5,8 +5,8 @@ FIXME: prestress not correct
 """
 import os, math
 import numpy as np
-import cst.sord
-s_ = cst.sord.get_slices()
+from cst import sord
+s_ = sord.get_slices()
 prm = {}
 
 # dimensions
@@ -117,5 +117,5 @@ y.astype('f').tofile(d + 'syy.bin')
 z.astype('f').tofile(d + 'szz.bin')
 
 # run SORD
-cst.sord.run(prm)
+sord.run(prm)
 

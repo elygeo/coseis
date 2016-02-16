@@ -2,12 +2,10 @@
 
 exclude = []
 include = [
-    'setup.py',
-    'bin/*',
-    'doc/*.py',
     'cst/*.py',
     'cst/*/*.py',
-    'scripts/*/*.py',
+    'Scripts/*.py',
+    'Util/*.py',
 ]
 
 def test(**kwargs):

@@ -2,7 +2,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-import cst.bin2npy
+from cst import bin2npy
 
 # simulation directory
 os.chdir(os.path.join('run', 'SORD-Example'))
