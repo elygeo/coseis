@@ -1,9 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Convert binary files to NumPy
-Geoffrey Ely, 2015-03-10
-
-TODO: adapt for very large files, ala swab.py
 """
 import os, sys, json
 import numpy as np

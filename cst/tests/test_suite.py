@@ -12,7 +12,6 @@ def test():
     for m in [
         cst.tests.syntax,
         cst.tests.doctests,
-        cst.tests.configure,
         cst.tests.hello,
         cst.tests.sord_mpi,
         cst.tests.sord_pml,

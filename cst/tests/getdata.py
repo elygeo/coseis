@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
-import cst.cvms, cst.cvmh, cst.cfm, cst.data
+from cst import cvms, cvmh, cfm, data
 
-cst.cvms.make()
-cst.cvmh.cvmh_voxet()
-cst.cfm.catalog()
-cst.data.mapdata()
-cst.data.etopo1()
-cst.data.globe30()
-cst.data.lsh_cat()
-cst.data.engdahl_cat()
+cvms.make()
+cvmh.cvmh_voxet()
+cfm.catalog()
+data.mapdata()
+data.etopo1()
+data.globe30()
+data.lsh_cat()
+data.engdahl_cat()
 

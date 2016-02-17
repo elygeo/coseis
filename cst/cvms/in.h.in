@@ -1,8 +1,0 @@
-! in.h - memory usage is ibig * 38 * 4 bytes
-!     integer, parameter :: ibig = 4800000
-      integer, parameter :: ibig = {max_samples}
-      real, parameter :: rdepmin = 0.0
-      common /oi/ rlat, rlon, rdep, alpha, beta, rho, inout, nn, nnl
-      real :: rlat(ibig), rlon(ibig), rdep(ibig), alpha(ibig),
-     $    beta(ibig), rho(ibig)
-      integer :: inout(ibig), nn, nnl

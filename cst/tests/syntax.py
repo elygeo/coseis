@@ -3,9 +3,8 @@
 exclude = []
 include = [
     'cst/*.py',
-    'cst/*/*.py',
-    'Scripts/*.py',
     'Util/*.py',
+    'Scripts/*.py',
 ]
 
 def test(**kwargs):

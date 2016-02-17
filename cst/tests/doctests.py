@@ -1,13 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 def test(**kwargs):
     import doctest
-    import cst.tests
+    from cst import sord, coord
     failed = []
-    for m in [
-        cst.coord,
-        cst.sord,
-    ]:
+    for m in [coord, sord]:
         c = 'doctest.testmod(%s)' % m.__name__
         print('-' * 80)
         print('>>> ' + c)

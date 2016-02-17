@@ -86,8 +86,8 @@ ifeq ($(MACHINE), KAUST-Shaheen)
     LIBS =
 endif
 
-# NICS Kraken: Cray XT5
-ifeq ($(MACHINE), NICS-Kraken)
+# Cray XT5
+ifeq ($(MACHINE), Cray-XT5)
     PROCESS = mpi
     CC = cc
     FC = ftn

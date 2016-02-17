@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Swap byte order. Default is 4 byte numbers.
 """

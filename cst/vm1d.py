@@ -27,18 +27,15 @@ def dreger(prop, depth):
     f: Array of properties (kg/m^3 for rho, m/s for Vp and Vs)
     """
     import numpy as np
+    m = {
+        'z':   (5.5,  5.5, 16.0, 16.0, 35.0, 35.0),
+        'rho': (2.4,  2.67, 2.67, 2.8,  2.8,  3.0),
+        'vp':  (5.5,  6.3,  6.3,  6.7,  6.7,  7.8),
+        'vs':  (3.18, 3.64, 3.64, 3.87, 3.87, 4.5),
+    }
     depth = np.asarray(depth)
-    f = np.empty_like(depth)
-    f.fill(float('nan'))
-    z, rho, vp, vs = 1000.0 * np.array([
-        ( 5.5, 2.4,  5.5, 3.18),
-        ( 5.5, 2.67, 6.3, 3.64),
-        (16.0, 2.67, 6.3, 3.64),
-        (16.0, 2.8,  6.7, 3.87),
-        (35.0, 2.8,  6.7, 3.87),
-        (35.0, 3.0,  7.8, 4.5),
-    ]).T
-    f = {'rho': rho, 'vp': vp, 'vs': vs}[prop]
+    z = 1000.0 * np.array(m['z'])
+    f = 1000.0 * np.array(m[prop])
     f = np.interp(depth, z, f)
     return f
 

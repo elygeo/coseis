@@ -5,10 +5,7 @@ SRF is documented at http://epicenter.usc.edu/cmeportal/docs/srf4.pdf
 """
 
 def open_(fh, mode='r'):
-    """
-    Open a regular or compressed file if not already opened.
-    """
-    if isinstance(fh, basestring):
+    if type(fh) == str:
         import os, gzip
         fh = os.path.expanduser(fh)
         if fh.endswith('.gz'):
