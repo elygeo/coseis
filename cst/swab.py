@@ -27,7 +27,7 @@ def swab(src, dst, verbose=False, dtype='f', block=64*1024*1024):
         print('')
     return
 
-def command_line():
+def main():
     dtype = 'f'
     files = []
     for a in sys.argv[1:]:
@@ -43,5 +43,5 @@ def command_line():
         swab(f, f + '.swab', True, dtype)
 
 if __name__ == '__main__':
-    command_line()
+    main()
 

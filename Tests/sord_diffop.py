@@ -1,33 +1,28 @@
 #!/usr/bin/env python
+"""Test SORD operators"""
+import os
+import json
+import numpy as np
+import cst
+
 
 def test(**kwargs):
-    """
-    Test SORD operators
-    """
-    import os, json
-    import numpy as np
-    import cst
-    prm = {}
 
     # parameters
-    prm['itstats'] = 1
-
-    # dimensions
-    prm['nproc3'] = [2, 1, 1]
-    prm['nproc3'] = [1, 1, 1]
-    prm['shape'] = [5, 4, 2, 2]
-    prm['delta'] = [100.0, 100.0, 100.0, 0.0075]
-
-    # material
-    prm['rho'] = [2670.0]
-    prm['vp']  = [6000.0]
-    prm['vs']  = [3464.0]
-    prm['gam'] = [0.3]
-    prm['hourglass'] = [1.0, 1.0]
-
-    # boundary conditions
-    prm['bc1'] = ['free', 'free', 'free']
-    prm['bc2'] = ['free', 'free', 'free']
+    prm = {
+        # 'nproc3': [2, 1, 1],
+        'nproc3': [1, 1, 1],
+        'shape': [5, 4, 2, 2],
+        'delta': [100.0, 100.0, 100.0, 0.0075],
+        'rho': [2670.0],
+        'vp': [6000.0],
+        'vs': [3464.0],
+        'gam': [0.3],
+        'hourglass': [1.0, 1.0],
+        'bc1': ['free', 'free', 'free'],
+        'bc2': ['free', 'free', 'free'],
+        'itstats': 1,
+    }
 
     # output
     fns = cst.sord.fieldnames()
@@ -36,9 +31,9 @@ def test(**kwargs):
         prm[k] += [([], '=>', k + '.bin')]
 
     # source
-    prm['pxx'] += [([0,0,0,0], '=', 1e10)]
-    prm['pyy'] += [([0,0,0,0], '=', 1e10)]
-    prm['pzz'] += [([0,0,0,0], '=', 1e10)]
+    prm['pxx'] += [([0, 0, 0, 0], '=', 1e10)]
+    prm['pyy'] += [([0, 0, 0, 0], '=', 1e10)]
+    prm['pzz'] += [([0, 0, 0, 0], '=', 1e10)]
 
     # master
     prm['diffop'] = i = 'exac'
@@ -77,7 +72,6 @@ def test(**kwargs):
         max_err_all_ = max(max_err_all_, max_err_)
     assert max_err_all_ == 0.0
 
-# continue if command line
+
 if __name__ == '__main__':
     test()
-

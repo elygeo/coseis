@@ -47,7 +47,7 @@ def stats(filename, dtype='f', block=64*1024*1024):
         rmean = rsum / m
     return rmin, rmax, rmean, list(shape)
 
-def command_line():
+def main():
     dtype = 'f'
     files = []
     for a in sys.argv[1:]:
@@ -61,5 +61,5 @@ def command_line():
         print('%12g %12g %12g  %s  %s' % (s + (f,)))
 
 if __name__ == '__main__':
-    command_line()
+    main()
 

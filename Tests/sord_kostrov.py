@@ -1,12 +1,12 @@
 #!/usr/bin/env python
+"""Kostrov circular crack test."""
+import os
+import json
+import numpy as np
+from cst import sord, kostrov
+
 
 def test(**kwargs):
-    """
-    Kostrov circular crack test.
-    """
-    import os, json
-    import numpy as np
-    import cst
     prm = {}
 
     # dimensions
@@ -18,9 +18,9 @@ def test(**kwargs):
     prm['nproc3'] = [1, 1, 1]
 
     # material properties
-    prm['rho'] = rho = 2670.0
-    prm['vp'] = vp = 6000.0
-    prm['vs'] = vs = 3464.0
+    prm['rho'] = rho = [2670.0]
+    prm['vp'] = vp = [6000.0]
+    prm['vs'] = vs = [3464.0]
     prm['gam'] = 1.0
     prm['hourglass'] = [1.0, 1.0]
 
@@ -43,24 +43,24 @@ def test(**kwargs):
 
     # receivers
     prm['svm'] = [
-        ([ -1,-21,-1], '=>', 'p20a.bin'),
-        ([-13,-17,-1], '=>', 'p20b.bin'),
-        ([-17,-13,-1], '=>', 'p20c.bin'),
-        ([-21, -1,-1], '=>', 'p20d.bin'),
+        ([-1,  -21, -1], '=>', 'p20a.bin'),
+        ([-13, -17, -1], '=>', 'p20b.bin'),
+        ([-17, -13, -1], '=>', 'p20c.bin'),
+        ([-21,  -1, -1], '=>', 'p20d.bin'),
     ]
 
     # analytical solution
     r = 2000.0
     t = (nt - 1.5) * dt - r / prm['vrup']
-    #v = cst.kostrov.slip_rate(rho, vp, vs, vr, dtau, r, t, 0.82)
-    v = cst.kostrov.slip_rate(rho, vp, vs, vr, dtau, r, t)
+    # v = kostrov.slip_rate(rho, vp, vs, vr, dtau, r, t, 0.82)
+    v = kostrov.slip_rate(rho, vp, vs, vr, dtau, r, t)
 
     # run SORD
     cwd = os.getcwd()
     d = os.path.join('run', 'sord_kostrov') + os.sep
     os.makedirs(d)
     os.chdir(d)
-    cst.sord.run(prm, **kwargs)
+    sord.run(prm, **kwargs)
     meta = open('meta.json')
     dtype = json.load(meta)['dtype']
     os.chdir(cwd)
@@ -73,7 +73,6 @@ def test(**kwargs):
         print(v, err)
         assert abs(err) < 0.015
 
-# continue if command line
+
 if __name__ == '__main__':
     test()
-

@@ -7,7 +7,11 @@ Data retrieval and processing tools.
 # ftp://hazards.cr.usgs.gov/maps/qfault/
 # http://earthquake.usgs.gov/hazards/qfaults/KML/Quaternaryall.zip
 
-from . import repo
+try:
+    from . import conf
+except ImportError:
+    from cst import conf
+repo = conf.configure()['repository']
 
 def upsample(f):
     """

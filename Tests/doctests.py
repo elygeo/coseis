@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+
 def test(**kwargs):
     import doctest
     from cst import sord, coord
@@ -13,6 +14,6 @@ def test(**kwargs):
             failed.append(c)
     assert(failed == [])
 
+
 if __name__ == "__main__":
     test()
-

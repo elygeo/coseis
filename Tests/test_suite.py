@@ -1,23 +1,18 @@
 #!/usr/bin/env python
+from . import syntax, doctests, hello, sord_mpi, sord_pml, sord_kostrov
+
 
 def test():
-    import os
-    import cst.tests
-
     passed = []
     failed = []
-
-    # unit tests
-    path = os.path.dirname(cst.tests.__file__)
     for m in [
-        cst.tests.syntax,
-        cst.tests.doctests,
-        cst.tests.hello,
-        cst.tests.sord_mpi,
-        cst.tests.sord_pml,
-        cst.tests.sord_kostrov,
+        syntax,
+        doctests,
+        hello,
+        sord_mpi,
+        sord_pml,
+        sord_kostrov,
     ]:
-        os.chdir(path)
         c = '%s.test()' % m.__name__
         print('-' * 80)
         print('>>> ' + c)
@@ -26,11 +21,10 @@ def test():
             passed.append('PASSED: ' + c)
         except Exception as e:
             failed.append('FAILED: %s: %s' % (c, e.message))
-
-    # finished
     print('\n' + '\n'.join(passed))
     print('\n' + '\n'.join(failed))
+    return
+
 
 if __name__ == "__main__":
     test()
-

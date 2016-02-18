@@ -8,17 +8,14 @@ Quick multi-purpose plotting.
 --power=val        Exponent power applied to data
 --step=int         Decimate data
 --transpose        Transpose data
-
 """
+
 import os, sys, json
 import numpy as np
 from numpy.lib.npyio import format as npy
 import matplotlib.pyplot as plt
 
 def stats(f, msg=''):
-    """
-    Display statistic of a NumPy array f with optional message.
-    """
     if f.size == 0:
         rmin = float('nan')
         rmax = float('nan')
@@ -31,39 +28,24 @@ def stats(f, msg=''):
     print('%12g %12g %12g  %s  %s' % (rmin, rmax, rmean, f.shape, msg))
     return
 
-def quickplot(*files, dtype='f', shape=[], step=None, power=None, clim=None, transpose=None):
-    """
-    Quick multi-purpose plotting.
-    """
 
-    # defaults
+def quickplot(*files, dtype='f', shape=[], step=0, power=0, clim=[], transpose=False):
     shape0 = shape
     dtype0 = dtype.replace('l', '<').replace('b', '>')
-
-    # init
     fig = plt.figure(figsize=(12, 7.2))
     print('         Min          Max         Mean  Shape')
-
-    # loop over files
     for filename in files:
-
         dtype = dtype0
         shape = shape0
         title = os.path.split(filename)[-1]
         title = os.path.splitext(title)[0]
-
-        # read text
         if filename.lower().endswith('.txt'):
             data = np.loadtxt(filename).T
             shape = data.shape
-
-        # read SAC
         elif filename.lower().endswith('.sac'):
             import obspy.core
             data = obspy.core.read(filename)[0].data
             shape = data.shape
-
-        # read NumPy
         elif filename.lower().endswith('.npy'):
             fh = open(filename, 'rb')
             version = npy.read_magic(fh)
@@ -74,8 +56,6 @@ def quickplot(*files, dtype='f', shape=[], step=None, power=None, clim=None, tra
                 fh.close()
                 data = np.load(filename)
                 shape = data.shape
-
-        # read binary
         elif filename.lower().endswith('.bin'):
             if len(shape) < 3:
                 data = np.fromfile(filename, dtype)
@@ -85,16 +65,11 @@ def quickplot(*files, dtype='f', shape=[], step=None, power=None, clim=None, tra
                     shape = data.shape
             else:
                 fh = open(filename, 'rb')
-
         else:
             raise Exception('unknown file type: ' + filename)
-
-        # setup figure
         fig.clf()
         ax = fig.add_subplot(111)
         ax.set_title(title)
-
-        # plot
         if len(shape) == 1:
             if step:
                 data = data[::step]
@@ -155,7 +130,8 @@ def quickplot(*files, dtype='f', shape=[], step=None, power=None, clim=None, tra
         fig.canvas.draw()
         fig.ginput(1, 0, False)
 
-def command_line():
+
+def main():
     args = {}
     files = []
     for k in sys.argv[1:]:
@@ -173,5 +149,5 @@ def command_line():
     quickplot(*files, **args)
 
 if __name__ == '__main__':
-    command_line()
+    main()
 

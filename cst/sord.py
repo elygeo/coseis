@@ -688,7 +688,8 @@ def expand_slices(shape, slices=[]):
 
     return slices
 
-def command_line():
+
+def main():
     import sys, json, yaml
     files = []
     args = {}
@@ -696,8 +697,6 @@ def command_line():
     prm = yaml.load(prm)
     del(sys.argv[1])
     cst.sord.run(prm)
-
-    # command line parameters
     for i in job['argv']:
         if not i.startswith('--'):
             raise Exception('Bad argument ' + i)
@@ -708,5 +707,5 @@ def command_line():
 
 
 if __name__ == '__main__':
-    command_line()
+    main()
 
