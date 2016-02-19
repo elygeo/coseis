@@ -52,4 +52,3 @@ for it in range(shape[-1]):
     # wait for mouse click
     fig.canvas.draw()
     fig.ginput(1, 0, False)
-

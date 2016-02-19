@@ -6,7 +6,8 @@ import os
 import json
 import shutil
 import numpy as np
-import cst.util, cst.cvms
+import cst.util
+import cst.cvms
 
 # parameters
 dx = 2000.0; nproc = 1

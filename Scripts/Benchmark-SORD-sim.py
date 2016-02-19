@@ -18,15 +18,15 @@ power = range(6) # Challenger
 
 # SORD parameters
 prm = {
-    'minutes': 20
-    'diffop': 'exac'
-    'diffop': 'save'
-    'itstats': 9999
-    'itio': 128
-    'gridnoise': 0.1
-    'vx': ('[:,:,:,0]', '=~', 1.0)
-    'vy': ('[:,:,:,0]', '=~', 1.0)
-    'vz': ('[:,:,:,0]', '=~', 1.0)
+    'minutes': 20,
+    'diffop': 'exac',
+    'diffop': 'save',
+    'itstats': 9999,
+    'itio': 128,
+    'gridnoise': 0.1,
+    'vx': ('[:,:,:,0]', '=~', 1.0),
+    'vy': ('[:,:,:,0]', '=~', 1.0),
+    'vz': ('[:,:,:,0]', '=~', 1.0),
 }
 
 for i in power[::-1]:

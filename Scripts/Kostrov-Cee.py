@@ -4,9 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cst.kostrov
 
-# Parameters
-b = 0.9 # Vrup / Vs ratio
-a = b / np.sqrt(3.0) # Poisson solid
+b = 0.9  # Vrup / Vs ratio
+a = b / np.sqrt(3.0)  # Poisson solid
 
 # plot like Dahlen (1974), Fig 3
 fig = plt.figure(None, (5, 5), 100, 'w')
@@ -46,13 +45,11 @@ if 1:
     f = '../figures/Kostrov-Cee-Dahlen1974.png'
     if os.path.exists(f):
         img = plt.imread(f)
-        img[:,:,0] = 1.0
+        img[:, :, 0] = 1.0
         extent = -0.0045, 1.002, -0.007, 1.005
         ax.imshow(img, aspect='equal', extent=extent)
         b = 0, 0, 1, 1
         C = 0, 1, 0, 1
         ax.plot(b, C, '+r')
 
-# save figure
 fig.savefig('Kostrov-Cee.pdf')
-

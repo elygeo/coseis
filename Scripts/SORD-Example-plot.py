@@ -14,9 +14,9 @@ vy = np.load('vy.npy')
 vm = np.sqrt(vx * vx + vy * vy)
 
 # plot figure
-fig = plt.figure(figsize=(3,3))
+fig = plt.figure(figsize=(3, 3))
 ax = plt.gca()
-ax.imshow(vm, extent=(-3,3,-3,3), interpolation='nearest')
+ax.imshow(vm, extent=(-3, 3, -3, 3), interpolation='nearest')
 ax.axis('image')
 fig.savefig('SORD-Example.png', dpi=80)
 fig.savefig('SORD-Example.svg', dpi=80)

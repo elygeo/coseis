@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 stations = 'P1a', 'P2a'
 stations = 'P1b', 'P2b'
 stations = 'P1', 'P2'
-path_bi = os.path.join('..','Data', 'TVP3-BI-')
+path_bi = os.path.join('..', 'Data', 'TVP3-BI-')
 runs = '../Repository/TPV3-*'
 
 # loop over runs
@@ -20,7 +20,7 @@ for path in glob.glob(runs):
     meta = json.load(open('meta.json'))
     shape = meta['shape']
     delta = meta['delta']
-    hypo  = meta['hypocenter']
+    hypo = meta['hypocenter']
 
     # time histories
     t1 = np.arange(shape[-1]) * delta[-1]
@@ -40,7 +40,7 @@ for path in glob.glob(runs):
         ax.set_title(sta, position=(0.05, 0.83), ha='left', va='center')
         ax.set_xticklabels([])
         ax.set_ylabel('Shear stress (MPa)')
-        #leg = fig.legend(('SOM', 'BI'), loc=(0.78, 0.6))
+        # leg = fig.legend(('SOM', 'BI'), loc=(0.78, 0.6))
 
         # slip rate
         ax = fig.add_subplot(2, 1, 2)
@@ -100,4 +100,3 @@ for path in glob.glob(runs):
     f = 'TPV3-%03d-trup' % delta
     fig.savefig(f + '.png')
     fig.savefig(f + '.pdf')
-

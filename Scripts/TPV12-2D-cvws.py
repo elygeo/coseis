@@ -20,7 +20,7 @@ fmt1 = '%20.12f' + 7 * ' %14.6f'
 fmt2 = '%20.12f' + 6 * ' %14.6f'
 
 # headers
-header="""\
+header = """\
 # problem=TPV12-2D
 # author=Geoffrey Ely
 # date={rundate}
@@ -41,7 +41,7 @@ header1 = """\
 # Column #8 = normal stress (MPa)
 t h-slip h-slip-rate h-shear-stress v-slip v-slip-rate v-shear-stress n-stress
 """
-header2="""\
+header2 = """\
 # Column #1 = Time (s)
 # Column #2 = horizontal displacement (m)
 # Column #3 = horizontal velocity (m/s)
@@ -59,20 +59,20 @@ for sta in meta['deltas']:
         meta['sta'] = sta
         f = sta + '-%s.npy'
         su1 = np.load(f % 'su1')
-        y   = np.load(f % 'su2')
-        z   = np.load(f % 'su3')
+        y = np.load(f % 'su2')
+        z = np.load(f % 'su3')
         suv = np.sqrt(y * y + z * z)
         sv1 = np.load(f % 'sv1')
-        y   = np.load(f % 'sv2')
-        z   = np.load(f % 'sv3')
+        y = np.load(f % 'sv2')
+        z = np.load(f % 'sv3')
         svv = np.sqrt(y * y + z * z)
         ts1 = np.load(f % 'ts1') * 1e-6
-        y   = np.load(f % 'ts2')
-        z   = np.load(f % 'ts3')
+        y = np.load(f % 'ts2')
+        z = np.load(f % 'ts3')
         tsv = np.sqrt(y * y + z * z) * 1e-6
         tnm = np.load(f % 'tnm') * 1e-6
-        c   = np.array([t, su1, sv1, ts1, suv, svv, tsv, tnm]).T
-        f   = sta + '.asc'
+        c = np.array([t, su1, sv1, ts1, suv, svv, tsv, tnm]).T
+        f = sta + '.asc'
         with open(f, 'w') as fh:
             fh.write(header % meta)
             fh.write(header1)
@@ -90,10 +90,9 @@ for sta in meta['deltas']:
         v1 = np.load(f % 'v1')
         v2 = np.load(f % 'v2')
         v3 = np.load(f % 'v3')
-        c  = np.array([t, u1, v1, u2, v2, u3, v3]).T
-        f  = sta + '.asc'
+        c = np.array([t, u1, v1, u2, v2, u3, v3]).T
+        f = sta + '.asc'
         with open(f, 'w') as fh:
             fh.write(header % meta)
             fh.write(header2)
             np.savetxt(fh, c, fmt2)
-

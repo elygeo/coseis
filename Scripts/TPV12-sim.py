@@ -17,10 +17,10 @@ prm['nproc3'] = [1, 1, 2]
 # model dimensions
 dx = 100.0
 dt = dx / 12500.0
-nx = int(16500.0 / dx +  21.5)
-ny = int(16500.0 / dx +  21.5)
+nx = int(16500.0 / dx + 21.5)
+ny = int(16500.0 / dx + 21.5)
 nz = int(12000.0 / dx + 120.5)
-nt = int(    8.0 / dt +   1.5)
+nt = int(8.0 / dt + 1.5)
 prm['shape'] = [nx, ny, nz, nt]
 prm['delta'] = [dx, dx, dx, dt]
 
@@ -50,9 +50,9 @@ l1 = int(z + 3000.0 / dx + 0.5)
 
 # material properties
 prm['rho'] = 2700.0
-prm['vp']  = 5716.0
-prm['vs']  = 3300.0
-prm['gam'] = [0.2, (s_[:i,:i,l0:l1], '=', 0.02)]
+prm['vp'] = 5716.0
+prm['vs'] = 3300.0
+prm['gam'] = [0.2, (s_[:i, :i, l0:l1], '=', 0.02)]
 prm['hourglass'] = [1.0, 2.0]
 
 # fault parameters
@@ -60,21 +60,21 @@ prm['faultnormal'] = '+z'
 prm['co'] = 200000.0
 prm['dc'] = 0.5
 prm['mud'] = 0.1
-prm['mus'] = [10000.0, (s_[:i+1,:i+1], '=', 0.7)]
-prm['sxx'] = (s_[0,:], '=>', 'sxx.bin')
-prm['syy'] = (s_[0,:], '=>', 'syy.bin')
-prm['szz'] = (s_[0,:], '=>', 'szz.bin')
-prm['trup'] = (s_[:i+1,:i+1,-1], '=>', 'trup.bin')
+prm['mus'] = [10000.0, (s_[:i+1, :i+1], '=', 0.7)]
+prm['sxx'] = (s_[0, :], '=>', 'sxx.bin')
+prm['syy'] = (s_[0, :], '=>', 'syy.bin')
+prm['szz'] = (s_[0, :], '=>', 'szz.bin')
+prm['trup'] = (s_[:i+1, :i+1, -1], '=>', 'trup.bin')
 
 # nucleation
 k = int(hypo[1])
 m = int(1500.0 / dx + 0.5)
 n = int(1500.0 / dx + 1.5)
 prm['mus'] += [
-    (s_[:n,k-n:k+n+1], '=', 0.66),
-    (s_[:n,k-m:k+m+1], '=', 0.62),
-    (s_[:m,k-n:k+n+1], '=', 0.62),
-    (s_[:m,k-m:k+m+1], '=', 0.54),
+    (s_[:n, k-n:k+n+1], '=', 0.66),
+    (s_[:n, k-m:k+m+1], '=', 0.62),
+    (s_[:m, k-n:k+n+1], '=', 0.62),
+    (s_[:m, k-m:k+m+1], '=', 0.54),
 ]
 
 # slip, slip velocity, and shear traction time histories
@@ -92,11 +92,15 @@ for j, k in [
 ]:
     x = j * 100.0 / dx
     y = k * 100.0 / dx
-    for f in 'sux', 'suy', 'suz', 'svx', 'svy', 'svz', 'tsx', 'tsy', 'tsz', 'tnm':
+    for f in (
+        'sux', 'suy', 'suz',
+        'svx', 'svy', 'svz',
+        'tsx', 'tsy', 'tsz', 'tnm'
+    ):
         s = 'faultst%03ddp%03d-%s.bin' % (j, k, f)
         if f not in prm:
             prm[f] = []
-        prm[f] += [(s_[x,y,:], '.>', s)]
+        prm[f] += [(s_[x, y, :], '.>', s)]
 
 # displacement and velocity time histories
 for j, k, l in [
@@ -121,7 +125,7 @@ for j, k, l in [
         s = s.replace('body-', 'body-0')
         if f not in prm:
             prm[f] = []
-        prm[f] += [(s_[x,y,z,:], '.>', s)]
+        prm[f] += [(s_[x, y, z, :], '.>', s)]
 
 # pre-stress
 d = np.arange(ny) * alpha * dx

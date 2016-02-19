@@ -20,4 +20,4 @@ for p in glob.glob(path + '-[0-9]*'):
         procs.append(n)
         times.append(t[1:-1].mean())
 
-json.dumps(zip(time, procs), indent=0)
+json.dumps(zip(times, procs), indent=0)

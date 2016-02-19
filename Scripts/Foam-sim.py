@@ -11,7 +11,7 @@ doi:10.1785/0120010273.
 import os
 import cst.sord
 
-s_ = sord.get_slices()
+s_ = cst.sord.get_slices()
 prm = {}
 
 # dimentions
@@ -28,8 +28,8 @@ prm['shape'] = [nx, ny, nz, nt]
 
 # material model
 prm['rho'] = 16.0
-prm['vp']  = 56.0
-prm['vs']  = 30.0
+prm['vp'] = 56.0
+prm['vs'] = 30.0
 prm['gam'] = 0.5
 prm['hourglass'] = [1.0, 1.0]
 
@@ -51,17 +51,17 @@ prm['slipvector'] = [0.0, 1.0, 0.0]
 prm['ts'] = [-730.0]
 prm['tn'] = [-330.0]
 prm['dc'] = 0.001
-prm['mus'] = [1e5, (s_[:j+1,:], '=', 2.4)]
-prm['mud'] = [1e5, (s_[:j+1,:], '=', 1.85)]
+prm['mus'] = [1e5, (s_[:j+1, :], '=', 2.4)]
+prm['mud'] = [1e5, (s_[:j+1, :], '=', 1.85)]
 
 # weak zone
 weakzone = 0.2
 weakzone = 0.0
 j = int(weakzone / dx)
 if weakzone:
-    prm['ts']  += [(s_[:j+1,:], '=', -66.0)]
-    prm['mus'] += [(s_[:j+1,:], '=', 0.6)]
-    prm['mud'] += [(s_[:j+1,:], '=', 0.6)]
+    prm['ts'] += [(s_[:j+1, :], '=', -66.0)]
+    prm['mus'] += [(s_[:j+1, :], '=', 0.6)]
+    prm['mud'] += [(s_[:j+1, :], '=', 0.6)]
 
 # accelerometers
 z = 0.03 / dx
@@ -77,19 +77,19 @@ for s, x, g in [
     if 'ay' not in prm:
         prm['ay'] = []
     prm['ay'] += [
-        (s_[x,0.0,z,:], '.>', 'sensor%02d.bin' % s),
+        (s_[x, 0.0, z, :], '.>', 'sensor%02d.bin' % s),
     ]
 
 # displacement sensor
 prm['uy'] = [
-    (s_[0,0,0,:], '=>', 'sensor16.bin'),
+    (s_[0, 0, 0, :], '=>', 'sensor16.bin'),
 ]
 
 # surface output
 k = int(prm['hypocenter'][1])
 l = int(0.8 / dx)
-prm['uy'] += [(s_[0,k,1:l+1,:], '=>', 'off-fault.bin')]
-#prm['vy'] = [(s_[:,k,1:l+1,::10], '=>', 'xsec.bin')]
+prm['uy'] += [(s_[0, k, 1:l+1, :], '=>', 'off-fault.bin')]
+# prm['vy'] = [(s_[:, k, 1:l+1, ::10], '=>', 'xsec.bin')]
 
 # run SORD
 path = os.path.join('..', 'Repository', 'foam-%02.0f' % (weakzone * 100))

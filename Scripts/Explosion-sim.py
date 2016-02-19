@@ -31,14 +31,14 @@ prm['bc2'] = ['pml', 'pml', 'pml']
 i = reg
 val = 1.0
 tau = 0.1
-prm['pxx'] = (s_[i,i,i,:], '.', val, 'brune', tau)
-prm['pyy'] = (s_[i,i,i,:], '.', val, 'brune', tau)
-prm['pzz'] = (s_[i,i,i,:], '.', val, 'brune', tau)
+prm['pxx'] = (s_[i, i, i, :], '.', val, 'brune', tau)
+prm['pyy'] = (s_[i, i, i, :], '.', val, 'brune', tau)
+prm['pzz'] = (s_[i, i, i, :], '.', val, 'brune', tau)
 
 # material
 prm['rho'] = rho = 2670.0
-prm['vp']  = vp = 6000.0
-prm['vs']  = vs = 3464.0
+prm['vp'] = vp = 6000.0
+prm['vs'] = vs = 3464.0
 prm['gam'] = 0.0
 prm['hourglass'] = [1.0, 1.0]
 
@@ -48,19 +48,19 @@ y = reg + 3000.0 / dx
 z = reg + 4000.0 / dx
 for f in 'vx', 'vy', 'vz':
     prm[f] = [
-        (s_[x,x,z,:], '.>', 'p1-%s.bin' % f),
-        (s_[x,y,z,:], '.>', 'p2-%s.bin' % f),
-        (s_[x,x,z,:], '.>', 'p3-%s.bin' % f),
-        (s_[y,y,z,:], '.>', 'p4-%s.bin' % f),
-        (s_[y,x,z,:], '.>', 'p5-%s.bin' % f),
-        (s_[x,x,z,:], '.>', 'p6-%s.bin' % f),
+        (s_[x, x, z, :], '.>', 'p1-%s.bin' % f),
+        (s_[x, y, z, :], '.>', 'p2-%s.bin' % f),
+        (s_[x, x, z, :], '.>', 'p3-%s.bin' % f),
+        (s_[y, y, z, :], '.>', 'p4-%s.bin' % f),
+        (s_[y, x, z, :], '.>', 'p5-%s.bin' % f),
+        (s_[x, x, z, :], '.>', 'p6-%s.bin' % f),
     ]
 
 # snapshots
 j = int(reg + 0.5)
 for f in 'vx', 'vy', 'vz':
     prm[f] += [
-        (s_[j,:,:,::10], '=>', 'snap-%s.bin' % f),
+        (s_[j, :, :, ::10], '=>', 'snap-%s.bin' % f),
     ]
 
 # run sord

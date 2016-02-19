@@ -3,7 +3,8 @@
 SCEC Code Validation Workshop, Test Problem 12-2D
 FIXME: prestress not correct
 """
-import os, math
+import os
+import math
 import numpy as np
 import cst.sord
 
@@ -14,9 +15,9 @@ prm = {}
 dx = 100.0
 dt = dx / 12500.0
 nx = 2
-ny = int(16500.0 / dx +  21.5)
+ny = int(16500.0 / dx + 21.5)
 nz = int(12000.0 / dx + 120.5)
-nt = int(    8.0 / dt +   1.5)
+nt = int(8.0 / dt + 1.5)
 prm['delta'] = [dx, dx, dx, dt]
 prm['shape'] = [nx, ny, nz, nt]
 prm['nproc3'] = [1, 1, 2]
@@ -47,8 +48,8 @@ l1 = int(z + 3000.0 / dx + 0.5)
 
 # material properties
 prm['rho'] = 2700.0
-prm['vp']  = 5716.0
-prm['vs']  = 3300.0
+prm['vp'] = 5716.0
+prm['vs'] = 3300.0
 prm['gam'] = [0.2, (s_[:, :k, l0:l1] == 0.02)]
 prm['hourglass'] = 1.0, 2.0
 
@@ -67,14 +68,18 @@ prm['szz'] = (s_[0, :], '=<', 'szz.bin')
 i = int(1500.0 / dx + 0.5)
 k = int(hypo[1])
 prm['mus'] = [
-    (s_[:, k-i  :k+i+1], '=', 0.62),
+    (s_[:, k-i:k+i+1],   '=', 0.62),
     (s_[:, k-i-1:k+i+2], '=', 0.54),
 ]
 
 # fault time histories
 for k in 0, 15, 30, 45, 75, 120:
     y = k * 100.0 / dx
-    for f in 'sux', 'suy', 'suz', 'svx', 'svy', 'svz', 'tsx', 'tsy', 'tsz', 'tnm':
+    for f in (
+        'sux', 'suy', 'suz',
+        'svx', 'svy', 'svz',
+        'tsx', 'tsy', 'tsz', 'tnm',
+    ):
         if f not in prm:
             prm[f] = []
         s = 'faultst%03ddp000-%s.bin' % (k, f)
@@ -98,7 +103,7 @@ for k, l in [
     for f in 'u1', 'u2', 'u3', 'v1', 'v2', 'v3':
         s = 'body%03dst000dp%03d-%s.bin' % (l, k, f)
         s = s.replace('body-', 'body-0')
-        prm[f] += [(s_[0.0,y,z,:], '.>', s)]
+        prm[f] += [(s_[0.0, y, z, :], '.>', s)]
 
 # pre-stress
 d = np.arange(ny) * alpha * dx

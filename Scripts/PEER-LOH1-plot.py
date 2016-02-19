@@ -67,8 +67,8 @@ ax[2].plot(t, v[2], 'k')
 # read Prose F/K results
 p = os.path.join('..', 'Data', 'LOH1-ProseFK-')
 t = np.load(p + 'Time.npy')
-v1 =  1e5 * np.load(p + 'V-Radial.bin')
-v2 =  1e5 * np.load(p + 'V-Transverse.bin')
+v1 = 1e5 * np.load(p + 'V-Radial.bin')
+v2 = 1e5 * np.load(p + 'V-Transverse.bin')
 v3 = -1e5 * np.load(p + 'V-Vertical.bin')
 v = np.array([v1, v2, v3])
 
@@ -82,9 +82,9 @@ v = np.apply_along_axis(np.convolve, -1, v, b, 'same')
 print(np.sqrt(np.sum(v * v, 0).max()))
 
 # plot waveforms
-ax[0].plot(t, v[0], 'k--')[0].set_dashes((2,0.5))
-ax[1].plot(t, v[1], 'k--')[0].set_dashes((2,0.5))
-ax[2].plot(t, v[2], 'k--')[0].set_dashes((2,0.5))
+ax[0].plot(t, v[0], 'k--')[0].set_dashes((2, 0.5))
+ax[1].plot(t, v[1], 'k--')[0].set_dashes((2, 0.5))
+ax[2].plot(t, v[2], 'k--')[0].set_dashes((2, 0.5))
 
 # finish up
 ax[1].legend(['SOM', 'FK'], loc='lower left', frameon=False)

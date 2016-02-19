@@ -74,4 +74,3 @@ if 0:
 fig.canvas.draw()
 fig.savefig('PEER-SC2.1.pdf', format='pdf')
 fig.show()
-

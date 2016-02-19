@@ -38,8 +38,8 @@ prm['bc2'] = ['pml', 'pml', 'pml']
 
 # material
 prm['rho'] = ([], '=<', 'mesh-rho.bin')
-prm['vp']  = ([], '=<', 'mesh-vp.bin')
-prm['vs']  = ([], '=<', 'mesh-vs.bin')
+prm['vp'] = ([], '=<', 'mesh-vp.bin')
+prm['vs'] = ([], '=<', 'mesh-vs.bin')
 prm['gam'] = 0.0
 prm['vp1'] = 600.0
 prm['vs1'] = 200.0

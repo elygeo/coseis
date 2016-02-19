@@ -20,14 +20,14 @@ dy1 = L / n
 f = np.linspace(0.0, 0.5 * math.pi, n2)
 x = np.empty([n1, n2])
 y = np.empty([n1, n2])
-x[0,:] = np.cos(f) * r0
-y[0,:] = np.sin(f) * r0
+x[0, :] = np.cos(f) * r0
+y[0, :] = np.sin(f) * r0
 
 # outer edge
-x[-1,:] = L
-x[-1,-n:] = np.arange(n)[::-1] * dy1
-y[-1,:] = L
-y[-1,:n] = np.arange(n) * dy1
+x[-1, :] = L
+x[-1, -n:] = np.arange(n)[::-1] * dy1
+y[-1, :] = L
+y[-1, :n] = np.arange(n) * dy1
 
 # blend
 w = np.cumsum(np.linspace(2.0 * dy0, dy1, n1 - 1))
