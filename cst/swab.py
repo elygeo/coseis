@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""
-Swap byte order. Default is 4 byte numbers.
-"""
+"""Swap byte order. Default is 4 byte numbers."""
 from __future__ import division
-import os, sys
+import os
+import sys
 import numpy as np
+
 
 def swab(src, dst, verbose=False, dtype='f', block=64*1024*1024):
     nb = np.dtype(dtype).itemsize
@@ -27,6 +27,7 @@ def swab(src, dst, verbose=False, dtype='f', block=64*1024*1024):
         print('')
     return
 
+
 def main():
     dtype = 'f'
     files = []
@@ -42,6 +43,6 @@ def main():
             continue
         swab(f, f + '.swab', True, dtype)
 
+
 if __name__ == '__main__':
     main()
-

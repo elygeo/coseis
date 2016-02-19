@@ -1,17 +1,18 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 PEER Lifelines program task 1A02, Problem SC2.1
 """
-import os, json
+import os
+import json
 import numpy as np
 import matplotlib.pyplot as plt
 import cst.signal
 
 # sim dir
-p = os.path.join('run', 'sc21-sim-200')
-p = os.path.join('run', 'sc21-sim-2000')
-p = os.path.join('run', 'sc21-sim-500')
-p = os.path.join('run', 'sc21-sim-100')
+p = os.path.join('..', 'Repository', 'PEER-SC2.1-0200')
+p = os.path.join('..', 'Repository', 'PEER-SC2.1-2000')
+p = os.path.join('..', 'Repository', 'PEER-SC2.1-0500')
+p = os.path.join('..', 'Repository', 'PEER-SC2.1-0100')
 os.chdir(p)
 
 # parameters
@@ -71,6 +72,6 @@ if 0:
 
 # finish up
 fig.canvas.draw()
-fig.savefig('SC21.pdf', format='pdf')
+fig.savefig('PEER-SC2.1.pdf', format='pdf')
 fig.show()
 

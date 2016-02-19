@@ -2,12 +2,15 @@
 """
 Convert binary files to NumPy
 """
-import os, sys, json
+import os
+import sys
+import json
 import numpy as np
+
 
 def bin2npy(filename, dtype='f', shape=[]):
     p = ['.'] + os.path.split(filename)
-    k = f.pop()
+    k = filename
     while p:
         f = os.sep.join(p + ['meta.json'])
         g = os.sep.join(p + ['meta', 'meta.json'])
@@ -18,7 +21,7 @@ def bin2npy(filename, dtype='f', shape=[]):
         else:
             continue
         if 'dtype' in m:
-            dtype = m['dtype'] 
+            dtype = m['dtype']
         if 'shapes' in m and k in m['shapes']:
             shape = m['shape'][k]
         elif 'shape' in m:
@@ -36,6 +39,7 @@ def bin2npy(filename, dtype='f', shape=[]):
     print('%s: %s %s' % (filename, dtype, v.shape))
     np.save(f, v)
 
+
 def command_line():
     args = {}
     files = []
@@ -49,6 +53,7 @@ def command_line():
             files.append(i)
     for f in files:
         bin2npy(f, **args)
+
 
 if __name__ == '__main__':
     command_line()

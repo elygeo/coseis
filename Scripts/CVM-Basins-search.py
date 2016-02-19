@@ -1,15 +1,16 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Locate the shallowest 2D isosurface in a volume.
 """
-import os, json
+import os
+import json
 import numpy as np
 
 # parameters
 val = 2500.0
 cell = 0
 up = 0
-path = os.path.join('run', 'CVM-Basins', 'mesh') + os.sep
+path = os.path.join('..', 'Repository', 'CVM-Basins', 'mesh') + os.sep
 meta = json.load(open(path + 'meta.json'))
 delta = meta['delta']
 shape = meta['shape']
@@ -42,4 +43,3 @@ else:
 
 # write output
 np.save(path + 'z25.npy', z)
-

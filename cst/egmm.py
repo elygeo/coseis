@@ -1,46 +1,45 @@
 #!/usr/bin/env python3
-"""
-Empirical Ground Motion Model (EGMM) tools.
-"""
+"""Empirical Ground Motion Model (EGMM) tools."""
+
 
 def cbnga(T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb):
     """
     2008 Campbell-Bozorgnia NGA ground motion relation
 
-    Parameters
-    ----------
-    T:      Strong motion parameter ('PGA', 'PGV', 'PGD', SA period)
-    M:      Moment magnitude
+    Parameters:
+
+    T:  Strong motion parameter ('PGA', 'PGV', 'PGD', SA period)
+    M:  Moment magnitude
     R_RUP:  Closest distance to the coseismic rupture plane (km)
     R_JB:   Closest distance to the surface projection of the coseismic rupture
             plane (Joyner-Boore distance, km)
     Z_TOR:  Depth to the top of the coseismic rupture plane (km)
-    Z_25:   Depth to the 2.5 km/s shear-wave velocity horizon (sediment depth, km)
-    V_S30:  Average shear-wave velocity in the top 30 m of the site profile (m/s)
+    Z_25:   Depth to 2.5 km/s shear-wave velocity horizon (sediment depth, km)
+    V_S30:  Average shear-wave velocity in top 30 m of the site profile (m/s)
     delta:  Average fault dip (degrees)
     lamb:   Average fault rake (degrees)
 
-    Returns
-    -------
-    Y:      Median ground motion estimate
-    sigmaT: Total standard deviation of ln(Y)
+    Returns:
 
-    Reference
-    ---------
+    Y:  Median ground motion estimate
+    sigmaT:  Total standard deviation of ln(Y)
+
+    Reference:
+
     Campbell, K., and Y. Bozorgnia (2007), Campbell-Bozorgnia NGA ground motion
     relations for the geometric mean horizontal component of peak and spectral
     ground motion parameters, Tech. Rep. PEER 2007/02, Pacific Earthquake
     Engineering Research Center.
     """
     import numpy as np
-    M     = np.array(M)
-    R_RUP = np.array(R_RUP)
-    R_JB  = np.array(R_JB)
-    Z_TOR = np.array(Z_TOR)
-    Z_25  = np.array(Z_25)
-    V_S30 = np.array(V_S30)
-    delta = np.array(delta)
-    lamb  = np.array(lamb)
+    M = np.asarray(M)
+    R_RUP = np.asarray(R_RUP)
+    R_JB = np.asarray(R_JB)
+    Z_TOR = np.asarray(Z_TOR)
+    Z_25 = np.asarray(Z_25)
+    V_S30 = np.asarray(V_S30)
+    delta = np.asarray(delta)
+    lamb = np.asarray(lamb)
     params = {
     'T':   (  'c0', 'c1',  'c2', 'c3',  'c4','c5', 'c6','c7', 'c8','c9','c10','c11','c12',   'k1',  'k2','k3','slY','tlY','sT','rho'),
     0.010: ( -1715,  500,  -530, -262, -2118, 170, 5600, 280, -120, 490, 1058,  40,  610,  865000, -1186, 1839, 478, 219, 526, 1000),
@@ -70,13 +69,13 @@ def cbnga(T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb):
     }
 
     params = 0.001 * np.array(params[T])
-    n  = 1.18
+    n = 1.18
     cc = 1.88
-    c  = params[:13]
-    k  = params[13:16]
+    c = params[:13]
+    k = params[13:16]
     sigma_lnY, tau_lnY, sigmaT, rho = params[16:]
-    sigma_lnAF  = 0.3
-    sigma_lnGPA = 0.478 #FIXME
+    sigma_lnAF = 0.3
+    sigma_lnGPA = 0.478  # FIXME
     sigma_lnY_B = np.sqrt(sigma_lnY ** 2 - sigma_lnAF ** 2)
     sigma_lnA_B = np.sqrt(sigma_lnGPA ** 2 - sigma_lnAF ** 2)
 
@@ -96,7 +95,8 @@ def cbnga(T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb):
     f_hng = np.maximum(R_RUP, np.sqrt(R_JB * R_JB + 1.0))
     f_hng = (f_hng - R_JB) / f_hng
     f_hng[i] = (R_RUP[i] - R_JB[i]) / R_RUP[i]
-    f_hng = (c[9] * f_hng *
+    f_hng = (
+        c[9] * f_hng *
         np.minimum(1.0, np.maximum(0.0, 2.0 * M - 12.0)) *
         np.maximum(0.0, 1.0 - 0.05 * Z_TOR) *
         np.minimum(1.0, 4.5 - 0.05 * delta)
@@ -108,7 +108,8 @@ def cbnga(T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb):
     if lowvel:
         sigmaT = sigmaT * np.ones_like(V_S30)
         V_1100 = 1100.0 * np.ones_like(V_S30)
-        A_1100 = cbnga('PGA', M, R_RUP, R_JB, Z_TOR, Z_25, V_1100, delta, lamb)[0]
+        A_1100 = cbnga(
+            'PGA', M, R_RUP, R_JB, Z_TOR, Z_25, V_1100, delta, lamb)[0]
         f_site[i] = (
             c[10] * np.log(V_S30[i] / k[0]) +
             k[1] * (
@@ -141,6 +142,7 @@ def cbnga(T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb):
         sigmaT = sigmaT * np.ones_like(Y)
 
     return Y, sigmaT
+
 
 def test():
     """
@@ -194,7 +196,7 @@ def test():
     Z_25 = 1.0,
 
     TT = (0.01, 0.02, 0.03, 0.05, 0.075, 0.1, 0.15, 0.2, 0.25, 0.3,
-           0.4, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 7.5, 10.0)
+        0.4, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 7.5, 10.0)
     Y = []
     sigma = []
     for T in TT:
@@ -219,7 +221,6 @@ def test():
     plt.show()
     return
 
-# command line
+
 if __name__ == '__main__':
     test()
-

@@ -1,13 +1,14 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 LOH.1 - Plot FK/SOM comparison.
 """
-import os, json
+import os
+import json
 import numpy as np
 import matplotlib.pyplot as plt
 import cst.signal
 
-os.chdir(os.path.join('run', 'LOH1'))
+os.chdir(os.path.join('..', 'Repository', 'LOH1'))
 
 # parameters
 meta = json.load(open('meta.json'))
@@ -88,4 +89,3 @@ ax[2].plot(t, v[2], 'k--')[0].set_dashes((2,0.5))
 # finish up
 ax[1].legend(['SOM', 'FK'], loc='lower left', frameon=False)
 fig.savefig('LOH1.pdf')
-

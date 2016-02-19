@@ -1,5 +1,7 @@
-#!/usr/bin/env python
-import os, json, glob
+#!/usr/bin/env python3
+import os
+import json
+import glob
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -7,8 +9,8 @@ import matplotlib.pyplot as plt
 stations = 'P1a', 'P2a'
 stations = 'P1b', 'P2b'
 stations = 'P1', 'P2'
-runs = 'run/tpv3-*'
-path_bi = os.path.join('..','data', 'TVP3-BI-')
+path_bi = os.path.join('..','Data', 'TVP3-BI-')
+runs = '../Repository/TPV3-*'
 
 # loop over runs
 cwd = os.getcwd()

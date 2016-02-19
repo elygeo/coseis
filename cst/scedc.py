@@ -1,6 +1,13 @@
 """
 Southern California Earthquake Data Center (SCEDC) tools.
 """
+import os
+import sys
+import time
+import struct
+import socket
+import urllib
+
 
 class stp():
     """
@@ -48,12 +55,11 @@ class stp():
     }
 
     def __init__(self, waveserver='scedc', retry=60):
-        import time, struct, socket
         print('init')
         self.sock = socket.socket()
         self.send = self.sock.send
         self.close = self.sock.close
-        if isinstance(waveserver, basestring):
+        if isinstance(waveserver, str):
             waveserver = self.presets[waveserver]
         for i in range(retry):
             for host, port, password in waveserver:
@@ -96,7 +102,6 @@ class stp():
             return
 
     def receive(self, path=None, verbose=False):
-        import os, sys
         dirname = path
         buff = self.sock.recv(4096)
         line = ''
@@ -124,7 +129,7 @@ class stp():
             elif key[0] == 'FILE':
                 filename = key[1]
             elif key[0] == 'DIR':
-                if path == None:
+                if path is None:
                     dirname = key[1]
                 if not os.path.exists(dirname):
                     os.makedirs(dirname)
@@ -168,7 +173,6 @@ def mts(eventid):
     source1 =  m['myy'],  m['mxx'],  m['mzz']
     source2 = -m['mxz'], -m['myz'],  m['mxy']
     """
-    import urllib
     url = 'http://www.data.scec.org/MomentTensor/solutions/%s/' % eventid
     url = 'http://www.data.scec.org/MomentTensor/showMT.php?evid=%s' % eventid
 
@@ -180,7 +184,7 @@ def mts(eventid):
         'mts_coordinates': '(x, y, z) = (north, east, down)',
     }
     clvd = {}
-    dc   = {}
+    dc = {}
     for line in text.readlines():
         print(line)
         line = line.strip()
@@ -202,7 +206,8 @@ def mts(eventid):
             f = f[1].split()
             d = f[0].split('/')
             t = f[1].split(':')
-            mts[k] = '%s-%s-%sT%s:%s:%s.%s' % (d[2], d[0], d[1], t[0], t[1], t[2], t[3])
+            mts[k] = '%s-%s-%sT%s:%s:%s.%s' % (
+                d[2], d[0], d[1], t[0], t[1], t[2], t[3])
         elif k == 'best_fitting_double_couple_and_clvd_solution':
             tensor = clvd
         elif k == 'best_fitting_double_couple_solution':
@@ -218,18 +223,17 @@ def mts(eventid):
                 'azimuth': float(f[3]),
             }
         elif k == 'mo':
-            mts['moment'] = 1e-7 * float(f[1].split()[0] )
+            mts['moment'] = 1e-7 * float(f[1].split()[0])
         elif k in ('np1', 'np2'):
             mts[k] = {
-                'strike': float(f[1] ),
-                'rake': float(f[2] ),
-                'dip': float(f[3] ),
+                'strike': float(f[1]),
+                'rake': float(f[2]),
+                'dip': float(f[3]),
             }
         elif k == 'moment_magnitude' and '=' in line:
-            mts[k] = float(f[1] )
+            mts[k] = float(f[1])
             break
     mts['double_couple_clvd'] = clvd
     mts['double_couple'] = dc
     mts['depth'] *= 1000.0
     return mts
-

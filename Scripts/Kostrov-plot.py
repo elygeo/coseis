@@ -1,10 +1,11 @@
-#!/usr/bin/env python
-import os, json
+#!/usr/bin/env python3
+import os
+import json
 import numpy as np
 import matplotlib.pyplot as plt
 import cst.kostrov
 
-p = os.path.join('run', 'Kostrov')
+p = os.path.join('..', 'Repository', 'Kostrov')
 os.chdir(p)
 
 # parameters
@@ -41,4 +42,3 @@ ax.set_xlim(0.0, t[-1])
 ax.set_xlabel('Time (s)')
 ax.set_ylabel('Slip velocity (m/s)')
 fig.savefig('Kostrov.pdf')
-

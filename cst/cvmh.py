@@ -1,10 +1,6 @@
-"""
-SCEC Community Velocity Model (CVM-H) tools.
-"""
-
+"""SCEC Community Velocity Model (CVM-H) tools."""
 from . import repo
 
-# parameters
 projection = {'proj': 'utm', 'zone': 11, 'datum': 'NAD27', 'ellps': 'clrk66'}
 extent = (131000.0, 828000.0), (3431000.0, 4058000.0), (-200000.0, 4900.0)
 prop2d = {'topo': '1', 'base': '2', 'moho': '3'}
@@ -16,8 +12,12 @@ voxet3d = {
     'lab':    ('CVM_HR', True),
 }
 
+
 def vs30_model(x, y, version='Wills+Wald', method='nearest'):
-    import os, urllib, gzip, cStringIO
+    import os
+    import urllib
+    import gzip
+    import cStringIO
     import numpy as np
     from . import data, interp
     if version not in ['Wills', 'Wald', 'Wills+Wald']:
@@ -43,7 +43,8 @@ def vs30_model(x, y, version='Wills+Wald', method='nearest'):
         xlim = x0, x0 + delta * (w.shape[0] - 1)
         ylim = y0, y0 + delta * (w.shape[1] - 1)
         extent = xlim, ylim
-        interp.interp2(extent, w, (x, y), z, method=method,
+        interp.interp2(
+            extent, w, (x, y), z, method=method,
             bound=True, mask=True, no_data_val=0)
     return z
 
@@ -54,7 +55,8 @@ def nafe_drake(f):
     """
     import numpy as np
     f = np.asarray(f) * 0.001
-    f = f * (1.6612 - f * (0.4721 - f * (0.0671 - f * (0.0043 - f * 0.000106))))
+    f = f * (
+        1.6612 - f * (0.4721 - f * (0.0671 - f * (0.0043 - f * 0.000106))))
     f = np.maximum(f, 1.0) * 1000.0
     return f
 
@@ -69,6 +71,7 @@ def brocher_vp(f):
     f *= 1000.0
     return f
 
+
 def ely_vp(f):
     """
     V_p derived from V_s via Ely (2012).
@@ -78,12 +81,13 @@ def ely_vp(f):
     f = 400.0 + 1.4 * f
     return f
 
+
 def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version=None):
     """
     Download and read SCEC CVM-H voxet.
 
-    Parameters
-    ----------
+    Parameters:
+
     prop:
         2d property: 'topo', 'base', or 'moho'
         3d property: 'Vp', 'Vs', or 'tag'
@@ -92,26 +96,30 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version=None):
     no_data_value: None, 'nan', or float value. None = filled from below.
     version: 'vx62', 'vx63', '11.2.0', '11.9.0' or None (default)
 
-    Returns
-    -------
+    Returns:
+
     extent: (x0, x1), (y0, y1), (z0, z1)
     bound: (x0, x1), (y0, y1), (z0, z1)
     data: Array of properties
     """
-    import os, urllib, tarfile
+    import os
+    import urllib
+    import tarfile
     from . import gocad
 
-    if version == None:
+    if version is None:
         version = versions[-1]
     path = os.path.join(repo, 'CVMH-%s' % version)
     if version[:2] == 'vx':
-        url = 'http://structure.harvard.edu/cvm-h/download/%s.tar.bz2' % version
-        base = '%s/bin' % version
+        url = 'http://structure.harvard.edu/cvm-h/download/%s.tar.bz2'
+        base = '%s/bin'
         f = path + '.bztar'
     else:
-        url = 'http://hypocenter.usc.edu/research/cvmh/11.9.0/cvmh-%s.tar.gz' % version
-        base = 'cvmh-%s/model' % version
+        url = 'http://hypocenter.usc.edu/research/cvmh/11.9.0/cvmh-%s.tar.gz'
+        base = 'cvmh-%s/model'
         f = path + '.tgz'
+    url %= version
+    base %= version
 
     # download if not found
     if not os.path.exists(path):
@@ -147,16 +155,16 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version=None):
             n = d1.shape[2]
             if w > 0.0:
                 for i in range(1, n):
-                    ii = (d1[:,:,i] == v1) | (d2[:,:,i] == v2)
-                    d1[:,:,i][ii] = d1[:,:,i-1][ii]
-                    d2[:,:,i][ii] = d2[:,:,i-1][ii]
-                    d3[:,:,i][ii] = d3[:,:,i-1][ii]
+                    ii = (d1[:, :, i] == v1) | (d2[:, :, i] == v2)
+                    d1[:, :, i][ii] = d1[:, :, i-1][ii]
+                    d2[:, :, i][ii] = d2[:, :, i-1][ii]
+                    d3[:, :, i][ii] = d3[:, :, i-1][ii]
             else:
                 for i in range(n-1, 0, -1):
-                    ii = (d1[:,:,i-1] == v1) | (d2[:,:,i-1] == v2)
-                    d1[:,:,i-1][ii] = d1[:,:,i][ii]
-                    d2[:,:,i-1][ii] = d2[:,:,i][ii]
-                    d3[:,:,i-1][ii] = d3[:,:,i][ii]
+                    ii = (d1[:, :, i-1] == v1) | (d2[:, :, i-1] == v2)
+                    d1[:, :, i-1][ii] = d1[:, :, i][ii]
+                    d2[:, :, i-1][ii] = d2[:, :, i][ii]
+                    d3[:, :, i-1][ii] = d3[:, :, i][ii]
             f1 = os.path.join(path, vox['PROP'][vp]['FILE'] + '-filled')
             f2 = os.path.join(path, vox['PROP'][vs]['FILE'] + '-filled')
             f3 = os.path.join(path, vox['PROP'][tag]['FILE'] + '-filled')
@@ -180,7 +188,7 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version=None):
         pid = prop2d[prop]
     else:
         pid = prop3d[prop]
-    if no_data_value == None and prop in prop3d:
+    if no_data_value is None and prop in prop3d:
         vox = gocad.voxet(voxfile, [pid], alternate='-filled')['1']
     else:
         vox = gocad.voxet(voxfile, [pid], no_data_value=no_data_value)['1']
@@ -199,8 +207,8 @@ class Model():
     """
     SCEC CVM-H model.
 
-    Init parameters
-    ---------------
+    Init parameters:
+
     prop:
         2d property: 'topo', 'base', 'moho'
         3d property: 'vp', 'vs', or 'tag'
@@ -209,17 +217,17 @@ class Model():
     no_data_value: None, 'nan', or float value. None = filled from below.
     version: 'vx62', 'vx63', '11.2.0', 11.9.0' or None (default)
 
-    Call parameters
-    ---------------
+    Call parameters:
+
     x, y, z: Sample coordinate arrays.
     out: Optional output array with same shape as coordinate arrays.
     interpolation: 'nearest', or 'linear'
 
-    Returns
-    -------
-    out: Property samples at coordinates (x, y, z)
+    Returns property samples at coordinates (x, y, z)
     """
-    def __init__(self, prop, voxet=['mantle', 'crust'], no_data_value=None, version=None):
+    def __init__(
+            self, prop, voxet=['mantle', 'crust'],
+            no_data_value=None, version=None):
         self.prop = prop = prop.lower()
         if prop in prop2d:
             self.voxet = [cvmh_voxet(prop, version=version)]
@@ -228,6 +236,7 @@ class Model():
             for i in voxet:
                 self.voxet += [cvmh_voxet(prop, i, no_data_value, version)]
         return
+
     def __call__(self, x, y, z=None, out=None, interpolation='nearest'):
         import numpy as np
         from . import interp
@@ -237,9 +246,11 @@ class Model():
         for extent, bound, data in self.voxet:
             if z is None:
                 data = data.reshape(data.shape[:2])
-                interp.interp2(extent[:2], data, (x, y), out, interpolation, bound)
+                interp.interp2(
+                    extent[:2], data, (x, y), out, interpolation, bound)
             else:
-                interp.interp3(extent, data, (x, y, z), out, interpolation, bound)
+                interp.interp3(
+                    extent, data, (x, y, z), out, interpolation, bound)
         return out
 
 
@@ -247,8 +258,8 @@ class Extraction():
     """
     CVM-H extraction with geotechnical layer (GTL)
 
-    Init parameters
-    ---------------
+    Init parameters:
+
     x, y: Coordinates arrays
     vm: 'vp', 'vs', 'tag', or Model object.
     vs30: 'Wills', 'Wald', 'Wills+Wald', None, or Model object.
@@ -258,19 +269,18 @@ class Extraction():
     **kwargs: Keyword arguments passed to Model()
 
     Call parameters
-    ---------------
+
     z: Vertical coordinate array.
     out: Optional output array, same shape as coordinate arrays.
     min_depth: Minimum depth in Z array, optional but provides speed-up.
     by_depth: Z coordinate type, True for depth, False for elevation.
 
-    Returns
-    -------
-    out: Property samples at coordinates (x, y, z)
+    Returns property samples at coordinates (x, y, z)
     """
 
-    def __init__(self, x, y, vm, vs30='Wills+Wald', topo='topo',
-        interpolation='nearest', geographic=True, **kwargs):
+    def __init__(
+      self, x, y, vm, vs30='Wills+Wald', topo='topo',
+      interpolation='nearest', geographic=True, **kwargs):
         import numpy as np
         x = np.asarray(x)
         y = np.asarray(y)
@@ -304,7 +314,7 @@ class Extraction():
             if vm.prop == 'vp':
                 v0 = ely_vp(v0)
             vt = vm(x, y, z0 - zt, interpolation=interpolation)
-            v0 = np.minimum(vt, v0) # XXX new feature
+            v0 = np.minimum(vt, v0)  # XXX new feature
             if np.isnan(vt).any():
                 print('WARNING: NaNs in GTL')
             self.gtl = v0, vt
@@ -340,16 +350,14 @@ def extract(x, y, z, vm=['rho', 'vp', 'vs'], by_depth=True, **kwargs):
     """
     Simple CVM-H extraction.
 
-    Parameters
-    ----------
+    Parameters:
+
     x, y, z: Coordinates arrays
     vm: 'rho', 'vp', 'vs', 'tag', or Model object.
     by_depth: Z coordinate type, True for depth, False for elevation.
     **kwargs: Keyword arguments passed to Extraction()
 
-    Returns
-    -------
-    out: Property samples at coordinates (x, y, z)
+    Returns property samples at coordinates (x, y, z)
     """
     import numpy as np
     x = np.asarray(x)
@@ -369,4 +377,3 @@ def extract(x, y, z, vm=['rho', 'vp', 'vs'], by_depth=True, **kwargs):
         else:
             out += [f(z, by_depth=by_depth)]
     return np.array(out)
-

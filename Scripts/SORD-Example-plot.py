@@ -1,11 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from cst import bin2npy
+import cst.bin2npy
 
 # simulation directory
-os.chdir(os.path.join('run', 'SORD-Example'))
+os.chdir(os.path.join('..', 'Repository', 'SORD-Example'))
 cst.bin2npy()
 
 # read slices
@@ -20,4 +20,3 @@ ax.imshow(vm, extent=(-3,3,-3,3), interpolation='nearest')
 ax.axis('image')
 fig.savefig('SORD-Example.png', dpi=80)
 fig.savefig('SORD-Example.svg', dpi=80)
-

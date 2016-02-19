@@ -1,15 +1,16 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Plot snapshots
 """
-import os, json
+import os
+import json
 import numpy as np
 import matplotlib.pyplot as plt
 
 # parameters
 exp = 0.5
 clim = 0.0, 0.000001
-p = os.path.join('run', 'Canyon')
+p = os.path.join('..', 'Repository', 'Canyon')
 os.chdir(p)
 
 # metadata

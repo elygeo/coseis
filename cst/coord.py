@@ -7,10 +7,11 @@ rearth = 6370000.0
 
 def dotvv(a, b, check=True):
     """
-    Vector-vector dot product, optimized for small number of components containing
-    large arrays. For large numbers of components use numpy.dot instead. Unlike
-    numpy.dot, broadcasting rules only apply component-wise, so components may be a
-    mix of scalars and numpy arrays of any shape compatible for broadcasting.
+    Vector-vector dot product, optimized for small number of components
+    containing large arrays. For large numbers of components use numpy.dot
+    instead. Unlike numpy.dot, broadcasting rules only apply component-wise, so
+    components may be a mix of scalars and numpy arrays of any shape compatible
+    for broadcasting.
     """
     n = len(a)
     if check and n > 8:
@@ -23,10 +24,11 @@ def dotvv(a, b, check=True):
 
 def dotmv(A, b, check=True):
     """
-    Matrix-vector dot product, optimized for small number of components containing
-    large arrays. For large numbers of components use numpy.dot instead. Unlike
-    numpy.dot, broadcasting rules only apply component-wise, so components may be a
-    mix of scalars and numpy arrays of any shape compatible for broadcasting.
+    Matrix-vector dot product, optimized for small number of components
+    containing large arrays. For large numbers of components use numpy.dot
+    instead. Unlike numpy.dot, broadcasting rules only apply component-wise, so
+    components may be a mix of scalars and numpy arrays of any shape compatible
+    for broadcasting.
     """
     m = len(A)
     n = len(A[0])
@@ -43,10 +45,11 @@ def dotmv(A, b, check=True):
 
 def dotmm(A, B, check=True):
     """
-    Matrix-matrix dot product, optimized for small number of components containing
-    large arrays. For large numbers of components use numpy.dot instead. Unlike
-    numpy.dot, broadcasting rules only apply component-wise, so components may be a
-    mix of scalars and numpy arrays of any shape compatible for broadcasting.
+    Matrix-matrix dot product, optimized for small number of components
+    containing large arrays. For large numbers of components use numpy.dot
+    instead. Unlike numpy.dot, broadcasting rules only apply component-wise, so
+    components may be a mix of scalars and numpy arrays of any shape compatible
+    for broadcasting.
     """
     m = len(A)
     n = len(B[0])
@@ -67,12 +70,12 @@ def dotmm(A, B, check=True):
 
 def solve2(A, b):
     """
-    2 by 2 linear equation solver. Components may be scalars or numpy arrays.
+    2x2 linear equation solver. Components may be scalars or numpy arrays.
     """
-    d = 1.0 / (A[0,0] * A[1,1] - A[0,1] * A[1,0])
+    d = 1.0 / (A[0, 0] * A[1, 1] - A[0, 1] * A[1, 0])
     x = [
-        d * A[1,1] * b[0] - d * A[0,1] * b[1],
-        d * A[0,0] * b[1] - d * A[1,0] * b[0],
+        d * A[1, 1] * b[0] - d * A[0, 1] * b[1],
+        d * A[0, 0] * b[1] - d * A[1, 0] * b[0],
     ]
     return x
 
@@ -81,15 +84,13 @@ def rot_sym_tensor(w1, w2, rot):
     """
     Rotate symmetric 3x3 tensor stored as diagonal and off-diagonal vectors.
 
-    Parameters
-    ----------
+    Parameters:
+
     w1: diagonal components w11, w22, w33
     w2: off-diagonal components w23, w31, w12
     rot: rotation matrix
 
-    Returns
-    -------
-    w1, w2: rotated tensor components
+    Returns: (w1, w2) rotated tensor components
     """
     import numpy as np
 
@@ -105,16 +106,13 @@ def rot_sym_tensor(w1, w2, rot):
 
 def eigvals_sym_tensor(w1, w2):
     """
-    Eigenvalues of a symmetric 3x3 tensor stored as diagonal and off-diagonal vectors.
+    Returns eigenvalues of a symmetric 3x3 tensor stored as diagonal and
+    off-diagonal vectors.
 
     Parameters
-    ----------
+
     w1: diagonal components w11, w22, w33
     w2: off-diagonal components w23, w31, w12
-
-    Returns
-    -------
-    w: eigenvalues
     """
     import numpy as np
     m = np.diag(w1)
@@ -145,8 +143,8 @@ def rotmat(x, origin=(0, 0, 0), upvector=(0, 0, 1)):
 def llr2xyz(x, y, z, inverse=False):
     """
     Spherical to Cartesian coordinate conversion. Spherical coordinates are
-    parameterized in degrees longitude and latitude. This approximates Geographic to
-    Earth-Centered, Earth-Fixed (ECEF) Cartesian coordinates.
+    parameterized in degrees longitude and latitude. This approximates
+    Geographic to Earth-Centered, Earth-Fixed (ECEF) Cartesian coordinates.
     Cartesian X axis is at lon 0, lat 0.
     Cartesian Y axis is at lon 90, lat 0.
     Cartesian Z axis is at lat 90.
@@ -163,11 +161,11 @@ def llr2xyz(x, y, z, inverse=False):
         y = 180.0 / math.pi * y
         return x, y, r
     else:
-        x  = math.pi / 180.0 * x
-        y  = math.pi / 180.0 * y
+        x = math.pi / 180.0 * x
+        y = math.pi / 180.0 * y
         x_ = np.cos(x) * np.cos(y) * z
         y_ = np.sin(x) * np.cos(y) * z
-        z  = np.sin(y) * z
+        z = np.sin(y) * z
         return x_, y_, z
 
 
@@ -189,22 +187,26 @@ def euler_rotation(phi=0.0, theta=0.0, psi=0.0):
     B = math.pi / 180.0 * theta
     C = math.pi / 180.0 * psi
     del(phi, theta, psi)
-    c, s = np.cos(A), np.sin(A); A = [c, s, 0], [-s, c, 0], [0,  0, 1]
-    c, s = np.cos(B), np.sin(B); B = [1, 0, 0], [ 0, c, s], [0, -s, c]
-    c, s = np.cos(C), np.sin(C); C = [c, s, 0], [-s, c, 0], [0,  0, 1]
+    c, s = np.cos(A), np.sin(A)
+    A = [c, s, 0], [-s, c, 0], [0,  0, 1]
+    c, s = np.cos(B), np.sin(B)
+    B = [1, 0, 0], [0,  c, s], [0, -s, c]
+    c, s = np.cos(C), np.sin(C)
+    C = [c, s, 0], [-s, c, 0], [0,  0, 1]
     return dotmm(dotmm(C, B), A)
 
 
 def slip_vectors(strike, dip, rake, dtype=None):
     """
-    For given strike, dip, and rake (degrees), using the Aki & Richards convention
-    of dip to the right of the strike vector, find the rotation matrix R from world
-    coordinates (east, north, up) to fault local coordinates (slip1, slip2, normal).
-    The transpose R^T performs the reverse rotation from fault local coordinates to
-    world coordinates.  Columns of R are axis unit vectors of the world space in
-    fault local coordinates.  Rows of R are axis unit vectors of the fault local
-    space in world coordinates, that can be unpacked by:
-    n_slip1, n_slip2, n_normal = slip_vectors(strike, dip, rake)
+    For given strike, dip, and rake (degrees), using the Aki & Richards
+    convention of dip to the right of the strike vector, find the rotation
+    matrix R from world coordinates (east, north, up) to fault local
+    coordinates (slip1, slip2, normal). The transpose R^T performs the reverse
+    rotation from fault local coordinates to world coordinates.  Columns of R
+    are axis unit vectors of the world space in fault local coordinates.  Rows
+    of R are axis unit vectors of the fault local space in world coordinates,
+    that can be unpacked by: n_slip1, n_slip2, n_normal = slip_vectors(strike,
+    dip, rake)
     """
     return euler_rotation(90 - strike, dip, rake)
 
@@ -277,19 +279,17 @@ class Transform():
     """
     Coordinate transform for scale, rotation, and origin translation.
 
-    Optional Parameters
-    -------------------
+    Optional Parameters:
+
     proj: Map projection defined by Pyproj or similar.
     scale: Scale factor.
     rotate: Rotation angle in degrees.
     translate: Translation amount.
     origin: Untransformed coordinates of the new origin.  If two sets of points
-        are given, the origin is centered between them, and rotation is relative to the
-        connecting line.
+        are given, the origin is centered between them, and rotation is
+        relative to the connecting line.
 
-    Returns
-    -------
-    proj: Coordinate transformation function
+    Returns a coordinate transformation function
 
     Example: TeraShake SDSU/Okaya projection
     >>> import pyproj
@@ -301,17 +301,17 @@ class Transform():
     array([-121. ,   34.5])
     """
 
-    def __init__(self, proj=None, origin=None, scale=1.0, rotate=0.0,
-        translate=(0.0, 0.0), matrix=((1,0,0), (0,1,0), (0,0,1))
-    ):
+    def __init__(
+      self, proj=None, origin=None, scale=1.0, rotate=0.0,
+      translate=(0.0, 0.0), matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1))):
         import numpy as np
         import math
         phi = math.pi / 180.0 * rotate
-        if origin == None:
+        if origin is None:
             x, y = 0.0, 0.0
         else:
             x, y = origin
-            if proj != None:
+            if proj is not None:
                 x, y = proj(x, y)
             if type(x) in (list, tuple):
                 phi -= np.arctan2(y[1] - y[0], x[1] - x[0])
@@ -335,24 +335,25 @@ class Transform():
         x = np.asarray(x)
         y = np.asarray(y)
         if kwarg.get('inverse') is not True:
-            if proj != None:
+            if proj is not None:
                 x, y = proj(x, y, **kwarg)
-            x, y = dotmv(self.mat[:2,:2], [x, y])
-            x += self.mat[0,2]
-            y += self.mat[1,2]
+            x, y = dotmv(self.mat[:2, :2], [x, y])
+            x += self.mat[0, 2]
+            y += self.mat[1, 2]
         else:
-            x = x - self.mat[0,2]
-            y = y - self.mat[1,2]
-            x, y = solve2(self.mat[:2,:2], [x, y])
-            if proj != None:
+            x = x - self.mat[0, 2]
+            y = y - self.mat[1, 2]
+            x, y = solve2(self.mat[:2, :2], [x, y])
+            if proj is not None:
                 x, y = proj(x, y, **kwarg)
         return np.array([x, y])
 
 
 def potency_tensor(normal, slip):
     """
-    Given a fault unit normal and a slip vector, return a symmetric potency tensor as
-    volume components (W11, W22, W33), and shear components (W23, W31, W12).
+    Given a fault unit normal and a slip vector, return a symmetric potency
+    tensor as volume components (W11, W22, W33), and shear components
+    (W23, W31, W12).
     """
     v = [
         normal[0] * slip[0],
@@ -368,9 +369,7 @@ def potency_tensor(normal, slip):
 
 
 def compass(azimuth, radians=False):
-    """
-    Get named direction from azimuth.
-    """
+    """Get named direction from azimuth."""
     import math
     if radians:
         azimuth *= 180.0 / math.pi
@@ -381,4 +380,3 @@ def compass(azimuth, radians=False):
         'W', 'WNW', 'NW', 'NNW',
     )
     return names[int((azimuth / 22.5 + 0.5) % 16.0)]
-

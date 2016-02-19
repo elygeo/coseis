@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 PEER Lifelines program task 1A02, Problem SC2.1
 
@@ -6,9 +6,11 @@ SCEC Community Velocity Model, version 2.2 with double-couple point source.
 http://peer.berkeley.edu/lifelines/lifelines_pre_2006/lifelines_princ_invest_y-7.html#day
 http://www-rohan.sdsu.edu/~steveday/BASINS/Final_Report_1A02.pdf
 """
-import os, json
-from cst import sord
-s_ = sord.get_slices()
+import os
+import json
+import cst.sord
+
+s_ = cst.sord.get_slices()
 prm = {}
 
 # parameters
@@ -18,7 +20,7 @@ dx = 100.0;  prm['nproc3'] = [1, 4, 60]
 dx = 500.0;  prm['nproc3'] = [1, 1, 2]
 
 # mesh metadata
-mesh = os.path.join('run', 'SC21', 'mesh', '%.0f' % dx) + os.sep
+mesh = os.path.join('..', 'Repository', 'SC21', 'mesh', '%.0f' % dx) + os.sep
 meta = json.load(open(mesh + 'meta.json'))
 dx, dy, dz = meta['delta']
 nx, ny, nz = meta['shape']
@@ -47,7 +49,7 @@ prm['hourglass'] = [1.0, 1.0]
 j = int(56000.0 / dx + 0.5)
 k = int(40000.0 / dx + 0.5)
 l = int(14000.0 / dx + 0.5)
-prm['mxy'] = (s_[j,k,l,:], '+', 1e18, 'brune', 0.2)
+prm['mxy'] = (s_[j, k, l, :], '+', 1e18, 'brune', 0.2)
 
 # receivers
 for i in range(8):
@@ -57,14 +59,13 @@ for i in range(8):
         if f not in prm:
             prm[f] = []
         prm[f] += [
-            (s_[j,k,0,:], '=>', 'p%s-%s.bin' % (i, f)),
+            (s_[j, k, 0, :], '=>', 'p%s-%s.bin' % (i, f)),
         ]
 
 # run job
-d = os.path.join('run', 'SC21-sim-', '%.0f' % dx)
-os.makedirs(d)
-os.chdir(d)
+path = os.path.join('..', 'Repository', 'PEER-SC2.1-', '%.0f' % dx)
+os.makedirs(path)
+os.chdir(path)
 for v in 'rho', 'vp', 'vs':
     os.link(mesh + 'mesh-' + v + '.bin', '.')
-sord.run(prm)
-
+cst.sord.run(prm)

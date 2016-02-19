@@ -1,10 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Simple SoCal mesh generation and CVM-S extraction.
 """
-import os, json
+import os
+import json
 import numpy as np
-from cst import cvms
+import cst.cvms
 
 # parameters
 delta = 0.25 / 60.0, 0.25 / 60.0, 20.0;   nproc = 512
@@ -31,7 +32,7 @@ meta = {
 }
 
 # run dir
-p = os.path.join('run', 'CVM-Basins')
+p = os.path.join('..', 'Repository', 'CVM-Basins')
 os.makedirs(p)
 os.chdir(p)
 
@@ -53,5 +54,4 @@ with open('dep.bin', 'wb') as f:
         x.tofile(f)
 
 # launch CVM-S
-cvms.run(nsample=nsample, nproc=nproc)
-
+cst.cvms.run(nsample=nsample, nproc=nproc)

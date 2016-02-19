@@ -5,51 +5,51 @@ Support Operator Rupture Dynamics
 
 # default simulation parameters
 parameters = {
-    'nproc3': [1, 1, 1], # number of processors in [j, k, l]
-    'mpin': 1, # MPI-IO input: 0=off, 1=collective, -1=non-collective
-    'mpout': 1, # MPI-IO output: 0=off, 1=collective, -1=non-collective
-    'itstats': 10, # interval for calculating statistics
-    'itio': 50, # interval for writing i/o buffers
-    'itbuff': 10, # buffer size for time series output
-    'debug': 0, # >1 sync, >2 MPI vars, >3 I/O
-    'diffop': 'auto', # spatial difference operator
-    'shape': [41, 41, 41, 41], # mesh size [nx, ny, nz, nt]
-    'delta': [100.0, 100.0, 100.0, 0.0075], # step size [dx, dy, dz, dt]
-    'affine': [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]], # transform
-    'rexpand': 1.06, # grid expansion ratio
-    'n1expand': [0, 0, 0], # number of grid expansion nodes - near side
-    'n2expand': [0, 0, 0], # number of grid expansion nodes - far side
-    'gridnoise': 0.0, # random noise added to mesh, assumes planar fault
-    'tm0': 0.0, # initial time
-    'rho': [2670.0], # density
-    'vp':  [6000.0], # P-wave speed
-    'vs':  [3464.0], # S-wave speed
-    'gam': [0.0], # viscosity
-    'rho_min': -1.0, # min density
-    'rho_max': -1.0, # max density
-    'vp_min': -1.0, # min P-wave speed
-    'vp_max': -1.0, # max P-wave speed
-    'vs_min': -1.0, # min S-wave speed
-    'vs_max': -1.0, # max S-wave speed
-    'gam_min': -1.0, # min viscosity
-    'gam_max': 0.8, # max viscosity
-    'hourglass': [1.0, 1.0], # hourglass stiffness (1) and viscosity (2)
-    'vdamp': -1.0, # Vs dependent damping
-    'bc1': ['free', 'free', 'free'], # boundary cond: near x, y, z surface
-    'bc2': ['free', 'free', 'free'], # boundary cond: far x, y, z surface
-    'npml': 10, # number of PML damping nodes
-    'ppml': 2, # PML exponent, 1-4. Generally 2 is best.
-    'vpml': -1.0, # damping velocity, <0 default to min, max V_s harmonic mean
-    'nsource': 0, # number of finite source sub-faults
-    'source': 'potency', # finite source type: potency, moment, force
-    'hypocenter': [0.0, 0.0, 0.0], # hypocenter logical coordinates
-    'slipvector': [1.0, 0.0, 0.0], # shear traction direction for ts1
-    'faultnormal': 'none', # fault normal direction: +x, +y, +z, -x, -y, -z
-    'faultopening': 0, # 0=not allowed, 1=allowed
-    'vrup': -1.0, # nucleation rupture velocity, negative = no nucleation
-    'rcrit': 1000.0, # nucleation critical radius
-    'trelax': 0.075, # nucleation relaxation time
-    'svtol': 0.001, # slip velocity considered rupturing
+    'nproc3': [1, 1, 1],  # number of processors in [j, k, l]
+    'mpin': 1,  # MPI-IO input: 0=off, 1=collective, -1=non-collective
+    'mpout': 1,  # MPI-IO output: 0=off, 1=collective, -1=non-collective
+    'itstats': 10,  # interval for calculating statistics
+    'itio': 50,  # interval for writing i/o buffers
+    'itbuff': 10,  # buffer size for time series output
+    'debug': 0,  # >1 sync, >2 MPI vars, >3 I/O
+    'diffop': 'auto',  # spatial difference operator
+    'shape': [41, 41, 41, 41],  # mesh size [nx, ny, nz, nt]
+    'delta': [100.0, 100.0, 100.0, 0.0075],  # step size [dx, dy, dz, dt]
+    'affine': [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],  # transform
+    'rexpand': 1.06,  # grid expansion ratio
+    'n1expand': [0, 0, 0],  # number of grid expansion nodes - near side
+    'n2expand': [0, 0, 0],  # number of grid expansion nodes - far side
+    'gridnoise': 0.0,  # random noise added to mesh, assumes planar fault
+    'tm0': 0.0,  # initial time
+    'rho': [2670.0],  # density
+    'vp':  [6000.0],  # P-wave speed
+    'vs':  [3464.0],  # S-wave speed
+    'gam': [0.0],  # viscosity
+    'rho_min': -1.0,  # min density
+    'rho_max': -1.0,  # max density
+    'vp_min': -1.0,  # min P-wave speed
+    'vp_max': -1.0,  # max P-wave speed
+    'vs_min': -1.0,  # min S-wave speed
+    'vs_max': -1.0,  # max S-wave speed
+    'gam_min': -1.0,  # min viscosity
+    'gam_max': 0.8,  # max viscosity
+    'hourglass': [1.0, 1.0],  # hourglass stiffness (1) and viscosity (2)
+    'vdamp': -1.0,  # Vs dependent damping
+    'bc1': ['free', 'free', 'free'],  # boundary cond: near x, y, z surface
+    'bc2': ['free', 'free', 'free'],  # boundary cond: far x, y, z surface
+    'npml': 10,  # number of PML damping nodes
+    'ppml': 2,  # PML exponent, 1-4. Generally 2 is best.
+    'vpml': -1.0,  # damping velocity, <0 default to min, max V_s harmonic mean
+    'nsource': 0,  # number of finite source sub-faults
+    'source': 'potency',  # finite source type: potency, moment, force
+    'hypocenter': [0.0, 0.0, 0.0],  # hypocenter logical coordinates
+    'slipvector': [1.0, 0.0, 0.0],  # shear traction direction for ts1
+    'faultnormal': 'none',  # fault normal direction: +x, +y, +z, -x, -y, -z
+    'faultopening': 0,  # 0=not allowed, 1=allowed
+    'vrup': -1.0,  # nucleation rupture velocity, negative = no nucleation
+    'rcrit': 1000.0,  # nucleation critical radius
+    'trelax': 0.075,  # nucleation relaxation time
+    'svtol': 0.001,  # slip velocity considered rupturing
 }
 
 # Multi-dimensional field variable names for input and output.
@@ -177,9 +177,9 @@ boundary_conditions = {
     'free': 0,
     'rigid': 3,
     '+node': 1,
-    '+cell': 2, 
+    '+cell': 2,
     '-node': -1,
-    '-cell': -2, 
+    '-cell': -2,
     'pml': 10,
 }
 
@@ -196,11 +196,13 @@ time_functions = [
     'ricker2',
 ]
 
+
 class typed_dict(dict):
     def __setitem__(self, k, v):
-        if type(v) != type(self[k]):
-            raise TypeError(key, self[k], v)
+        if isinstance(self[k], type(v)):
+            raise TypeError(k, self[k], v)
         dict.__setitem__(self, k, v)
+
 
 def f90modules(path):
     mods = set()
@@ -213,6 +215,7 @@ def f90modules(path):
             elif tok[0] == 'use':
                 deps.update(tok[1:])
     return list(mods), list(deps)
+
 
 def configure(force=False):
     import os
@@ -283,14 +286,15 @@ def configure(force=False):
         m = m.format(machine=machine, objects=objects, rules=rules)
         open('Makefile', 'w').write(m)
 
-    # finished
     os.chdir(cwd)
 
     return
 
 
 def make(force=False):
-    import os, json, subprocess
+    import os
+    import json
+    import subprocess
     configure(force)
     p = __file__[:-3] + os.sep
     if force:
@@ -431,7 +435,7 @@ def prepare_param(prm, fio):
                 nb = min(nb, prm['itbuff'])
 
             # append to list
-            #s = '[' + ','.join('%s:%s:%s' % tuple(s) for s in slices) + ']'
+            # s = '[' + ','.join('%s:%s:%s' % tuple(s) for s in slices) + ']'
             ios_ += [[field, reg, slices, nb, x1, x2, val, tau, op, fname]]
 
             # metadata
@@ -474,15 +478,18 @@ def prepare_param(prm, fio):
     }
     return prm, fio_, meta
 
+
 def run(args=None, **kwargs):
-    import os, json, shutil
+    import os
+    import json
+    import shutil
     import numpy as np
     from . import util
 
     print('SORD: Support Operator Rupture Dynamics')
 
     # arguments
-    if args == None:
+    if args is None:
         args = {}
     args.update(kwargs)
 
@@ -512,13 +519,13 @@ def run(args=None, **kwargs):
             fio[k] = v
         elif k in parameters:
             u = parameters[k]
-            if u != None and v != None and type(u) != type(v):
+            if u is not None and v is not None and type(u) != type(v):
                 raise TypeError(k, v, u)
             prm[k] = v
         else:
             job[k] = v
 
-    cfg = make() # process thread realsize
+    cfg = make()  # process thread realsize
     prm, fio, meta = prepare_param(prm, fio)
 
     job = {}
@@ -545,7 +552,7 @@ def run(args=None, **kwargs):
     prm['nproc3'] = [j, k, l]
     job['nproc'] = n = j * k * l
     if cfg['process'] == 'serial' and n > 1:
-        raise Exception('MPI build required for multiprocessing') 
+        raise Exception('MPI build required for multiprocessing')
 
     # resources
     if prm['diffop'] in ('cons', 'rect'):
@@ -566,7 +573,7 @@ def run(args=None, **kwargs):
     job = util.prepare(**job)
     prm.update({'nthread': job['nthread']})
 
-    # create run files 
+    # create run files
     d = os.path.dirname(__file__)
     f = os.path.join(d, 'sord.x')
     shutil.copy2(f, '.')
@@ -584,7 +591,7 @@ def run(args=None, **kwargs):
 
     # save parametes
     prm.update({'~fieldio': fio})
-    meta.update({'dtype': np.dtype('f' +  cfg['realsize']).str})
+    meta.update({'dtype': np.dtype('f' + cfg['realsize']).str})
     out = json.dumps(args, indent=4, sort_keys=True)
     open('parameters.json', 'w').write(out)
     out = json.dumps(job, indent=4, sort_keys=True)
@@ -594,15 +601,16 @@ def run(args=None, **kwargs):
     out = json.dumps(meta, indent=4, sort_keys=True)
     open('meta.json', 'w').write(out)
 
-    # save archive and start job
     util.launch(job)
 
     return job
+
 
 class get_slices:
     def __getitem__(self, slices):
         return slices
 s_ = get_slices()
+
 
 # String representation of slice object
 def repr_slices(slices):
@@ -629,6 +637,7 @@ def repr_slices(slices):
         slices[i] = s
     slices = '[' + ','.join(slices) + ']'
     return slices
+
 
 def expand_slices(shape, slices=[]):
     """
@@ -708,4 +717,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

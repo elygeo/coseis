@@ -1,12 +1,13 @@
-#!/usr/bin/env python
-import os, json
+#!/usr/bin/env python3
+import os
+import json
 import numpy as np
 import matplotlib.pyplot as plt
 
 # metadata
 id_ = '00'
 id_ = '20'
-p = os.path.join('run', 'Foam-' + id_)
+p = os.path.join('..', 'Repository', 'Foam-' + id_)
 os.chdir(p)
 meta = json.load(open('meta.json'))
 
@@ -59,4 +60,3 @@ for s, x, g in [
     ax.set_xlabel('Time (ms)')
     ax.set_ylabel('Depth along fault (cm)')
 fig.savefig('Foam-%s-Acceleration.pdf' % id_)
-

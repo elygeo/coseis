@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Foam rubber model from:
 
@@ -9,7 +9,8 @@ scale-model experiments*, Bull. Seism. Soc. Am., `92(8), 3022-3041
 doi:10.1785/0120010273.
 """
 import os
-from cst import sord
+import cst.sord
+
 s_ = sord.get_slices()
 prm = {}
 
@@ -91,8 +92,7 @@ prm['uy'] += [(s_[0,k,1:l+1,:], '=>', 'off-fault.bin')]
 #prm['vy'] = [(s_[:,k,1:l+1,::10], '=>', 'xsec.bin')]
 
 # run SORD
-d = os.path.join('run', 'foam-%02.0f' % (weakzone * 100))
-os.makedirs(d)
-os.chdir(d)
-sord.run(prm)
-
+path = os.path.join('..', 'Repository', 'foam-%02.0f' % (weakzone * 100))
+os.makedirs(path)
+os.chdir(path)
+cst.sord.run(prm)

@@ -1,16 +1,18 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 TPV3 convergence test
 """
-import os, json, glob
+import os
+import json
+import glob
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.interpolate.RectBivariateSpline as interp2d
 
 # paramters
 degree = 1
-dirs = glob.glob('run/[0-9]*')
-dirs = glob.glob('run/[0-9]*')[3:]
+dirs = glob.glob('../Repository/TPV3-[0-9]*')
+dirs = glob.glob('../Repository/TPV3-[0-9]*')[3:]
 
 # reference solution
 path = dirs[0] + os.sep
@@ -95,4 +97,3 @@ if 0:
     fig.canvas.draw()
     fig.savefig('tpv3-convergence.png')
     fig.savefig('tpv3-convergence.pdf')
-

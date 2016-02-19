@@ -3,7 +3,7 @@
 import os
 import json
 import numpy as np
-import cst
+from cst import sord
 
 
 def test(**kwargs):
@@ -25,7 +25,7 @@ def test(**kwargs):
     }
 
     # output
-    fns = cst.sord.fieldnames()
+    fns = sord.fieldnames()
     fns = sorted(fns['node']) + sorted(fns['cell'])
     for k in fns:
         prm[k] += [([], '=>', k + '.bin')]
@@ -41,8 +41,7 @@ def test(**kwargs):
     cwd = os.getcwd()
     os.makedirs(d0)
     os.chdir(d0)
-    cst.sord.run(prm, **kwargs)
-    cst.sord.run(prm, **kwargs)
+    sord.run(prm, **kwargs)
     meta = open('meta.json')
     dtype = json.load(meta)['dtype']
     os.chdir(cwd)
@@ -54,7 +53,7 @@ def test(**kwargs):
         prm['path'] = d = os.path.join('run', 'sord_%s' % i) + os.sep
         os.makedirs(d)
         os.chdir(d)
-        cst.sord.run(prm, **kwargs)
+        sord.run(prm, **kwargs)
         os.chdir(cwd)
         max_err_ = 0.0
         for k in fns:

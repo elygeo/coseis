@@ -1,7 +1,7 @@
-#!/usr/bin/env python
-from cst import sord
+#!/usr/bin/env python3
+import cst.sord
 
-sord.run({
+cst.sord.run({
 
 # dimentions
 'delta': [100.0, 100.0, 100.0, 0.0075],
@@ -46,4 +46,3 @@ sord.run({
 ]
 
 })
-

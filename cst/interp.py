@@ -1,6 +1,10 @@
 """
 Interpolation tools.
 """
+import os
+from distutils.core import setup, Extension
+import numpy as np
+
 
 # C extensions
 def build():
@@ -8,9 +12,6 @@ def build():
         from . import interp_
         interp_
     except ImportError:
-        import os
-        from distutils.core import setup, Extension
-        import numpy as np
         cwd = os.getcwd()
         os.chdir(os.path.dirname(__file__))
         incl = [np.get_include()]
@@ -24,12 +25,12 @@ except ImportError:
     pass
 
 
-def interp1(xlim, f, xi, fi=None, method='nearest', bound=False, mask=False, no_data_val='nan'):
+def interp1(
+  xlim, f, xi, fi=None, method='nearest', bound=False, mask=False,
+  no_data_val='nan'):
     """
     1D piecewise interpolation of function values specified on regular grid.
 
-    Parameters
-    ----------
     xlim: Range (x_min, x_max) of coordinate space covered by `f`.
     f: Array of regularly spaced data values to be interpolated.
     xi: Array of coordinates for the interpolation points, same shape as `fi`.
@@ -40,12 +41,8 @@ def interp1(xlim, f, xi, fi=None, method='nearest', bound=False, mask=False, no_
     mask: If true and `fi` is passed, non_data_vals are masked from output.
     no_data_val: value to insert for empty data.
 
-    Returns
-    -------
-    fi: Array of interpolated values, same shape as `xi`.
+    Returns an array of interpolated values, same shape as `xi`.
     """
-    import numpy as np
-    # prepare arrays
     f = np.asarray(f)
     xi = np.asarray(xi)
 
@@ -69,8 +66,10 @@ def interp1(xlim, f, xi, fi=None, method='nearest', bound=False, mask=False, no_
     m = False
     if type(bound) not in (tuple, list):
         bound = bound, bound
-    if bound[0]: m = m | (x < 0)
-    if bound[1]: m = m | (x > nx - 1)
+    if bound[0]:
+        m = m | (x < 0)
+    if bound[1]:
+        m = m | (x > nx - 1)
     x = np.minimum(np.maximum(x, 0), nx - 1)
 
     # NaNs
@@ -80,10 +79,10 @@ def interp1(xlim, f, xi, fi=None, method='nearest', bound=False, mask=False, no_
     # interpolation
     if method == 'nearest':
         j = (x + 0.5).astype('i')
-        f = f[...,j]
+        f = f[..., j]
     elif method == 'linear':
         j = np.minimum(x.astype('i'), nx - 2)
-        f = (1.0 - x + j) * f[...,j] + (x - j) * f[...,j+1]
+        f = (1.0 - x + j) * f[..., j] + (x - j) * f[..., j+1]
     else:
         raise Exception('Unknown interpolation method: %s' % method)
     del(j, x)
@@ -91,11 +90,11 @@ def interp1(xlim, f, xi, fi=None, method='nearest', bound=False, mask=False, no_
     # apply mask
     if fi is None:
         nans = nans | m
-        f[...,nans] = no_data_val
+        f[..., nans] = no_data_val
         fi = f
     else:
         if not mask:
-            f[...,nans] = no_data_val
+            f[..., nans] = no_data_val
         elif str(no_data_val) == 'nan':
             m = m | nans | np.isnan(f)
         else:
@@ -103,19 +102,18 @@ def interp1(xlim, f, xi, fi=None, method='nearest', bound=False, mask=False, no_
         if m is False:
             fi[...] = f[...]
         else:
-            fi[...,~m] = f[...,~m]
+            fi[..., ~m] = f[..., ~m]
     return fi
 
 
-def interp2(xlim, f, xi, fi=None, method='nearest', bound=False, mask=False, no_data_val='nan'):
+def interp2(
+  xlim, f, xi, fi=None, method='nearest', bound=False, mask=False,
+  no_data_val='nan'):
     """
     2D piecewise interpolation of function values specified on regular grid.
 
     See 1D interp for documentation.
     """
-    import numpy as np
-
-    # prepare arrays
     f = np.asarray(f)
     xi = np.asarray(xi)
 
@@ -141,10 +139,14 @@ def interp2(xlim, f, xi, fi=None, method='nearest', bound=False, mask=False, no_
     if type(bound) not in (tuple, list):
         bound = [(bound, bound)] * 2
     bx, by = bound
-    if bx[0]: m = m | (x < 0)
-    if by[0]: m = m | (y < 0)
-    if bx[1]: m = m | (x > nx - 1)
-    if by[1]: m = m | (y > ny - 1)
+    if bx[0]:
+        m = m | (x < 0)
+    if by[0]:
+        m = m | (y < 0)
+    if bx[1]:
+        m = m | (x > nx - 1)
+    if by[1]:
+        m = m | (y > ny - 1)
     x = np.minimum(np.maximum(x, 0), nx - 1)
     y = np.minimum(np.maximum(y, 0), ny - 1)
 
@@ -157,14 +159,16 @@ def interp2(xlim, f, xi, fi=None, method='nearest', bound=False, mask=False, no_
     if method == 'nearest':
         j = (x + 0.5).astype('i')
         k = (y + 0.5).astype('i')
-        f = f[...,j,k]
+        f = f[..., j, k]
     elif method == 'linear':
         j = np.minimum(x.astype('i'), nx - 2)
         k = np.minimum(y.astype('i'), ny - 2)
-        f = ( (1.0 - x + j) * (1.0 - y + k) * f[...,j,k]
-            + (1.0 - x + j) * (y - k)       * f[...,j,k+1]
-            + (x - j)       * (1.0 - y + k) * f[...,j+1,k]
-            + (x - j)       * (y - k)       * f[...,j+1,k+1] )
+        f = (
+            (1.0 - x + j) * (1.0 - y + k) * f[..., j, k] +
+            (1.0 - x + j) * (y - k) * f[..., j, k+1] +
+            (x - j) * (1.0 - y + k) * f[..., j+1, k] +
+            (x - j) * (y - k) * f[..., j+1, k+1]
+        )
     else:
         raise Exception('Unknown interpolation method: %s' % method)
     del(j, k, x, y)
@@ -172,11 +176,11 @@ def interp2(xlim, f, xi, fi=None, method='nearest', bound=False, mask=False, no_
     # apply mask
     if fi is None:
         nans = nans | m
-        f[...,nans] = no_data_val
+        f[..., nans] = no_data_val
         fi = f
     else:
         if not mask:
-            f[...,nans] = no_data_val
+            f[..., nans] = no_data_val
         elif str(no_data_val) == 'nan':
             m = m | nans | np.isnan(f)
         else:
@@ -184,19 +188,18 @@ def interp2(xlim, f, xi, fi=None, method='nearest', bound=False, mask=False, no_
         if m is False:
             fi[...] = f[...]
         else:
-            fi[...,~m] = f[...,~m]
+            fi[..., ~m] = f[..., ~m]
     return fi
 
 
-def interp3(xlim, f, xi, fi=None, method='nearest', bound=False, mask=False, no_data_val='nan'):
+def interp3(
+  xlim, f, xi, fi=None, method='nearest', bound=False, mask=False,
+  no_data_val='nan'):
     """
     3D piecewise interpolation of function values specified on regular grid.
 
     See 1D interp for documentation.
     """
-    import numpy as np
-
-    # prepare arrays
     f = np.asarray(f)
     xi = np.asarray(xi)
 
@@ -223,12 +226,18 @@ def interp3(xlim, f, xi, fi=None, method='nearest', bound=False, mask=False, no_
     if type(bound) not in (tuple, list):
         bound = [(bound, bound)] * 3
     bx, by, bz = bound
-    if bx[0]: m = m | (x < 0)
-    if by[0]: m = m | (y < 0)
-    if bz[0]: m = m | (z < 0)
-    if bx[1]: m = m | (x > nx - 1)
-    if by[1]: m = m | (y > ny - 1)
-    if bz[1]: m = m | (z > nz - 1)
+    if bx[0]:
+        m = m | (x < 0)
+    if by[0]:
+        m = m | (y < 0)
+    if bz[0]:
+        m = m | (z < 0)
+    if bx[1]:
+        m = m | (x > nx - 1)
+    if by[1]:
+        m = m | (y > ny - 1)
+    if bz[1]:
+        m = m | (z > nz - 1)
     x = np.minimum(np.maximum(x, 0), nx - 1)
     y = np.minimum(np.maximum(y, 0), ny - 1)
     z = np.minimum(np.maximum(z, 0), nz - 1)
@@ -244,19 +253,21 @@ def interp3(xlim, f, xi, fi=None, method='nearest', bound=False, mask=False, no_
         j = (x + 0.5).astype('i')
         k = (y + 0.5).astype('i')
         l = (z + 0.5).astype('i')
-        f = f[...,j,k,l]
+        f = f[..., j, k, l]
     elif method == 'linear':
         j = np.minimum(x.astype('i'), nx - 2)
         k = np.minimum(y.astype('i'), ny - 2)
         l = np.minimum(z.astype('i'), nz - 2)
-        f = ( (1.0 - x + j) * (1.0 - y + k) * (1.0 - z + l) * f[...,j,k,l]
-            + (1.0 - x + j) * (1.0 - y + k) * (z - l)       * f[...,j,k,l+1]
-            + (1.0 - x + j) * (y - k)       * (1.0 - z + l) * f[...,j,k+1,l]
-            + (1.0 - x + j) * (y - k)       * (z - l)       * f[...,j,k+1,l+1]
-            + (x - j)       * (1.0 - y + k) * (1.0 - z + l) * f[...,j+1,k,l]
-            + (x - j)       * (1.0 - y + k) * (z - l)       * f[...,j+1,k,l+1]
-            + (x - j)       * (y - k)       * (1.0 - z + l) * f[...,j+1,k+1,l]
-            + (x - j)       * (y - k)       * (z - l)       * f[...,j+1,k+1,l+1] )
+        f = (
+            (1.0 - x + j) * (1.0 - y + k) * (1.0 - z + l) * f[..., j, k, l] +
+            (1.0 - x + j) * (1.0 - y + k) * (z - l) * f[..., j, k, l+1] +
+            (1.0 - x + j) * (y - k) * (1.0 - z + l) * f[..., j, k+1, l] +
+            (1.0 - x + j) * (y - k) * (z - l) * f[..., j, k+1, l+1] +
+            (x - j) * (1.0 - y + k) * (1.0 - z + l) * f[..., j+1, k, l] +
+            (x - j) * (1.0 - y + k) * (z - l) * f[..., j+1, k, l+1] +
+            (x - j) * (y - k) * (1.0 - z + l) * f[..., j+1, k+1, l] +
+            (x - j) * (y - k) * (z - l) * f[..., j+1, k+1, l+1]
+        )
     else:
         raise Exception('Unknown interpolation method: %s' % method)
     del(j, k, l, x, y, z)
@@ -264,11 +275,11 @@ def interp3(xlim, f, xi, fi=None, method='nearest', bound=False, mask=False, no_
     # apply mask
     if fi is None:
         nans = nans | m
-        f[...,nans] = no_data_val
+        f[..., nans] = no_data_val
         fi = f
     else:
         if not mask:
-            f[...,nans] = no_data_val
+            f[..., nans] = no_data_val
         elif str(no_data_val) == 'nan':
             m = m | nans | np.isnan(f)
         else:
@@ -276,7 +287,7 @@ def interp3(xlim, f, xi, fi=None, method='nearest', bound=False, mask=False, no_
         if m is False:
             fi[...] = f[...]
         else:
-            fi[...,~m] = f[...,~m]
+            fi[..., ~m] = f[..., ~m]
     return fi
 
 
@@ -297,18 +308,15 @@ def trinterp_np(x, f, t, xi, fi=None, no_data_val=float('nan')):
 
     Note: This is the NumPy version. The Cython version is faster.
     """
-    import numpy as np
-
-    # prepare arrays
     x, y = x
     xi, yi = xi
-    if fi == None:
+    if fi is None:
         fi = np.empty_like(xi)
         fi.fill(no_data_val)
 
     # tolerance
     lmin = -0.000001
-    lmax =  1.000001
+    lmax = 1.000001
 
     # loop over triangles
     for i0, i1, i2 in t.T:
@@ -338,30 +346,35 @@ def trinterp_np(x, f, t, xi, fi=None, no_data_val=float('nan')):
 
     return fi
 
-def ibilinear(xx, yy, xi, yi):
-    """
-    Vectorized inverse bilinear interpolation
-    """
-    import numpy as np
 
+def ibilinear(xx, yy, xi, yi):
+    """Vectorized inverse bilinear interpolation"""
     xx = np.asarray(xx)
     yy = np.asarray(yy)
     xi = np.asarray(xi) - 0.25 * xx.sum(0).sum(0)
     yi = np.asarray(yi) - 0.25 * yy.sum(0).sum(0)
-    j1 = 0.25 * np.array([ [xx[1,:] - xx[0,:], xx[:,1] - xx[:,0]],
-                           [yy[1,:] - yy[0,:], yy[:,1] - yy[:,0]] ]).sum(2)
-    j2 = 0.25 * np.array([ xx[1,1] - xx[0,1] - xx[1,0] + xx[0,0],
-                           yy[1,1] - yy[0,1] - yy[1,0] + yy[0,0] ])
+    j1 = 0.25 * np.array([
+        [xx[1, :] - xx[0, :], xx[:, 1] - xx[:, 0]],
+        [yy[1, :] - yy[0, :], yy[:, 1] - yy[:, 0]]
+    ]).sum(2)
+    j2 = 0.25 * np.array([
+        xx[1, 1] - xx[0, 1] - xx[1, 0] + xx[0, 0],
+        yy[1, 1] - yy[0, 1] - yy[1, 0] + yy[0, 0]
+    ])
     x = dx = solve2(j1, [xi, yi])
     i = 0
     while(abs(dx).max() > 1e-6):
         i += 1
         if i > 10:
             raise Exception('inverse bilinear interpolation did not converge')
-        j = [ [j1[0,0] + j2[0]*x[1], j1[0,1] + j2[0]*x[0]],
-              [j1[1,0] + j2[1]*x[1], j1[1,1] + j2[1]*x[0]] ]
-        b = [ xi - j1[0,0]*x[0] - j1[0,1]*x[1] - j2[0]*x[0]*x[1],
-              yi - j1[1,0]*x[0] - j1[1,1]*x[1] - j2[1]*x[0]*x[1] ]
+        j = [
+            [j1[0, 0] + j2[0] * x[1], j1[0, 1] + j2[0] * x[0]],
+            [j1[1, 0] + j2[1] * x[1], j1[1, 1] + j2[1] * x[0]]
+        ]
+        b = [
+            xi - j1[0, 0] * x[0] - j1[0, 1] * x[1] - j2[0] * x[0] * x[1],
+            yi - j1[1, 0] * x[0] - j1[1, 1] * x[1] - j2[1] * x[0] * x[1]
+        ]
         dx = solve2(j, b)
         x[0] += dx[0]
         x[1] += dx[1]
@@ -372,13 +385,13 @@ def solve2(A, b):
     """
     2 by 2 linear equation solver. Components may be scalars or numpy arrays.
     """
-    d = 1.0 / (A[0,0] * A[1,1] - A[0,1] * A[1,0])
+    d = 1.0 / (A[0, 0] * A[1, 1] - A[0, 1] * A[1, 0])
     x = [
-        d * A[1,1] * b[0] - d * A[0,1] * b[1],
-        d * A[0,0] * b[1] - d * A[1,0] * b[0],
+        d * A[1, 1] * b[0] - d * A[0, 1] * b[1],
+        d * A[0, 0] * b[1] - d * A[1, 0] * b[0],
     ]
     return x
 
+
 if __name__ != '__main__':
     build()
-

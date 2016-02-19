@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 PEER Lifelines program task 1A01, Problem LOH.1
 
@@ -8,7 +8,8 @@ http://peer.berkeley.edu/lifelines/lifelines_pre_2006/final_reports/1A01-FR.pdf
 http://www-rohan.sdsu.edu/~steveday/BASINS/Final_Report_1A01.pdf
 """
 import os
-from cst import sord
+import cst.sord
+
 s_ = sord.get_slices()
 prm = {}
 
@@ -52,8 +53,7 @@ for i in range(10):
         ]
 
 # run SORD
-p = os.path.join('run', 'LOH1')
+p = os.path.join('..', 'Repository', 'LOH1')
 os.makedirs(p)
 os.chdir(p)
-sord.run(prm)
-
+cst.sord.run(prm)

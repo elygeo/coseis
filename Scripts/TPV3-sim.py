@@ -1,10 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 SCEC Code Validation Workshop, Test Problem Version 3
 """
 import os
-from cst import sord
-s_ = sord.get_slices()
+import cst.sord
+
+s_ = cst.sord.get_slices()
 prm = {}
 
 # list of runs:
@@ -107,9 +108,8 @@ for dx, np in runs:
         ]
 
     # run SORD
-    d = os.path.join('run', 'TPV3-%03.0f' % dx)
+    d = os.path.join('..', 'Repository', 'TPV3-%03.0f' % dx)
     os.makedirs(d)
     os.chdir(d)
-    sord.run(prm)
+    cst.sord.run(prm)
     os.chdir(cwd)
-

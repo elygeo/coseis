@@ -4,9 +4,11 @@ Utilities for Graves Standard Rupture Format (SRF).
 SRF is documented at http://epicenter.usc.edu/cmeportal/docs/srf4.pdf
 """
 
+
 def open_(fh, mode='r'):
     if type(fh) == str:
-        import os, gzip
+        import os
+        import gzip
         fh = os.path.expanduser(fh)
         if fh.endswith('.gz'):
             fh = gzip.open(fh, mode)
@@ -14,13 +16,14 @@ def open_(fh, mode='r'):
             fh = open(fh, mode)
     return fh
 
+
 def read(fh):
     """
     Read SRF file.
 
-    Given file handle fh, return SRF metadata/data pair of dictionaries. The first
-    dict 'meta' contains scalars and metadata. The second dict 'data' contains
-    NumPy arrays.
+    Given file handle fh, return SRF metadata/data pair of dictionaries. The
+    first dict 'meta' contains scalars and metadata. The second dict 'data'
+    contains NumPy arrays.
     """
     import numpy as np
 
@@ -199,15 +202,15 @@ def write(fh, srf):
         s3 = data['sv3'][i3:i3+n3] * u_cm
         s = np.concatenate([s1, s2, s3])
         i = s.size // 6 * 6
-        np.savetxt(fh, s[:i].reshape([-1,6]), '%13.5e', '')
-        np.savetxt(fh, s[i:].reshape([1,-1]), '%13.5e', '')
+        np.savetxt(fh, s[:i].reshape([-1, 6]), '%13.5e', '')
+        np.savetxt(fh, s[i:].reshape([1, -1]), '%13.5e', '')
         i1 += n1
         i2 += n2
         i3 += n3
     return
 
 
-def write_sord(path, srf, delta=(1,1,1), proj=None, dbytes=4):
+def write_sord(path, srf, delta=(1, 1, 1), proj=None, dbytes=4):
     """
     Write SORD potency tensor input files.
 
@@ -230,9 +233,10 @@ def write_sord(path, srf, delta=(1,1,1), proj=None, dbytes=4):
     i1 = data['nt1'] > 0
     i2 = data['nt2'] > 0
     i3 = data['nt3'] > 0
-    with open(path + 'nt.bin', 'wb') as f1:
-     with open(path + 'dt.bin', 'wb') as f2:
-      with open(path + 't0.bin', 'wb') as f3:
+    f1 = open(path + 'nt.bin', 'wb')
+    f2 = open(path + 'dt.bin', 'wb')
+    f3 = open(path + 't0.bin', 'wb')
+    with f1, f2, f3:
         data['nt1'][i1].astype(i_).tofile(f1)
         data['nt2'][i2].astype(i_).tofile(f1)
         data['nt3'][i3].astype(i_).tofile(f1)
@@ -252,9 +256,10 @@ def write_sord(path, srf, delta=(1,1,1), proj=None, dbytes=4):
     x /= delta[0]
     y /= delta[1]
     z /= delta[2]
-    with open(path + 'xi1.bin', 'wb') as f1:
-     with open(path + 'xi2.bin', 'wb') as f2:
-      with open(path + 'xi3.bin', 'wb') as f3:
+    f1 = open(path + 'xi1.bin', 'wb')
+    f2 = open(path + 'xi2.bin', 'wb')
+    f3 = open(path + 'xi3.bin', 'wb')
+    with f1, f2, f3:
         for i in i1, i2, i3:
             x[i].astype(f_).tofile(f1)
             y[i].astype(f_).tofile(f2)
@@ -262,27 +267,31 @@ def write_sord(path, srf, delta=(1,1,1), proj=None, dbytes=4):
     del(x, y, z)
 
     # fault local coordinate system
-    s1, s2, n = coord.slip_vectors(data['stk'] + rot, data['dip'], data['rake'])
+    s1, s2, n = coord.slip_vectors(
+        data['stk'] + rot, data['dip'], data['rake']
+    )
     p1 = data['area'] * coord.potency_tensor(n, s1)
     p2 = data['area'] * coord.potency_tensor(n, s2)
     p3 = data['area'] * coord.potency_tensor(n, n)
     del(s1, s2, n)
 
     # tensor components
-    with open(path + 'w11.bin', 'wb') as f11:
-     with open(path + 'w23.bin', 'wb') as f22:
-      with open(path + 'w33.bin', 'wb') as f33:
+    f11 = open(path + 'w11.bin', 'wb')
+    f22 = open(path + 'w23.bin', 'wb')
+    f33 = open(path + 'w33.bin', 'wb')
+    with f11, f22, f33:
         for p, i in (p1, i1), (p2, i2), (p3, i3):
-            p[0,0,i].astype(f_).tofile(f11)
-            p[0,1,i].astype(f_).tofile(f22)
-            p[0,2,i].astype(f_).tofile(f33)
-    with open(path + 'w23.bin', 'wb') as f23:
-     with open(path + 'w31.bin', 'wb') as f31:
-      with open(path + 'w12.bin', 'wb') as f12:
+            p[0, 0, i].astype(f_).tofile(f11)
+            p[0, 1, i].astype(f_).tofile(f22)
+            p[0, 2, i].astype(f_).tofile(f33)
+    f23 = open(path + 'w23.bin', 'wb')
+    f31 = open(path + 'w31.bin', 'wb')
+    f12 = open(path + 'w12.bin', 'wb')
+    with f23, f31, f12:
         for p, i in (p1, i1), (p2, i2), (p3, i3):
-            p[1,0,i].astype(f_).tofile(f23)
-            p[1,1,i].astype(f_).tofile(f31)
-            p[1,2,i].astype(f_).tofile(f12)
+            p[1, 0, i].astype(f_).tofile(f23)
+            p[1, 1, i].astype(f_).tofile(f31)
+            p[1, 2, i].astype(f_).tofile(f12)
     del(p1, p2, p3)
 
     # time history
@@ -309,8 +318,9 @@ def write_sord(path, srf, delta=(1,1,1), proj=None, dbytes=4):
     return
 
 
-def write_awp(fh, srf, t, mu, lam=0.0, delta=1.0, proj=None,
-    binary=True, interp='linear'):
+def write_awp(
+        fh, srf, t, mu, lam=0.0, delta=1.0,
+        proj=None, binary=True, interp='linear'):
     """
     Write ODC-AWP moment rate input file.
 
@@ -382,12 +392,12 @@ def write_awp(fh, srf, t, mu, lam=0.0, delta=1.0, proj=None,
         s3 = interp.interp1(t3, s3, t, s(t), interp, bound=True)
         ii = np.array([[jj[i], kk[i], ll[i]]], 'i')
         mm = np.array([
-            m1[0,0,i] * s1 + m2[0,0,i] * s2 + m3[0,0,i] * s3,
-            m1[0,1,i] * s1 + m2[0,1,i] * s2 + m3[0,1,i] * s3,
-            m1[0,2,i] * s1 + m2[0,2,i] * s2 + m3[0,2,i] * s3,
-            m1[1,1,i] * s1 + m2[1,1,i] * s2 + m3[1,1,i] * s3,
-            m1[1,0,i] * s1 + m2[1,0,i] * s2 + m3[1,0,i] * s3,
-            m1[1,2,i] * s1 + m2[1,2,i] * s2 + m3[1,2,i] * s3,
+            m1[0, 0, i] * s1 + m2[0, 0, i] * s2 + m3[0, 0, i] * s3,
+            m1[0, 1, i] * s1 + m2[0, 1, i] * s2 + m3[0, 1, i] * s3,
+            m1[0, 2, i] * s1 + m2[0, 2, i] * s2 + m3[0, 2, i] * s3,
+            m1[1, 1, i] * s1 + m2[1, 1, i] * s2 + m3[1, 1, i] * s3,
+            m1[1, 0, i] * s1 + m2[1, 0, i] * s2 + m3[1, 0, i] * s3,
+            m1[1, 2, i] * s1 + m2[1, 2, i] * s2 + m3[1, 2, i] * s3,
         ])
         if binary:
             mm.astype('f').tofile(fh)
@@ -417,11 +427,11 @@ def write_coulomb(path, srf, proj, scut=0):
 
     # slip components
     meta, data = srf
-    s1, s2  = data['slip1'], data['slip2']
+    s1, s2 = data['slip1'], data['slip2']
     s = np.sin(math.pi / 180.0 * data['rake'])
     c = np.cos(math.pi / 180.0 * data['rake'])
     r1 = -c * s1 + s * s2
-    r2 =  s * s1 + c * s2
+    r2 = s * s1 + c * s2
 
     # coordinates
     x, y, z = data['lon'], data['lat'], data['dep']
@@ -439,8 +449,14 @@ def write_coulomb(path, srf, proj, scut=0):
     z1, z2 = z - dz, z + dz
 
     # source file
-    i = (s1**2 + s2**2) > (np.sign(scut) * scut**2)
-    c = np.array([x1[i], y1[i], x2[i], y2[i], r1[i], r2[i], data['dip'][i], z1[i], z2[i]]).T
+    i = (s1 ** 2 + s2 ** 2) > (np.sign(scut) * scut**2)
+    c = np.array([
+        x1[i], y1[i],
+        x2[i], y2[i],
+        r1[i], r2[i],
+        data['dip'][i],
+        z1[i], z2[i]
+    ]).T
     with open(path + 'source.inp', 'w') as fh:
         fh.write(coulomb_header.format(**meta))
         np.savetxt(fh, c, coulomb_fmt)
@@ -503,4 +519,3 @@ coulomb_footer = """
   5  ---------------------------- max. lat =       42.5
   6  ---------------------------- zero lat =       40.0
 """
-

@@ -1,9 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Explosion test problem
 """
 import os
 import cst.sord
+
 s_ = cst.sord.get_slices()
 prm = {}
 
@@ -63,8 +64,7 @@ for f in 'vx', 'vy', 'vz':
     ]
 
 # run sord
-p = os.path.join('run', 'Explosion')
+p = os.path.join('..', 'Repository', 'Explosion')
 os.makedirs(p)
 os.chdir(p)
 cst.sord.run(prm)
-

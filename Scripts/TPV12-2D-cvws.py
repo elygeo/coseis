@@ -1,11 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Prepare output for uploading to the SCEC Code Validation Workshop website.
 """
-import os, json
+import os
+import json
 import numpy as np
 
-os.chdir(os.path.join('run', 'TPV12-2D'))
+os.chdir(os.path.join('..', 'Repository', 'TPV12-2D'))
 
 # parameters
 meta = json.load(open('meta.json'))

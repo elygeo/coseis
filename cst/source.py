@@ -2,6 +2,7 @@
 Seismic source tools.
 """
 
+
 def magarea(A):
     """
     Various earthquake magnitude area relations.
@@ -43,10 +44,8 @@ def mw(moment, units='mks'):
     Moment magnitude
     """
     import numpy as np
-    if units=='mks':
+    if units == 'mks':
         m = (np.log10(moment) - 9.05) / 1.5
     else:
         m = (np.log10(moment) - 16.05) / 1.5
     return m
-
-

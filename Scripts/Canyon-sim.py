@@ -1,14 +1,14 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Semi-cylindrical canyon with vertically incident P-wave.
 """
 import os
-from cst import sord
+import cst.sord
 
-p = os.path.join('run', 'Canyon')
-os.chdir(p)
+path = os.path.join('..', 'Repository', 'Canyon')
+os.chdir(path)
 
-sord.run({
+cst.sord.run({
 
 # dimentions
 'delta': [0.0075, 0.0075, 0.0075, 0.002],

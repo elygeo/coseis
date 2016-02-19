@@ -1,17 +1,14 @@
 """
 Data retrieval and processing tools.
 """
-
 # TODO
 # Quaternary Fault Database
 # ftp://hazards.cr.usgs.gov/maps/qfault/
 # http://earthquake.usgs.gov/hazards/qfaults/KML/Quaternaryall.zip
 
-try:
-    from . import conf
-except ImportError:
-    from cst import conf
-repo = conf.configure()['repository']
+import os
+repo = os.path.join('..', 'Repository')
+
 
 def upsample(f):
     """
@@ -21,10 +18,10 @@ def upsample(f):
     n = list(f.shape)
     n[:2] = [n[0] * 2 - 1, n[1] * 2 - 1]
     g = np.empty(n, f.dtype)
-    g[0::2,0::2] = f
-    g[0::2,1::2] = 0.5 * (f[:,:-1] + f[:,1:])
-    g[1::2,0::2] = 0.5 * (f[:-1,:] + f[1:,:])
-    g[1::2,1::2] = 0.25 * (f[:-1,:-1] + f[1:,1:] + f[:-1,1:] + f[1:,:-1])
+    g[0::2, 0::2] = f
+    g[0::2, 1::2] = 0.5 * (f[:, :-1] + f[:, 1:])
+    g[1::2, 0::2] = 0.5 * (f[:-1, :] + f[1:, :])
+    g[1::2, 1::2] = 0.25 * (f[:-1, :-1] + f[1:, 1:] + f[:-1, 1:] + f[1:, :-1])
     return g
 
 
@@ -38,7 +35,7 @@ def downsample(f, d):
     g = np.zeros(n, f.dtype)
     for k in range(d):
         for j in range(d):
-            g += f[j::d,k::d]
+            g += f[j::d, k::d]
     g *= 1.0 / (d * d)
     return g
 
@@ -47,8 +44,6 @@ def clipdata(x, y, extent, lines=1):
     """
     Clip data outside extent.
 
-    Parameters
-    ----------
     x, y: data coordinates
     extent: (xmin, xmax), (ymin, ymax)
     lines: 0 = points, assume no connectivity.
@@ -76,7 +71,8 @@ def densify(x, y, delta):
     Piecewise up-sample line segments with spacing delta.
     """
     import numpy as np
-    x, y = np.array([x, y])
+    x = np.asarray(x)
+    y = np.asarray(y)
     if x.size <= 1:
         return np.array([x, y])
     dx = np.diff(x)
@@ -116,9 +112,9 @@ def downsample_sphere(f, d):
         k = n[1] - 1 - abs(n[1] - 1 - abs(dk + kk))
         for dj in i:
             j = (jj + dj) % n[0]
-            g = g + f[j,k]
-    g[:,0] = g[:,0].mean()
-    g[:,-1] = g[:,-1].mean()
+            g = g + f[j, k]
+    g[:, 0] = g[:, 0].mean()
+    g[:, -1] = g[:, -1].mean()
     g *= 1.0 / (d * d)
     return g
 
@@ -128,10 +124,13 @@ def etopo1(downsample=1):
     ETOPO1 Global Relief Model.
     http://www.ngdc.noaa.gov/mgg/global/global.html
     """
-    import os, urllib, zipfile, cStringIO
+    import os
+    import urllib
+    import zipfile
+    import cStringIO
     import numpy as np
     filename0 = os.path.join(repo, 'DEM0060.npy')
-    filename  = os.path.join(repo, 'DEM%04d.npy' % (60 * downsample))
+    filename = os.path.join(repo, 'DEM%04d.npy' % (60 * downsample))
     url = 'http://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/binary/etopo1_ice_g_i2.zip'
     shape = 10801, 21601
     if not os.path.exists(filename0):
@@ -140,7 +139,7 @@ def etopo1(downsample=1):
         data = cStringIO.StringIO(data.read())
         data = zipfile.ZipFile(data)
         data = data.read('etopo1_ice_g_i2.bin')
-        data = np.fromstring(data, '<i2').reshape(shape).T[:,::-1]
+        data = np.fromstring(data, '<i2').reshape(shape).T[:, ::-1]
         print('Creating %s' % filename0)
         np.save(filename0, data)
         del(data)
@@ -159,20 +158,22 @@ def globe30(tile=(0, 1), fill=True):
     Missing bathymetry is optionally filled with ETOPO1.
     http://www.ngdc.noaa.gov/mgg/topo/globe.html
 
-    Parameters
-    ----------
-    tile: 90 x 90 deg tile indices:
-        (0, 0): W Antarctica, S Pacific
-        (1, 0): W Antarctica, S America, S Atlantic
-        (2, 0): E Antarctica, S Africa, Indian Ocean
-        (3, 0): E Antarctica, Australia
-        (0, 1): W N America, N Pacific
-        (1, 1): E N America, W Africa, W Europe, N Atlantic
-        (2, 1): W Asia, Africa, E Europe
-        (3, 1): E Asia, W Pacific
-    fill: Fill missing data (ocean basins) with ETOPO1 bathymetry.
+    Parameters:
+        tile: 90 x 90 deg tile indices:
+            (0, 0): W Antarctica, S Pacific
+            (1, 0): W Antarctica, S America, S Atlantic
+            (2, 0): E Antarctica, S Africa, Indian Ocean
+            (3, 0): E Antarctica, Australia
+            (0, 1): W N America, N Pacific
+            (1, 1): E N America, W Africa, W Europe, N Atlantic
+            (2, 1): W Asia, Africa, E Europe
+            (3, 1): E Asia, W Pacific
+        fill: Fill missing data (ocean basins) with ETOPO1 bathymetry.
     """
-    import os, urllib, gzip, cStringIO
+    import os
+    import gzip
+    import urllib
+    import cStringIO
     import numpy as np
     filename = os.path.join(repo, 'DEM0030-%s%s.npy' % tile)
     url = 'http://www.ngdc.noaa.gov/mgg/topo/DATATILES/elev/%s10g.gz'
@@ -188,20 +189,20 @@ def globe30(tile=(0, 1), fill=True):
             f = urllib.urlopen(u)
             f = cStringIO.StringIO(f.read())
             z += gzip.GzipFile(fileobj=f).read()
-        z = np.fromstring(z, '<i2').reshape(shape).T[:,::-1]
+        z = np.fromstring(z, '<i2').reshape(shape).T[:, ::-1]
         if fill:
             n = shape[1] // 2
             m = shape[0] // 2
             j = slice(tile[0] * n, tile[0] * n + n + 1)
             k = slice(tile[1] * m, tile[1] * m + m + 1)
-            x = 0.0625 * etopo1()[j,k]
+            x = 0.0625 * etopo1()[j, k]
             y = np.empty_like(z)
             i0 = slice(None, -1)
             i1 = slice(1, None)
-            y[0::2,0::2] = 9 * x[i0,i0] + x[i1,i1] + 3 * (x[i0,i1] + x[i1,i0]) + 0.5
-            y[0::2,1::2] = 9 * x[i0,i1] + x[i1,i0] + 3 * (x[i0,i0] + x[i1,i1]) + 0.5
-            y[1::2,0::2] = 9 * x[i1,i0] + x[i0,i1] + 3 * (x[i1,i1] + x[i0,i0]) + 0.5
-            y[1::2,1::2] = 9 * x[i1,i1] + x[i0,i0] + 3 * (x[i1,i0] + x[i0,i1]) + 0.5
+            y[0::2, 0::2] = 9 * x[i0, i0] + x[i1, i1] + 3 * (x[i0, i1] + x[i1, i0]) + 0.5
+            y[0::2, 1::2] = 9 * x[i0, i1] + x[i1, i0] + 3 * (x[i0, i0] + x[i1, i1]) + 0.5
+            y[1::2, 0::2] = 9 * x[i1, i0] + x[i0, i1] + 3 * (x[i1, i1] + x[i0, i0]) + 0.5
+            y[1::2, 1::2] = 9 * x[i1, i1] + x[i0, i0] + 3 * (x[i1, i0] + x[i0, i1]) + 0.5
             del(x)
             i = z == -500
             z[i] = y[i]
@@ -216,25 +217,22 @@ def dem(coords, scale=1.0, downsample=0, mesh=False):
     """
     Extract digital elevation model for given region.
 
-    Parameters
-    ----------
-    coords: (lon, lat)
-        If length of lon and lat are 2, they specify the region limits,
-        otherwise they specify interpolation points
-    scale: Scaling factor for elevation data
-    downsample:
-        <0: Upsample by factor of 2
-        0:  GLOBE 30 sec, with missing data filled by ETOPO1
-        1:  ETOPO1 60 sec
-        >1: Down-sample factor for ETOPO1
+    Parameters:
+        coords: (lon, lat)
+            If length of lon and lat are 2, they specify the region limits,
+            otherwise they specify interpolation points
+        scale: Scaling factor for elevation data
+        downsample:
+            <0: Upsample by factor of 2
+            0:  GLOBE 30 sec, with missing data filled by ETOPO1
+            1:  ETOPO1 60 sec
+            >1: Down-sample factor for ETOPO1
 
-    Returns (when given region limits)
-    ----------------------------------
-    lon, lat, elev: 2D arrays for regular mesh
+    Returns (when given region limits):
+        lon, lat, elev: 2D arrays for regular mesh
 
-    Returns (when given interpolation points)
-    -----------------------------------------
-    elev: array of elevation values at the interpolation points
+    Returns (when given interpolation points):
+        elev: array of elevation values at the interpolation points
     """
     import math
     import numpy as np
@@ -253,7 +251,7 @@ def dem(coords, scale=1.0, downsample=0, mesh=False):
     else:
         res = 120
         x0 = -180.0 + 0.5 / res
-        y0 =  -90.0 + 0.5 / res
+        y0 = -90.0 + 0.5 / res
     j0 = int(math.floor((xlim[0] - x0) % 360 * res))
     j1 = int(math.ceil((xlim[1] - x0) % 360 * res))
     k0 = int(math.floor((ylim[0] - y0) * res))
@@ -263,7 +261,7 @@ def dem(coords, scale=1.0, downsample=0, mesh=False):
     ylim = y0 + k0 * delta, y0 + k1 * delta
     extent = xlim, ylim
     if downsample > 0:
-        z = etopo1(downsample)[j0:j1,k0:k1]
+        z = etopo1(downsample)[j0:j1, k0:k1]
     else:
         n = 10800
         tile0 = j0 // n, k0 // n
@@ -274,11 +272,11 @@ def dem(coords, scale=1.0, downsample=0, mesh=False):
             raise Exception
         j0, j1 = j0 % n, j1 % n
         k0, k1 = k0 % n, k1 % n
-        z = globe30(tile0)[j0:j1+1,k0:k1+1]
+        z = globe30(tile0)[j0:j1+1, k0:k1+1]
         if downsample < 0:
             z = upsample(z)
             res *= 2
-    z = z * scale # always do this to convert to float
+    z = z * scale  # always do this to convert to float
     if sample:
         return interp.interp2(extent, z, (x, y))
     elif mesh:
@@ -297,7 +295,11 @@ def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):
     """
     Wald, et al. Vs30 map.
     """
-    import os, math, gzip, urllib, cStringIO
+    import os
+    import math
+    import gzip
+    import urllib
+    import cStringIO
     import numpy as np
     from . import interp
     f = os.path.join(repo, 'Vs30-Wald-%s.npy') % region.replace('_', '-')
@@ -321,7 +323,7 @@ def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):
     res = 120
     delta = 1.0 / res
     x0 = -125.0 + 0.5 * delta
-    y0 =   30.0 + 0.5 * delta
+    y0 = 30.0 + 0.5 * delta
     j0 = int(math.floor((xlim[0] - x0) % 360 * res))
     j1 = int(math.ceil((xlim[1] - x0) % 360 * res))
     k0 = int(math.floor((ylim[0] - y0) * res))
@@ -329,7 +331,7 @@ def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):
     xlim = x0 + j0 * delta, x0 + j1 * delta
     ylim = y0 + k0 * delta, y0 + k1 * delta
     extent = xlim, ylim
-    z = np.load(f, mmap_mode='c')[j0:j1+1,k0:k1+1]
+    z = np.load(f, mmap_mode='c')[j0:j1+1, k0:k1+1]
     if sample:
         z = interp.interp2(extent, z, (x, y), method=method)
         return z
@@ -343,32 +345,34 @@ def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):
         return extent, z
 
 
-def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0, max_level=4, delta=None, clip=1):
+def mapdata(
+  kind=None, resolution='high', extent=None, min_area=0.0, min_level=0,
+  max_level=4, delta=None, clip=1):
     """
-    Reader for the Global Self-consistent, Hierarchical, High-resolution Shoreline
-    database (GSHHS) by Wessel and Smith.  WGS-84 ellipsoid.
+    Reader for the Global Self-consistent, Hierarchical, High-resolution
+    Shoreline database (GSHHS) by Wessel and Smith.  WGS-84 ellipsoid.
 
-    Parameters
-    ----------
-    kind: 'coastlines', 'rivers', 'borders', or None
-    resolution: 'crude', 'low', 'intermediate', 'high', or 'full'
-    extent: (min_lon, max_lon), (min_lat, max_lat)
-    delta: densify line segments to given delta.
-    min_level, max_level: where levels 1-4 are (1) coastline, (2) lakeshore,
-        (3) island-in-lake shore, and (4) lake-in-island-in-lake shore.
+    Parameters:
+        kind: 'coastlines', 'rivers', 'borders', or None
+        resolution: 'crude', 'low', 'intermediate', 'high', or 'full'
+        extent: (min_lon, max_lon), (min_lat, max_lat)
+        delta: densify line segments to given delta.
+        min_level, max_level: where levels 1-4 are (1) coastline, (2)
+            lakeshore, (3) island-in-lake shore, and (4) lake-in-island-in-lake
+            shore.
 
-    Returns
-    -------
-    x, y: Coordinates arrays.
+    Returns (x, y) coordinates arrays.
 
-    Reference
-    ---------
+    Reference:
     Wessel, P., and W. H. F. Smith, A Global Self-consistent, Hierarchical,
     High-resolution Shoreline Database, J. Geophys. Res., 101, 8741-8743, 1996.
     http://www.ngdc.noaa.gov/mgg/shorelines/gshhs.html
     http://www.soest.hawaii.edu/wessel/gshhs/index.html
     """
-    import os, urllib, zipfile, cStringIO
+    import os
+    import urllib
+    import zipfile
+    import cStringIO
     import numpy as np
 
     url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhs/version2.2.0/gshhs+wdbii_2.2.0.zip'
@@ -381,7 +385,8 @@ def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0
         zipfile.ZipFile(data).extractall(repo)
     if not kind:
         return
-    name = {'c': 'GSHHS coastlines', 'r': 'WDB rivers', 'b': 'WDB borders'}[kind[0]]
+    name = {'c': 'GSHHS coastlines', 'r': 'WDB rivers', 'b': 'WDB borders'}
+    name = name[kind[0]]
     kind = {'c': 'gshhs', 'r': 'wdb_rivers', 'b': 'wdb_borders'}[kind[0]]
     filename = os.path.join(repo, 'GSHHS/%s_%s.b' % (kind, resolution[0]))
     data = np.fromfile(filename, '>i')
@@ -395,7 +400,7 @@ def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0
     xx = []
     yy = []
     ii = 0
-    nh = 11 # number of header values
+    nh = 11  # number of header values
     nkeep = 0
     ntotal = 0
     while ii < data.size:
@@ -414,7 +419,10 @@ def mapdata(kind=None, resolution='high', extent=None, min_area=0.0, min_level=0
         if extent is not None:
             west, east, south, north = hdr[3:7] * 1e-6
             west, east, south, north = hdr[3:7] * 1e-6
-            if east < lon[0] or west > lon[1] or north < lat[0] or south > lat[1]:
+            if (
+                east < lon[0] or north < lat[0] or
+                west > lon[1] or south > lat[1]
+            ):
                 continue
         nkeep += 1
         x, y = 1e-6 * np.array(data[ii-2*n:ii].reshape(n, 2).T, 'f')
@@ -437,19 +445,23 @@ def us_place_names():
     """
     USGS place name database.
     """
-    import os, urllib, zipfile, cStringIO
+    import os
+    import urllib
+    import zipfile
+    import cStringIO
     import numpy as np
+
     filename = os.path.join(repo, 'US-Place-Names.npy')
     url = 'http://geonames.usgs.gov/docs/stategaz/US_CONCISE.zip'
     cols = 1, 2, 3, 5, 9, 10, 15
     dtype = [
-        ('name',   'S84'),
-        ('class',  'S15'),
-        ('state',  'S2'),
+        ('name', 'S84'),
+        ('class', 'S15'),
+        ('state', 'S2'),
         ('county', 'S26'),
-        ('lat',    'f'),
-        ('lon',    'f'),
-        ('elev',   'i'),
+        ('lat', 'f'),
+        ('lon', 'f'),
+        ('elev', 'i'),
     ]
     if not os.path.exist(filename):
         print('Retrieving %s' % url)
@@ -457,8 +469,8 @@ def us_place_names():
         data = cStringIO.StringIO(data.read())
         data = zipfile.ZipFile(data)
         data = data.open(data.namelist()[0])
-        data = np.genfromtxt(data, delimiter='|',
-            skip_header=1, usecols=cols, dtype=dtype)
+        data = np.genfromtxt(
+            data, delimiter='|', skip_header=1, usecols=cols, dtype=dtype)
         np.save(filename, data)
         del(data)
     return np.load(filename, mmap_mode='c')
@@ -469,7 +481,8 @@ def engdahl_cat():
     Engdahl Centennial Earthquake Catalog.
     http://earthquake.usgs.gov/research/data/centennial.php
     """
-    import os, urllib
+    import os
+    import urllib
     import numpy as np
     filename = os.path.join(repo, 'Engdahl-Centennial-Cat.npy')
     url = 'http://earthquake.usgs.gov/research/data/centennial_Y2K.CAT'
@@ -506,10 +519,11 @@ def lsh_cat():
     Lin, Shearer, Hauksson southern California seismicity catalog.
     http://www.rsmas.miami.edu/personal/glin/LSH.html
     """
-    import os, urllib
+    import os
+    import urllib
     import numpy as np
     filename = os.path.join(repo, 'LSH-Catalog.npy')
-    url="http://www.rsmas.miami.edu/personal/glin/LSH_files/LSH_1.12"
+    url = "http://www.rsmas.miami.edu/personal/glin/LSH_files/LSH_1.12"
     dtype = [
         ('year',    'u2'),
         ('month',   'u1'),
@@ -550,18 +564,20 @@ def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
 
     Must have account on intensity.usc.edu with auto SSH authentication.
 
-    Parameters
-    ----------
+    Parameters:
+
     isrc: source ID
     irup: rupture ID
     islip: slip variation ID
     ihypo: hypocenter ID
 
-    Returns
-    -------
-    srf: (metadata, data) SRF dictionaries
+    Returns (metadata, data) SRF dictionaries
     """
-    import os, json, gzip, cStringIO, subprocess
+    import os
+    import json
+    import gzip
+    import cStringIO
+    import subprocess
     import numpy as np
     from . import srf as srflib
 
@@ -572,7 +588,6 @@ def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
     erf = '/home/scec-00/cybershk/reports/'
     srf = '/home/rcf-104/CyberShake2007/ruptures/RuptureVariations_35_V%d_%d/%d/%d/%d_%d.txt'
 
-    # create directory
     try:
         os.mkdir(path)
     except OSError:
@@ -597,7 +612,6 @@ def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
         g = dict(g)[isrc]
         h = srf % (v0, v1, isrc, irup, isrc, irup)
         h = 'ssh', host, 'head -2 %s %s.variation.output' % (h, h)
-        #h = subprocess.Popen(h, stdout=subprocess.PIPE).communicate()[0].split()
         h = subprocess.check_output(h).split()
         meta = {
             'segment': g,
@@ -609,7 +623,7 @@ def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
             'probability': float(h[5]),
         }
         json.dump(meta, open(f, 'w'), indent=4, sort_keys=True)
-    if ihypo == None:
+    if ihypo is None:
         return meta
     meta.update({
         'islip': islip,
@@ -617,7 +631,8 @@ def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
     })
 
     # fetch SRF
-    f = path + '%1d%1d-%03d-%03d-%02d-%02d.srf.gz' % (v0, v1, isrc, irup, islip, ihypo)
+    f = '%1d%1d-%03d-%03d-%02d-%02d.srf.gz'
+    f = path + f % (v0, v1, isrc, irup, islip, ihypo)
     if os.path.exists(f):
         g = gzip.open(f)
     else:
@@ -625,7 +640,6 @@ def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
         g = srf + '.variation-s%04d-h%04d'
         g = g % (v0, v1, isrc, irup, isrc, irup, islip, ihypo)
         g = 'ssh', host, 'gzip -c ' + g
-        #g = subprocess.Popen(g, stdout=subprocess.PIPE).communicate()[0]
         g = subprocess.check_output(g)
         open(f, 'wb').write(g)
         g = cStringIO.StringIO(g)
@@ -633,4 +647,3 @@ def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
     m, data = srflib.read(g)
     m.update(meta)
     return m, data
-

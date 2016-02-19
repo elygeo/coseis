@@ -45,7 +45,7 @@ hostmap = [
 class typed_dict(dict):
     def __setitem__(self, k, v):
         if isinstance(self[k], type(v)):
-            raise TypeError(key, self[k], v)
+            raise TypeError(k, self[k], v)
         dict.__setitem__(self, k, v)
 
 
@@ -71,7 +71,8 @@ def json_args(argv):
 
 
 def hostname():
-    import os, socket
+    import os
+    import socket
     h = os.uname()
     g = socket.getfqdn()
     host = ' '.join([h[0], h[4], h[1], g])
@@ -82,9 +83,12 @@ def hostname():
 
 
 def configure(*args, **kwargs):
-    import os, sys, pwd, copy, json, multiprocessing
-    job = copy.deepcopy(defatuls)
-    job = typed_dict(defaults)
+    import os
+    import copy
+    import json
+    import multiprocessing
+    job = copy.deepcopy(defaults)
+    job = typed_dict(job)
     job['host'], job['machine'] = hostname()
     job['maxcores'] = multiprocessing.cpu_count()
     d = {}
@@ -107,7 +111,8 @@ def prepare(job=None, **kwargs):
     Compute resource usage. Loop over queue configurations and if resources
     exceeded, try another queue
     """
-    import os, time
+    import os
+    import time
     if job is None:
         job = configure(**kwargs)
     else:
@@ -163,7 +168,7 @@ def prepare(job=None, **kwargs):
         job['ram'] = job['pmem'] * job['ppn']
         m = job['maxtime']
         job['walltime'] = '%d:%02d:00' % (m // 60, m % 60)
-        sus = m // 60 * job['totalcores'] + 1
+        # sus = m // 60 * job['totalcores'] + 1
         if job['ppn_range'] and job['ppn'] > job['ppn_range'][-1]:
             continue
         if job['maxtime'] and job['minutes'] > job['maxtime']:
@@ -186,7 +191,10 @@ def prepare(job=None, **kwargs):
 
 
 def launch(job=None, **kwargs):
-    import os, re, shlex, subprocess
+    import os
+    import re
+    import shlex
+    import subprocess
     if job is None:
         job = prepare(**kwargs)
     else:
@@ -207,10 +215,11 @@ def launch(job=None, **kwargs):
         subprocess.check_call(c)
     return job
 
+
 if __name__ == '__main__':
-    import sys, json
+    import sys
+    import json
     d = json_args(sys.argv[1:])
     d = configure(d)
     d = json.dumps(d, indent=4, sort_keys=True)
     print(d)
-

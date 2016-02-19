@@ -10,10 +10,13 @@ Quick multi-purpose plotting.
 --transpose        Transpose data
 """
 
-import os, sys, json
+import os
+import sys
+import json
 import numpy as np
 from numpy.lib.npyio import format as npy
 import matplotlib.pyplot as plt
+
 
 def stats(f, msg=''):
     if f.size == 0:
@@ -29,7 +32,8 @@ def stats(f, msg=''):
     return
 
 
-def quickplot(*files, dtype='f', shape=[], step=0, power=0, clim=[], transpose=False):
+def quickplot(
+  *files, dtype='f', shape=[], step=0, power=0, clim=[], transpose=False):
     shape0 = shape
     dtype0 = dtype.replace('l', '<').replace('b', '>')
     fig = plt.figure(figsize=(12, 7.2))
@@ -83,7 +87,7 @@ def quickplot(*files, dtype='f', shape=[], step=0, power=0, clim=[], transpose=F
                 shape = data.shape
             if shape[0] == 2:
                 if step:
-                    data = data[:,::step]
+                    data = data[:, ::step]
                 stats(data[0], title)
                 stats(data[1], title)
                 if power:
@@ -91,7 +95,7 @@ def quickplot(*files, dtype='f', shape=[], step=0, power=0, clim=[], transpose=F
                 ax.plot(data[0], data[1])
             else:
                 if step:
-                    data = data[::step,::step]
+                    data = data[::step, ::step]
                 stats(data, title)
                 if power:
                     data = data ** power
@@ -108,7 +112,7 @@ def quickplot(*files, dtype='f', shape=[], step=0, power=0, clim=[], transpose=F
                 data = np.fromfile(fh, dtype, n)
                 data = data.reshape(shape[1::-1]).T
                 if step:
-                    data = data[::step,::step]
+                    data = data[::step, ::step]
                 if transpose:
                     data = data.T
                 stats(data, '%s %s' % (title, it))
@@ -116,7 +120,8 @@ def quickplot(*files, dtype='f', shape=[], step=0, power=0, clim=[], transpose=F
                 if power:
                     data = data ** power
                 if it == 0:
-                    im = ax.imshow(data.T, origin='lower', interpolation='nearest')
+                    im = ax.imshow(
+                        data.T, origin='lower', interpolation='nearest')
                     fig.colorbar(im, orientation='horizontal')
                 else:
                     im.set_array(data.T)
@@ -148,6 +153,6 @@ def main():
             files.append(k)
     quickplot(*files, **args)
 
+
 if __name__ == '__main__':
     main()
-

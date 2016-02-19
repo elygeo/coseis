@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
-
 """
 SCEC Community Fault Model (CFM) tools.
 """
 
 # projection: UTM zone 11, NAD 1927 datum (implies Clark 1866 geoid)
 projection = {'proj': 'utm', 'zone': 11, 'datum': 'NAD27'}
-
-from . import repo
+repo = os.path.join('..', 'Repository')
 
 
 def catalog(version='CFM4-socal-primary'):
     """
     Return a dictionary of available faults. The dictionary key:value pair is
-    the fault name and number of segments. The CFM database is downloaded if not
-    already present.
+    the fault name and number of segments. The CFM database is downloaded if
+    not already present.
     """
-    import os, urllib, zipfile
+    import os
+    import urllib
+    import zipfile
     import numpy as np
     from . import gocad
 
@@ -47,7 +47,7 @@ def catalog(version='CFM4-socal-primary'):
 
 
 def tree():
-    import pprint
+    import json
     tree = {}
     for f, n in catalog():
         k = f.split('-', 3)
@@ -57,7 +57,7 @@ def tree():
                 node[k[i]] = {}
             node = node[k[i]]
         node[k[-1]] = ''
-    pprint.pprint(tree)
+    json.dumps(tree, indent=4, sort_keys=True)
     return
 
 
@@ -177,11 +177,11 @@ def tsurf_merge(tsurfs, fuse=-1.0, cull=-1.0, clean=True):
         tri = np.arange(tri.size)[j].reshape(tri.shape)
         vtx = vtx[i]
         for j in range(len(i)):
-            x = vtx[j,0] - vtx[j+1:,0]
-            y = vtx[j,1] - vtx[j+1:,1]
-            z = vtx[j,2] - vtx[j+1:,2]
+            x = vtx[j, 0] - vtx[j+1:, 0]
+            y = vtx[j, 1] - vtx[j+1:, 1]
+            z = vtx[j, 2] - vtx[j+1:, 2]
             for k in (x * x + y * y + z * z < tol).nonzero()[0]:
-                tri[tri==(j + 1 + k)] = j
+                tri[tri == (j + 1 + k)] = j
 
     # remove unused vertices
     if clean:
@@ -388,18 +388,18 @@ def quad_mesh(vtx, tri, delta, drape=False, clean_top=False):
 
     # cleanup surface trace
     if clean_top:
-        y[:,0] = 2.0 * y[:,1] - y[:,2]
+        y[:, 0] = 2.0 * y[:, 1] - y[:, 2]
 
     # logical to Cartesian coordinates
     r = delta / (normal[0] ** 2 + normal[1] ** 2)
-    a  = r * normal[1]
-    b  = r * normal[0]
+    a = r * normal[1]
+    b = r * normal[0]
     ac = r * normal[1] * normal[2] * (1.0 - normal[2])
     bc = r * normal[0] * normal[2] * (1.0 - normal[2])
-    d  = delta * (1.0 - normal[2])
-    xi =  a * x + b * y - bc * z
+    d = delta * (1.0 - normal[2])
+    xi = a * x + b * y - bc * z
     yi = -b * x + a * y - ac * z
-    zi =  d * z
+    zi = d * z
     xi += centroid[0]
     yi += centroid[1]
 
@@ -409,8 +409,8 @@ def quad_mesh(vtx, tri, delta, drape=False, clean_top=False):
 def line_simplify(vtx, indices, area=None, nkeep=None):
     """
     Remove detail from a line or polygon beginning with the least significant
-    vertices using Visvalingam's algorithm. Vertex significance is determined by
-    the triangle area formed by a point and it's neighbors.
+    vertices using Visvalingam's algorithm. Vertex significance is determined
+    by the triangle area formed by a point and it's neighbors.
 
     Parameters:
     vtx: vertex coordinates.
@@ -418,13 +418,13 @@ def line_simplify(vtx, indices, area=None, nkeep=None):
     area: maximum triangle area for vertex removal.
     nkeep: minimum number of vertices to keep.
 
-    If the first and last indices match, then the line is assumed to be a closed
-    polygon. If neither area nor nkeep are given, then half of the indices are
-    removed. If both area and nkeep are given, priority is given to case that
-    retains more detail.
+    If the first and last indices match, then the line is assumed to be a
+    closed polygon. If neither area nor nkeep are given, then half of the
+    indices are removed. If both area and nkeep are given, priority is given to
+    case that retains more detail.
     """
     import numpy as np
-    if nkeep == None:
+    if nkeep is None:
         if area:
             nkeep = 3
         else:
@@ -439,7 +439,7 @@ def line_simplify(vtx, indices, area=None, nkeep=None):
     while len(j) >= nkeep:
         k = j[1:] + j[:1]
         l = j[-1:] + j[:-1]
-        a =  ((x[k] - x[j]) * (y[l] - y[j]))
+        a = ((x[k] - x[j]) * (y[l] - y[j]))
         a -= ((y[k] - y[j]) * (x[l] - x[j]))
         a = a * a
         if polygon:
@@ -513,7 +513,7 @@ def explore(prefix, faults):
     if not faults:
         print('No faults found')
         return
-    single_fault = type(faults) == str
+    single_fault = isinstance(faults, str)
 
     # projection
     import pyproj
@@ -528,7 +528,7 @@ def explore(prefix, faults):
             s += [prefix[3].replace('_', ' ')]
         s = ', '.join(s)
     print('\n%s\n' % s)
-    fig = mlab.figure(bgcolor=(1,1,1), fgcolor=(0,0,0), size=(1280, 720))
+    fig = mlab.figure(bgcolor=(1, 1, 1), fgcolor=(0, 0, 0), size=(1280, 720))
     fig.name = s
     fig.scene.disable_render = True
 
@@ -541,7 +541,7 @@ def explore(prefix, faults):
         extent = (x.min(), x.max()), (y.min(), y.max())
         x, y = proj(x, y)
         np.save(f, [x, y, z])
-    mlab.mesh(x, y, z, color=(1,1,1), opacity=0.3)
+    mlab.mesh(x, y, z, color=(1, 1, 1), opacity=0.3)
 
     # base map
     f = os.path.join(repo, 'CFM4', 'mapdata.npy')
@@ -561,7 +561,7 @@ def explore(prefix, faults):
         x[i] = float('nan')
         y[i] = float('nan')
         np.save(f, [x, y, z])
-    mlab.plot3d(x, y, z, color=(0,0,0), line_width=1, tube_radius=None)
+    mlab.plot3d(x, y, z, color=(0, 0, 0), line_width=1, tube_radius=None)
     mlab.view(view_azimuth, view_elevation)
     fig.scene.camera.view_angle = view_angle
     fig.scene.disable_render = False
@@ -599,10 +599,10 @@ def explore(prefix, faults):
             'Mean Dip:      %10.5f deg' % m['dip'],
             'Centroid Lon:  %10.5f deg' % m['centroid_lon'],
             'Centroid Lat:  %10.5f deg' % m['centroid_lat'],
-            'Centroid Elev: %10d m'     % m['centroid_z'],
-            'Min Elevation: %10d m'     % z.min(),
-            'Max Elevation: %10d m'     % z.max(),
-            'Surface Area:  %10d km^2'  % (m['area'] * 0.000001),
+            'Centroid Elev: %10d m' % m['centroid_z'],
+            'Min Elevation: %10d m' % z.min(),
+            'Max Elevation: %10d m' % z.max(),
+            'Surface Area:  %10d km^2' % (m['area'] * 0.000001),
         ]
         k = name.split('-', 3)
         s += [fault_names[i][a] for i, a in enumerate(k[:3])]
@@ -611,8 +611,8 @@ def explore(prefix, faults):
         s += [name]
         p = mlab.triangular_mesh(
             x, y, z, tri.T,
-            representation = 'surface',
-            color = color_bg,
+            representation='surface',
+            color=color_bg,
         ).actor.actor.property
         i = m['centroid_lon']
         u = m['centroid_x'], m['centroid_y'], m['centroid_z']
@@ -657,12 +657,14 @@ def explore(prefix, faults):
     mlab.view(view_azimuth, view_elevation)
     fig.scene.camera.view_angle = view_angle
     fig.scene.disable_render = False
-    print("\nPress H in the figure window for help.")
+    print('\nPress H in the figure window for help.')
     mlab.show()
     return
 
-def command_line():
-    import sys, getopt
+
+def main():
+    import sys
+    import getopt
     opts, argv = getopt.getopt(sys.argv[1:], 's:')
     opts = dict(opts)
     if '-s' in opts:
@@ -672,196 +674,197 @@ def command_line():
         prefix, faults = search(argv)
     explore(prefix, faults)
 
+
 fault_names = [{
-"BNRA": "Basin and Range Fault Area",
-"CRFA": "Coast Ranges Fault Area",
-"ETRA": "Eastern Transverse Ranges",
-"GRFS": "Garlock Fault System",
-"GVFA": "Great Valley Fault Area",
-"MJVA": "Mojave Fault Area",
-"OCBA": "Offshore Continental Borderland",
-"OCCA": "Offshore Central California",
-"PNRA": "Peninsular Ranges",
-"SAFS": "San Andreas Fault System",
-"SALT": "Salton Trough Fault Area",
-"SNFA": "Sierra Nevada Fault Area",
-"WTRA": "Western Tranverse Ranges"
+    'BNRA': 'Basin and Range Fault Area',
+    'CRFA': 'Coast Ranges Fault Area',
+    'ETRA': 'Eastern Transverse Ranges',
+    'GRFS': 'Garlock Fault System',
+    'GVFA': 'Great Valley Fault Area',
+    'MJVA': 'Mojave Fault Area',
+    'OCBA': 'Offshore Continental Borderland',
+    'OCCA': 'Offshore Central California',
+    'PNRA': 'Peninsular Ranges',
+    'SAFS': 'San Andreas Fault System',
+    'SALT': 'Salton Trough Fault Area',
+    'SNFA': 'Sierra Nevada Fault Area',
+    'WTRA': 'Western Tranverse Ranges'
 }, {
-"AHTC": "Ash Hill-Tank Canyon fault system",
-"BBFS": "Big Bear fault system",
-"BCFZ": "Blue Cut fault zone",
-"BMFZ": "Black Mountain fault zone",
-"BPPM": "Big Pine-Pine Mountain fault system",
-"BRSZ": "Brawley Seismic Zone",
-"BWFZ": "Blackwater fault zone",
-"CBFZ": "Coronado Bank fault zone",
-"CEPS": "Compton-Lower Elysian Park fault system",
-"CHFZ": "Calico-Hildalgo fault zone",
-"CIFS": "Channel Islands fault system",
-"CLFZ": "Cleghorn fault zone",
-"CPFZ": "Cerro Prieto fault zone",
-"CREC": "Camp Rock-Emerson-Copper Mtn fault zone",
-"CRFS": "Cross fault",
-"CRSF": "Cross fault",
-"CSTL": "Coastal faults",
-"ELSZ": "Elsinore-Laguna Salada fault zone",
-"GLPS": "Goldstone Lake-Paradise fault system",
-"GMFS": "Granite Mountains fault system",
-"GRFZ": "Garlock fault zone",
-"HMFZ": "Hunter Mountain fault zone",
-"HPFZ": "Harper Lake fault zone",
-"HSFZ": "Hosgri fault zone",
-"HSLZ": "Helendale-South Lockhart fault zone",
-"HVFZ": "Homestead Valley fault zone",
-"IBFS": "Inner Borderland fault system",
-"IMFZ": "Imperial fault zone",
-"JVFZ": "Johnson Valley fault zone",
-"LDWZ": "Ludlow fault zone",
-"LILZ": "Lake Isabella Lineament zone",
-"LLFZ": "Little Lake fault zone",
-"LSBM": "Little San Bernardino Mtns fault system",
-"MHFZ": "Mecca Hills-Hidden Springs fault system",
-"MNXZ": "Manix fault zone",
-"MRFS": "Mission Ridge fault system",
-"NAFZ": "Nacimiento fault zone",
-"NBJD": "Northern Baja Detachments?",
-"NCFS": "North Channel fault system",
-"NDVZ": "Northern Death Valley fault zone",
-"NFTS": "North Frontal thrust system",
-"NIFZ": "Newport-Inglewood fault zone",
-"NIRC": "Newport-Inglewood-Rose Canyon fault zone",
-"NULL": "undefined",
-"ORFZ": "Oak Ridge fault zone",
-"OSMS": "Oceanside-San Mateo fault system",
-"OWFZ": "Owens Valley fault zone",
-"PBFZ": "Pisgah-Bullion fault zone",
-"PLFZ": "Pleito fault zone",
-"PMFZ": "Pinto Mountain fault zone",
-"PMVZ": "Panamint Valley fault zone",
-"PVFZ": "Palos Verdes fault zone",
-"SAFZ": "San Andreas fault zone",
-"SBCF": "Santa Barbara Channel faults",
-"SBTS": "Southern Boundary Thrust system",
-"SCCR": "Santa Cruz-Catalina Ridge fault zone",
-"SCFZ": "South Cuyama fault zone",
-"SDTZ": "San Diego Trough fault zone",
-"SDVZ": "Southern Death Valley fault zone",
-"SFFS": "Southern Frontal fault system",
-"SFNS": "San Fernando fault system",
-"SGFZ": "San Gabriel fault zone",
-"SGMF": "San Gabriel Mountain faults",
-"SGRP": "San Gorgonio Pass fault system",
-"SJFZ": "San Jacinto fault zone",
-"SJMZ": "San Juan-Morales fault zone",
-"SLCZ": "Sisar-Lion Canyon fault zone",
-"SMFZ": "Sierra Madre fault zone",
-"SNFZ": "Southern Sierra Nevada fault zone",
-"SOCZ": "San Onofre-Carlsbad fault zone",
-"SPBZ": "San Pedro Basin fault zone",
-"SSFZ": "Santa Susana fault zone",
-"SSRZ": "Simi-Santa Rosa fault zone",
-"SYFZ": "Santa Ynez fault zone",
-"TDRS": "Temblor-Diablo Range fault system",
-"TMFZ": "Tiefort Mountains fault zone",
-"WWFZ": "White Wolf fault zone"
+    'AHTC': 'Ash Hill-Tank Canyon fault system',
+    'BBFS': 'Big Bear fault system',
+    'BCFZ': 'Blue Cut fault zone',
+    'BMFZ': 'Black Mountain fault zone',
+    'BPPM': 'Big Pine-Pine Mountain fault system',
+    'BRSZ': 'Brawley Seismic Zone',
+    'BWFZ': 'Blackwater fault zone',
+    'CBFZ': 'Coronado Bank fault zone',
+    'CEPS': 'Compton-Lower Elysian Park fault system',
+    'CHFZ': 'Calico-Hildalgo fault zone',
+    'CIFS': 'Channel Islands fault system',
+    'CLFZ': 'Cleghorn fault zone',
+    'CPFZ': 'Cerro Prieto fault zone',
+    'CREC': 'Camp Rock-Emerson-Copper Mtn fault zone',
+    'CRFS': 'Cross fault',
+    'CRSF': 'Cross fault',
+    'CSTL': 'Coastal faults',
+    'ELSZ': 'Elsinore-Laguna Salada fault zone',
+    'GLPS': 'Goldstone Lake-Paradise fault system',
+    'GMFS': 'Granite Mountains fault system',
+    'GRFZ': 'Garlock fault zone',
+    'HMFZ': 'Hunter Mountain fault zone',
+    'HPFZ': 'Harper Lake fault zone',
+    'HSFZ': 'Hosgri fault zone',
+    'HSLZ': 'Helendale-South Lockhart fault zone',
+    'HVFZ': 'Homestead Valley fault zone',
+    'IBFS': 'Inner Borderland fault system',
+    'IMFZ': 'Imperial fault zone',
+    'JVFZ': 'Johnson Valley fault zone',
+    'LDWZ': 'Ludlow fault zone',
+    'LILZ': 'Lake Isabella Lineament zone',
+    'LLFZ': 'Little Lake fault zone',
+    'LSBM': 'Little San Bernardino Mtns fault system',
+    'MHFZ': 'Mecca Hills-Hidden Springs fault system',
+    'MNXZ': 'Manix fault zone',
+    'MRFS': 'Mission Ridge fault system',
+    'NAFZ': 'Nacimiento fault zone',
+    'NBJD': 'Northern Baja Detachments?',
+    'NCFS': 'North Channel fault system',
+    'NDVZ': 'Northern Death Valley fault zone',
+    'NFTS': 'North Frontal thrust system',
+    'NIFZ': 'Newport-Inglewood fault zone',
+    'NIRC': 'Newport-Inglewood-Rose Canyon fault zone',
+    'NULL': 'undefined',
+    'ORFZ': 'Oak Ridge fault zone',
+    'OSMS': 'Oceanside-San Mateo fault system',
+    'OWFZ': 'Owens Valley fault zone',
+    'PBFZ': 'Pisgah-Bullion fault zone',
+    'PLFZ': 'Pleito fault zone',
+    'PMFZ': 'Pinto Mountain fault zone',
+    'PMVZ': 'Panamint Valley fault zone',
+    'PVFZ': 'Palos Verdes fault zone',
+    'SAFZ': 'San Andreas fault zone',
+    'SBCF': 'Santa Barbara Channel faults',
+    'SBTS': 'Southern Boundary Thrust system',
+    'SCCR': 'Santa Cruz-Catalina Ridge fault zone',
+    'SCFZ': 'South Cuyama fault zone',
+    'SDTZ': 'San Diego Trough fault zone',
+    'SDVZ': 'Southern Death Valley fault zone',
+    'SFFS': 'Southern Frontal fault system',
+    'SFNS': 'San Fernando fault system',
+    'SGFZ': 'San Gabriel fault zone',
+    'SGMF': 'San Gabriel Mountain faults',
+    'SGRP': 'San Gorgonio Pass fault system',
+    'SJFZ': 'San Jacinto fault zone',
+    'SJMZ': 'San Juan-Morales fault zone',
+    'SLCZ': 'Sisar-Lion Canyon fault zone',
+    'SMFZ': 'Sierra Madre fault zone',
+    'SNFZ': 'Southern Sierra Nevada fault zone',
+    'SOCZ': 'San Onofre-Carlsbad fault zone',
+    'SPBZ': 'San Pedro Basin fault zone',
+    'SSFZ': 'Santa Susana fault zone',
+    'SSRZ': 'Simi-Santa Rosa fault zone',
+    'SYFZ': 'Santa Ynez fault zone',
+    'TDRS': 'Temblor-Diablo Range fault system',
+    'TMFZ': 'Tiefort Mountains fault zone',
+    'WWFZ': 'White Wolf fault zone'
 }, {
-"1857": "1857 rupture",
-"1872": "1872 rupture",
-"1992": "1992 rupture",
-"ALCM": "Agua Caliente-Laguna Mts.?",
-"ANCP": "Anacapa",
-"ANZA": "Anza",
-"AGCL": "Agua Caliente",
-"ASHH": "Ash Hill",
-"BRMT": "Burnt Mountain",
-"BRSZ": "Brawley Seismic Zone",
-"CDVD": "Canada-David",
-"CHNH": "Chino Hills",
-"CHNO": "Chino",
-"CLCZ": "Cholame-Carrizo",
-"CMGF": "Cucamonga fault",
-"CNTR": "Central",
-"COAL": "Coalinga",
-"COAV": "Coachella",
-"CRCT": "Cerro-Centinela",
-"CRPR": "Cerro Prieto basin",
-"CSPC": "Clamshell-Sawpit Canyon",
-"CYMT": "Coyote Mountain",
-"CYTC": "Coyote Creek",
-"EAST": "Eastern",
-"EMCP": "El_Mayor-Cucapah",
-"EMRS": "Emerson",
-"EMTB": "East Montebello",
-"EQVS": "Earthquake Valley",
-"ERPK": "Eureka Peak",
-"GLDS": "Goldstone Lake",
-"GLIV": "Glen Ivy",
-"HMVS": "Homestead Valley",
-"HTSP": "Hot Springs",
-"IMPV": "Imperial Valley",
-"INDP": "Independence",
-"JNSV": "Johnson Valley",
-"JULN": "Julian",
-"KTLM": "Kettleman Hills",
-"LABS": "Los Angeles Basin",
-"LCKV": "Lockwood Valley",
-"LGSD": "Laguna Salada",
-"LSBM": "Little San Bernardino Mtns",
-"LSTH": "Lost Hills",
-"LVLK": "Lavic Lake",
-"MCHS": "Mecca Hills-Hidden Springs",
-"MJVS": "Mojave",
-"MRLS": "Morales",
-"MSNH": "Mission Hills",
-"MULT": "multiple",
-"NCPP": "North Channel-Pitas Point",
-"NE": "Northeast",
-"NTEW": "Northeast-Northwest",
-"NWPT": "Newport",
-"OCNS": "Oceanside",
-"OFFS": "Offshore",
-"PARK": "Parkfield",
-"PHLS": "Peralta Hills",
-"PLMS": "Palomas",
-"PMTS": "Pine Mountain",
-"PPMC": "Pitas Point-Mid-Channel trend",
-"PPT": "Pitas Point",
-"PPTV": "Pitas Point-Ventura",
-"PRDS": "Paradise",
-"RDMT": "Red Mountain",
-"RDNC": "Redondo Canyon",
-"RSCN": "Rose Canyon",
-"SANC": "San Antonio Canyon",
-"SBMT": "San Bernardino Mountains",
-"SBRN": "San Bernardino",
-"SCVA": "Santa Clarita Valley",
-"SFNV": "San Fernando Valley",
-"SGPS": "San Gorgonio Pass",
-"SGV": "San Gabriel Valley",
-"SJCV": "San Jacinto-Claremont",
-"SJMT": "San Jacinto Mts",
-"SJSH": "San Jose Hills",
-"SLTS": "Salton Sea",
-"SMMT": "Santa Monica Mountains",
-"SMNB": "Santa Monica basin",
-"SNCZ": "Santa Cruz",
-"SNRS": "Santa Rosa",
-"SPDB": "San Pedro basin",
-"SQJH": "San Joaquin Hills",
-"SSHS": "Superstition Hills",
-"SSMT": "Superstition Mountain",
-"STEW": "Southeast-Southwest",
-"TANK": "Tank Canyon",
-"TMBK": "Thirty Mile Bank",
-"TMCL": "Temecula",
-"USAF": "Upper Santa Ana Valley",
-"USAV": "Upper Santa Ana Valley",
-"VNTB": "Ventura basin",
-"VRDM": "Verdugo Mountains",
-"WEST": "Western",
-"WHIT": "Whittier"
+    '1857': '1857 rupture',
+    '1872': '1872 rupture',
+    '1992': '1992 rupture',
+    'ALCM': 'Agua Caliente-Laguna Mts.?',
+    'ANCP': 'Anacapa',
+    'ANZA': 'Anza',
+    'AGCL': 'Agua Caliente',
+    'ASHH': 'Ash Hill',
+    'BRMT': 'Burnt Mountain',
+    'BRSZ': 'Brawley Seismic Zone',
+    'CDVD': 'Canada-David',
+    'CHNH': 'Chino Hills',
+    'CHNO': 'Chino',
+    'CLCZ': 'Cholame-Carrizo',
+    'CMGF': 'Cucamonga fault',
+    'CNTR': 'Central',
+    'COAL': 'Coalinga',
+    'COAV': 'Coachella',
+    'CRCT': 'Cerro-Centinela',
+    'CRPR': 'Cerro Prieto basin',
+    'CSPC': 'Clamshell-Sawpit Canyon',
+    'CYMT': 'Coyote Mountain',
+    'CYTC': 'Coyote Creek',
+    'EAST': 'Eastern',
+    'EMCP': 'El_Mayor-Cucapah',
+    'EMRS': 'Emerson',
+    'EMTB': 'East Montebello',
+    'EQVS': 'Earthquake Valley',
+    'ERPK': 'Eureka Peak',
+    'GLDS': 'Goldstone Lake',
+    'GLIV': 'Glen Ivy',
+    'HMVS': 'Homestead Valley',
+    'HTSP': 'Hot Springs',
+    'IMPV': 'Imperial Valley',
+    'INDP': 'Independence',
+    'JNSV': 'Johnson Valley',
+    'JULN': 'Julian',
+    'KTLM': 'Kettleman Hills',
+    'LABS': 'Los Angeles Basin',
+    'LCKV': 'Lockwood Valley',
+    'LGSD': 'Laguna Salada',
+    'LSBM': 'Little San Bernardino Mtns',
+    'LSTH': 'Lost Hills',
+    'LVLK': 'Lavic Lake',
+    'MCHS': 'Mecca Hills-Hidden Springs',
+    'MJVS': 'Mojave',
+    'MRLS': 'Morales',
+    'MSNH': 'Mission Hills',
+    'MULT': 'multiple',
+    'NCPP': 'North Channel-Pitas Point',
+    'NE': 'Northeast',
+    'NTEW': 'Northeast-Northwest',
+    'NWPT': 'Newport',
+    'OCNS': 'Oceanside',
+    'OFFS': 'Offshore',
+    'PARK': 'Parkfield',
+    'PHLS': 'Peralta Hills',
+    'PLMS': 'Palomas',
+    'PMTS': 'Pine Mountain',
+    'PPMC': 'Pitas Point-Mid-Channel trend',
+    'PPT': 'Pitas Point',
+    'PPTV': 'Pitas Point-Ventura',
+    'PRDS': 'Paradise',
+    'RDMT': 'Red Mountain',
+    'RDNC': 'Redondo Canyon',
+    'RSCN': 'Rose Canyon',
+    'SANC': 'San Antonio Canyon',
+    'SBMT': 'San Bernardino Mountains',
+    'SBRN': 'San Bernardino',
+    'SCVA': 'Santa Clarita Valley',
+    'SFNV': 'San Fernando Valley',
+    'SGPS': 'San Gorgonio Pass',
+    'SGV': 'San Gabriel Valley',
+    'SJCV': 'San Jacinto-Claremont',
+    'SJMT': 'San Jacinto Mts',
+    'SJSH': 'San Jose Hills',
+    'SLTS': 'Salton Sea',
+    'SMMT': 'Santa Monica Mountains',
+    'SMNB': 'Santa Monica basin',
+    'SNCZ': 'Santa Cruz',
+    'SNRS': 'Santa Rosa',
+    'SPDB': 'San Pedro basin',
+    'SQJH': 'San Joaquin Hills',
+    'SSHS': 'Superstition Hills',
+    'SSMT': 'Superstition Mountain',
+    'STEW': 'Southeast-Southwest',
+    'TANK': 'Tank Canyon',
+    'TMBK': 'Thirty Mile Bank',
+    'TMCL': 'Temecula',
+    'USAF': 'Upper Santa Ana Valley',
+    'USAV': 'Upper Santa Ana Valley',
+    'VNTB': 'Ventura basin',
+    'VRDM': 'Verdugo Mountains',
+    'WEST': 'Western',
+    'WHIT': 'Whittier'
 }]
 
-if __name__ == '__main__':
-    commdan_line()
 
+if __name__ == '__main__':
+    main()

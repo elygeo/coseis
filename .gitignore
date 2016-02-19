@@ -15,7 +15,6 @@ __pycache__
 /cst/cvms/build-*
 /cst/cvms/Makefile
 /cst/tests/Makefile
-/cst/tests/run
 /cst/sord/Makefile
 /cst/sord/config.json
-/Scripts/run
+/Repository

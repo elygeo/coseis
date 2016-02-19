@@ -1,8 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 2d Semicircular canyon mesh
 """
-import os, math
+import os
+import math
 import numpy as np
 
 # parameters
@@ -32,8 +33,8 @@ y[-1,:n] = np.arange(n) * dy1
 w = np.cumsum(np.linspace(2.0 * dy0, dy1, n1 - 1))
 w = w / w[-1]
 for i in range(1, n1-1):
-    x[i,:] = (1.0 - w[i-1]) * x[0,:] + w[i-1] * x[-1,:]
-    y[i,:] = (1.0 - w[i-1]) * y[0,:] + w[i-1] * y[-1,:]
+    x[i, :] = (1.0 - w[i-1]) * x[0, :] + w[i-1] * x[-1, :]
+    y[i, :] = (1.0 - w[i-1]) * y[0, :] + w[i-1] * y[-1, :]
 
 # print mesh properties
 vp = 2.0
@@ -44,13 +45,13 @@ print('nt > ', L / vp / dt)
 print('dt < ', dt)
 print('L = ', L)
 print('L / n = ', L / n)
-print('dx00 = ', (x[1,0]  - x[0,0],  y[0,1]  - y[0,0]))
-print('dx01 = ', (x[0,-2] - x[0,-1], y[1,-1] - y[0,-1]))
-print('dx10 = ', (x[-1,0] - x[-2,0], y[-1,1] - y[-1,0]))
-print('dx11 = ', (x[-1,-2] - x[-1,-1], y[-1,-1] - y[-2,-1]))
+print('dx00 = ', (x[1, 0]  - x[0, 0],  y[0, 1]  - y[0, 0]))
+print('dx01 = ', (x[0, -2] - x[0, -1], y[1, -1] - y[0, -1]))
+print('dx10 = ', (x[-1, 0] - x[-2, 0], y[-1, 1] - y[-1, 0]))
+print('dx11 = ', (x[-1, -2] - x[-1, -1], y[-1, -1] - y[-2, -1]))
 
 # write files
-p = os.path.join('run', 'Canyon')
+p = os.path.join('..', 'Repository', 'Canyon')
 os.makedirs(p)
 os.chdir(p)
 x.T.astype('f').tofile('x.bin')
@@ -62,7 +63,7 @@ fig = plt.gcf()
 fig.clf()
 ax = fig.add_subplot(111)
 d = 10
-x, y = x[::d,::d], y[::d,::d]
+x, y = x[::d, ::d], y[::d, ::d]
 ax.plot(x, y, 'k-')
 ax.plot(-x, y, 'k-')
 ax.plot(x.T, y.T, 'k-')
@@ -71,4 +72,3 @@ ax.axis('scaled')
 ax.axis([-2, 2, 2, -0.2])
 fig.savefig('Canyon-Mesh.pdf')
 fig.show()
-

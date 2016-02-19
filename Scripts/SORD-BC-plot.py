@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
@@ -102,4 +102,3 @@ ax.axis('image')
 ax.axis([-6, 6, -6, 6])
 ax.axis('off')
 ax.figure.savefig('SORD-BC-2.svg', dpi=60)
-

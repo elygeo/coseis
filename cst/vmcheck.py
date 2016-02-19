@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""
-Velocity model statistics
-"""
+"""Velocity model statistics"""
 
 import os
 import numpy as np
+
 
 def vmcheck():
     vpmin, vsmin = 1500.0, 500.0
@@ -13,7 +12,7 @@ def vmcheck():
     dtype = 'f'
 
     nb = np.dtype(dtype).itemsize
-    n  = os.path.getsize('rho.bin') // nb
+    n = os.path.getsize('rho.bin') // nb
     fr = open('rho.bin', 'rb')
     fp = open('vp.bin', 'rb')
     fs = open('vs.bin', 'rb')
@@ -49,10 +48,10 @@ def vmcheck():
 
         print('         Min          Max         Mean %12d / %12d' % (i, n))
         print('%12g %12g %12g rho' % (minr, maxr, sumr / i))
-        print('%12g %12g %12g vp'  % (minp, maxp, sump / i))
-        print('%12g %12g %12g vs'  % (mins, maxs, sums / i))
-        print('%12g %12g %12g nu'  % (minn, maxn, sumn / i))
+        print('%12g %12g %12g vp' % (minp, maxp, sump / i))
+        print('%12g %12g %12g vs' % (mins, maxs, sums / i))
+        print('%12g %12g %12g nu' % (minn, maxn, sumn / i))
+
 
 if __name__ != '__main__':
     vmcheck()
-

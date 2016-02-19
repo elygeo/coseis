@@ -1,9 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Visualization using Mayavi and Matplotlib
 """
 import os
-import pyproj, Image
+import Image
+import pyproj
 import numpy as np
 import matplotlib.pyplot as plt
 from enthought.mayavi import mlab
@@ -12,7 +13,7 @@ import cst.data, cst.viz, cst.plt
 # parameters
 outfile = 'CVM-Basins.png'; dpi = 150.0
 outfile = 'CVM-Basins.pdf'; dpi = 300.0
-path = os.path.join('run', 'CVM-Basins') + os.sep
+path = os.path.join('..', 'Repository', 'CVM-Basins') + os.sep
 proj = pyproj.Proj(proj='tmerc', lon_0=-117.25, lat_0=33.75, k=0.001)
 title = 'SCEC Community\nVelocity Model'
 legend = 'Depth to Vs = 2.5 km/s'
@@ -185,4 +186,3 @@ else:
     out.save(outfile)
 
 fig.scene.disable_render = False
-

@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
+"""Compute basic statistics from binary files"""
 # TODO: handle text input
 
-import os, sys
+import os
+import sys
 import numpy as np
 from numpy.lib.npyio import format as npy
 
-def stats(filename, dtype='f', block=64*1024*1024):
 
-    # open file
+def stats(filename, dtype='f', block=64*1024*1024):
     if filename.endswith('.npy'):
         fh = open(filename, 'rb')
         version = npy.read_magic(fh)
@@ -23,14 +24,12 @@ def stats(filename, dtype='f', block=64*1024*1024):
         fh = open(filename, 'rb')
     else:
         raise Exception()
-
-    # compute stats
     if n == 0:
         rmin = float('nan')
         rmax = float('nan')
         rmean = float('nan')
     else:
-        rmin =  float('inf')
+        rmin = float('inf')
         rmax = -float('inf')
         rsum = 0.0
         i = 0
@@ -47,6 +46,7 @@ def stats(filename, dtype='f', block=64*1024*1024):
         rmean = rsum / m
     return rmin, rmax, rmean, list(shape)
 
+
 def main():
     dtype = 'f'
     files = []
@@ -60,6 +60,6 @@ def main():
         s = stats(f, dtype)
         print('%12g %12g %12g  %s  %s' % (s + (f,)))
 
+
 if __name__ == '__main__':
     main()
-

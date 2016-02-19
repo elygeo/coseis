@@ -1,14 +1,16 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Explosion test plot
 """
-import os, math, json
+import os
+import math
+import json
 import numpy as np
 import matplotlib.pyplot as plt
 import cst.coord, cst.signal
 
-# run directory
-os.chdir(os.path.join('run', 'Explosion'))
+path = os.path.join('..', 'Repository', 'Explosion')
+os.chdir(path)
 
 # parameters
 meta = json.load(open('parameters.json'))

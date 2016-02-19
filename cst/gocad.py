@@ -4,6 +4,7 @@ GOCAD data tools.
 paulbourke.net/dataformats/gocad/gocad.pdf
 """
 
+
 def header(buff, counter=0, casters=None):
     """
     GOCAD header reader
@@ -33,14 +34,15 @@ def header(buff, counter=0, casters=None):
                 try:
                     header[k] = tuple(cast[k](x) for x in f)
                 except ValueError:
-                    print('Warning: could not cast %s %s to %s' % (k, v, cast[k]))
+                    print('Could not cast %s %s to %s' % (k, v, cast[k]))
             else:
                 try:
                     header[k] = cast[k](v)
                 except ValueError:
-                    print('Warning: could not cast %s %s to %s' % (k, v, cast[k]))
+                    print('Could not cast %s %s to %s' % (k, v, cast[k]))
     raise Exception('Error in header')
     return
+
 
 def voxet(path, load_props=[], alternate='', no_data_value=None, buff=None):
     """
@@ -48,14 +50,20 @@ def voxet(path, load_props=[], alternate='', no_data_value=None, buff=None):
     """
     import os
     import numpy as np
-    if buff == None:
+    if buff is None:
         buff = open(path).read()
     buff = buff.strip().split('\n')
     cast = {}
     casters = {
-        str: ('NAME', 'FILE', 'TYPE', 'ETYPE', 'FORMAT', 'UNIT', 'ORIGINAL_UNIT'),
         int: ('N', 'ESIZE', 'OFFSET', 'SIGNED', 'PAINTED_FLAG_BIT_POS'),
-        float: ('O', 'D', 'U', 'V', 'W', 'MIN', 'MAX', 'NO_DATA_VALUE', 'SAMPLE_STATS'),
+        str: (
+            'NAME', 'FILE', 'TYPE', 'ETYPE', 'FORMAT', 'UNIT',
+            'ORIGINAL_UNIT'
+        ),
+        float: (
+            'O', 'D', 'U', 'V', 'W', 'MIN', 'MAX', 'NO_DATA_VALUE',
+            'SAMPLE_STATS'
+        ),
     }
     for c in casters:
         for k in casters[c]:
@@ -93,12 +101,13 @@ def voxet(path, load_props=[], alternate='', no_data_value=None, buff=None):
                     dtype = '>f%s' % p['ESIZE']
                     data = np.fromfile(f, dtype)
                     if no_data_value in ('nan', 'NaN', 'NAN'):
-                        data[data==p['NO_DATA_VALUE']] = float('nan')
+                        data[data == p['NO_DATA_VALUE']] = float('nan')
                     elif no_data_value is not None:
-                        data[data==p['NO_DATA_VALUE']] = no_data_value
+                        data[data == p['NO_DATA_VALUE']] = no_data_value
                     p['DATA'] = data.reshape(n[::-1]).T
             voxet[id_] = {'HEADER': hdr, 'AXIS': axis, 'PROP': prop}
     return voxet
+
 
 def tsurf(buff):
     """
@@ -108,10 +117,10 @@ def tsurf(buff):
     buff = buff.strip().split('\n')
     tsurf = []
     counter = 0
-    #casters = {
-    #    int: ('ATOM', 'PATOM', 'TRGL', 'BORDER', 'BSTONE'),
-    #    float: ('VRTX', 'PVRTX'),
-    #}
+    # casters = {
+    #     int: ('ATOM', 'PATOM', 'TRGL', 'BORDER', 'BSTONE'),
+    #     float: ('VRTX', 'PVRTX'),
+    # }
     while counter < len(buff):
         line = buff[counter].strip()
         counter += 1
@@ -125,7 +134,7 @@ def tsurf(buff):
         elif f[0] in ('ATOM', 'PATOM'):
             i = int(f[2]) - 1
             a.append([len(x), i])
-            #x.append(x[i])
+            # x.append(x[i])
             x.append([float('nan'), float('nan'), float('nan')])
         elif f[0] == 'TRGL':
             t.append([int(f[1]) - 1, int(f[2]) - 1, int(f[3]) - 1])
@@ -143,9 +152,9 @@ def tsurf(buff):
             b = np.array(b, 'i')
             s = np.array(s, 'i')
             for i, j in a:
-                tri[tri==i] = j
-                b[b==i] = j
-                s[s==i] = j
+                tri[tri == i] = j
+                b[b == i] = j
+                s[s == i] = j
             data = {'vtx': x, 'tri': tri, 'border': b, 'bstone': s}
             meta.update(meta0)
             tsurf.append([meta, data])
@@ -154,4 +163,3 @@ def tsurf(buff):
         elif f[0] == 'HEADER':
             meta0, counter = header(buff, counter)
     return tsurf
-

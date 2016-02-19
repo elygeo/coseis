@@ -1,8 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Material model extraction from CVM
 """
-import os, json, shutil
+import os
+import json
+import shutil
 import numpy as np
 import cst.util, cst.cvms
 
@@ -35,17 +37,17 @@ y, x = np.meshgrid(y, x)
 
 # metadata
 meta = dict(
-    delta = delta,
-    shape = shape,
-    bounds = bounds,
-    extent = extent,
-    npml = 10,
+    delta=delta,
+    shape=shape,
+    bounds=bounds,
+    extent=extent,
+    npml=10,
 )
 
 # create run directory
-path = os.path.join('run', 'SC21', 'mesh', '%.0f' % dx)
+path = os.path.join('..', 'Repository', 'SC21', 'mesh', '%.0f' % dx)
 os.makedirs(path)
-shutil.copy2('../util/mesh-extrude.py', path)
+shutil.copy2('../Util/mesh-extrude.py', path)
 os.chdir(path)
 json.dump(meta, open('meta.json', 'w'))
 np.save(x.astype('f'), 'lat.npy')
@@ -53,16 +55,15 @@ np.save(y.astype('f'), 'lon.npy')
 
 # launch mesher
 job = cst.util.launch(
-    execute = '{python} mesh-extrude.py',
-    minutes = nsample // 120000000,
-    nproc = min(3, nproc),
+    execute='python mesh-extrude.py',
+    minutes=nsample // 120000000,
+    nproc=min(3, nproc),
 )
 
 # launch CVM-S
 cst.cvms.run(
-    version = '2.2',
-    nsample = nsample,
-    depend = job['jobid'],
-    nproc = nproc,
+    version='2.2',
+    nsample=nsample,
+    depend=job['jobid'],
+    nproc=nproc,
 )
-

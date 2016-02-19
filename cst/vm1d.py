@@ -1,30 +1,26 @@
 """
 1D velocity model tools.
 """
+import numpy as np
+
 
 def v30gtl(v30, vt, z, zt=350.0, a=0.5, b=2.0/3.0, c=2.0):
     """
     V30 derived GTL
     """
-    import numpy as np
     z = z / zt
     f = z + b * (z - z * z)
     g = a - (a + 3.0 * c) * z + c * z * z + 2.0 * c * np.sqrt(z)
     v = f * vt + g * v30
     return v
 
+
 def dreger(prop, depth):
     """
-    SoCal model of Dreger and Helmberger (1991)
-
-    Parameters
-    ----------
-    prop: 'rho', 'vp', or 'vs'
-    depth: Array of depth values in meters
-
-    Returns
-    -------
-    f: Array of properties (kg/m^3 for rho, m/s for Vp and Vs)
+    SoCal model of Dreger and Helmberger (1991).
+    prop: 'rho', 'vp', or 'vs'.
+    depth: Array of depth values in meters.
+    Returns array of properties (kg/m^3 or m/s)
     """
     import numpy as np
     m = {
@@ -39,27 +35,21 @@ def dreger(prop, depth):
     f = np.interp(depth, z, f)
     return f
 
+
 def boore_rock(depth):
     """
-    Boore and Joyner (1997) generic rock site Vs
-
-    Parameters
-    ----------
-    depth: Array of depth values in meters
-
-    Returns
-    -------
-    vs: Array of S-wave velocities in m/s
+    Boore and Joyner (1997) generic rock site Vs model.
+    Takes an array of depth values in meters.
+    Returns an array of S-wave velocities in m/s.
     """
-    import numpy as np
     depth = np.asarray(depth)
     vs = np.empty_like(depth)
     vs.fill(float('nan'))
     z0 = -0.00001
     zve = [
-        (   1.0,  245.0, 0.0),
-        (  30.0, 2206.0, 0.272),
-        ( 190.0, 3542.0, 0.407),
+        (1.0,    245.0, 0.0),
+        (30.0, 2206.0, 0.272),
+        (190.0, 3542.0, 0.407),
         (4000.0, 2505.0, 0.199),
         (8000.0, 2927.0, 0.086),
     ]
@@ -69,17 +59,12 @@ def boore_rock(depth):
         z0 = z1
     return vs
 
+
 def boore_hard_rock(depth):
     """
-    Boore and Joyner (1997) generic very hard rock site Vs
-
-    Parameters
-    ----------
-    depth: Array of depth values in meters
-
-    Returns
-    -------
-    vs: Array of S-wave velocities in m/s
+    Boore and Joyner (1997) generic very hard rock site Vs.
+    Takes array of depth values in meters.
+    Returns array of S-wave velocities in m/s.
     """
     import numpy as np
     from . import interp
@@ -99,4 +84,3 @@ def boore_hard_rock(depth):
         vs[i] = (v * 0.001 ** e) * depth[i] ** e
         z0 = z1
     return vs
-
