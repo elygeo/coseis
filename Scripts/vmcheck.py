@@ -52,7 +52,3 @@ def vmcheck():
         print('%12g %12g %12g vp' % (minp, maxp, sump / i))
         print('%12g %12g %12g vs' % (mins, maxs, sums / i))
         print('%12g %12g %12g nu' % (minn, maxn, sumn / i))
-
-
-if __name__ != '__main__':
-    vmcheck()

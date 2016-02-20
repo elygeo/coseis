@@ -1,42 +1,25 @@
-#!/usr/bin/env python3
 """
 Signal processing tools.
 """
 import os
 import math
 
-
-def _build():
+try:
+    from cst.rspectra import rspectra
+except ImportError:
+    cwd = os.getcwd()
+    d = os.path.dirname(__file__)
+    if d:
+        os.chdir(d)
     try:
         from numpy.distutils.core import setup, Extension
-    except ImportError:
-        return
-    cwd = os.getcwd()
-    os.chdir(os.path.dirname(__file__))
-    ext = [Extension('rspectra', ['rspectra.f90'])]
-    try:
+        ext = [Extension('rspectra', ['rspectra.f90'])]
         setup(ext_modules=ext, script_args=['build_ext', '--inplace'])
     except:
         pass
+    finally:
+        from cst.rspectra import rspectra
     os.chdir(cwd)
-
-try:
-    from .rspectra import rspectra
-except ImportError:
-    _build()
-    try:
-        from .rspectra import rspectra
-    except ImportError:
-        pass
-except SystemError:
-    try:
-        from cst.rspectra import rspectra
-    except ImportError:
-        _build()
-    try:
-        from cst.rspectra import rspectra
-    except ImportError:
-        pass
 
 
 def time_function(pulse, t, tau=1.0):
@@ -164,8 +147,3 @@ def filter(x, dt, fcorner, btype='lowpass', order=2, repeat=0, mode='same'):
         elif repeat:
             x = scipy.signal.lfilter(b, a, x)
     return x
-
-
-if __name__ == '__main__':
-    print(__file__)
-    print(__doc__)

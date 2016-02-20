@@ -229,7 +229,7 @@ def f90modules(path):
 
 
 def configure(force=False):
-    from . import util
+    from cst import conf
 
     # source directory
     cwd = os.getcwd()
@@ -291,7 +291,7 @@ def configure(force=False):
         rules = '	\n\n'.join(rules)
 
         # makefile
-        host, machine = util.hostname()
+        host, machine = conf.hostname()
         m = open('Makefile.in').read()
         m = m.format(machine=machine, objects=objects, rules=rules)
         open('Makefile', 'w').write(m)
@@ -488,7 +488,7 @@ def prepare_param(prm, fio):
 
 def run(args=None, **kwargs):
     import numpy as np
-    from . import util
+    from cst import conf
 
     print('SORD: Support Operator Rupture Dynamics')
 
@@ -573,7 +573,7 @@ def run(args=None, **kwargs):
     job['minutes'] = m
 
     # configure and stage
-    job = util.prepare(**job)
+    job = conf.prepare(**job)
     prm.update({'nthread': job['nthread']})
 
     # create run files
@@ -604,7 +604,7 @@ def run(args=None, **kwargs):
     out = json.dumps(meta, indent=4, sort_keys=True)
     open('meta.json', 'w').write(out)
 
-    util.launch(job)
+    conf.launch(job)
 
     return job
 
@@ -697,6 +697,7 @@ def expand_slices(shape, slices=[]):
 
 def main():
     if not sys.argv[1:]:
+        print(json.dumps(parameters, indent=4, sort_keys=True))
         raise SystemExit(__doc__)
     args = {}
     for k in sys.argv[1:]:
@@ -711,7 +712,7 @@ def main():
                 args[k] = True
         else:
             args.update(json.load(k))
-    cst.sord.run(args)
+    run(args)
 
 if __name__ == '__main__':
     main()

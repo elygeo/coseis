@@ -2,10 +2,10 @@
 SCEC Community Velocity Model (CVM-H) tools.
 """
 import os
+import io
 import gzip
 import urllib
 import tarfile
-import cStringIO
 
 repo = os.path.join('..', 'Repository')
 projection = {'proj': 'utm', 'zone': 11, 'datum': 'NAD27', 'ellps': 'clrk66'}
@@ -22,11 +22,11 @@ voxet3d = {
 
 def vs30_model(x, y, version='Wills+Wald', method='nearest'):
     import numpy as np
-    from . import data, interp
+    from cst import geodata, interp
     if version not in ['Wills', 'Wald', 'Wills+Wald']:
         raise Exception()
     if 'Wald' in version:
-        z = data.vs30_wald(x, y, method=method)
+        z = geodata.vs30_wald(x, y, method=method)
     else:
         z = np.empty_like(x)
         z.fill(float('nan'))
@@ -39,7 +39,7 @@ def vs30_model(x, y, version='Wills+Wald', method='nearest'):
         if not os.path.exists(f):
             print('Downloading %s' % u)
             d = urllib.urlopen(u)
-            d = cStringIO.StringIO(d.read())
+            d = io.StringIO(d.read())
             d = gzip.GzipFile(fileobj=d).read()
             open(f, 'w').write(d)
         w = np.load(f, mmap_mode='c')
@@ -105,7 +105,7 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version=None):
     bound: (x0, x1), (y0, y1), (z0, z1)
     data: Array of properties
     """
-    from . import gocad
+    from cst import gocad
 
     if version is None:
         version = versions[-1]
@@ -239,7 +239,7 @@ class Model():
 
     def __call__(self, x, y, z=None, out=None, interpolation='nearest'):
         import numpy as np
-        from . import interp
+        from cst import interp
         if out is None:
             out = np.empty_like(x)
             out.fill(float('nan'))
@@ -324,7 +324,7 @@ class Extraction():
 
     def __call__(self, z, out=None, min_depth=None, by_depth=True):
         import numpy as np
-        from . import vm1d
+        from cst import vm1d
         x, y, z0, zt = self.x, self.y, self.z0, self.zt
         vm, interpolation = self.vm, self.interpolation
         z = np.asarray(z)

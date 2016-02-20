@@ -1,6 +1,7 @@
 """
 1D velocity model tools.
 """
+from cst import interp
 
 
 def v30gtl(v30, vt, z, zt=350.0, a=0.5, b=2.0/3.0, c=2.0):
@@ -48,9 +49,9 @@ def boore_rock(depth):
     vs.fill(float('nan'))
     z0 = -0.00001
     zve = [
-        (1.0,    245.0, 0.0),
-        (30.0, 2206.0, 0.272),
-        (190.0, 3542.0, 0.407),
+        (1.0,     245.0, 0.0),
+        (30.0,   2206.0, 0.272),
+        (190.0,  3542.0, 0.407),
         (4000.0, 2505.0, 0.199),
         (8000.0, 2927.0, 0.086),
     ]
@@ -68,7 +69,6 @@ def boore_hard_rock(depth):
     Returns array of S-wave velocities in m/s.
     """
     import numpy as np
-    from . import interp
     depth = np.asarray(depth)
     v = [
         2768.0, 2808.0, 2847.0, 2885.0, 2922.0, 2958.0, 2993.0, 3026.0,

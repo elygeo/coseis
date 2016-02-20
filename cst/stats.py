@@ -7,7 +7,6 @@ native float).
 import os
 import sys
 
-# TODO: handle text input
 
 def stats(filename, dtype='f', block=64*1024*1024):
     import numpy as np

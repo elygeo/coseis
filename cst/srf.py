@@ -221,7 +221,7 @@ def write_sord(path, srf, delta=(1, 1, 1), proj=None, dbytes=4):
     proj: function to project lon/lat to logical model coordinates
     dbytes: 4 or 8
     """
-    from . import coord
+    from cst import coord
 
     # setup
     meta, data = srf
@@ -333,7 +333,7 @@ def write_awp(
     interp: interpolation method, linear or cubic
     """
     import numpy as np
-    from . import coord, interp
+    from cst import coord
 
     fh = open_(fh)
 
@@ -417,7 +417,7 @@ def write_coulomb(path, srf, proj, scut=0):
     scut: slip-rate below which values are not output
     """
     import numpy as np
-    from . import coord
+    from cst import coord
 
     # slip components
     meta, data = srf

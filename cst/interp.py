@@ -3,25 +3,18 @@ Interpolation tools.
 """
 import os
 
-
-# C extensions
-def build():
-    try:
-        from . import interp_
-        interp_
-    except ImportError:
-        from distutils.core import setup, Extension
-        cwd = os.getcwd()
-        os.chdir(os.path.dirname(__file__))
-        incl = [np.get_include()]
-        ext = [Extension('interp_', ['interp_.c'], include_dirs=incl)]
-        setup(ext_modules=ext, script_args=['build_ext', '--inplace'])
-        os.chdir(cwd)
 try:
-    from .interp_ import trinterp
-    trinterp
+    from cst.interp_ import trinterp
 except ImportError:
-    pass
+    from distutils.core import setup, Extension
+    import numpy as np
+    cwd = os.getcwd()
+    os.chdir(os.path.dirname(__file__))
+    incl = [np.get_include()]
+    ext = [Extension('interp_', ['interp_.c'], include_dirs=incl)]
+    setup(ext_modules=ext, script_args=['build_ext', '--inplace'])
+    os.chdir(cwd)
+    from cst.interp_ import trinterp
 
 
 def interp1(

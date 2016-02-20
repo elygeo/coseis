@@ -2,12 +2,12 @@
 Data retrieval and processing tools.
 """
 import os
+import io
 import json
 import gzip
 import math
 import urllib
 import zipfile
-import cStringIO
 import subprocess
 
 # TODO
@@ -135,12 +135,15 @@ def etopo1(downsample=1):
     import numpy as np
     filename0 = os.path.join(repo, 'DEM0060.npy')
     filename = os.path.join(repo, 'DEM%04d.npy' % (60 * downsample))
-    url = 'http://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/ice_surface/grid_registered/binary/etopo1_ice_g_i2.zip'
+    url = (
+        'http://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/'
+        'ice_surface/grid_registered/binary/etopo1_ice_g_i2.zip'
+    )
     shape = 10801, 21601
     if not os.path.exists(filename0):
         print('Retrieving %s' % url)
         data = urllib.urlopen(url)
-        data = cStringIO.StringIO(data.read())
+        data = io.StringIO(data.read())
         data = zipfile.ZipFile(data)
         data = data.read('etopo1_ice_g_i2.bin')
         data = np.fromstring(data, '<i2').reshape(shape).T[:, ::-1]
@@ -187,7 +190,7 @@ def globe30(tile=(0, 1), fill=True):
             u = url % t
             print('Retrieving %s' % u)
             f = urllib.urlopen(u)
-            f = cStringIO.StringIO(f.read())
+            f = io.StringIO(f.read())
             z += gzip.GzipFile(fileobj=f).read()
         z = np.fromstring(z, '<i2').reshape(shape).T[:, ::-1]
         if fill:
@@ -199,10 +202,14 @@ def globe30(tile=(0, 1), fill=True):
             y = np.empty_like(z)
             i0 = slice(None, -1)
             i1 = slice(1, None)
-            y[0::2, 0::2] = 9 * x[i0, i0] + x[i1, i1] + 3 * (x[i0, i1] + x[i1, i0]) + 0.5
-            y[0::2, 1::2] = 9 * x[i0, i1] + x[i1, i0] + 3 * (x[i0, i0] + x[i1, i1]) + 0.5
-            y[1::2, 0::2] = 9 * x[i1, i0] + x[i0, i1] + 3 * (x[i1, i1] + x[i0, i0]) + 0.5
-            y[1::2, 1::2] = 9 * x[i1, i1] + x[i0, i0] + 3 * (x[i1, i0] + x[i0, i1]) + 0.5
+            y[0::2, 0::2] = 9 * x[i0, i0] + x[i1, i1] + 3 * (
+                x[i0, i1] + x[i1, i0]) + 0.5
+            y[0::2, 1::2] = 9 * x[i0, i1] + x[i1, i0] + 3 * (
+                x[i0, i0] + x[i1, i1]) + 0.5
+            y[1::2, 0::2] = 9 * x[i1, i0] + x[i0, i1] + 3 * (
+                x[i1, i1] + x[i0, i0]) + 0.5
+            y[1::2, 1::2] = 9 * x[i1, i1] + x[i0, i0] + 3 * (
+                x[i1, i0] + x[i0, i1]) + 0.5
             del(x)
             i = z == -500
             z[i] = y[i]
@@ -235,7 +242,7 @@ def dem(coords, scale=1.0, downsample=0, mesh=False):
         elev: array of elevation values at the interpolation points
     """
     import numpy as np
-    from . import interp
+    from cst import interp
     x, y = np.asarray(coords)
     sample = x.size > 2 or y.size > 2
     if sample:
@@ -295,14 +302,14 @@ def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):
     Wald, et al. Vs30 map.
     """
     import numpy as np
-    from . import interp
+    from cst import interp
     f = os.path.join(repo, 'Vs30-Wald-%s.npy') % region.replace('_', '-')
     u = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/%s.grd.gz'
     if not os.path.exists(f):
         u = u % region
         print('Retrieving %s' % u)
         z = urllib.urlopen(u).read()
-        z = cStringIO.StringIO(z)
+        z = io.StringIO(z)
         z = gzip.GzipFile(fileobj=z).read()[19512:]
         z = np.fromstring(z, '>f').reshape((2400, 2280)).T
         np.save(f, z)
@@ -365,13 +372,15 @@ def mapdata(
     """
     import numpy as np
 
-    url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhs/version2.2.0/gshhs+wdbii_2.2.0.zip'
-    url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhg/latest/gshhg-bin-2.2.2.zip'
+    url = (
+        'http://www.ngdc.noaa.gov/mgg/shorelines/'
+        'data/gshhg/latest/gshhg-bin-2.2.2.zip'
+    )
     d = os.path.join(repo, 'GSHHS')
     if not os.path.exists(d):
         print('Retrieving %s' % url)
         data = urllib.urlopen(url)
-        data = cStringIO.StringIO(data.read())
+        data = io.StringIO(data.read())
         zipfile.ZipFile(data).extractall(repo)
     if not kind:
         return
@@ -452,7 +461,7 @@ def us_place_names():
     if not os.path.exist(filename):
         print('Retrieving %s' % url)
         data = urllib.urlopen(url)
-        data = cStringIO.StringIO(data.read())
+        data = io.StringIO(data.read())
         data = zipfile.ZipFile(data)
         data = data.open(data.namelist()[0])
         data = np.genfromtxt(
@@ -556,15 +565,17 @@ def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
     Returns (metadata, data) SRF dictionaries
     """
     import numpy as np
-    from . import srf as srflib
+    from cst import srf as srflib
 
     # locations
     v0, v1 = version
     path = os.path.join(repo, 'CyberShake') + os.sep
     host = 'intensity.usc.edu'
     erf = '/home/scec-00/cybershk/reports/'
-    srf = '/home/rcf-104/CyberShake2007/ruptures/RuptureVariations_35_V%d_%d/%d/%d/%d_%d.txt'
-
+    srf = (
+        '/home/rcf-104/CyberShake2007/ruptures/'
+        'RuptureVariations_35_V%d_%d/%d/%d/%d_%d.txt'
+    )
     try:
         os.mkdir(path)
     except OSError:
@@ -619,7 +630,7 @@ def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
         g = 'ssh', host, 'gzip -c ' + g
         g = subprocess.check_output(g)
         open(f, 'wb').write(g)
-        g = cStringIO.StringIO(g)
+        g = io.StringIO(g)
         g = gzip.GzipFile(fileobj=g)
     m, data = srflib.read(g)
     m.update(meta)

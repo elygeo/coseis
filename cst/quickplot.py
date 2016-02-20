@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 """
-Quick multi-purpose plotting.
+Quick multi-purpose plotting from the command line or Python.
+Reads text, binary, JSON, NumPy, or SAC files.
 
---dtype=str        NumpPy data type
---shape=[int,...]  Array dimensions
---clim=[val,val]   Color scale limit
---power=val        Exponent power applied to data
---step=int         Decimate data
---transpose        Transpose data
+Options:
+
+--dtype: str         NumPy data type
+--shape: [int, ...]  Array dimensions
+--step: int          Decimate data
+--power: val         Exponent power applied to data
+--clim: [val, val]   Color scale limit
+--transpose: bool    Transpose data
+
 """
 import os
 import sys
@@ -15,6 +19,7 @@ import json
 
 
 def stats(f, msg=''):
+    import numpy as np
     if f.size == 0:
         rmin = float('nan')
         rmax = float('nan')
@@ -45,7 +50,10 @@ def quickplot(
         title = os.path.split(filename)[-1]
         title = os.path.splitext(title)[0]
         if filename.lower().endswith('.txt'):
-            data = np.loadtxt(filename).T
+            data = np.loadtxt(filename)
+            shape = data.shape
+        elif filename.lower().endswith('.json'):
+            data = np.asarray(json.load(filename))
             shape = data.shape
         elif filename.lower().endswith('.sac'):
             import obspy.core

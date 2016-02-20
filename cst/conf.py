@@ -7,7 +7,6 @@ import re
 import sys
 import json
 import time
-import json
 import copy
 import shlex
 import socket

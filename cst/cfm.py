@@ -6,10 +6,9 @@ import os
 import sys
 import math
 import json
-import urllib
 import getopt
+import urllib
 import zipfile
-from . import gocad
 
 # projection: UTM zone 11, NAD 1927 datum (implies Clark 1866 geoid)
 projection = {'proj': 'utm', 'zone': 11, 'datum': 'NAD27'}
@@ -23,6 +22,7 @@ def catalog(version='CFM4-socal-primary'):
     not already present.
     """
     import numpy as np
+    from cst import gocad
 
     url = 'http://structure.harvard.edu/cfm/download/vdo/SCEC_VDO.jar'
     path = os.path.join(repo, 'CFM4', version) + os.sep
@@ -342,7 +342,8 @@ def quad_mesh(vtx, tri, delta, drape=False, clean_top=False):
     1/M = | -b a -ac/d     | / (aa + bb)
           |  0 0 (aa+bb)/d |
     """
-    from . import data, trinterp
+    import numpy as np
+    from cst import interp, geodata
 
     # remove topography
     x, y, z = vtx
@@ -351,7 +352,7 @@ def quad_mesh(vtx, tri, delta, drape=False, clean_top=False):
         import pyproj
         proj = pyproj.Proj(**projection)
         lon, lat = proj(x, y, inverse=True)
-        z = data.dem([lon, lat]) - z
+        z = geodata.dem([lon, lat]) - z
         del(lon, lat)
 
     # get plane orientation
@@ -377,7 +378,7 @@ def quad_mesh(vtx, tri, delta, drape=False, clean_top=False):
     x = np.arange(x[0], x[1] + 1)
     z = np.arange(z[0], z[1] + 1)
     z, x = np.meshgrid(z, x)
-    y = trinterp.trinterp([xi, zi], yi, tri, [x, z])
+    y = interp.trinterp([xi, zi], yi, tri, [x, z])
     del(xi, yi, zi, tri)
     mask = np.isnan(y)
     y[mask] = y[~mask].mean()
@@ -496,9 +497,10 @@ def explore(prefix, faults):
         print('No faults found')
         return
 
+    import numpy as np
     import pyproj
     from enthought.mayavi import mlab
-    from . import data, interp
+    from cst import interp, geodata
 
     # parameters
     extent = (-122.0, -114.0), (31.5, 37.5)
@@ -531,7 +533,7 @@ def explore(prefix, faults):
     if os.path.exists(f):
         x, y, z = np.load(f)
     else:
-        x, y, z = data.dem(extent, mesh=True)
+        x, y, z = geodata.dem(extent, mesh=True)
         extent = (x.min(), x.max()), (y.min(), y.max())
         x, y = proj(x, y)
         np.save(f, [x, y, z])
@@ -544,9 +546,10 @@ def explore(prefix, faults):
     else:
         ddeg = 0.5 / 60.0
         x, y = np.c_[
-            data.mapdata('coastlines', resolution, extent, 10.0, delta=ddeg),
+            geodata.mapdata(
+                'coastlines', resolution, extent, 10.0, delta=ddeg),
             [float('nan'), float('nan')],
-            data.mapdata('borders', resolution, extent, delta=ddeg),
+            geodata.mapdata('borders', resolution, extent, delta=ddeg),
         ]
         x -= 360.0
         z = interp.interp2(extent, z, (x, y))
@@ -640,8 +643,8 @@ def explore(prefix, faults):
             mlab.view(view_azimuth, view_elevation)
             fig.scene.camera.view_angle = view_angle
         elif k in '/?h':
-            from .cfm import explore
-            print(explore.__doc__)
+            from cst import cfm
+            print(cfm.explore.__doc__)
         fig.scene.disable_render = False
         save[0] = isurf
         return

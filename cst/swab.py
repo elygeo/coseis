@@ -4,7 +4,6 @@ Swap byte order.
 
 -dtype=<NumPy dtype>  Default is native float
 """
-from __future__ import division
 import os
 import sys
 
@@ -34,9 +33,7 @@ def swab(src, dst, verbose=False, dtype='f', block=64*1024*1024):
 
 def main():
     if not sys.argv[1:]:
-        print(__file__)
-        print(__doc__)
-        raise SystemExit()
+        raise SystemExit(__doc__)
     files = []
     args = {'verbose': True}
     for k in sys.argv[1:]:
