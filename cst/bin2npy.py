@@ -40,7 +40,7 @@ def bin2npy(filename, dtype='f', shape=[]):
     np.save(f, v)
 
 
-def command_line():
+def main():
     args = {}
     files = []
     for i in sys.argv[1:]:
@@ -56,4 +56,4 @@ def command_line():
 
 
 if __name__ == '__main__':
-    command_line()
+    main()

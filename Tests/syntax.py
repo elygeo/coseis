@@ -1,5 +1,7 @@
-#!/usr/bin/env python3
-"""Test code syntax."""
+"""
+Test code syntax.
+Run this with python2 and python3
+"""
 import os
 
 
@@ -10,7 +12,10 @@ def test(**kwargs):
                 continue
             f = os.path.join(p, f)
             c = open(f).read()
-            compile(c, f, 'exec')
+            try:
+                compile(c, f, 'exec')
+            except SyntaxError as e:
+                print(e)
 
 if __name__ == '__main__':
     test()

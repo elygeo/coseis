@@ -344,7 +344,7 @@ def prepare_param(prm, fio):
     # convert boundary conditions to numeric ids
     for k in 'bc1', 'bc2':
         for i in 0, 1, 2:
-            if type(prm[k][i]) == str:
+            if isinstance(prm[k][i], str):
                 prm[k][i] = boundary_conditions[prm[k][i]]
 
     # field i/o
@@ -370,7 +370,7 @@ def prepare_param(prm, fio):
             shape += [nt]
         if type(ios) in (float, int):
             ios = [ios]
-        elif len(ios) > 1 and type(ios[1]) == str:
+        elif len(ios) > 1 and isinstance(ios[1], str):
             ios = [ios]
         ios_ = []
         for io in ios:
@@ -504,9 +504,9 @@ def run(args=None, **kwargs):
             prm[k] = v
     for k, v in args.items():
         if k in fieldnames:
-            if type(v) != list:
+            if not isinstance(v, list):
                 v = [v]
-            elif len(v) > 1 and type(v[1]) == str:
+            elif len(v) > 1 and isinstance(v[1], str):
                 v = [v]
             for i, io in enumerate(v):
                 if type(io) in (tuple, list):
@@ -519,6 +519,8 @@ def run(args=None, **kwargs):
             fio[k] = v
         elif k in parameters:
             u = parameters[k]
+
+XXX FIXME use typed_dict
             if u is not None and v is not None and type(u) != type(v):
                 raise TypeError(k, v, u)
             prm[k] = v

@@ -2,6 +2,15 @@
 """
 SCEC Community Fault Model (CFM) tools.
 """
+import os
+import sys
+import math
+import json
+import urllib
+import getopt
+import zipfile
+import numpy as np
+from . import gocad
 
 # projection: UTM zone 11, NAD 1927 datum (implies Clark 1866 geoid)
 projection = {'proj': 'utm', 'zone': 11, 'datum': 'NAD27'}
@@ -14,11 +23,6 @@ def catalog(version='CFM4-socal-primary'):
     the fault name and number of segments. The CFM database is downloaded if
     not already present.
     """
-    import os
-    import urllib
-    import zipfile
-    import numpy as np
-    from . import gocad
 
     url = 'http://structure.harvard.edu/cfm/download/vdo/SCEC_VDO.jar'
     path = os.path.join(repo, 'CFM4', version) + os.sep
@@ -62,7 +66,6 @@ def tree():
 
 
 def search(items, split=1, maxsplit=3):
-    import os
 
     # search the catalog
     cat = catalog()
@@ -117,8 +120,6 @@ def read(fault, version='CFM4-socal-primary'):
     """
     Read triangulated surface data.
     """
-    import os
-    import numpy as np
     path = os.path.join(repo, 'CFM4', version) + os.sep
     f, i = (fault + ':').split(':')[:2]
     d = np.load(path + f + '.npz')
@@ -140,7 +141,6 @@ def tsurf_merge(tsurfs, fuse=-1.0, cull=-1.0, clean=True):
     cull (float): area tolerance for triangle removal.
     clean (bool): remove unused vertices.
     """
-    import numpy as np
 
     # merge surfaces
     n = 0
@@ -240,8 +240,6 @@ def tsurf_plane(vtx, tri):
     Find the center of mass, best-fit plane, and total surface area of a
     triangulated surface.
     """
-    import math
-    import numpy as np
     import scipy.optimize
 
     # area normals
@@ -298,7 +296,6 @@ def geometry(vtx, tri):
     dip: Fault dip
     area: Total surface area
     """
-    import math
     import pyproj
 
     proj = pyproj.Proj(**projection)
@@ -344,8 +341,6 @@ def quad_mesh(vtx, tri, delta, drape=False, clean_top=False):
     1/M = | -b a -ac/d     | / (aa + bb)
           |  0 0 (aa+bb)/d |
     """
-    import math
-    import numpy as np
     from . import data, trinterp
 
     # remove topography
@@ -423,7 +418,6 @@ def line_simplify(vtx, indices, area=None, nkeep=None):
     indices are removed. If both area and nkeep are given, priority is given to
     case that retains more detail.
     """
-    import numpy as np
     if nkeep is None:
         if area:
             nkeep = 3
@@ -496,8 +490,6 @@ def explore(prefix, faults):
     Save a screen-shot                 S
     Help                             h ?
     """
-    import os
-    import numpy as np
     from . import data, interp
 
     # parameters
@@ -663,8 +655,6 @@ def explore(prefix, faults):
 
 
 def main():
-    import sys
-    import getopt
     opts, argv = getopt.getopt(sys.argv[1:], 's:')
     opts = dict(opts)
     if '-s' in opts:

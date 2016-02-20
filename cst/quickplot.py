@@ -33,7 +33,8 @@ def stats(f, msg=''):
 
 
 def quickplot(
-  *files, dtype='f', shape=[], step=0, power=0, clim=[], transpose=False):
+    files, dtype='f', shape=[], step=0, power=0, clim=[], transpose=False
+):
     shape0 = shape
     dtype0 = dtype.replace('l', '<').replace('b', '>')
     fig = plt.figure(figsize=(12, 7.2))
@@ -151,7 +152,7 @@ def main():
                 args[k] = True
         else:
             files.append(k)
-    quickplot(*files, **args)
+    quickplot(files, **args)
 
 
 if __name__ == '__main__':
