@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
-Swap byte order. Default is 4 byte numbers.
+Swap byte order.
+
+-dtype=<NumPy dtype>  Default is native float
 """
 from __future__ import division
 import os
@@ -31,20 +33,19 @@ def swab(src, dst, verbose=False, dtype='f', block=64*1024*1024):
 
 
 def main():
-    dtype = 'f'
+    if not sys.argv[1:]:
+        raise SystemExit(__doc__)
+    args = {'verbose': True}
     files = []
-    for a in sys.argv[1:]:
-        if a.startswith('-'):
-            dtype = a[1:].replace('l', '<').replace('b', '>')
+    for k in sys.argv[1:]:
+        if k[0] == '-':
+            k, v = k.split('=')
+            k = k.lstrip('-')
+            args[k] = v
         else:
-            files += [a]
-    if len(files) == 0:
-        print(sys.byteorder)
+            files.append(k)
     for f in files:
-        if not os.path.isfile(f):
-            continue
-        swab(f, f + '.swab', True, dtype)
-
+        swab(f, f + '.swab', **args)
 
 if __name__ == '__main__':
     main()

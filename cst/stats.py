@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
-Compute basic statistics from binary files
+Compute basic statistics from raw binary or NumPy .npy files.
+The data type for raw binary is specied by -dtype=str option (defautls to
+native float).
 """
 import os
 import sys
@@ -49,18 +51,21 @@ def stats(filename, dtype='f', block=64*1024*1024):
 
 
 def main():
-    dtype = 'f'
+    if not sys.argv[1:]:
+        raise SystemExit(__doc__)
+    args = {}
     files = []
-    for a in sys.argv[1:]:
-        if a[0] == '-':
-            dtype = a.lstrip('-').replace('l', '<').replace('b', '>')
+    for k in sys.argv[1:]:
+        if k[0] == '-':
+            k, v = k.split('=')
+            k = k.lstrip('-')
+            args[k] = v
         else:
-            files.append(a)
+            files.append(k)
     print('         Min          Max         Mean  Shape')
     for f in files:
-        s = stats(f, dtype)
+        s = stats(f, **args)
         print('%12g %12g %12g  %s  %s' % (s + (f,)))
-
 
 if __name__ == '__main__':
     main()

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
 Signal processing tools.
+
+XXX FIXME
 """
 import math
 

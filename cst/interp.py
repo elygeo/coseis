@@ -389,7 +389,3 @@ def solve2(A, b):
         d * A[0, 0] * b[1] - d * A[1, 0] * b[0],
     ]
     return x
-
-
-if __name__ != '__main__':
-    build()

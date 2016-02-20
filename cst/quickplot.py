@@ -138,10 +138,12 @@ def quickplot(
 
 
 def main():
+    if not sys.argv[1:]:
+        raise SystemExit(__doc__)
     args = {}
     files = []
     for k in sys.argv[1:]:
-        if k.startswith('-'):
+        if k[0] == '-':
             k = k.lstrip('-')
             if '=' in k:
                 k, v = k.split('=')

@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
 """
-Convert binary files to NumPy
+Convert binary files to NumPy .npy format.
+
+Data types will be read from file 'meta.json' if it exists, or specified with
+command line options:
+
+-dtype=<numpy dytpe>
+-shape=[nx, ny, ...]
 """
 import os
 import sys
 import json
-import numpy as np
 
 
 def bin2npy(filename, dtype='f', shape=[]):
+    import numpy as np
     p = ['.'] + os.path.split(filename)
     k = filename
     while p:
@@ -32,7 +38,7 @@ def bin2npy(filename, dtype='f', shape=[]):
     else:
         f = filename + '.npy'
     if os.path.exists(f):
-        continue
+        return
     v = np.fromfile(filename, dtype)
     if shape:
         v = v.reshape(shape[::-1]).T
@@ -41,6 +47,8 @@ def bin2npy(filename, dtype='f', shape=[]):
 
 
 def main():
+    if not sys.argv[1:]:
+        raise SystemExit(__doc__)
     args = {}
     files = []
     for i in sys.argv[1:]:
@@ -53,7 +61,6 @@ def main():
             files.append(i)
     for f in files:
         bin2npy(f, **args)
-
 
 if __name__ == '__main__':
     main()
