@@ -1,6 +1,13 @@
-"""SCEC Community Velocity Model (CVM-H) tools."""
-from . import repo
+"""
+SCEC Community Velocity Model (CVM-H) tools.
+"""
+import os
+import gzip
+import urllib
+import tarfile
+import cStringIO
 
+repo = os.path.join('..', 'Repository')
 projection = {'proj': 'utm', 'zone': 11, 'datum': 'NAD27', 'ellps': 'clrk66'}
 extent = (131000.0, 828000.0), (3431000.0, 4058000.0), (-200000.0, 4900.0)
 prop2d = {'topo': '1', 'base': '2', 'moho': '3'}
@@ -14,10 +21,6 @@ voxet3d = {
 
 
 def vs30_model(x, y, version='Wills+Wald', method='nearest'):
-    import os
-    import urllib
-    import gzip
-    import cStringIO
     import numpy as np
     from . import data, interp
     if version not in ['Wills', 'Wald', 'Wills+Wald']:
@@ -102,9 +105,6 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version=None):
     bound: (x0, x1), (y0, y1), (z0, z1)
     data: Array of properties
     """
-    import os
-    import urllib
-    import tarfile
     from . import gocad
 
     if version is None:

@@ -1,12 +1,20 @@
 """
 Data retrieval and processing tools.
 """
+import os
+import json
+import gzip
+import math
+import urllib
+import zipfile
+import cStringIO
+import subprocess
+
 # TODO
 # Quaternary Fault Database
 # ftp://hazards.cr.usgs.gov/maps/qfault/
 # http://earthquake.usgs.gov/hazards/qfaults/KML/Quaternaryall.zip
 
-import os
 repo = os.path.join('..', 'Repository')
 
 
@@ -124,10 +132,6 @@ def etopo1(downsample=1):
     ETOPO1 Global Relief Model.
     http://www.ngdc.noaa.gov/mgg/global/global.html
     """
-    import os
-    import urllib
-    import zipfile
-    import cStringIO
     import numpy as np
     filename0 = os.path.join(repo, 'DEM0060.npy')
     filename = os.path.join(repo, 'DEM%04d.npy' % (60 * downsample))
@@ -170,10 +174,6 @@ def globe30(tile=(0, 1), fill=True):
             (3, 1): E Asia, W Pacific
         fill: Fill missing data (ocean basins) with ETOPO1 bathymetry.
     """
-    import os
-    import gzip
-    import urllib
-    import cStringIO
     import numpy as np
     filename = os.path.join(repo, 'DEM0030-%s%s.npy' % tile)
     url = 'http://www.ngdc.noaa.gov/mgg/topo/DATATILES/elev/%s10g.gz'
@@ -234,7 +234,6 @@ def dem(coords, scale=1.0, downsample=0, mesh=False):
     Returns (when given interpolation points):
         elev: array of elevation values at the interpolation points
     """
-    import math
     import numpy as np
     from . import interp
     x, y = np.asarray(coords)
@@ -295,11 +294,6 @@ def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):
     """
     Wald, et al. Vs30 map.
     """
-    import os
-    import math
-    import gzip
-    import urllib
-    import cStringIO
     import numpy as np
     from . import interp
     f = os.path.join(repo, 'Vs30-Wald-%s.npy') % region.replace('_', '-')
@@ -369,10 +363,6 @@ def mapdata(
     http://www.ngdc.noaa.gov/mgg/shorelines/gshhs.html
     http://www.soest.hawaii.edu/wessel/gshhs/index.html
     """
-    import os
-    import urllib
-    import zipfile
-    import cStringIO
     import numpy as np
 
     url = 'http://www.ngdc.noaa.gov/mgg/shorelines/data/gshhs/version2.2.0/gshhs+wdbii_2.2.0.zip'
@@ -445,10 +435,6 @@ def us_place_names():
     """
     USGS place name database.
     """
-    import os
-    import urllib
-    import zipfile
-    import cStringIO
     import numpy as np
 
     filename = os.path.join(repo, 'US-Place-Names.npy')
@@ -481,8 +467,6 @@ def engdahl_cat():
     Engdahl Centennial Earthquake Catalog.
     http://earthquake.usgs.gov/research/data/centennial.php
     """
-    import os
-    import urllib
     import numpy as np
     filename = os.path.join(repo, 'Engdahl-Centennial-Cat.npy')
     url = 'http://earthquake.usgs.gov/research/data/centennial_Y2K.CAT'
@@ -519,8 +503,6 @@ def lsh_cat():
     Lin, Shearer, Hauksson southern California seismicity catalog.
     http://www.rsmas.miami.edu/personal/glin/LSH.html
     """
-    import os
-    import urllib
     import numpy as np
     filename = os.path.join(repo, 'LSH-Catalog.npy')
     url = "http://www.rsmas.miami.edu/personal/glin/LSH_files/LSH_1.12"
@@ -573,11 +555,6 @@ def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
 
     Returns (metadata, data) SRF dictionaries
     """
-    import os
-    import json
-    import gzip
-    import cStringIO
-    import subprocess
     import numpy as np
     from . import srf as srflib
 

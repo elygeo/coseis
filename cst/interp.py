@@ -2,8 +2,6 @@
 Interpolation tools.
 """
 import os
-from distutils.core import setup, Extension
-import numpy as np
 
 
 # C extensions
@@ -12,6 +10,7 @@ def build():
         from . import interp_
         interp_
     except ImportError:
+        from distutils.core import setup, Extension
         cwd = os.getcwd()
         os.chdir(os.path.dirname(__file__))
         incl = [np.get_include()]
@@ -30,7 +29,6 @@ def interp1(
   no_data_val='nan'):
     """
     1D piecewise interpolation of function values specified on regular grid.
-
     xlim: Range (x_min, x_max) of coordinate space covered by `f`.
     f: Array of regularly spaced data values to be interpolated.
     xi: Array of coordinates for the interpolation points, same shape as `fi`.
@@ -40,9 +38,9 @@ def interp1(
         tuple species the left and right boundaries independently.
     mask: If true and `fi` is passed, non_data_vals are masked from output.
     no_data_val: value to insert for empty data.
-
     Returns an array of interpolated values, same shape as `xi`.
     """
+    import numpy as np
     f = np.asarray(f)
     xi = np.asarray(xi)
 
@@ -111,9 +109,9 @@ def interp2(
   no_data_val='nan'):
     """
     2D piecewise interpolation of function values specified on regular grid.
-
     See 1D interp for documentation.
     """
+    import numpy as np
     f = np.asarray(f)
     xi = np.asarray(xi)
 
@@ -197,9 +195,10 @@ def interp3(
   no_data_val='nan'):
     """
     3D piecewise interpolation of function values specified on regular grid.
-
     See 1D interp for documentation.
     """
+    import numpy as np
+
     f = np.asarray(f)
     xi = np.asarray(xi)
 
@@ -294,20 +293,15 @@ def interp3(
 def trinterp_np(x, f, t, xi, fi=None, no_data_val=float('nan')):
     """
     2D linear interpolation of function values specified on triangular mesh.
-
-    Parameters
-    ----------
     x:  shape (2, M) array of vertex coordinates.
     f:  shape (M) array of function values at the vertices.
     t:  shape (3, N) array of vertex indices for the triangles.
     xi: shape (2, ...) array of coordinates for the interpolation points.
-
-    Returns
-    -------
-    fi: Array of interpolated values, same shape as `xi[0]`.
-
+    Returns array of interpolated values, same shape as `xi[0]`.
     Note: This is the NumPy version. The Cython version is faster.
     """
+    import numpy as np
+
     x, y = x
     xi, yi = xi
     if fi is None:
@@ -348,7 +342,11 @@ def trinterp_np(x, f, t, xi, fi=None, no_data_val=float('nan')):
 
 
 def ibilinear(xx, yy, xi, yi):
-    """Vectorized inverse bilinear interpolation"""
+    """
+    Vectorized inverse bilinear interpolation
+    """
+    import numpy as np
+
     xx = np.asarray(xx)
     yy = np.asarray(yy)
     xi = np.asarray(xi) - 0.25 * xx.sum(0).sum(0)

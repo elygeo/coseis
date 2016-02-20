@@ -3,12 +3,13 @@ Utilities for Graves Standard Rupture Format (SRF).
 
 SRF is documented at http://epicenter.usc.edu/cmeportal/docs/srf4.pdf
 """
+import os
+import math
+import gzip
 
 
 def open_(fh, mode='r'):
     if type(fh) == str:
-        import os
-        import gzip
         fh = os.path.expanduser(fh)
         if fh.endswith('.gz'):
             fh = gzip.open(fh, mode)
@@ -421,7 +422,6 @@ def write_coulomb(path, srf, proj, scut=0):
     proj: PyProj map projection instance
     scut: slip-rate below which values are not output
     """
-    import math
     import numpy as np
     from . import coord
 

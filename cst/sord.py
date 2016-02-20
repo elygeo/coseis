@@ -2,6 +2,11 @@
 """
 Support Operator Rupture Dynamics
 """
+import os
+import sys
+import json
+import shutil
+import subprocess
 
 # default simulation parameters
 parameters = {
@@ -218,7 +223,6 @@ def f90modules(path):
 
 
 def configure(force=False):
-    import os
     from . import util
 
     # source directory
@@ -292,9 +296,6 @@ def configure(force=False):
 
 
 def make(force=False):
-    import os
-    import json
-    import subprocess
     configure(force)
     p = __file__[:-3] + os.sep
     if force:
@@ -305,7 +306,6 @@ def make(force=False):
 
 
 def prepare_param(prm, fio):
-    import os
 
     # checks
     assert(prm['source'] in ('potency', 'moment', 'force', 'none'))
@@ -480,9 +480,6 @@ def prepare_param(prm, fio):
 
 
 def run(args=None, **kwargs):
-    import os
-    import json
-    import shutil
     import numpy as np
     from . import util
 
@@ -701,7 +698,6 @@ def expand_slices(shape, slices=[]):
 
 
 def main():
-    import sys, json, yaml
     files = []
     args = {}
     prm = open(sys.argv[1])

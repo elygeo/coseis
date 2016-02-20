@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Velocity model statistics"""
-
+"""
+Velocity model statistics
+"""
 import os
-import numpy as np
 
 
 def vmcheck():
+    import numpy as np
     vpmin, vsmin = 1500.0, 500.0
     vpmin, vsmin = 0.0, 0.0
     block = 16 * 1024 * 1024
@@ -17,10 +18,10 @@ def vmcheck():
     fp = open('vp.bin', 'rb')
     fs = open('vs.bin', 'rb')
 
-    sumr, minr, maxr = 0.0, np.inf, -np.inf
-    sump, minp, maxp = 0.0, np.inf, -np.inf
-    sums, mins, maxs = 0.0, np.inf, -np.inf
-    sumn, minn, maxn = 0.0, np.inf, -np.inf
+    sumr, minr, maxr = 0.0, float('inf'), -float('inf')
+    sump, minp, maxp = 0.0, float('inf'), -float('inf')
+    sums, mins, maxs = 0.0, float('inf'), -float('inf')
+    sumn, minn, maxn = 0.0, float('inf'), -float('inf')
 
     i = 0
     while i < n:

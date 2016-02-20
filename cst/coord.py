@@ -1,6 +1,7 @@
 """
 Coordinate conversion tools.
 """
+import math
 
 rearth = 6370000.0
 
@@ -108,13 +109,11 @@ def eigvals_sym_tensor(w1, w2):
     """
     Returns eigenvalues of a symmetric 3x3 tensor stored as diagonal and
     off-diagonal vectors.
-
-    Parameters
-
     w1: diagonal components w11, w22, w33
     w2: off-diagonal components w23, w31, w12
     """
     import numpy as np
+
     m = np.diag(w1)
     m.flat[[5, 6, 1]] = w2
     m.flat[[7, 2, 3]] = w2
@@ -127,6 +126,7 @@ def rotmat(x, origin=(0, 0, 0), upvector=(0, 0, 1)):
     Given a position vector x, find the rotation matrix to r,h,v coordinates.
     """
     import numpy as np
+
     x = np.asarray(x) - np.asarray(origin)
     nr = x / np.sqrt((x * x).sum())
     nh = np.cross(upvector, nr)
@@ -151,7 +151,6 @@ def llr2xyz(x, y, z, inverse=False):
 
     x <-> lon, y <-> lat, z <-> r
     """
-    import math
     import numpy as np
     if inverse:
         r = np.sqrt(x * x + y * y + z * z)
@@ -181,7 +180,6 @@ def euler_rotation(phi=0.0, theta=0.0, psi=0.0):
     East, North, Up to fault surface coordinates:
     m = euler_rotation(90 - strike, dip, rake)
     """
-    import math
     import numpy as np
     A = math.pi / 180.0 * phi
     B = math.pi / 180.0 * theta
@@ -214,13 +212,11 @@ def slip_vectors(strike, dip, rake, dtype=None):
 def rotation(lon, lat, projection, eps=100.0):
     """
     mat, theta = rotation(lon, lat, projection)
-
     Rotation matrix and clockwise rotation angle to transform components in the
     geographic coordinate system to components in the local system.
     local_components = dotmv(mat, components)
     local_strike = strike + theta
     """
-    import math
     import numpy as np
     dlon = eps * 180.0 / (math.pi * rearth) * np.cos(math.pi / 180.0 * lat)
     dlat = eps * 180.0 / (math.pi * rearth)
@@ -245,12 +241,10 @@ def rotation(lon, lat, projection, eps=100.0):
 def rotation3(lon, lat, dep, projection, eps=100.0):
     """
     mat = rotation(lon, lat, dep, projection)
-
     Rotation matrix to transform components in the
     geographic coordinate system to components in the local system.
     local_components = dotmv(mat, components)
     """
-    import math
     import numpy as np
     dlon = eps * 180.0 / (math.pi * rearth) * np.cos(math.pi / 180.0 * lat)
     dlat = eps * 180.0 / (math.pi * rearth)
@@ -278,9 +272,6 @@ def rotation3(lon, lat, dep, projection, eps=100.0):
 class Transform():
     """
     Coordinate transform for scale, rotation, and origin translation.
-
-    Optional Parameters:
-
     proj: Map projection defined by Pyproj or similar.
     scale: Scale factor.
     rotate: Rotation angle in degrees.
@@ -288,8 +279,7 @@ class Transform():
     origin: Untransformed coordinates of the new origin.  If two sets of points
         are given, the origin is centered between them, and rotation is
         relative to the connecting line.
-
-    Returns a coordinate transformation function
+    Returns a coordinate transformation function.
 
     Example: TeraShake SDSU/Okaya projection
     >>> import pyproj
@@ -305,7 +295,6 @@ class Transform():
       self, proj=None, origin=None, scale=1.0, rotate=0.0,
       translate=(0.0, 0.0), matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1))):
         import numpy as np
-        import math
         phi = math.pi / 180.0 * rotate
         if origin is None:
             x, y = 0.0, 0.0
@@ -369,8 +358,9 @@ def potency_tensor(normal, slip):
 
 
 def compass(azimuth, radians=False):
-    """Get named direction from azimuth."""
-    import math
+    """
+    Get named direction from azimuth.
+    """
     if radians:
         azimuth *= 180.0 / math.pi
     names = (

@@ -1,4 +1,6 @@
-"""Waveform data tools."""
+"""
+Waveform data tools.
+"""
 
 
 def csmip_vol2(filename, max_year=2050):

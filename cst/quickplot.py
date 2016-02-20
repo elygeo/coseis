@@ -9,13 +9,9 @@ Quick multi-purpose plotting.
 --step=int         Decimate data
 --transpose        Transpose data
 """
-
 import os
 import sys
 import json
-import numpy as np
-from numpy.lib.npyio import format as npy
-import matplotlib.pyplot as plt
 
 
 def stats(f, msg=''):
@@ -35,6 +31,10 @@ def stats(f, msg=''):
 def quickplot(
     files, dtype='f', shape=[], step=0, power=0, clim=[], transpose=False
 ):
+    import numpy as np
+    from numpy.lib.npyio import format as npy
+    import matplotlib.pyplot as plt
+
     shape0 = shape
     dtype0 = dtype.replace('l', '<').replace('b', '>')
     fig = plt.figure(figsize=(12, 7.2))

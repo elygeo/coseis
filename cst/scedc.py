@@ -13,13 +13,13 @@ class stp():
     """
     Seismogram Transfer Program (STP) client.
 
-    Init parameters
-    ---------------
+    Init parameters:
+
     waveserver: 'scedc' or 'ncedc' for N. or S. CA Earthquake Data Centers, or
         list of (host, port, password) triplets.
 
     Call parameters:
-    ----------------
+
     cmd: STP command or list of commands.
     path: directory for saved files, default specified by server.
     verbose: diagnostic output.
@@ -30,8 +30,8 @@ class stp():
     Excluded STP commands:
     ! (shell escape), SET, VERBOSE, INPUT, OUTPUT, EXIT
 
-    Example
-    -------
+    Example:
+
     # download waveforms in SAC format and save station list:
     import cst
     with cst.scedc.stp('scedc') as stp:
@@ -154,14 +154,8 @@ class stp():
 def mts(eventid):
     """
     Retrieve Moment Tensor Solution (MTS)
-
-    Parameters
-    ----------
-    eventid: Event identification number
-
-    Returns
-    -------
-    mts: Dictionary of MTS parameters
+    Takes event identification number.
+    Returns Dictionary of MTS parameters.
 
     MTS coordinate system: (x, y, z) = (north, east, down)
 

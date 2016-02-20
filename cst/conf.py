@@ -1,4 +1,18 @@
 #!/usr/bin/env python3
+"""
+Configure and launch jobs.
+"""
+import os
+import re
+import sys
+import json
+import time
+import json
+import copy
+import shlex
+import socket
+import subprocess
+import multiprocessing
 
 defaults = {
     'host': '',
@@ -50,7 +64,6 @@ class typed_dict(dict):
 
 
 def json_args(argv):
-    import json
     d = {}
     l = []
     for k in argv:
@@ -71,8 +84,6 @@ def json_args(argv):
 
 
 def hostname():
-    import os
-    import socket
     h = os.uname()
     g = socket.getfqdn()
     host = ' '.join([h[0], h[4], h[1], g])
@@ -83,10 +94,6 @@ def hostname():
 
 
 def configure(*args, **kwargs):
-    import os
-    import copy
-    import json
-    import multiprocessing
     job = copy.deepcopy(defaults)
     job = typed_dict(job)
     job['host'], job['machine'] = hostname()
@@ -111,8 +118,6 @@ def prepare(job=None, **kwargs):
     Compute resource usage. Loop over queue configurations and if resources
     exceeded, try another queue
     """
-    import os
-    import time
     if job is None:
         job = configure(**kwargs)
     else:
@@ -191,10 +196,6 @@ def prepare(job=None, **kwargs):
 
 
 def launch(job=None, **kwargs):
-    import os
-    import re
-    import shlex
-    import subprocess
     if job is None:
         job = prepare(**kwargs)
     else:
@@ -217,8 +218,6 @@ def launch(job=None, **kwargs):
 
 
 if __name__ == '__main__':
-    import sys
-    import json
     d = json_args(sys.argv[1:])
     d = configure(d)
     d = json.dumps(d, indent=4, sort_keys=True)

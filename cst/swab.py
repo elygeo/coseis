@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-"""Swap byte order. Default is 4 byte numbers."""
+"""
+Swap byte order. Default is 4 byte numbers.
+"""
 from __future__ import division
 import os
 import sys
-import numpy as np
 
 
 def swab(src, dst, verbose=False, dtype='f', block=64*1024*1024):
+    import numpy as np
     nb = np.dtype(dtype).itemsize
     n = os.path.getsize(src)
     if n == 0 or n % nb != 0:

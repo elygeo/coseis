@@ -3,8 +3,6 @@
 Signal processing tools.
 """
 import math
-import numpy as np
-import matplotlib.pyplot as plt
 
 
 def build():
@@ -36,6 +34,8 @@ def time_function(pulse, t, tau=1.0):
 
     Returns an function samples.
     """
+    import numpy as np
+
     t = np.asarray(t)
     f = np.zeros_like(t)
     if pulse == 'const':
@@ -96,6 +96,8 @@ def brune2gauss(x, dt, tau, sigma=None, mode='same'):
     sigma: Gaussian spread.
     mode: 'same' or 'full' (see numpy.convolve).
     """
+    import numpy as np
+
     x = np.asarray(x)
     if sigma is None:
         sigma = math.sqrt(2.0) * tau
@@ -122,6 +124,8 @@ def filter(x, dt, fcorner, btype='lowpass', order=2, repeat=0, mode='same'):
 
     Returns an array of filtered samples.
     """
+    import numpy as np
+
     if not fcorner:
         return x
     if btype == 'hann':
@@ -150,7 +154,12 @@ def filter(x, dt, fcorner, btype='lowpass', order=2, repeat=0, mode='same'):
 def spectrum(
   h, dt=1.0, shift=False, tzoom=10.0, db=None,
   legend=None, title='Forier spectrum', axes=None):
-    """Plot a time signal and it's Fourier spectrum."""
+    """
+    Plot a time signal and it's Fourier spectrum.
+    """
+    import numpy as np
+    import matplotlib.pyplot as plt
+
     h = np.asarray(h)
     n = h.shape[-1]
     H = np.fft.rfft(h) * 2 / n
@@ -218,7 +227,11 @@ def spectrum(
 
 
 def test():
-    """Test spectrum plot"""
+    """
+    Test spectrum plot
+    """
+    import numpy as np
+
     n = 3200
     dt = 0.002
     fbp = 2.0, 8.0

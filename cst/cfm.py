@@ -9,7 +9,6 @@ import json
 import urllib
 import getopt
 import zipfile
-import numpy as np
 from . import gocad
 
 # projection: UTM zone 11, NAD 1927 datum (implies Clark 1866 geoid)
@@ -23,6 +22,7 @@ def catalog(version='CFM4-socal-primary'):
     the fault name and number of segments. The CFM database is downloaded if
     not already present.
     """
+    import numpy as np
 
     url = 'http://structure.harvard.edu/cfm/download/vdo/SCEC_VDO.jar'
     path = os.path.join(repo, 'CFM4', version) + os.sep
@@ -51,7 +51,6 @@ def catalog(version='CFM4-socal-primary'):
 
 
 def tree():
-    import json
     tree = {}
     for f, n in catalog():
         k = f.split('-', 3)
@@ -120,6 +119,7 @@ def read(fault, version='CFM4-socal-primary'):
     """
     Read triangulated surface data.
     """
+    import numpy as np
     path = os.path.join(repo, 'CFM4', version) + os.sep
     f, i = (fault + ':').split(':')[:2]
     d = np.load(path + f + '.npz')
@@ -135,12 +135,12 @@ def read(fault, version='CFM4-socal-primary'):
 
 def tsurf_merge(tsurfs, fuse=-1.0, cull=-1.0, clean=True):
     """
-    Merge multiple triangulated surfaces
-
-    fuse (float): separation tolerance for combining vertices.
-    cull (float): area tolerance for triangle removal.
-    clean (bool): remove unused vertices.
+    Merge multiple triangulated surfaces.
+    fuse: separation tolerance for combining vertices.
+    cull: area tolerance for triangle removal.
+    clean: remove unused vertices.
     """
+    import numpy as np
 
     # merge surfaces
     n = 0
@@ -240,6 +240,7 @@ def tsurf_plane(vtx, tri):
     Find the center of mass, best-fit plane, and total surface area of a
     triangulated surface.
     """
+    import numpy as np
     import scipy.optimize
 
     # area normals
@@ -407,7 +408,6 @@ def line_simplify(vtx, indices, area=None, nkeep=None):
     vertices using Visvalingam's algorithm. Vertex significance is determined
     by the triangle area formed by a point and it's neighbors.
 
-    Parameters:
     vtx: vertex coordinates.
     indices: indices of vtx for the line or polygon.
     area: maximum triangle area for vertex removal.
@@ -418,6 +418,8 @@ def line_simplify(vtx, indices, area=None, nkeep=None):
     indices are removed. If both area and nkeep are given, priority is given to
     case that retains more detail.
     """
+    import numpy as np
+
     if nkeep is None:
         if area:
             nkeep = 3
@@ -473,11 +475,11 @@ def cubit_facet(vtx, tri, geographic=True):
 
 def explore(prefix, faults):
     """
-    # CFMX: Community Fault Model Explorer
+    CFMX: Community Fault Model Explorer
 
     A simple tool for exploring the CFM
 
-    ## Keyboard Controls
+    Keyboard Controls:
 
     Fault selection                  [ ]
     Fault selection and view         { }
@@ -490,6 +492,12 @@ def explore(prefix, faults):
     Save a screen-shot                 S
     Help                             h ?
     """
+    if not faults:
+        print('No faults found')
+        return
+
+    import pyproj
+    from enthought.mayavi import mlab
     from . import data, interp
 
     # parameters
@@ -501,18 +509,12 @@ def explore(prefix, faults):
     color_bg = 1.0, 1.0, 0.0
     color_hl = 1.0, 0.0, 0.0
 
-    # check
-    if not faults:
-        print('No faults found')
-        return
     single_fault = isinstance(faults, str)
 
     # projection
-    import pyproj
     proj = pyproj.Proj(**projection)
 
     # setup figure
-    from enthought.mayavi import mlab
     s = 'SCEC Community Fault Model'
     if prefix:
         s = [s] + [fault_names[i][k] for i, k in enumerate(prefix[:3])]

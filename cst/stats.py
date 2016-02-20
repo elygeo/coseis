@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-"""Compute basic statistics from binary files"""
-# TODO: handle text input
-
+"""
+Compute basic statistics from binary files
+"""
 import os
 import sys
-import numpy as np
-from numpy.lib.npyio import format as npy
 
+# TODO: handle text input
 
 def stats(filename, dtype='f', block=64*1024*1024):
+    import numpy as np
+    from numpy.lib.npyio import format as npy
     if filename.endswith('.npy'):
         fh = open(filename, 'rb')
         version = npy.read_magic(fh)
