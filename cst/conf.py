@@ -58,7 +58,7 @@ hostmap = [
 
 class typed_dict(dict):
     def __setitem__(self, k, v):
-        if isinstance(self[k], type(v)):
+        if not isinstance(self[k], type(v)):
             raise TypeError(k, self[k], v)
         dict.__setitem__(self, k, v)
 
@@ -108,8 +108,8 @@ def configure(*args, **kwargs):
         d.update(json.load(open(f)))
     for a in args:
         d.update(a)
-    for k, v in d.items():
-        job[k] = v
+    for k in d:
+        job[k] = d[k]
     return job
 
 
@@ -121,8 +121,8 @@ def prepare(job=None, **kwargs):
     if job is None:
         job = configure(**kwargs)
     else:
-        for k, v in kwargs.items():
-            job[k] = v
+        for k in kwargs:
+            job[k] = kwargs[k]
     job.update({
         'jobid': '',
         'date': time.strftime('%Y-%m-%d'),
@@ -199,8 +199,8 @@ def launch(job=None, **kwargs):
     if job is None:
         job = prepare(**kwargs)
     else:
-        for k, v in kwargs.items():
-            job[k] = v
+        for k in kwargs:
+            job[k] = kwargs[k]
     if job['submit']:
         if job['wrapper']:
             f = job['name'] + '.sh'
@@ -217,8 +217,11 @@ def launch(job=None, **kwargs):
     return job
 
 
-if __name__ == '__main__':
+def main():
     d = json_args(sys.argv[1:])
     d = configure(d)
     d = json.dumps(d, indent=4, sort_keys=True)
     print(d)
+
+if __name__ == '__main__':
+    main()

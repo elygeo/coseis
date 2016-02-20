@@ -202,6 +202,12 @@ time_functions = [
 ]
 
 
+class get_slices:
+    def __getitem__(self, slices):
+        return slices
+s_ = get_slices()
+
+
 class typed_dict(dict):
     def __setitem__(self, k, v):
         if isinstance(self[k], type(v)):
@@ -353,7 +359,8 @@ def prepare_param(prm, fio):
     shapes = {}
     deltas = {}
     indices = {}
-    for field, ios in sorted(fio.items()):
+    for field in sorted(fio):
+        ios = fio[field]
         tags = fieldnames[field][0]
         reg = tags[0]
         input_ = '<' in tags
@@ -368,7 +375,7 @@ def prepare_param(prm, fio):
             del(shape[ifn])
         if not static:
             shape += [nt]
-        if type(ios) in (float, int):
+        if isinstance(ios, (float, int)):
             ios = [ios]
         elif len(ios) > 1 and isinstance(ios[1], str):
             ios = [ios]
@@ -376,7 +383,7 @@ def prepare_param(prm, fio):
         for io in ios:
             fname, val, tau = 'const', 0.0, 0.0
             x1, x2 = [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]
-            if type(io) in (float, int):
+            if isinstance(io, (float, int)):
                 slices, op, rhs = [], '=', [io]
             else:
                 slices, op, rhs = io[0], io[1], io[2:]
@@ -494,19 +501,21 @@ def run(args=None, **kwargs):
     prm = {}
     fio = {}
     job = {}
-    for k, v in parameters.items():
+    for k in parameters:
         if k in fieldnames:
-            fio[k] = v
+            fio[k] = parameters[k]
         else:
-            prm[k] = v
-    for k, v in args.items():
+            prm[k] = parameters[k]
+    prm = typed_dict(prm)
+    for k in args:
+        v = args[k]
         if k in fieldnames:
             if not isinstance(v, list):
                 v = [v]
             elif len(v) > 1 and isinstance(v[1], str):
                 v = [v]
             for i, io in enumerate(v):
-                if type(io) in (tuple, list):
+                if isinstance(io, (list, tuple)):
                     ii = repr_slices(io[0])
                     io = [ii] + list(io[1:])
                     v[i] = io
@@ -515,11 +524,6 @@ def run(args=None, **kwargs):
             args[k] = v
             fio[k] = v
         elif k in parameters:
-            u = parameters[k]
-
-XXX FIXME use typed_dict
-            if u is not None and v is not None and type(u) != type(v):
-                raise TypeError(k, v, u)
             prm[k] = v
         else:
             job[k] = v
@@ -605,27 +609,21 @@ XXX FIXME use typed_dict
     return job
 
 
-class get_slices:
-    def __getitem__(self, slices):
-        return slices
-s_ = get_slices()
-
-
 # String representation of slice object
 def repr_slices(slices):
-    if type(slices) == str:
+    if isinstance(slices, str):
         return slices
-    elif type(slices) in (tuple, list):
+    elif isinstance(slices, (tuple, list)):
         slices = list(slices)
     else:
         slices = [slices]
     for i, s in enumerate(slices):
-        if type(s) in (tuple, list):
+        if isinstance(s, (tuple, list)):
             if len(s) == 0:
                 s = slice(None)
             else:
                 s = slice(*s)
-        if type(s) == slice:
+        if isinstance(s, slice):
             if s.step in (1, None):
                 s = '%s:%s' % (s.start, s.stop)
             else:
@@ -650,13 +648,13 @@ def expand_slices(shape, slices=[]):
     """
 
     # normalize to list
-    if type(slices) == str:
+    if isinstance(slices, str):
         assert(slices[0] + slices[-1] == '[]')
         if slices == '[]':
             slices = []
         else:
             slices = slices[1:-1].split(',')
-    elif type(slices) in (tuple, list):
+    elif isinstance(slices, (tuple, list)):
         slices = list(slices)
     else:
         slices = [slices]
@@ -670,7 +668,7 @@ def expand_slices(shape, slices=[]):
 
     # loop over slices
     for i, s in enumerate(slices):
-        if type(s) == str:
+        if isinstance(s, str):
             t = []
             for j in s.split(':'):
                 if j == '':
@@ -680,14 +678,14 @@ def expand_slices(shape, slices=[]):
                 else:
                     t.append(int(j))
             s = t
-        if type(s) in (tuple, list):
+        if isinstance(s, (tuple, list)):
             if len(s) == 0:
                 s = slice(None)
             elif len(s) == 1:
                 s = s[0]
             else:
                 s = slice(*s)
-        if type(s) == slice:
+        if isinstance(s, slice):
             s = list(s.indices(shape[i]))
         else:
             s %= shape[i]
@@ -698,20 +696,22 @@ def expand_slices(shape, slices=[]):
 
 
 def main():
-    files = []
+    if not sys.argv[1:]:
+        raise SystemExit(__doc__)
     args = {}
-    prm = open(sys.argv[1])
-    prm = yaml.load(prm)
-    del(sys.argv[1])
-    cst.sord.run(prm)
-    for i in job['argv']:
-        if not i.startswith('--'):
-            raise Exception('Bad argument ' + i)
-        k, v = i[2:].split('=')
-        if len(v) and not v[0].isalpha():
-            v = json.loads(v)
-        job[k] = v
-
+    for k in sys.argv[1:]:
+        if k[0] == '-':
+            k = k.lstrip('-')
+            if '=' in k:
+                k, v = k.split('=')
+                if len(v) and not v[0].isalpha():
+                    v = json.loads(v)
+                args[k] = v
+            else:
+                args[k] = True
+        else:
+            args.update(json.load(k))
+    cst.sord.run(args)
 
 if __name__ == '__main__':
     main()

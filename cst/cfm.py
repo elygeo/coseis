@@ -74,7 +74,7 @@ def search(items, split=1, maxsplit=3):
         n = 0
     else:
         match = set()
-        if type(items) == str:
+        if isinstance(items, str):
             items = [items]
         for a in items:
             b = a.split(':')[0].lower()
@@ -574,7 +574,7 @@ def explore(prefix, faults):
                 tsurfs.append(('%s:%s' % (f, i), x.T, j.T))
     else:
         for f in faults:
-            if type(f) == str:
+            if isinstance(f, str):
                 x, t = tsurf_merge(read(f))
             else:
                 f, s = f

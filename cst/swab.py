@@ -34,9 +34,11 @@ def swab(src, dst, verbose=False, dtype='f', block=64*1024*1024):
 
 def main():
     if not sys.argv[1:]:
-        raise SystemExit(__doc__)
-    args = {'verbose': True}
+        print(__file__)
+        print(__doc__)
+        raise SystemExit()
     files = []
+    args = {'verbose': True}
     for k in sys.argv[1:]:
         if k[0] == '-':
             k, v = k.split('=')

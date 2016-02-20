@@ -9,7 +9,7 @@ import gzip
 
 
 def open_(fh, mode='r'):
-    if type(fh) == str:
+    if isinstance(fh, str):
         fh = os.path.expanduser(fh)
         if fh.endswith('.gz'):
             fh = gzip.open(fh, mode)
@@ -215,8 +215,6 @@ def write_sord(path, srf, delta=(1, 1, 1), proj=None, dbytes=4):
     """
     Write SORD potency tensor input files.
 
-    Parameters
-    ----------
     path: file name root
     srf: (meta, data) SRF dictionaries
     delta: grid step size (dx, dy, dz)
@@ -320,13 +318,11 @@ def write_sord(path, srf, delta=(1, 1, 1), proj=None, dbytes=4):
 
 
 def write_awp(
-        fh, srf, t, mu, lam=0.0, delta=1.0,
-        proj=None, binary=True, interp='linear'):
+    fh, srf, t, mu, lam=0.0, delta=1.0, proj=None, binary=True, interp='linear'
+):
     """
     Write ODC-AWP moment rate input file.
 
-    Parameters
-    ----------
     fh: file handle
     srf: (meta, data) SRF dictionaries
     t: array of time values
@@ -343,7 +339,7 @@ def write_awp(
 
     # parameters
     meta, data = srf
-    if type(delta) not in (tuple, list):
+    if not isinstance(delta, (tuple, list)):
         delta = delta, delta, delta
     x = data['lon']
     y = data['lat']
@@ -415,8 +411,6 @@ def write_coulomb(path, srf, proj, scut=0):
     """
     Write Coulomb input file.
 
-    Parameters
-    ----------
     path: fine name on disk
     srf: (meta, data) SRF dictionaries
     proj: PyProj map projection instance

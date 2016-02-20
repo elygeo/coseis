@@ -302,7 +302,7 @@ class Transform():
             x, y = origin
             if proj is not None:
                 x, y = proj(x, y)
-            if type(x) in (list, tuple):
+            if isinstance(x, (list, tuple)):
                 phi -= np.arctan2(y[1] - y[0], x[1] - x[0])
                 x = 0.5 * (x[0] + x[1])
                 y = 0.5 * (y[0] + y[1])

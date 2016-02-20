@@ -284,13 +284,13 @@ class Extraction():
         import numpy as np
         x = np.asarray(x)
         y = np.asarray(y)
-        if type(vm) == str:
+        if isinstance(vm, str):
             vm = Model(vm, **kwargs)
         if vm.prop in prop2d:
             raise Exception('Cannot extract 2D model')
         elif vm.prop == 'tag':
             vs30 = None
-        if type(topo) == str:
+        if isinstance(topo, str):
             topo = Model(topo, **kwargs)
         if geographic:
             import pyproj
@@ -350,8 +350,6 @@ def extract(x, y, z, vm=['rho', 'vp', 'vs'], by_depth=True, **kwargs):
     """
     Simple CVM-H extraction.
 
-    Parameters:
-
     x, y, z: Coordinates arrays
     vm: 'rho', 'vp', 'vs', 'tag', or Model object.
     by_depth: Z coordinate type, True for depth, False for elevation.
@@ -362,7 +360,7 @@ def extract(x, y, z, vm=['rho', 'vp', 'vs'], by_depth=True, **kwargs):
     import numpy as np
     x = np.asarray(x)
     y = np.asarray(y)
-    if type(vm) not in [list, tuple]:
+    if not isinstance(vm, (list, tuple)):
         vm = [vm]
     out = []
     f = None

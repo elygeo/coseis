@@ -89,7 +89,7 @@ class stp():
         return
 
     def __call__(self, cmd, path=None, verbose=False):
-        if type(cmd) in [tuple, list]:
+        if isinstance(cmd, (tuple, list)):
             cmd = '\n'.join(cmd)
         out = []
         for cmd in cmd.split('\n'):

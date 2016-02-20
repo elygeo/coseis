@@ -62,7 +62,7 @@ def interp1(
 
     # compute mask
     m = False
-    if type(bound) not in (tuple, list):
+    if not isinstance(bound, (tuple, list)):
         bound = bound, bound
     if bound[0]:
         m = m | (x < 0)
@@ -134,7 +134,7 @@ def interp2(
 
     # compute mask
     m = False
-    if type(bound) not in (tuple, list):
+    if not isinstance(bound, (tuple, list)):
         bound = [(bound, bound)] * 2
     bx, by = bound
     if bx[0]:
@@ -222,7 +222,7 @@ def interp3(
 
     # compute mask
     m = False
-    if type(bound) not in (tuple, list):
+    if isinstance(bound, (tuple, list)):
         bound = [(bound, bound)] * 3
     bx, by, bz = bound
     if bx[0]:
