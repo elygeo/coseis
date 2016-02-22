@@ -3,6 +3,8 @@
 Support Operator Rupture Dynamics
 """
 
+# FIXME fileio ans slice stuff
+
 import sys
 if '' in sys.path:
     sys.path.remove('')
@@ -630,15 +632,6 @@ s_ = get_slices()
 
 
 def expand_slices(shape, slices):
-    """
-    >>> shape = [8, 8, 8, 8]
-
-    >>> expand_slices(shape, [])
-    [[0, 8, 1], [0, 8, 1], [0, 8, 1], [0, 8, 1]]
-
-    >>> expand_slices(shape, [0, ':-4', '-4:', ':'])
-    [[0, 1, 1], [0, 4, 1], [4, 8, 1], [0, 8, 1]]
-    """
     n = len(shape)
     if len(slices) == 0:
         slices = n * [':']
@@ -661,6 +654,15 @@ def expand_slices(shape, slices):
             s = [s, s + 1, 1]
         new.append(s)
     return new
+
+
+def test():
+    n = [8, 8, 8, 8]
+    s = expand_slices(n, [])
+    assert(s == [[0, 8, 1], [0, 8, 1], [0, 8, 1], [0, 8, 1]])
+    s = expand_slices(n, [0, ':-4', '-4:', ':'])
+    assert(s == [[0, 1, 1], [0, 4, 1], [4, 8, 1], [0, 8, 1]])
+    return
 
 
 def main():

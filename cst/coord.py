@@ -284,15 +284,6 @@ class Transform():
         are given, the origin is centered between them, and rotation is
         relative to the connecting line.
     Returns a coordinate transformation function.
-
-    Example: TeraShake SDSU/Okaya projection
-    >>> import pyproj
-    >>> proj = pyproj.Proj(proj='utm', zone=11, ellps='WGS84')
-    >>> proj = Transform(proj, rotate=40.0, origin=(-121.0, 34.5))
-    >>> proj(-120.0, 35.0)
-    array([  38031.1000251 ,  100171.63485189])
-    >>> proj(0, 0, inverse=True)
-    array([-121. ,   34.5])
     """
 
     def __init__(
@@ -342,6 +333,20 @@ class Transform():
         return np.array([x, y])
 
 
+def test():
+    """
+    Test TeraShake SDSU/Okaya projection
+    """
+    import pyproj
+    proj = pyproj.Proj(proj='utm', zone=11, ellps='WGS84')
+    proj = Transform(proj, rotate=40.0, origin=(-121.0, 34.5))
+    x, y = proj(-120.0, 35.0)
+    assert([x, y] == [38031.1000251, 100171.63485189])
+    x, y = proj(0, 0, inverse=True)
+    assert([x, y] == [-121.0, 34.5])
+    return
+
+
 def potency_tensor(normal, slip):
     """
     Given a fault unit normal and a slip vector, return a symmetric potency
@@ -374,3 +379,6 @@ def compass(azimuth, radians=False):
         'W', 'WNW', 'NW', 'NNW',
     )
     return names[int((azimuth / 22.5 + 0.5) % 16.0)]
+
+if __name__ == '__main__':
+    test()

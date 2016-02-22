@@ -35,10 +35,10 @@ prm['pyy'] = ([i, i, i, ':'], '.', val, 'brune', tau)
 prm['pzz'] = ([i, i, i, ':'], '.', val, 'brune', tau)
 
 # material
-prm['rho'] = rho = 2670.0
-prm['vp'] = vp = 6000.0
-prm['vs'] = vs = 3464.0
-prm['gam'] = 0.0
+prm['rho'] = [2670.0]
+prm['vp'] = [6000.0]
+prm['vs'] = [3464.0]
+prm['gam'] = [0.0]
 prm['hourglass'] = [1.0, 1.0]
 
 # receivers FIXME

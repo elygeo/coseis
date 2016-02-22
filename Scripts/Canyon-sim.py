@@ -16,10 +16,10 @@ cst.sord.run({
     'nproc3': [2, 1, 1],
 
     # material model
-    'rho': 1.0,
-    'vp': 2.0,
-    'vs': 1.0,
-    'gam': 0.0,
+    'rho': [1.0],
+    'vp': [2.0],
+    'vs': [1.0],
+    'gam': [0.0],
     'hourglass': [1.0, 2.0],
 
     # boundary conditions

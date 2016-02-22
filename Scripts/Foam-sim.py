@@ -27,10 +27,10 @@ prm['delta'] = [dx, dx, dx, dt]
 prm['shape'] = [nx, ny, nz, nt]
 
 # material model
-prm['rho'] = 16.0
-prm['vp'] = 56.0
-prm['vs'] = 30.0
-prm['gam'] = 0.5
+prm['rho'] = [16.0]
+prm['vp'] = [56.0]
+prm['vs'] = [30.0]
+prm['gam'] = [0.5]
 prm['hourglass'] = [1.0, 1.0]
 
 # boundary conditions
@@ -50,7 +50,7 @@ prm['hypocenter'] = [x, 0.0, 0.5]
 prm['slipvector'] = [0.0, 1.0, 0.0]
 prm['ts'] = [-730.0]
 prm['tn'] = [-330.0]
-prm['dc'] = 0.001
+prm['dc'] = [0.001]
 prm['mus'] = [1e5, ([j, :], '=', 2.4)]
 prm['mud'] = [1e5, ([j, :], '=', 1.85)]
 

@@ -13,19 +13,19 @@ cst.sord.run({
     'bc2': ['pml', 'pml', 'pml'],
 
     # material model
-    'rho': 2670.0,
-    'vp': 6000.0,
-    'vs': 3464.0,
-    'gam': 1.0,
+    'rho': [2670.0],
+    'vp': [6000.0],
+    'vs': [3464.0],
+    'gam': [1.0],
     'hourglass': [1.0, 1.0],
 
     # rupture model
     'faultnormal': '+z',
-    'mud': 1.0,
-    'mus': 1.0e+9,
-    'dc':  1.0e+9,
-    'tn':  -90.0e+6,
-    'ts': -100.0e+6,
+    'mud': [1.0],
+    'mus': [1.0e+9],
+    'dc':  [1.0e+9],
+    'tn':  [-90.0e+6],
+    'ts': [-100.0e+6],
 
     # nucleation
     'hypocenter': [0.0, 0.0, 0.5],

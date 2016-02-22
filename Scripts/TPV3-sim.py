@@ -54,17 +54,17 @@ for dx, np in runs:
     prm['nproc3'] = np
 
     # material properties
-    prm['rho'] = 2670.0
-    prm['vp'] = 6000.0
-    prm['vs'] = 3464.0
+    prm['rho'] = [2670.0]
+    prm['vp'] = [6000.0]
+    prm['vs'] = [3464.0]
     prm['hourglass'] = [1.0, 2.0]
 
     # fault properties
     prm['faultnormal'] = '+z'
     prm['hypocenter'] = [-1.0, -1.0, -1.5]
-    prm['dc'] = 0.4
-    prm['mud'] = 0.525
-    prm['tn'] = -120.0e+6
+    prm['dc'] = [0.4]
+    prm['mud'] = [0.525]
+    prm['tn'] = [-120.0e+6]
 
     # static friction for slipping patch
     j = s_[-int(15000.0 / dx + 0.5):]

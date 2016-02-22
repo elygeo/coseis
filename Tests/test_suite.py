@@ -6,8 +6,6 @@ def test():
     passed = []
     failed = []
     for m in [
-        syntax,
-        doctests,
         hello,
         sord_mpi,
         sord_pml,

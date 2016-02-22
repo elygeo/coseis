@@ -49,22 +49,22 @@ l0 = int(z - 3000.0 / dx + 0.5)
 l1 = int(z + 3000.0 / dx + 0.5)
 
 # material properties
-prm['rho'] = 2700.0
-prm['vp'] = 5716.0
-prm['vs'] = 3300.0
+prm['rho'] = [2700.0]
+prm['vp'] = [5716.0]
+prm['vs'] = [3300.0]
 prm['gam'] = [0.2, (s_[:i, :i, l0:l1], '=', 0.02)]
 prm['hourglass'] = [1.0, 2.0]
 
 # fault parameters
 prm['faultnormal'] = '+z'
-prm['co'] = 200000.0
-prm['dc'] = 0.5
-prm['mud'] = 0.1
+prm['co'] = [200000.0]
+prm['dc'] = [0.5]
+prm['mud'] = [0.1]
 prm['mus'] = [10000.0, (s_[:i+1, :i+1], '=', 0.7)]
-prm['sxx'] = ([0, ':'], '=>', 'sxx.bin')
-prm['syy'] = ([0, ':'], '=>', 'syy.bin')
-prm['szz'] = ([0, ':'], '=>', 'szz.bin')
-prm['trup'] = (s_[:i+1, :i+1, -1], '=>', 'trup.bin')
+prm['sxx'] = [([0, ':'], '=>', 'sxx.bin')]
+prm['syy'] = [([0, ':'], '=>', 'syy.bin')]
+prm['szz'] = [([0, ':'], '=>', 'szz.bin')]
+prm['trup'] = [(s_[:i+1, :i+1, -1], '=>', 'trup.bin')]
 
 # nucleation
 k = int(hypo[1])

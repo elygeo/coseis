@@ -47,18 +47,18 @@ l0 = int(z - 3000.0 / dx + 0.5)
 l1 = int(z + 3000.0 / dx + 0.5)
 
 # material properties
-prm['rho'] = 2700.0
-prm['vp'] = 5716.0
-prm['vs'] = 3300.0
-prm['gam'] = [0.2, (s_[:, :k, l0:l1] == 0.02)]
+prm['rho'] = [2700.0]
+prm['vp'] = [5716.0]
+prm['vs'] = [3300.0]
+prm['gam'] = [0.2, (s_[:,:k,l0:l1], '==', 0.02)]
 prm['hourglass'] = 1.0, 2.0
 
 # fault parameters
 k = s_[:int(15000.0 / dx) + 1]
 prm['faultnormal'] = '+z'
-prm['co'] = 200000.0
-prm['dc'] = 0.5
-prm['mud'] = 0.1
+prm['co'] = [200000.0]
+prm['dc'] = [0.5]
+prm['mud'] = [0.1]
 prm['mus'] = [10000.0, ([':', k], '=', 0.7)]
 prm['sxx'] = ([0, ':'], '=<', 'sxx.bin')
 prm['syy'] = ([0, ':'], '=<', 'syy.bin')
@@ -68,8 +68,8 @@ prm['szz'] = ([0, ':'], '=<', 'szz.bin')
 i = int(1500.0 / dx + 0.5)
 k = int(hypo[1])
 prm['mus'] = [
-    (s_[:, k-i:k+i+1],   '=', 0.62),
-    (s_[:, k-i-1:k+i+2], '=', 0.54),
+    (s_[:,k-i:k+i+1],   '=', 0.62),
+    (s_[:,k-i-1:k+i+2], '=', 0.54),
 ]
 
 # fault time histories
