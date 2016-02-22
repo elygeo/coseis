@@ -61,9 +61,9 @@ prm['co'] = 200000.0
 prm['dc'] = 0.5
 prm['mud'] = 0.1
 prm['mus'] = [10000.0, (s_[:i+1, :i+1], '=', 0.7)]
-prm['sxx'] = (s_[0, :], '=>', 'sxx.bin')
-prm['syy'] = (s_[0, :], '=>', 'syy.bin')
-prm['szz'] = (s_[0, :], '=>', 'szz.bin')
+prm['sxx'] = ([0, ':'], '=>', 'sxx.bin')
+prm['syy'] = ([0, ':'], '=>', 'syy.bin')
+prm['szz'] = ([0, ':'], '=>', 'szz.bin')
 prm['trup'] = (s_[:i+1, :i+1, -1], '=>', 'trup.bin')
 
 # nucleation
@@ -100,7 +100,7 @@ for j, k in [
         s = 'faultst%03ddp%03d-%s.bin' % (j, k, f)
         if f not in prm:
             prm[f] = []
-        prm[f] += [(s_[x, y, :], '.>', s)]
+        prm[f] += [([x, y, ':'], '.>', s)]
 
 # displacement and velocity time histories
 for j, k, l in [
@@ -125,7 +125,7 @@ for j, k, l in [
         s = s.replace('body-', 'body-0')
         if f not in prm:
             prm[f] = []
-        prm[f] += [(s_[x, y, z, :], '.>', s)]
+        prm[f] += [([x, y, z, ':'], '.>', s)]
 
 # pre-stress
 d = np.arange(ny) * alpha * dx

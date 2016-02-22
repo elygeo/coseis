@@ -54,15 +54,15 @@ prm['gam'] = [0.2, (s_[:, :k, l0:l1] == 0.02)]
 prm['hourglass'] = 1.0, 2.0
 
 # fault parameters
-k = int(15000.0 / dx)
+k = s_[:int(15000.0 / dx) + 1]
 prm['faultnormal'] = '+z'
 prm['co'] = 200000.0
 prm['dc'] = 0.5
 prm['mud'] = 0.1
-prm['mus'] = [10000.0, (s_[:, :k+1], '=', 0.7)]
-prm['sxx'] = (s_[0, :], '=<', 'sxx.bin')
-prm['syy'] = (s_[0, :], '=<', 'syy.bin')
-prm['szz'] = (s_[0, :], '=<', 'szz.bin')
+prm['mus'] = [10000.0, ([':', k], '=', 0.7)]
+prm['sxx'] = ([0, ':'], '=<', 'sxx.bin')
+prm['syy'] = ([0, ':'], '=<', 'syy.bin')
+prm['szz'] = ([0, ':'], '=<', 'szz.bin')
 
 # nucleation
 i = int(1500.0 / dx + 0.5)
@@ -83,7 +83,7 @@ for k in 0, 15, 30, 45, 75, 120:
         if f not in prm:
             prm[f] = []
         s = 'faultst%03ddp000-%s.bin' % (k, f)
-        prm[f] += [(s_[0.0, y, :], '.>', s)]
+        prm[f] += [([0.0, y, ':'], '.>', s)]
 
 # body time histories
 for k, l in [
@@ -103,7 +103,7 @@ for k, l in [
     for f in 'u1', 'u2', 'u3', 'v1', 'v2', 'v3':
         s = 'body%03dst000dp%03d-%s.bin' % (l, k, f)
         s = s.replace('body-', 'body-0')
-        prm[f] += [(s_[0.0, y, z, :], '.>', s)]
+        prm[f] += [([0.0, y, z, ':'], '.>', s)]
 
 # pre-stress
 d = np.arange(ny) * alpha * dx

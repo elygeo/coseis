@@ -29,10 +29,10 @@ prm['delta'] = [dx, dx, dx, dt]
 prm['shape'] = [nx, ny, nz, nt]
 
 # material properties
-l = int(1000.0 / dx + 0.5)
-prm['rho'] = [2700.0, (s_[:, :, :l], '=', 2600.0)]
-prm['vp'] = [6000.0, (s_[:, :, :l], '=', 4000.0)]
-prm['vs'] = [3464.0, (s_[:, :, :l], '=', 2000.0)]
+l = s_[:int(1000.0 / dx + 0.5)]
+prm['rho'] = [2700.0, ([':', ':', l], '=', 2600.0)]
+prm['vp'] = [6000.0, ([':', ':', l], '=', 4000.0)]
+prm['vs'] = [3464.0, ([':', ':', l], '=', 2000.0)]
 prm['gam'] = 0.0
 prm['hourglass'] = [1.0, 2.0]
 
@@ -41,7 +41,7 @@ prm['bc1'] = ['-cell', '-cell', 'free']
 prm['bc2'] = ['pml',   'pml',   'pml']
 
 # source
-prm['mxy'] = (s_[0, 0, 40, :], '+', 1e18, 'brune', 0.1)
+prm['mxy'] = ([0, 0, 40, ':'], '+', 1e18, 'brune', 0.1)
 
 # receivers
 for i in range(10):
@@ -49,7 +49,7 @@ for i in range(10):
     y = 0.5 + 800.0 * (i + 1) / dx
     for f in 'vx', 'vy', 'vz':
         prm[f] = [
-            (s_[x, y, 0.0, :], '.>', 'p%s-%s.bin' % (i, f)),
+            ([x, y, 0.0, ':'], '.>', 'p%s-%s.bin' % (i, f)),
         ]
 
 # run SORD

@@ -67,33 +67,34 @@ for dx, np in runs:
     prm['tn'] = -120.0e+6
 
     # static friction for slipping patch
-    j = -int(15000.0 / dx + 0.5)
-    k = -int(7500.0 / dx + 0.5)
-    prm['mus'] = [10000.0, (s_[j:, k:, :], '=', 0.677)]
+    j = s_[-int(15000.0 / dx + 0.5):]
+    k = s_[-int(7500.0 / dx + 0.5):]
+    l = s_[:]
+    prm['mus'] = [10000.0, ([j, k, l], '=', 0.677)]
 
     # viscosity lower in slipping patch
-    j = -int(15000.0 / dx + 0.5)
-    k = -int(7500.0 / dx + 0.5)
-    l = -int(3000.0 / dx + 0.5)
-    prm['gam'] = [0.2, (s_[j:, k:, l:], '=', 0.02)]
+    j = s_[-int(15000.0 / dx + 0.5):]
+    k = s_[-int(7500.0 / dx + 0.5):]
+    l = s_[-int(3000.0 / dx + 0.5):]
+    prm['gam'] = [0.2, ([j, k, l], '=', 0.02)]
 
     # nucleation patch
-    i0 = -int(1500.0 / dx + 0.5)
-    i1 = -int(1500.0 / dx + 1.5)
+    i0 = s_[-int(1500.0 / dx + 0.5):]
+    i1 = s_[-int(1500.0 / dx + 1.5):]
     prm['ts'] = [
         70.0e+6,
-        (s_[i1:, i1:], '=', 72.9e+6),
-        (s_[i0:, i1:], '=', 75.8e+6),
-        (s_[i1:, i0:], '=', 75.8e+6),
+        ([i1, i1], '=', 72.9e+6),
+        ([i0, i1], '=', 75.8e+6),
+        ([i1, i0], '=', 75.8e+6),
     ]
 
     # fault plane output
-    prm['x'] = (s_[j:, k:, -2], '>', 'x.bin')
-    prm['y'] = (s_[j:, k:, -2], '>', 'y.bin')
-    prm['psv'] = (s_[j:, k:, -1], '>', 'psv.bin')
-    prm['trup'] = (s_[j:, k:, -1], '>', 'trup.bin')
-    prm['sux'] = [(s_[j:, k:, -1], '>', 'sux.bin')]
-    prm['suy'] = [(s_[j:, k:, -1], '>', 'suy.bin')]
+    prm['x'] = ([j, k, -2], '>', 'x.bin')
+    prm['y'] = ([j, k, -2], '>', 'y.bin')
+    prm['psv'] = ([j, k, -1], '>', 'psv.bin')
+    prm['trup'] = ([j, k, -1], '>', 'trup.bin')
+    prm['sux'] = [([j, k, -1], '>', 'sux.bin')]
+    prm['suy'] = [([j, k, -1], '>', 'suy.bin')]
 
     # slip, slip velocity, and shear traction time histories
     x, y = prm['hypocenter'][:2]
@@ -103,8 +104,8 @@ for dx, np in runs:
         if f not in prm:
             prm[f] = []
         prm[f] += [
-            (s_[x, -1, :], '.>', 'P1-%s.bin' % f),  # mode II point
-            (s_[-1, y, :], '.>', 'P2-%s.bin' % f),  # mode III point
+            ([x, -1, ':'], '.>', 'P1-%s.bin' % f),  # mode II point
+            ([-1, y, ':'], '.>', 'P2-%s.bin' % f),  # mode III point
         ]
 
     # run SORD

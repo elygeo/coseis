@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import cst.dsp
+
 
 def spectrum(
     h, dt=1.0, shift=False, tzoom=10.0, db=None,
@@ -82,6 +82,8 @@ def test():
     Test spectrum plot
     """
     import numpy as np
+    import matplotlib.pyplot as plt
+    from cst import dsp
 
     n = 3200
     dt = 0.002

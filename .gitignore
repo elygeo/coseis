@@ -12,9 +12,7 @@ __pycache__
 *.sha1
 *.x
 *.dSYM
-/cst/cvms/build-*
-/cst/cvms/Makefile
-/cst/tests/Makefile
-/cst/sord/Makefile
-/cst/sord/config.json
-/Repository
+/CVMS/Makefile
+/Tests/Makefile
+/SORD/Makefile
+/SORD/config.json

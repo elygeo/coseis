@@ -9,6 +9,7 @@ command line options:
 -shape=[nx, ny, ...]
 """
 import os
+os.path.remove('')
 import sys
 import json
 

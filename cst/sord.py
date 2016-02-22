@@ -202,12 +202,6 @@ time_functions = [
 ]
 
 
-class get_slices:
-    def __getitem__(self, slices):
-        return slices
-s_ = get_slices()
-
-
 class typed_dict(dict):
     def __setitem__(self, k, v):
         if isinstance(self[k], type(v)):
@@ -492,7 +486,6 @@ def run(args=None, **kwargs):
 
     print('SORD: Support Operator Rupture Dynamics')
 
-    # arguments
     if args is None:
         args = {}
     args.update(kwargs)
@@ -572,18 +565,15 @@ def run(args=None, **kwargs):
         m = (1 + (nt + 10) * nm // 70000000) * 60
     job['minutes'] = m
 
-    # configure and stage
     job = conf.prepare(**job)
     prm.update({'nthread': job['nthread']})
 
-    # create run files
     d = os.path.dirname(__file__)
     f = os.path.join(d, 'sord.x')
     shutil.copy2(f, '.')
     if prm['debug'] > 2:
         os.mkdir('debug')
 
-    # fortran parameters
     out = [prm[k] for k in sorted(prm)]
     out = json.dumps(out) + '\n'
     for i in fio:
@@ -592,15 +582,18 @@ def run(args=None, **kwargs):
         out = out.replace(i, '')
     open('sord.in', 'w').write(out)
 
-    # save parametes
     prm.update({'~fieldio': fio})
     meta.update({'dtype': np.dtype('f' + cfg['realsize']).str})
+
     out = json.dumps(args, indent=4, sort_keys=True)
     open('parameters.json', 'w').write(out)
+
     out = json.dumps(job, indent=4, sort_keys=True)
     open('job.json', 'w').write(out)
+
     out = json.dumps(prm, indent=4, sort_keys=True)
     open('sord.json', 'w').write(out)
+
     out = json.dumps(meta, indent=4, sort_keys=True)
     open('meta.json', 'w').write(out)
 
@@ -609,64 +602,46 @@ def run(args=None, **kwargs):
     return job
 
 
-# String representation of slice object
-def repr_slices(slices):
-    if isinstance(slices, str):
-        return slices
-    elif isinstance(slices, (tuple, list)):
-        slices = list(slices)
-    else:
-        slices = [slices]
-    for i, s in enumerate(slices):
-        if isinstance(s, (tuple, list)):
-            if len(s) == 0:
-                s = slice(None)
-            else:
-                s = slice(*s)
-        if isinstance(s, slice):
-            if s.step in (1, None):
-                s = '%s:%s' % (s.start, s.stop)
-            else:
-                s = '%s:%s:%s' % (s.start, s.stop, s.step)
-            s = s.replace('None', '')
-        else:
-            s = str(s)
-        slices[i] = s
-    slices = '[' + ','.join(slices) + ']'
-    return slices
+class get_slices:
+    def __getitem__(self, slices):
+        if not isinstance(slices, (tuple, list)):
+            slices = [slices]
+        new = []
+        for i, s in enumerate(slices):
+            if isinstance(s, slice):
+                ss = []
+                if s.start == None:
+                    ss.append('')
+                else:
+                    ss.append(str(s.start))
+                if s.stop == None:
+                    ss.append('')
+                else:
+                    ss.append(str(s.stop))
+                if s.step not in (1, None):
+                    ss.append(str(s.step))
+                s = ':'.join(ss)
+            new.append(s)
+        return new
+s_ = get_slices()
 
 
-def expand_slices(shape, slices=[]):
+def expand_slices(shape, slices):
     """
     >>> shape = [8, 8, 8, 8]
 
     >>> expand_slices(shape, [])
     [[0, 8, 1], [0, 8, 1], [0, 8, 1], [0, 8, 1]]
 
-    >>> expand_slices(shape, '[0,:-4,-4:,:]')
+    >>> expand_slices(shape, [0, ':-4', '-4:', ':'])
     [[0, 1, 1], [0, 4, 1], [4, 8, 1], [0, 8, 1]]
     """
-
-    # normalize to list
-    if isinstance(slices, str):
-        assert(slices[0] + slices[-1] == '[]')
-        if slices == '[]':
-            slices = []
-        else:
-            slices = slices[1:-1].split(',')
-    elif isinstance(slices, (tuple, list)):
-        slices = list(slices)
-    else:
-        slices = [slices]
-
-    # prep
     n = len(shape)
     if len(slices) == 0:
-        slices = n * [[]]
+        slices = n * [':']
     elif len(slices) != n:
         raise Exception('error in indices: %r' % (slices,))
-
-    # loop over slices
+    new = []
     for i, s in enumerate(slices):
         if isinstance(s, str):
             t = []
@@ -677,22 +652,12 @@ def expand_slices(shape, slices=[]):
                     t.append(float(j))
                 else:
                     t.append(int(j))
-            s = t
-        if isinstance(s, (tuple, list)):
-            if len(s) == 0:
-                s = slice(None)
-            elif len(s) == 1:
-                s = s[0]
-            else:
-                s = slice(*s)
-        if isinstance(s, slice):
-            s = list(s.indices(shape[i]))
+            s = list(slice(*t).indices(shape[i]))
         else:
             s %= shape[i]
             s = [s, s + 1, 1]
-        slices[i] = s
-
-    return slices
+        new.append(s)
+    return new
 
 
 def main():
