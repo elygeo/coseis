@@ -4,8 +4,10 @@ Compute basic statistics from raw binary or NumPy .npy files.
 The data type for raw binary is specied by -dtype=str option (defautls to
 native float).
 """
-import os
+
 import sys
+if '' in sys.path:
+    sys.path.remove('')
 
 
 def stats(filename, dtype='f', block=64*1024*1024):

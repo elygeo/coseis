@@ -8,9 +8,11 @@ command line options:
 -dtype=<numpy dytpe>
 -shape=[nx, ny, ...]
 """
-import os
-os.path.remove('')
+
 import sys
+if '' in sys.path:
+    sys.path.remove('')
+import os
 import json
 
 

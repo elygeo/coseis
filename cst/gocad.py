@@ -3,6 +3,10 @@ GOCAD data tools.
 
 paulbourke.net/dataformats/gocad/gocad.pdf
 """
+
+import sys
+if '' in sys.path:
+    sys.path.remove('')
 import os
 
 

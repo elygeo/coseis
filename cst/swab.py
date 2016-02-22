@@ -4,8 +4,10 @@ Swap byte order.
 
 -dtype=<NumPy dtype>  Default is native float
 """
-import os
+
 import sys
+if '' in sys.path:
+    sys.path.remove('')
 
 
 def swab(src, dst, verbose=False, dtype='f', block=64*1024*1024):

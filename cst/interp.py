@@ -1,6 +1,10 @@
 """
 Interpolation tools.
 """
+
+import sys
+if '' in sys.path:
+    sys.path.remove('')
 import os
 
 try:

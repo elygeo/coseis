@@ -2,8 +2,11 @@
 """
 SCEC Community Fault Model (CFM) tools.
 """
-import os
+
 import sys
+if '' in sys.path:
+    sys.path.remove('')
+import os
 import math
 import json
 import getopt

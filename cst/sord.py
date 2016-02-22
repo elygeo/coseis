@@ -2,8 +2,11 @@
 """
 Support Operator Rupture Dynamics
 """
-import os
+
 import sys
+if '' in sys.path:
+    sys.path.remove('')
+import os
 import json
 import shutil
 import subprocess

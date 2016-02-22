@@ -13,8 +13,11 @@ Options:
 --transpose: bool    Transpose data
 
 """
-import os
+
 import sys
+if '' in sys.path:
+    sys.path.remove('')
+import os
 import json
 
 

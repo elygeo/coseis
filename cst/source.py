@@ -2,6 +2,10 @@
 Seismic source tools.
 """
 
+import sys
+if '' in sys.path:
+    sys.path.remove('')
+
 
 def magarea(A):
     """

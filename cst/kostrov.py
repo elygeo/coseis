@@ -2,6 +2,10 @@
 Kostrov circular expanding crack analytical solution.
 """
 
+import sys
+if '' in sys.path:
+    sys.path.remove('')
+
 
 def cee_integrand(x, a2, b2):
     import numpy as np

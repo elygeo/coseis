@@ -1,6 +1,10 @@
 """
 Coordinate conversion tools.
 """
+
+import sys
+if '' in sys.path:
+    sys.path.remove('')
 import math
 
 rearth = 6370000.0

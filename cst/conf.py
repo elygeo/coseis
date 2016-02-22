@@ -2,9 +2,12 @@
 """
 Configure and launch jobs.
 """
+
+import sys
+if '' in sys.path:
+    sys.path.remove('')
 import os
 import re
-import sys
 import json
 import time
 import copy

@@ -2,6 +2,10 @@
 Waveform data tools.
 """
 
+import sys
+if '' in sys.path:
+    sys.path.remove('')
+
 
 def csmip_vol2(filename, max_year=2050):
     """

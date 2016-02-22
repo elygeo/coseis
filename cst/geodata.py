@@ -1,6 +1,10 @@
 """
 Data retrieval and processing tools.
 """
+
+import sys
+if '' in sys.path:
+    sys.path.remove('')
 import os
 import io
 import json
