@@ -7,6 +7,7 @@ while '' in sys.path:
     sys.path.remove('')
 import os
 import io
+import json
 import gzip
 import urllib
 import tarfile
@@ -389,3 +390,6 @@ def extract(x, y, z, vm=['rho', 'vp', 'vs'], by_depth=True, **kwargs):
         else:
             out += [f(z, by_depth=by_depth)]
     return np.array(out)
+
+if __name__ == '__main__':
+    cvmh_voxet()

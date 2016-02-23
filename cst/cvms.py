@@ -9,6 +9,7 @@ while '' in sys.path:
     sys.path.remove('')
 import os
 import json
+import copy
 import shutil
 import subprocess
 
@@ -21,7 +22,9 @@ if 'repo' in conf:
     repo = conf['repository']
 else:
     repo = os.path.join(home, 'Repo')
+
 versions = ['2.2', '3.0', '4.0']
+
 input_template = """\
 {nsample}
 {file_lon}
@@ -31,6 +34,7 @@ input_template = """\
 {file_vp}
 {file_vs}
 """
+
 defaults = {
     'version': '4.0',
     'file_dep': 'mesh-dep.bin',
@@ -216,3 +220,6 @@ def extract(lon, lat, dep, prop=['rho', 'vp', 'vs'], **kwargs):
     shutil.rmtree('cvms-tmp')
 
     return out
+
+if __name__ == '__main__':
+    make()

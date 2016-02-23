@@ -306,12 +306,12 @@ def configure(force=False):
 
 def make(force=False):
     configure(force)
+    p = os.path.join(home, 'SORD')
     if force:
         subprocess.check_call(['make', '-C', p, 'clean'])
     subprocess.check_call(['make', '-C', p, '-j', '4'])
-    cfg = os.path.join(home, 'SORD', 'config.json')
-    cfg = json.load(open(cfg))
-    return cfg
+    p = os.path.join(home, 'SORD', 'config.json')
+    return json.load(open(p))
 
 
 def prepare_param(prm, fio):

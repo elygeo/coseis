@@ -359,8 +359,9 @@ def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):
 
 
 def mapdata(
-  kind=None, resolution='high', extent=None, min_area=0.0, min_level=0,
-  max_level=4, delta=None, clip=1):
+    kind=None, resolution='high', extent=None, min_area=0.0, min_level=0,
+    max_level=4, delta=None, clip=1
+):
     """
     Reader for the Global Self-consistent, Hierarchical, High-resolution
     Shoreline database (GSHHS) by Wessel and Smith.  WGS-84 ellipsoid.
@@ -647,3 +648,11 @@ def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
     m, data = srflib.read(g)
     m.update(meta)
     return m, data
+
+
+def download():
+    mapdata()
+    etopo1()
+    globe30()
+    lsh_cat()
+    engdahl_cat()

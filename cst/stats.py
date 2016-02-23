@@ -8,6 +8,7 @@ native float).
 import sys
 while '' in sys.path:
     sys.path.remove('')
+import os
 
 
 def stats(filename, dtype='f', block=64*1024*1024):

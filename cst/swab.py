@@ -8,6 +8,7 @@ Swap byte order.
 import sys
 while '' in sys.path:
     sys.path.remove('')
+import os
 
 
 def swab(src, dst, verbose=False, dtype='f', block=64*1024*1024):
