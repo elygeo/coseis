@@ -11,7 +11,15 @@ import gzip
 import urllib
 import tarfile
 
-repo = os.path.join('..', 'Repository')
+home = os.path.dirname(__file__)
+home = os.path.realpath(home)
+home = os.path.dirname(home)
+conf = os.path.join(home, 'conf.json')
+conf = json.load(open(conf))
+if 'repo' in conf:
+    repo = conf['repository']
+else:
+    repo = os.path.join(home, 'Repo')
 projection = {'proj': 'utm', 'zone': 11, 'datum': 'NAD27', 'ellps': 'clrk66'}
 extent = (131000.0, 828000.0), (3431000.0, 4058000.0), (-200000.0, 4900.0)
 prop2d = {'topo': '1', 'base': '2', 'moho': '3'}

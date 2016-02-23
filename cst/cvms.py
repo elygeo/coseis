@@ -12,6 +12,25 @@ import json
 import shutil
 import subprocess
 
+home = os.path.dirname(__file__)
+home = os.path.realpath(home)
+home = os.path.dirname(home)
+conf = os.path.join(home, 'conf.json')
+conf = json.load(open(conf))
+if 'repo' in conf:
+    repo = conf['repository']
+else:
+    repo = os.path.join(home, 'Repo')
+versions = ['2.2', '3.0', '4.0']
+input_template = """\
+{nsample}
+{file_lon}
+{file_lat}
+{file_dep}
+{file_rho}
+{file_vp}
+{file_vs}
+"""
 defaults = {
     'version': '4.0',
     'file_dep': 'mesh-dep.bin',
@@ -29,27 +48,6 @@ defaults = {
         'alcf_bgq_mira': {'mode': 'vn'},
     },
 }
-
-input_template = """\
-{nsample}
-{file_lon}
-{file_lat}
-{file_dep}
-{file_rho}
-{file_vp}
-{file_vs}
-"""
-
-versions = ['2.2', '3.0', '4.0']
-home = os.path.dirname(__file__)
-home = os.path.realpath(home)
-home = os.path.dirname(home)
-conf = os.path.join(home, 'conf.json')
-conf = json.load(open(conf))
-if 'repo' in conf:
-    repo = conf['repository']
-else:
-    repo = os.path.join(home, 'Repo')
 
 
 def configure(force=False, **kwargs):
