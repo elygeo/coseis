@@ -5,7 +5,7 @@ Semi-cylindrical canyon with vertically incident P-wave.
 import os
 import cst.sord
 
-path = os.path.join('..', 'Repository', 'Canyon')
+path = os.path.join('..', 'Repo', 'Canyon')
 os.chdir(path)
 
 cst.sord.run({

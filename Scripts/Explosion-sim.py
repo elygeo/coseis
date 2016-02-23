@@ -63,7 +63,7 @@ for f in 'vx', 'vy', 'vz':
     ]
 
 # run sord
-p = os.path.join('..', 'Repository', 'Explosion')
+p = os.path.join('..', 'Repo', 'Explosion')
 os.makedirs(p)
 os.chdir(p)
 cst.sord.run(prm)

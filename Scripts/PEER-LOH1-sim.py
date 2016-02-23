@@ -53,7 +53,7 @@ for i in range(10):
         ]
 
 # run SORD
-p = os.path.join('..', 'Repository', 'LOH1')
+p = os.path.join('..', 'Repo', 'LOH1')
 os.makedirs(p)
 os.chdir(p)
 cst.sord.run(prm)

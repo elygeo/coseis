@@ -190,7 +190,7 @@ def globe30(tile=(0, 1), fill=True):
     tiles = ('im', 'jn', 'ko', 'lp'), ('ae', 'bf', 'cg', 'dh')
     shape = 10800, 10800
     if not os.path.exists(filename):
-        z = ''
+        z = b''
         j, k = tile
         for i in 0, 1:
             t = tiles[k][j][i]
@@ -646,12 +646,12 @@ def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
 
 
 def download():
-    us_place_names()
     engdahl_cat()
+    us_place_names()
     lsh_cat()
     mapdata()
-    etopo1()
     globe30()
+    etopo1()
 
 if __name__ == '__main__':
     download()
