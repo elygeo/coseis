@@ -2,8 +2,13 @@
 Data retrieval and processing tools.
 """
 
+# TODO
+# Quaternary Fault Database
+# ftp://hazards.cr.usgs.gov/maps/qfault/
+# http://earthquake.usgs.gov/hazards/qfaults/KML/Quaternaryall.zip
+
 import sys
-if '' in sys.path:
+while '' in sys.path:
     sys.path.remove('')
 import os
 import io
@@ -14,12 +19,15 @@ import urllib
 import zipfile
 import subprocess
 
-# TODO
-# Quaternary Fault Database
-# ftp://hazards.cr.usgs.gov/maps/qfault/
-# http://earthquake.usgs.gov/hazards/qfaults/KML/Quaternaryall.zip
-
-repo = os.path.join('..', 'Repository')
+home = os.path.dirname(__file__)
+home = os.path.realpath(home)
+home = os.path.dirname(home)
+conf = os.path.join(home, 'conf.json')
+conf = json.load(open(conf))
+if 'repo' in conf:
+    repo = conf['repository']
+else:
+    repo = os.path.join(home, 'Repo')
 
 
 def upsample(f):

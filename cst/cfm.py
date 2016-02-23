@@ -4,7 +4,7 @@ SCEC Community Fault Model (CFM) tools.
 """
 
 import sys
-if '' in sys.path:
+while '' in sys.path:
     sys.path.remove('')
 import os
 import math
@@ -13,9 +13,16 @@ import getopt
 import urllib
 import zipfile
 
-# projection: UTM zone 11, NAD 1927 datum (implies Clark 1866 geoid)
+home = os.path.dirname(__file__)
+home = os.path.realpath(home)
+home = os.path.dirname(home)
+conf = os.path.join(home, 'conf.json')
+conf = json.load(open(conf))
+if 'repo' in conf:
+    repo = conf['repository']
+else:
+    repo = os.path.join(home, 'Repo')
 projection = {'proj': 'utm', 'zone': 11, 'datum': 'NAD27'}
-repo = os.path.join('..', 'Repository')
 
 
 def catalog(version='CFM4-socal-primary'):

@@ -2,6 +2,16 @@
 SCEC Community Velocity Model - Magistrale version
 """
 
+# FIXME conf and build stuff
+
+import sys
+while '' in sys.path:
+    sys.path.remove('')
+import os
+import json
+import shutil
+import subprocess
+
 defaults = {
     'version': '4.0',
     'file_dep': 'mesh-dep.bin',
@@ -31,36 +41,23 @@ input_template = """\
 """
 
 versions = ['2.2', '3.0', '4.0']
+home = os.path.dirname(__file__)
+home = os.path.realpath(home)
+home = os.path.dirname(home)
+conf = os.path.join(home, 'conf.json')
+conf = json.load(open(conf))
+if 'repo' in conf:
+    repo = conf['repository']
+else:
+    repo = os.path.join(home, 'Repo')
 
-def download(version='4.0'):
-    """
-    Download CVMS data
-    """
-    import os, urllib, tarfile, cStringIO
-    from cst import conf
-    repo = conf.configure()['repository']
-
-    url = 'http://earth.usc.edu/~gely/cvm-data/CVMS-%s.tgz' % version
-    path = os.path.join(repo, 'CVMS-%s' % version) + os.sep
-
-    if not os.path.exists(path):
-        os.makedirs(path + 'src')
-        os.makedirs(path + 'data')
-        print('Downloading %s' % url)
-        tar = urllib.urlopen(url)
-        tar = cStringIO.StringIO(tar.read())
-        tar = tarfile.open(fileobj=tar, mode='r:gz')
-        for t in tar:
-            f = os.path.join(path, t.name)
-            open(f, 'wb').write(tar.extractfile(t).read())
-    return
 
 def configure(force=False, **kwargs):
-    import os, shutil, subprocess
     from cst import conf
 
     # source directory
     cwd = os.getcwd()
+    FIXME
     os.chdir(__file__[:-3])
 
     # configure
@@ -115,7 +112,6 @@ def make(force=False, **kwargs):
     """
     Build the code
     """
-    import os, json, subprocess
     cfg = configure(force, **kwargs)
     p = os.path.join(__file__[:-3], 'build-%s' % cfg['version']) + os.sep
     if force:
@@ -130,8 +126,7 @@ def run(**kwargs):
     """
     Stage and launch job
     """
-    import os
-    from . import util, repo
+    from . import util
 
     print('CVM-S')
 
@@ -169,6 +164,7 @@ def run(**kwargs):
 
     return cfg
 
+
 def extract(lon, lat, dep, prop=['rho', 'vp', 'vs'], **kwargs):
     """
     Simple CVM-S extraction
@@ -179,7 +175,6 @@ def extract(lon, lat, dep, prop=['rho', 'vp', 'vs'], **kwargs):
 
     Returns: (rho, vp, vs) material arrays
     """
-    import os, shutil
     import numpy as np
 
     # sanitize arrays
@@ -223,4 +218,3 @@ def extract(lon, lat, dep, prop=['rho', 'vp', 'vs'], **kwargs):
     shutil.rmtree('cvms-tmp')
 
     return out
-

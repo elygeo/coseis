@@ -5,7 +5,7 @@ SRF is documented at http://epicenter.usc.edu/cmeportal/docs/srf4.pdf
 """
 
 import sys
-if '' in sys.path:
+while '' in sys.path:
     sys.path.remove('')
 import os
 import math

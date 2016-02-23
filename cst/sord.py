@@ -3,15 +3,21 @@
 Support Operator Rupture Dynamics
 """
 
-# FIXME fileio ans slice stuff
+# FIXME fileio and slice stuff
 
 import sys
-if '' in sys.path:
+while '' in sys.path:
     sys.path.remove('')
 import os
 import json
 import shutil
 import subprocess
+
+home = os.path.dirname(__file__)
+home = os.path.realpath(home)
+home = os.path.dirname(home)
+conf = os.path.join(home, 'conf.json')
+conf = json.load(open(conf))
 
 # default simulation parameters
 parameters = {
@@ -231,8 +237,7 @@ def configure(force=False):
 
     # source directory
     cwd = os.getcwd()
-    d = os.path.join(path, 'SORD')
-    os.chdir(d)
+    os.chdir(os.path.join(home, 'SORD'))
 
     # makefile
     if force or not os.path.exists('Makefile'):
@@ -289,9 +294,7 @@ def configure(force=False):
         rules = '	\n\n'.join(rules)
 
         # makefile
-        c = os.path.dirname(__file__)
-        c = os.path.join(c, '..', 'config.json')
-        c = json.load(open(c))['machine']
+        c = conf['machine']
         m = open('Makefile.in').read()
         m = m.format(machine=c, objects=objects, rules=rules)
         open('Makefile', 'w').write(m)
@@ -303,11 +306,11 @@ def configure(force=False):
 
 def make(force=False):
     configure(force)
-    p = __file__[:-3] + os.sep
     if force:
         subprocess.check_call(['make', '-C', p, 'clean'])
     subprocess.check_call(['make', '-C', p, '-j', '4'])
-    cfg = json.load(open(p + 'config.json'))
+    cfg = os.path.join(home, 'SORD', 'config.json')
+    cfg = json.load(open(cfg))
     return cfg
 
 

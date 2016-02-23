@@ -3,7 +3,7 @@ Seismic source tools.
 """
 
 import sys
-if '' in sys.path:
+while '' in sys.path:
     sys.path.remove('')
 
 

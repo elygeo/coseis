@@ -3,7 +3,7 @@ Kostrov circular expanding crack analytical solution.
 """
 
 import sys
-if '' in sys.path:
+while '' in sys.path:
     sys.path.remove('')
 
 

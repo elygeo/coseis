@@ -3,7 +3,7 @@ Empirical Ground Motion Model (EGMM).
 """
 
 import sys
-if '' in sys.path:
+while '' in sys.path:
     sys.path.remove('')
 
 
