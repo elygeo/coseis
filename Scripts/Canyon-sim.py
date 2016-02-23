@@ -5,54 +5,43 @@ Semi-cylindrical canyon with vertically incident P-wave.
 import os
 import cst.sord
 
-path = os.path.join('..', 'Repo', 'Canyon')
-os.chdir(path)
+nx, ny, nz, nt = 301, 321, 2, 6000
+t = [None, None, 10]
 
-cst.sord.run({
-
-    # dimentions
+prm = {
     'delta': [0.0075, 0.0075, 0.0075, 0.002],
-    'shape': [301, 321, 2, 6000],
+    'shape': [nx, ny, nz, nt],
     'nproc3': [2, 1, 1],
-
-    # material model
     'rho': [1.0],
     'vp': [2.0],
     'vs': [1.0],
     'gam': [0.0],
     'hourglass': [1.0, 2.0],
-
-    # boundary conditions
     'bc1': ['free',  'free',  '+node'],
     'bc2': ['+node', '-node', '+node'],
-
-    # mesh input
-    'x': [([':', ':', 0], '=<', 'x.bin')],
-    'y': [([':', ':', 0], '=<', 'y.bin')],
-
-    # Ricker wavelet source with 2 s period.
+    'x': [([[], [], 0], '=<', 'x.bin')],
+    'y': [([[], [], 0], '=<', 'y.bin')],
     'vy': [
-        ([-1, '161:', ':' ,':'], '=', 'ricker1', 1.0, 2.0),
-        ([':', ':', 0, '::10'], '=>', 'snap-vy.bin'),
+        ([-1, [161, None], [], []], '=', 'ricker1', 1.0, 2.0),
+        ([[], [], 0, t], '=>', 'snap-vy.bin'),
     ],
-
-    # velocity output
     'vx': [
-        ([':', ':', 0, '::10'], '=>', 'snap-vx.bin')
+        ([[], [], 0, t], '=>', 'snap-vx.bin')
     ],
-
-    # displacement output
     'ux': [
-        ([-1, -1, 0, ':'], '=>', 'source-ux.bin'),
-        ([0, ':', 0, ':'], '=>', 'canyon-ux.bin'),
-        (['1:158', 0, 0, ':'], '=>', 'flank-ux.bin'),
-        ([':', ':', 0, '::10'], '=>', 'snap-ux.bin'),
+        ([-1, -1, 0, []], '=>', 'source-ux.bin'),
+        ([0, [], 0, []], '=>', 'canyon-ux.bin'),
+        ([[1, 158], 0, 0, []], '=>', 'flank-ux.bin'),
+        ([[], [], 0, t], '=>', 'snap-ux.bin'),
     ],
     'uy': [
-        ([-1, -1, 0, ':'], '=>', 'source-uy.bin'),
-        ([0, ':', 0, ':'], '=>', 'canyon-uy.bin'),
-        (['1:158', 0, 0, ':'], '=>', 'flank-uy.bin'),
-        ([':', ':', 0, '::10'], '=>', 'snap-uy.bin'),
+        ([-1, -1, 0, []], '=>', 'source-uy.bin'),
+        ([0, [], 0, []], '=>', 'canyon-uy.bin'),
+        ([[1, 158], 0, 0, []], '=>', 'flank-uy.bin'),
+        ([[], [], 0, t], '=>', 'snap-uy.bin'),
     ],
+}
 
-})
+path = os.path.join(cst.sord.repo, 'Canyon')
+os.chdir(path)
+cst.sord.run(prm)

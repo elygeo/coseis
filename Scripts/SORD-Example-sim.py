@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import cst.sord
 
-cst.sord.run({
+prm = {
 
     # model dimentions [x, y, z, t]
     'shape': [61, 61, 61, 60],
@@ -14,12 +14,17 @@ cst.sord.run({
     'gam':    [0.3],  # viscosity
 
     # potency tensor source time function
-    'pxx': [[30, 30, 30, ':'], '=', 1.0, 'integral_brune', 0.05],
-    'pyy': [[30, 30, 30, ':'], '=', 1.0, 'integral_brune', 0.05],
-    'pzz': [[30, 30, 30, ':'], '=', 1.0, 'integral_brune', 0.05],
+    'pxx': [([30, 30, 30, []], '=', 1.0, 'integral_brune', 0.05)],
+    'pyy': [([30, 30, 30, []], '=', 1.0, 'integral_brune', 0.05)],
+    'pzz': [([30, 30, 30, []], '=', 1.0, 'integral_brune', 0.05)],
 
     # write 2d velocity slice, last time step
-    'vx': [[':', ':', 30, -1], '=>', 'vx.bin'],
-    'vy': [[':', ':', 30, -1], '=>', 'vy.bin'],
+    'vx': [([[], [], 30, -1], '=>', 'vx.bin')],
+    'vy': [([[], [], 30, -1], '=>', 'vy.bin')],
 
-})
+}
+
+path = os.path.join(sord.repo, 'Example')
+os.mkdir(path)
+os.chdir(path)
+sord.run(prm)

@@ -52,7 +52,7 @@ l1 = int(z + 3000.0 / dx + 0.5)
 prm['rho'] = [2700.0]
 prm['vp'] = [5716.0]
 prm['vs'] = [3300.0]
-prm['gam'] = [0.2, (s_[:i, :i, l0:l1], '=', 0.02)]
+prm['gam'] = [0.2, ([[i], [i], [l0, l1]], '=', 0.02)]
 prm['hourglass'] = [1.0, 2.0]
 
 # fault parameters
@@ -60,21 +60,21 @@ prm['faultnormal'] = '+z'
 prm['co'] = [200000.0]
 prm['dc'] = [0.5]
 prm['mud'] = [0.1]
-prm['mus'] = [10000.0, (s_[:i+1, :i+1], '=', 0.7)]
-prm['sxx'] = [([0, ':'], '=>', 'sxx.bin')]
-prm['syy'] = [([0, ':'], '=>', 'syy.bin')]
-prm['szz'] = [([0, ':'], '=>', 'szz.bin')]
-prm['trup'] = [(s_[:i+1, :i+1, -1], '=>', 'trup.bin')]
+prm['mus'] = [10000.0, ([[i+1], [i+1]], '=', 0.7)]
+prm['sxx'] = [([0, []], '=>', 'sxx.bin')]
+prm['syy'] = [([0, []], '=>', 'syy.bin')]
+prm['szz'] = [([0, []], '=>', 'szz.bin')]
+prm['trup'] = [([[i+1], [i+1], -1], '=>', 'trup.bin')]
 
 # nucleation
 k = int(hypo[1])
 m = int(1500.0 / dx + 0.5)
 n = int(1500.0 / dx + 1.5)
 prm['mus'] += [
-    (s_[:n, k-n:k+n+1], '=', 0.66),
-    (s_[:n, k-m:k+m+1], '=', 0.62),
-    (s_[:m, k-n:k+n+1], '=', 0.62),
-    (s_[:m, k-m:k+m+1], '=', 0.54),
+    ([[n], [k-n, k+n+1]], '=', 0.66),
+    ([[n], [k-m, k+m+1]], '=', 0.62),
+    ([[m], [k-n, k+n+1]], '=', 0.62),
+    ([[m], [k-m, k+m+1]], '=', 0.54),
 ]
 
 # slip, slip velocity, and shear traction time histories
@@ -100,7 +100,7 @@ for j, k in [
         s = 'faultst%03ddp%03d-%s.bin' % (j, k, f)
         if f not in prm:
             prm[f] = []
-        prm[f] += [([x, y, ':'], '.>', s)]
+        prm[f] += [([x, y, []], '.>', s)]
 
 # displacement and velocity time histories
 for j, k, l in [
@@ -125,7 +125,7 @@ for j, k, l in [
         s = s.replace('body-', 'body-0')
         if f not in prm:
             prm[f] = []
-        prm[f] += [([x, y, z, ':'], '.>', s)]
+        prm[f] += [([x, y, z, []], '.>', s)]
 
 # pre-stress
 d = np.arange(ny) * alpha * dx

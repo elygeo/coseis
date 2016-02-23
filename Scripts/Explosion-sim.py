@@ -15,7 +15,7 @@ dx, dt = 200.0, 0.016
 
 # dimensions
 nx = int(6000.0 / dx + 1.0001)
-nt = int(   3.0 / dt + 1.0001)
+nt = int(3.0 / dt + 1.0001)
 prm['delta'] = [dx, dx, dx, dt]
 prm['shape'] = [nx, nx, nx, nt]
 prm['nproc3'] = [1, 1, 2]
@@ -30,9 +30,9 @@ prm['bc2'] = ['pml', 'pml', 'pml']
 i = reg
 val = 1.0
 tau = 0.1
-prm['pxx'] = ([i, i, i, ':'], '.', val, 'brune', tau)
-prm['pyy'] = ([i, i, i, ':'], '.', val, 'brune', tau)
-prm['pzz'] = ([i, i, i, ':'], '.', val, 'brune', tau)
+prm['pxx'] = ([i, i, i, []], '.', val, 'brune', tau)
+prm['pyy'] = ([i, i, i, []], '.', val, 'brune', tau)
+prm['pzz'] = ([i, i, i, []], '.', val, 'brune', tau)
 
 # material
 prm['rho'] = [2670.0]
@@ -47,23 +47,23 @@ y = reg + 3000.0 / dx
 z = reg + 4000.0 / dx
 for f in 'vx', 'vy', 'vz':
     prm[f] = [
-        ([x, x, z, ':'], '.>', 'p1-%s.bin' % f),
-        ([x, y, z, ':'], '.>', 'p2-%s.bin' % f),
-        ([x, x, z, ':'], '.>', 'p3-%s.bin' % f),
-        ([y, y, z, ':'], '.>', 'p4-%s.bin' % f),
-        ([y, x, z, ':'], '.>', 'p5-%s.bin' % f),
-        ([x, x, z, ':'], '.>', 'p6-%s.bin' % f),
+        ([x, x, z, []], '.>', 'p1-%s.bin' % f),
+        ([x, y, z, []], '.>', 'p2-%s.bin' % f),
+        ([x, x, z, []], '.>', 'p3-%s.bin' % f),
+        ([y, y, z, []], '.>', 'p4-%s.bin' % f),
+        ([y, x, z, []], '.>', 'p5-%s.bin' % f),
+        ([x, x, z, []], '.>', 'p6-%s.bin' % f),
     ]
 
 # snapshots
 j = int(reg + 0.5)
 for f in 'vx', 'vy', 'vz':
     prm[f] += [
-        ([j, ':', ':', '::10'], '=>', 'snap-%s.bin' % f),
+        ([j, [], [], [None, None, 10]], '=>', 'snap-%s.bin' % f),
     ]
 
 # run sord
-p = os.path.join('..', 'Repo', 'Explosion')
-os.makedirs(p)
+p = os.path.join(cst.sord.repo, 'Explosion')
+os.mkdir(p)
 os.chdir(p)
 cst.sord.run(prm)

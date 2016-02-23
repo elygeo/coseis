@@ -48,7 +48,7 @@ prm['hourglass'] = [1.0, 1.0]
 j = int(56000.0 / dx + 0.5)
 k = int(40000.0 / dx + 0.5)
 l = int(14000.0 / dx + 0.5)
-prm['mxy'] = ([j, k, l, ':'], '+', 1e18, 'brune', 0.2)
+prm['mxy'] = ([j, k, l, []], '+', 1e18, 'brune', 0.2)
 
 # receivers
 for i in range(8):
@@ -58,11 +58,11 @@ for i in range(8):
         if f not in prm:
             prm[f] = []
         prm[f] += [
-            ([j, k, 0, ':'], '=>', 'p%s-%s.bin' % (i, f)),
+            ([j, k, 0, []], '=>', 'p%s-%s.bin' % (i, f)),
         ]
 
 # run job
-path = os.path.join('..', 'Repository', 'PEER-SC2.1-', '%.0f' % dx)
+path = os.path.join(sord.repo, 'PEER-SC2.1-%.0f' % dx)
 os.makedirs(path)
 os.chdir(path)
 for v in 'rho', 'vp', 'vs':

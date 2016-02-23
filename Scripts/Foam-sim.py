@@ -11,10 +11,9 @@ doi:10.1785/0120010273.
 import os
 import cst.sord
 
-s_ = cst.sord.get_slices()
 prm = {}
 
-# dimentions
+# dimensions
 dx, dt = 0.01, 0.01, 0.01, 0.000075
 dx, dt = 0.02, 0.00015
 x, y, z, t = 2.8, 2.2, 2.2, 0.15
@@ -39,7 +38,7 @@ prm['bc2'] = ['pml', 'pml', 'pml']
 
 # nucleation
 x = 1.4 / dx
-j = s_[:int(x) + 1]
+j = int(x) + 1
 prm['vrup'] = 15.0
 prm['rcrit'] = 0.4
 prm['trelax'] = 10.0 * dt
@@ -51,17 +50,17 @@ prm['slipvector'] = [0.0, 1.0, 0.0]
 prm['ts'] = [-730.0]
 prm['tn'] = [-330.0]
 prm['dc'] = [0.001]
-prm['mus'] = [1e5, ([j, :], '=', 2.4)]
-prm['mud'] = [1e5, ([j, :], '=', 1.85)]
+prm['mus'] = [1e5, ([[j], []], '=', 2.4)]
+prm['mud'] = [1e5, ([[j], []], '=', 1.85)]
 
 # weak zone
 weakzone = 0.2
 weakzone = 0.0
-j = s_[:int(weakzone / dx) + 1]
+j = int(weakzone / dx) + 1
 if weakzone:
-    prm['ts'] += [([j, ':'], '=', -66.0)]
-    prm['mus'] += [([j, ':'], '=', 0.6)]
-    prm['mud'] += [([j, ':'], '=', 0.6)]
+    prm['ts'] += [([[j], []], '=', -66.0)]
+    prm['mus'] += [([[j], []], '=', 0.6)]
+    prm['mud'] += [([[j], []], '=', 0.6)]
 
 # accelerometers
 z = 0.03 / dx
@@ -77,22 +76,22 @@ for s, x, g in [
     if 'ay' not in prm:
         prm['ay'] = []
     prm['ay'] += [
-        ([x, 0.0, z, ':'], '.>', 'sensor%02d.bin' % s),
+        ([x, 0.0, z, []], '.>', 'sensor%02d.bin' % s),
     ]
 
 # displacement sensor
 prm['uy'] = [
-    ([0, 0, 0, ':'], '=>', 'sensor16.bin'),
+    ([0, 0, 0, []], '=>', 'sensor16.bin'),
 ]
 
 # surface output
 k = int(prm['hypocenter'][1])
-l = s_[1:int(0.8 / dx) + 1]
-prm['uy'] += [([0, k, l, ':'], '=>', 'off-fault.bin')]
-# prm['vy'] = [([':', k, l, '::10'], '=>', 'xsec.bin')]
+l = int(0.8 / dx) + 1
+prm['uy'] += [([0, k, [l], []], '=>', 'off-fault.bin')]
+# prm['vy'] = [([[], k, [l], [None, None, 10]], '=>', 'xsec.bin')]
 
 # run SORD
-path = os.path.join('..', 'Repo', 'foam-%02.0f' % (weakzone * 100))
+path = os.path.join(sord.repo, 'foam-%02.0f' % (weakzone * 100))
 os.makedirs(path)
 os.chdir(path)
 cst.sord.run(prm)
