@@ -15,19 +15,14 @@ import io
 import json
 import gzip
 import math
-import urllib
 import zipfile
 import subprocess
+import urllib.request
 
 home = os.path.dirname(__file__)
 home = os.path.realpath(home)
 home = os.path.dirname(home)
-conf = os.path.join(home, 'conf.json')
-conf = json.load(open(conf))
-if 'repo' in conf:
-    repo = conf['repository']
-else:
-    repo = os.path.join(home, 'Repo')
+repo = os.path.join(home, 'Repo')
 
 
 def upsample(f):
@@ -154,8 +149,8 @@ def etopo1(downsample=1):
     shape = 10801, 21601
     if not os.path.exists(filename0):
         print('Retrieving %s' % url)
-        data = urllib.urlopen(url)
-        data = io.StringIO(data.read())
+        data = urllib.request.urlopen(url)
+        data = io.BytesIO(data.read())
         data = zipfile.ZipFile(data)
         data = data.read('etopo1_ice_g_i2.bin')
         data = np.fromstring(data, '<i2').reshape(shape).T[:, ::-1]
@@ -201,8 +196,8 @@ def globe30(tile=(0, 1), fill=True):
             t = tiles[k][j][i]
             u = url % t
             print('Retrieving %s' % u)
-            f = urllib.urlopen(u)
-            f = io.StringIO(f.read())
+            f = urllib.request.urlopen(u)
+            f = io.BytesIO(f.read())
             z += gzip.GzipFile(fileobj=f).read()
         z = np.fromstring(z, '<i2').reshape(shape).T[:, ::-1]
         if fill:
@@ -320,8 +315,8 @@ def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):
     if not os.path.exists(f):
         u = u % region
         print('Retrieving %s' % u)
-        z = urllib.urlopen(u).read()
-        z = io.StringIO(z)
+        z = urllib.request.urlopen(u).read()
+        z = io.BytesIO(z)
         z = gzip.GzipFile(fileobj=z).read()[19512:]
         z = np.fromstring(z, '>f').reshape((2400, 2280)).T
         np.save(f, z)
@@ -387,14 +382,14 @@ def mapdata(
 
     url = (
         'http://www.ngdc.noaa.gov/mgg/shorelines/'
-        'data/gshhg/latest/gshhg-bin-2.2.2.zip'
+        'data/gshhg/latest/gshhg-bin-2.3.4.zip'
     )
     d = os.path.join(repo, 'GSHHS')
     if not os.path.exists(d):
         print('Retrieving %s' % url)
-        data = urllib.urlopen(url)
-        data = io.StringIO(data.read())
-        zipfile.ZipFile(data).extractall(repo)
+        data = urllib.request.urlopen(url)
+        data = io.BytesIO(data.read())
+        zipfile.ZipFile(data).extractall(d)
     if not kind:
         return
     name = {'c': 'GSHHS coastlines', 'r': 'WDB rivers', 'b': 'WDB borders'}
@@ -471,10 +466,10 @@ def us_place_names():
         ('lon', 'f'),
         ('elev', 'i'),
     ]
-    if not os.path.exist(filename):
+    if not os.path.exists(filename):
         print('Retrieving %s' % url)
-        data = urllib.urlopen(url)
-        data = io.StringIO(data.read())
+        data = urllib.request.urlopen(url)
+        data = io.BytesIO(data.read())
         data = zipfile.ZipFile(data)
         data = data.open(data.namelist()[0])
         data = np.genfromtxt(
@@ -487,11 +482,11 @@ def us_place_names():
 def engdahl_cat():
     """
     Engdahl Centennial Earthquake Catalog.
-    http://earthquake.usgs.gov/research/data/centennial.php
+    http://earthquake.usgs.gov/data/centennial/
     """
     import numpy as np
     filename = os.path.join(repo, 'Engdahl-Centennial-Cat.npy')
-    url = 'http://earthquake.usgs.gov/research/data/centennial_Y2K.CAT'
+    url = 'http://earthquake.usgs.gov/data/centennial/centennial_Y2K.CAT'
     d = [
         6, ('icat',   'S6'),
         1, ('asol',   'S1'),
@@ -513,7 +508,7 @@ def engdahl_cat():
     ]
     if not os.path.exists(filename):
         print('Retrieving %s' % url)
-        data = urllib.urlopen(url)
+        data = urllib.request.urlopen(url)
         data = np.genfromtxt(data, dtype=d[1::2], delimiter=d[0::2])
         np.save(filename, data)
         del(data)
@@ -555,7 +550,7 @@ def lsh_cat():
     ]
     if not os.path.exists(filename):
         print('Retrieving %s' % url)
-        data = urllib.urlopen(url)
+        data = urllib.request.urlopen(url)
         data = np.genfromtxt(data, dtype=dtype)
         np.save(filename, data)
         del(data)
@@ -643,7 +638,7 @@ def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
         g = 'ssh', host, 'gzip -c ' + g
         g = subprocess.check_output(g)
         open(f, 'wb').write(g)
-        g = io.StringIO(g)
+        g = io.BytesIO(g)
         g = gzip.GzipFile(fileobj=g)
     m, data = srflib.read(g)
     m.update(meta)
@@ -651,8 +646,12 @@ def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
 
 
 def download():
+    us_place_names()
+    engdahl_cat()
+    lsh_cat()
     mapdata()
     etopo1()
     globe30()
-    lsh_cat()
-    engdahl_cat()
+
+if __name__ == '__main__':
+    download()
