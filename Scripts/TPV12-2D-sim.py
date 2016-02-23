@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
-"""
-SCEC Code Validation Workshop, Test Problem 12-2D
-FIXME: prestress not correct
-"""
 import os
 import math
 import numpy as np
 import cst.sord
+
+# FIXME: prestress not correct
 
 prm = {}
 
@@ -114,13 +112,11 @@ k = int(13800.0 / dx + 1.5)
 x[k:] = y[k:]
 z[k:] = y[k:]
 
-# run directory
-p = os.path.join('..', 'Repository', 'TVP12-2D')
-os.makedirs(p)
-os.chdir(p)
-x.astype('f').tofile(d + 'sxx.bin')
-y.astype('f').tofile(d + 'syy.bin')
-z.astype('f').tofile(d + 'szz.bin')
-
 # run SORD
+d = cst.sord.repo + 'TVP12-2D'
+os.mkdir(d)
+os.chdir(d)
+x.astype('f').tofile('sxx.bin')
+y.astype('f').tofile('syy.bin')
+z.astype('f').tofile('szz.bin')
 cst.sord.run(prm)

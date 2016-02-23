@@ -16,6 +16,7 @@ import subprocess
 home = os.path.dirname(__file__)
 home = os.path.realpath(home)
 home = os.path.dirname(home)
+repo = os.path.join(home, 'Repo') + os.sep
 conf = os.path.join(home, 'conf.json')
 conf = json.load(open(conf))
 

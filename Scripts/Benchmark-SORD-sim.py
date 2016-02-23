@@ -32,7 +32,7 @@ for i in power[::-1]:
     n = 2 ** i
     prm['nproc3'] = [2, n, n]
     prm['shape'] = [points, n * points, n * points, prm['itio']]
-    d = os.path.joing(cst.sord.repo, 'Benchmark-SORD-%s' % i)
-    os.makedirs(d)
+    d = cst.sord.repo + 'Benchmark-SORD-%s' % i
+    os.mkdir(d)
     os.chdir(d)
     cst.sord.run(prm)

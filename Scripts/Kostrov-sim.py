@@ -34,7 +34,7 @@ prm = {
     ]
 }
 
-d = os.path.join(sord.repo, 'Kostrov')
-os.makedirs(d)
+d = cst.sord.repo + 'Kostrov'
+os.mkdir(d)
 os.chdir(d)
 sord.run(prm)

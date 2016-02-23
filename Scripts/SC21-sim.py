@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 """
 PEER Lifelines program task 1A02, Problem SC2.1
-
 SCEC Community Velocity Model, version 2.2 with double-couple point source.
-http://peer.berkeley.edu/lifelines/lifelines_pre_2006/lifelines_princ_invest_y-7.html#day
-http://www-rohan.sdsu.edu/~steveday/BASINS/Final_Report_1A02.pdf
 """
 import os
 import json
@@ -19,7 +16,7 @@ dx = 100.0;  prm['nproc3'] = [1, 4, 60]
 dx = 500.0;  prm['nproc3'] = [1, 1, 2]
 
 # mesh metadata
-mesh = os.path.join('..', 'Repository', 'SC21', 'mesh', '%.0f' % dx) + os.sep
+mesh = cst.sord.repo + ('SC21-Mesh-%.0f' % dx) + os.sep
 meta = json.load(open(mesh + 'meta.json'))
 dx, dy, dz = meta['delta']
 nx, ny, nz = meta['shape']
@@ -62,9 +59,9 @@ for i in range(8):
         ]
 
 # run job
-path = os.path.join(sord.repo, 'PEER-SC2.1-%.0f' % dx)
-os.makedirs(path)
-os.chdir(path)
+d = cst.sord.repo + 'PEER-SC2.1-%.0f' % dx
+os.mkdir(d)
+os.chdir(d)
 for v in 'rho', 'vp', 'vs':
     os.link(mesh + 'mesh-' + v + '.bin', '.')
 cst.sord.run(prm)

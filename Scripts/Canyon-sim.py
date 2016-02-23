@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""
-Semi-cylindrical canyon with vertically incident P-wave.
-"""
 import os
 import cst.sord
 
@@ -42,6 +39,6 @@ prm = {
     ],
 }
 
-path = os.path.join(cst.sord.repo, 'Canyon')
-os.chdir(path)
+d = cst.sord.repo + 'Canyon'
+os.chdir(d)
 cst.sord.run(prm)

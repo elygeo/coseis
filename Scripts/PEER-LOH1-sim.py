@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 """
 PEER Lifelines program task 1A01, Problem LOH.1
-
 Layer over a halfspace model with buried double-couple source.
-http://peer.berkeley.edu/lifelines/lifelines_pre_2006/lifelines_princ_invest_y-7.html#day
-http://peer.berkeley.edu/lifelines/lifelines_pre_2006/final_reports/1A01-FR.pdf
-http://www-rohan.sdsu.edu/~steveday/BASINS/Final_Report_1A01.pdf
 """
 import os
 import cst.sord
@@ -52,7 +48,7 @@ for i in range(10):
         ]
 
 # run SORD
-p = os.path.join(sord.repo, 'LOH1')
-os.makedirs(p)
-os.chdir(p)
+d = cst.sord.repo + 'LOH1'
+os.mkdir(d)
+os.chdir(d)
 cst.sord.run(prm)

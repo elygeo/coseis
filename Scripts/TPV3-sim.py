@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""
-SCEC Code Validation Workshop, Test Problem Version 3
-"""
 import os
 import cst.sord
 
@@ -91,8 +88,8 @@ for dx, np in runs:
         ]
 
     # run SORD
-    d = os.path.join(sord.repo, 'TPV3-%03.0f' % dx)
-    os.makedirs(d)
+    d = cst.sord.repo + 'TPV3-%03.0f' % dx
+    os.mkdir(d)
     os.chdir(d)
     cst.sord.run(prm)
     os.chdir(cwd)

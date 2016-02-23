@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
-"""
-SCEC Code Validation Workshop, Test Problem 12
-FIXME: prestress not correct
-"""
 import os
 import math
 import numpy as np
 import cst.sord
 
-s_ = cst.sord.get_slices()
+# FIXME: prestress not correct
+
 prm = {}
 
 # number of processes
@@ -137,9 +134,9 @@ x[k:] = y[k:]
 z[k:] = y[k:]
 
 # run directory
-p = os.path.join('..', 'Repository', 'TPV12')
-os.makedirs(p)
-os.chdir(p)
+d = os.sord.repo + 'TPV12'
+os.mkdir(d)
+os.chdir(d)
 x.astype('f').tofile('sxx.bin')
 y.astype('f').tofile('syy.bin')
 z.astype('f').tofile('szz.bin')

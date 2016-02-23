@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""
-Explosion test problem
-"""
 import os
 import cst.sord
 
@@ -63,7 +60,7 @@ for f in 'vx', 'vy', 'vz':
     ]
 
 # run sord
-p = os.path.join(cst.sord.repo, 'Explosion')
-os.mkdir(p)
-os.chdir(p)
+d = cst.sord.repo + 'Explosion'
+os.mkdir(d)
+os.chdir(d)
 cst.sord.run(prm)

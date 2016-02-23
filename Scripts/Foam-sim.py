@@ -1,12 +1,6 @@
 #!/usr/bin/env python3
 """
-Foam rubber model from:
-
-Day, S. M., and G. P. Ely (2002),
-*Effect of a shallow weak zone on fault rupture: Numerical simulation of
-scale-model experiments*, Bull. Seism. Soc. Am., `92(8), 3022-3041
-<http://www.bssaonline.org/cgi/content/abstract/92/8/3022>`__,
-doi:10.1785/0120010273.
+Foam rubber model from Day and Ely (2002), doi:10.1785/0120010273.
 """
 import os
 import cst.sord
@@ -91,7 +85,7 @@ prm['uy'] += [([0, k, [l], []], '=>', 'off-fault.bin')]
 # prm['vy'] = [([[], k, [l], [None, None, 10]], '=>', 'xsec.bin')]
 
 # run SORD
-path = os.path.join(sord.repo, 'foam-%02.0f' % (weakzone * 100))
-os.makedirs(path)
-os.chdir(path)
+d = cst.sord.repo + 'Foam-%02.0f' % (weakzone * 100)
+os.mkdir(d)
+os.chdir(d)
 cst.sord.run(prm)
