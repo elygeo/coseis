@@ -228,12 +228,11 @@ def f90modules(path):
 
 
 def configure(force=False):
-    from cst import conf
 
     # source directory
     cwd = os.getcwd()
-    path = os.path.dirname(__file__)
-    os.chdir(path)
+    d = os.path.join(path, 'SORD')
+    os.chdir(d)
 
     # makefile
     if force or not os.path.exists('Makefile'):
@@ -290,9 +289,11 @@ def configure(force=False):
         rules = '	\n\n'.join(rules)
 
         # makefile
-        host, machine = conf.hostname()
+        c = os.path.dirname(__file__)
+        c = os.path.join(c, '..', 'config.json')
+        c = json.load(open(c))['machine']
         m = open('Makefile.in').read()
-        m = m.format(machine=machine, objects=objects, rules=rules)
+        m = m.format(machine=c, objects=objects, rules=rules)
         open('Makefile', 'w').write(m)
 
     os.chdir(cwd)

@@ -61,7 +61,7 @@ def nafe_drake(f):
     Density derived from V_p via Nafe-Drake curve, Brocher (2005) eqn 1.
     """
     import numpy as np
-    f = np.asarray(f) * 0.001
+    f *= 0.001
     f = f * (
         1.6612 - f * (0.4721 - f * (0.0671 - f * (0.0043 - f * 0.000106))))
     f = np.maximum(f, 1.0) * 1000.0
@@ -72,8 +72,7 @@ def brocher_vp(f):
     """
     V_p derived from V_s via Brocher (2005) eqn 9.
     """
-    import numpy as np
-    f = np.asarray(f) * 0.001
+    f *= 0.001
     f = 0.9409 + f * (2.0947 - f * (0.8206 - f * (0.2683 - f * 0.0251)))
     f *= 1000.0
     return f
@@ -83,8 +82,6 @@ def ely_vp(f):
     """
     V_p derived from V_s via Ely (2012).
     """
-    import numpy as np
-    f = np.asarray(f)
     f = 400.0 + 1.4 * f
     return f
 
@@ -283,8 +280,13 @@ class Extraction():
     """
 
     def __init__(
-      self, x, y, vm, vs30='Wills+Wald', topo='topo',
-      interpolation='nearest', geographic=True, **kwargs):
+        self, x, y, vm,
+        vs30='Wills+Wald',
+        topo='topo',
+        interpolation='nearest',
+        geographic=True,
+        **kwargs
+    ):
         import numpy as np
         x = np.asarray(x)
         y = np.asarray(y)
