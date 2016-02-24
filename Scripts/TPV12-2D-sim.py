@@ -6,15 +6,14 @@ import cst.sord
 
 # FIXME: prestress not correct
 
-prm = {}
-
-# dimensions
 dx = 100.0
 dt = dx / 12500.0
 nx = 2
 ny = int(16500.0 / dx + 21.5)
 nz = int(12000.0 / dx + 120.5)
 nt = int(8.0 / dt + 1.5)
+
+prm = {}
 
 prm['delta'] = [dx, dx, dx, dt]
 prm['shape'] = [nx, ny, nz, nt]

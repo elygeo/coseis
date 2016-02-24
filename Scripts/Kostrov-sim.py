@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import cst.sord
+import cst.sord, cst.job
 
 prm = {
     'delta': [100.0, 100.0, 100.0, 0.0075],
@@ -37,4 +37,5 @@ prm = {
 d = cst.sord.repo + 'Kostrov'
 os.mkdir(d)
 os.chdir(d)
-sord.run(prm)
+cfg = cst.sord.stage(prm)
+cst.job.launch(cfg)

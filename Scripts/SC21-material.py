@@ -3,8 +3,8 @@ import os
 import json
 import shutil
 import numpy as np
-import cst.util
 import cst.cvms
+import cst.util
 
 # parameters
 dx = 2000.0; nproc = 1
@@ -34,34 +34,35 @@ y = np.linspace(y[0], y[1], shape[1])
 y, x = np.meshgrid(y, x)
 
 # metadata
-meta = dict(
-    delta=delta,
-    shape=shape,
-    bounds=bounds,
-    extent=extent,
-    npml=10,
-)
+meta = {
+    'delta': delta,
+    'shape': shape,
+    'bounds': bounds,
+    'extent': extent,
+    'npml': 10,
+}
 
 # create run directory
-path = os.path.join('..', 'Repository', 'SC21', 'mesh', '%.0f' % dx)
-os.makedirs(path)
-shutil.copy2('../Util/mesh-extrude.py', path)
-os.chdir(path)
-json.dump(meta, open('meta.json', 'w'))
+d = cvms.repo + 'SC21-Mesh-%.0f' % dx
+os.mkdir(d)
+os.chdir(d)
+f = os.path.join(cst.cvms.home, 'Util', 'Mesh-Extrude.py')
+shutil.copy2(f, '.')
+meta = json.dumps(meta, indent=4, sort_keys=True)
+open('meta.json', 'w').write(meta)
 np.save(x.astype('f'), 'lat.npy')
 np.save(y.astype('f'), 'lon.npy')
 
-# launch mesher
-job = cst.util.launch(
+job1 = cst.job.launch(
     execute='python mesh-extrude.py',
     minutes=nsample // 120000000,
     nproc=min(3, nproc),
 )
 
-# launch CVM-S
-cst.cvms.run(
+job2 = cst.cvms.stage(
     version='2.2',
     nsample=nsample,
-    depend=job['jobid'],
     nproc=nproc,
 )
+
+cst.job.launch(job2, depend=job1['jobid'])

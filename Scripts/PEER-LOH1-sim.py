@@ -4,7 +4,7 @@ PEER Lifelines program task 1A01, Problem LOH.1
 Layer over a halfspace model with buried double-couple source.
 """
 import os
-import cst.sord
+import cst.sord, cst.job
 
 prm = {}
 
@@ -51,4 +51,5 @@ for i in range(10):
 d = cst.sord.repo + 'LOH1'
 os.mkdir(d)
 os.chdir(d)
-cst.sord.run(prm)
+cfg = cst.sord.stage(prm)
+cst.job.launch(cfg)

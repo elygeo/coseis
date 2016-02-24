@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import subprocess
 import cst.sord
 prm = {
     'shape': [61, 61, 61, 60],
@@ -16,4 +17,5 @@ prm = {
 d = cst.sord.repo + 'Example'
 os.mkdir(d)
 os.chdir(d)
-sord.run(prm)
+cst.sord.stage(prm)
+subprocess.check_call(['./sord.x'])

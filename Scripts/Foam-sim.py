@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import os
-import cst.sord
+import cst.sord, cst.job
 
 prm = {}
 
@@ -85,4 +85,5 @@ prm['uy'] += [([0, k, [l], []], '=>', 'off-fault.bin')]
 d = cst.sord.repo + 'Foam-%02.0f' % (weakzone * 100)
 os.mkdir(d)
 os.chdir(d)
-cst.sord.run(prm)
+cfg = cst.sord.stage(prm)
+cst.job.launch(cfg)

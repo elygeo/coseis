@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import os
-import cst.sord
+import cst.sord, cst.job
 
 prm = {}
 
@@ -63,4 +63,5 @@ for f in 'vx', 'vy', 'vz':
 d = cst.sord.repo + 'Explosion'
 os.mkdir(d)
 os.chdir(d)
-cst.sord.run(prm)
+cfg = cst.sord.run(prm)
+cst.job.launch(cfg)

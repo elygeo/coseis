@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 import cst.bin2npy
 
 # simulation directory
-os.chdir(os.path.join('..', 'Repository', 'SORD-Example'))
+d = cst.repo + 'SORD-Exampls'
+os.chdir(d)
 cst.bin2npy()
 
 # read slices

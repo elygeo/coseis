@@ -5,7 +5,7 @@ SCEC Community Velocity Model, version 2.2 with double-couple point source.
 """
 import os
 import json
-import cst.sord
+import cst.sord, cst.job
 
 prm = {}
 
@@ -64,4 +64,5 @@ os.mkdir(d)
 os.chdir(d)
 for v in 'rho', 'vp', 'vs':
     os.link(mesh + 'mesh-' + v + '.bin', '.')
-cst.sord.run(prm)
+cfg = cst.sord.stage(prm)
+cst.job.launch(cfg)

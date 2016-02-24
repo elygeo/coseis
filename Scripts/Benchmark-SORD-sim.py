@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import os
-import cst.sord
+import cst.sord, cst.job
 
 # MPI
 power = range(7, 10)  # Mira
@@ -35,4 +35,5 @@ for i in power[::-1]:
     d = cst.sord.repo + 'Benchmark-SORD-%s' % i
     os.mkdir(d)
     os.chdir(d)
-    cst.sord.run(prm)
+    cfg = cst.sord.stage(prm)
+    cst.job.launch(cfg)
