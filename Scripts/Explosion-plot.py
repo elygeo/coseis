@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""
-Explosion test plot
-"""
 import os
 import math
 import json

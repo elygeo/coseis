@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""
-TPV3 convergence test
-"""
 import os
 import json
 import glob

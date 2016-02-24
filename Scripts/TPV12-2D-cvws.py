@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""
-Prepare output for uploading to the SCEC Code Validation Workshop website.
-"""
 import os
 import json
 import numpy as np

@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""
-Foam rubber model from Day and Ely (2002), doi:10.1785/0120010273.
-"""
 import os
 import cst.sord
 

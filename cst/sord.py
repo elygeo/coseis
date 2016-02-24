@@ -3,8 +3,6 @@
 Support Operator Rupture Dynamics
 """
 
-# FIXME fileio and slice stuff
-
 import sys
 while '' in sys.path:
     sys.path.remove('')
@@ -15,71 +13,63 @@ import subprocess
 
 home = os.path.dirname(__file__)
 home = os.path.realpath(home)
-home = os.path.dirname(home)
+home = os.path.dirname(home) + os.sep
 repo = os.path.join(home, 'Repo') + os.sep
-conf = os.path.join(home, 'conf.json')
-conf = json.load(open(conf))
+try:
+    conf = json.load(open(home + 'conf.json'))
+except:
+    conf = {}
 
-# default simulation parameters
 parameters = {
-    'nproc3': [1, 1, 1],  # number of processors in [j, k, l]
-    'mpin': 1,  # MPI-IO input: 0=off, 1=collective, -1=non-collective
-    'mpout': 1,  # MPI-IO output: 0=off, 1=collective, -1=non-collective
-    'itstats': 10,  # interval for calculating statistics
-    'itio': 50,  # interval for writing i/o buffers
-    'itbuff': 10,  # buffer size for time series output
-    'debug': 0,  # >1 sync, >2 MPI vars, >3 I/O
-    'diffop': 'auto',  # spatial difference operator
-    'shape': [41, 41, 41, 41],  # mesh size [nx, ny, nz, nt]
-    'delta': [100.0, 100.0, 100.0, 0.0075],  # step size [dx, dy, dz, dt]
-    'affine': [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],  # transform
-    'rexpand': 1.06,  # grid expansion ratio
-    'n1expand': [0, 0, 0],  # number of grid expansion nodes - near side
-    'n2expand': [0, 0, 0],  # number of grid expansion nodes - far side
-    'gridnoise': 0.0,  # random noise added to mesh, assumes planar fault
-    'tm0': 0.0,  # initial time
-    'rho': [2670.0],  # density
-    'vp':  [6000.0],  # P-wave speed
-    'vs':  [3464.0],  # S-wave speed
-    'gam': [0.0],  # viscosity
-    'rho_min': -1.0,  # min density
-    'rho_max': -1.0,  # max density
-    'vp_min': -1.0,  # min P-wave speed
-    'vp_max': -1.0,  # max P-wave speed
-    'vs_min': -1.0,  # min S-wave speed
-    'vs_max': -1.0,  # max S-wave speed
-    'gam_min': -1.0,  # min viscosity
-    'gam_max': 0.8,  # max viscosity
-    'hourglass': [1.0, 1.0],  # hourglass stiffness (1) and viscosity (2)
-    'vdamp': -1.0,  # Vs dependent damping
-    'bc1': ['free', 'free', 'free'],  # boundary cond: near x, y, z surface
-    'bc2': ['free', 'free', 'free'],  # boundary cond: far x, y, z surface
-    'npml': 10,  # number of PML damping nodes
-    'ppml': 2,  # PML exponent, 1-4. Generally 2 is best.
-    'vpml': -1.0,  # damping velocity, <0 default to min, max V_s harmonic mean
-    'nsource': 0,  # number of finite source sub-faults
-    'source': 'potency',  # finite source type: potency, moment, force
-    'hypocenter': [0.0, 0.0, 0.0],  # hypocenter logical coordinates
-    'slipvector': [1.0, 0.0, 0.0],  # shear traction direction for ts1
-    'faultnormal': 'none',  # fault normal direction: +x, +y, +z, -x, -y, -z
-    'faultopening': 0,  # 0=not allowed, 1=allowed
-    'vrup': -1.0,  # nucleation rupture velocity, negative = no nucleation
-    'rcrit': 1000.0,  # nucleation critical radius
-    'trelax': 0.075,  # nucleation relaxation time
-    'svtol': 0.001,  # slip velocity considered rupturing
+    'nproc3': [1, 1, 1],
+    'nthread': -1,
+    'mpin': 1,
+    'mpout': 1,
+    'itstats': 10,
+    'itio': 50,
+    'itbuff': 10,
+    'debug': 0,
+    'diffop': 'auto',
+    'shape': [41, 41, 41, 41],
+    'delta': [100.0, 100.0, 100.0, 0.0075],
+    'affine': [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+    'rexpand': 1.06,
+    'n1expand': [0, 0, 0],
+    'n2expand': [0, 0, 0],
+    'gridnoise': 0.0,
+    'tm0': 0.0,
+    'rho': [2670.0],
+    'vp': [6000.0],
+    'vs': [3464.0],
+    'gam': [0.0],
+    'rho_min': -1.0,
+    'rho_max': -1.0,
+    'vp_min': -1.0,
+    'vp_max': -1.0,
+    'vs_min': -1.0,
+    'vs_max': -1.0,
+    'gam_min': -1.0,
+    'gam_max': 0.8,
+    'hourglass': [1.0, 1.0],
+    'vdamp': -1.0,
+    'bc1': ['free', 'free', 'free'],
+    'bc2': ['free', 'free', 'free'],
+    'npml': 10,
+    'ppml': 2,
+    'vpml': -1.0,
+    'nsource': 0,
+    'source': 'potency',
+    'hypocenter': [0.0, 0.0, 0.0],
+    'slipvector': [1.0, 0.0, 0.0],
+    'faultnormal': 'none',
+    'faultopening': 0,
+    'vrup': -1.0,
+    'rcrit': 1000.0,
+    'trelax': 0.075,
+    'svtol': 0.001,
 }
 
-# Multi-dimensional field variable names for input and output.
-# n: node registered volume field
-# c: cell registered volume field
-# f: fault rupture field
-# ~: time varying field
-# <: input/output field, otherwise output only.
-# Note: For efficiency, magnitudes of 3D fields [am2, vm2, um2, wm2] are
-# magnitude squared because square roots are computationally expensive. Also
-# stress magnitude (wm2) is the square of the Frobenius Norm, as finding the
-# true stress tensor magnitude requires computing eigenvalues at every
-# location.
+# n node, c cell, f fault, ~ time varying, < input
 fieldnames = {
     'x': ['n<', 'x', 'Node coordinate'],
     'y': ['n<', 'y', 'Node coordinate'],
@@ -213,12 +203,58 @@ time_functions = [
     'ricker2',
 ]
 
+source_files = [
+    'globals.f90',
+    'kernels.f90',
+    'diff_cn_op.f90',
+    'diff_nc_op.f90',
+    'hourglass_op.f90',
+    'boundary_cond.f90',
+    'surf_normals.f90',
+    'utilities.f90',
+    'arrays.f90',
+    'fortran_io.f90',
+    'thread_single.f90',
+    'thread_omp.f90',
+    'process_serial.f90',
+    'process_mpi.f90',
+    'input_output.f90',
+    'statistics.f90',
+    'setup.f90',
+    'grid_generation.f90',
+    'material_model.f90',
+    'boundary_pml.f90',
+    'kinematic_source.f90',
+    'material_resample.f90',
+    'time_integration.f90',
+    'stress.f90',
+    'dynamic_rupture.f90',
+    'acceleration.f90',
+    'sord.f90',
+]
+
 
 class typed_dict(dict):
     def __setitem__(self, k, v):
         if isinstance(self[k], type(v)):
             raise TypeError(k, self[k], v)
         dict.__setitem__(self, k, v)
+
+
+def expand_slices(shape, slices):
+    n = len(shape)
+    if len(slices) == 0:
+        slices = n * [[]]
+    elif len(slices) != n:
+        raise Exception('error in indices: %r' % (slices,))
+    ss = []
+    for n, s in zip(shape, slices):
+        if isinstance(s, (list, tuple)):
+            s = slice(*s).indices(n)
+        else:
+            s = (s % n, s % n + 1, 1)
+        ss.append(s)
+    return new
 
 
 def f90modules(path):
@@ -235,49 +271,12 @@ def f90modules(path):
 
 
 def configure(force=False):
-
-    # source directory
     cwd = os.getcwd()
     os.chdir(os.path.join(home, 'SORD'))
-
-    # makefile
     if force or not os.path.exists('Makefile'):
-
-        # source files
-        sources = [
-            'globals.f90',
-            'kernels.f90',
-            'diff_cn_op.f90',
-            'diff_nc_op.f90',
-            'hourglass_op.f90',
-            'boundary_cond.f90',
-            'surf_normals.f90',
-            'utilities.f90',
-            'arrays.f90',
-            'fortran_io.f90',
-            'thread_single.f90',
-            'thread_omp.f90',
-            'process_serial.f90',
-            'process_mpi.f90',
-            'input_output.f90',
-            'statistics.f90',
-            'setup.f90',
-            'grid_generation.f90',
-            'material_model.f90',
-            'boundary_pml.f90',
-            'kinematic_source.f90',
-            'material_resample.f90',
-            'time_integration.f90',
-            'stress.f90',
-            'dynamic_rupture.f90',
-            'acceleration.f90',
-            'sord.f90',
-        ]
-
-        # rules
         rules = []
         objects = []
-        for s in sources[::-1]:
+        for s in source_files[::-1]:
             base, ext = os.path.splitext(s)
             o = base + '.o'
             if ext == '.c':
@@ -293,15 +292,11 @@ def configure(force=False):
                 objects.append(o)
         objects = ' \\\n        '.join(objects)
         rules = '	\n\n'.join(rules)
-
-        # makefile
         c = conf['machine']
         m = open('Makefile.in').read()
         m = m.format(machine=c, objects=objects, rules=rules)
         open('Makefile', 'w').write(m)
-
     os.chdir(cwd)
-
     return
 
 
@@ -315,9 +310,8 @@ def make(force=False):
     return json.load(open(p))
 
 
-def prepare_param(prm, fio):
+def prepare(prm, fio):
 
-    # checks
     assert(prm['source'] in ('potency', 'moment', 'force', 'none'))
     assert(prm['faultnormal'] in ('none', '-x', '-y', '-z', '+x', '+y', '+z'))
 
@@ -490,55 +484,38 @@ def prepare_param(prm, fio):
     return prm, fio_, meta
 
 
-def run(args=None, **kwargs):
-    import numpy as np
-    from cst import conf
-
-    print('SORD: Support Operator Rupture Dynamics')
-
+def stage(args=None, **kwargs):
     if args is None:
         args = {}
     args.update(kwargs)
-
-    # configure and make
     prm = {}
     fio = {}
     job = {}
     for k in parameters:
+        v = parameters[k]
         if k in fieldnames:
-            fio[k] = parameters[k]
+            fio[k] = v
         else:
-            prm[k] = parameters[k]
+            prm[k] = v
+    fio = typed_dict(fio)
     prm = typed_dict(prm)
     for k in args:
         v = args[k]
         if k in fieldnames:
-            if not isinstance(v, list):
-                v = [v]
-            elif len(v) > 1 and isinstance(v[1], str):
-                v = [v]
-            for i, io in enumerate(v):
-                if isinstance(io, (list, tuple)):
-                    ii = repr_slices(io[0])
-                    io = [ii] + list(io[1:])
-                    v[i] = io
-            if len(v) == 1:
-                v = v[0]
-            args[k] = v
             fio[k] = v
         elif k in parameters:
             prm[k] = v
         else:
             job[k] = v
 
-    cfg = make()  # process thread realsize
-    prm, fio, meta = prepare_param(prm, fio)
+    cfg = make()  # process, thread, realsize
+    prm, fio, meta = prepare(prm, fio)
 
     job = {}
     job['name'] = 'sord'
-    job['executable'] = os.path.join('.', 'sord.x')
+    job['executable'] = s = os.path.join('.', 'sord.x')
     if cfg['process'] == 'serial':
-        job['execute'] = job['executable']
+        job['execute'] = s
 
     # partition for parallelization
     nx, ny, nz, nt = prm['shape']
@@ -567,7 +544,7 @@ def run(args=None, **kwargs):
         nvars = 23
     else:
         nvars = 44
-    nb = int(cfg['realsize'])
+    nb = cfg['realsize']
     nm = (nl[0] + 2) * (nl[1] + 2) * (nl[2] + 2)
     job['pmem'] = (1 + nm * nvars * nb // 30000) * 32
     m = (1 + (nt + 10) * nm // 420000000) * 10
@@ -575,11 +552,7 @@ def run(args=None, **kwargs):
         m = (1 + (nt + 10) * nm // 70000000) * 60
     job['minutes'] = m
 
-    job = conf.prepare(**job)
-    prm.update({'nthread': job['nthread']})
-
-    d = os.path.dirname(__file__)
-    f = os.path.join(d, 'sord.x')
+    f = os.path.join(home, 'SORD', 'sord.x')
     shutil.copy2(f, '.')
     if prm['debug'] > 2:
         os.mkdir('debug')
@@ -592,8 +565,10 @@ def run(args=None, **kwargs):
         out = out.replace(i, '')
     open('sord.in', 'w').write(out)
 
+    d = {'little': '<', 'big': '>'}[sys.byteorder]
+    meta['dtype'] = d + 'f%s' % cfg['realsize']
+
     prm.update({'~fieldio': fio})
-    meta.update({'dtype': np.dtype('f' + cfg['realsize']).str})
 
     out = json.dumps(args, indent=4, sort_keys=True)
     open('parameters.json', 'w').write(out)
@@ -607,67 +582,7 @@ def run(args=None, **kwargs):
     out = json.dumps(meta, indent=4, sort_keys=True)
     open('meta.json', 'w').write(out)
 
-    conf.launch(job)
-
     return job
-
-
-class get_slices:
-    def __getitem__(self, slices):
-        if not isinstance(slices, (tuple, list)):
-            slices = [slices]
-        new = []
-        for i, s in enumerate(slices):
-            if isinstance(s, slice):
-                ss = []
-                if s.start == None:
-                    ss.append('')
-                else:
-                    ss.append(str(s.start))
-                if s.stop == None:
-                    ss.append('')
-                else:
-                    ss.append(str(s.stop))
-                if s.step not in (1, None):
-                    ss.append(str(s.step))
-                s = ':'.join(ss)
-            new.append(s)
-        return new
-s_ = get_slices()
-
-
-def expand_slices(shape, slices):
-    n = len(shape)
-    if len(slices) == 0:
-        slices = n * [':']
-    elif len(slices) != n:
-        raise Exception('error in indices: %r' % (slices,))
-    new = []
-    for i, s in enumerate(slices):
-        if isinstance(s, str):
-            t = []
-            for j in s.split(':'):
-                if j == '':
-                    t.append(None)
-                elif '.' in j:
-                    t.append(float(j))
-                else:
-                    t.append(int(j))
-            s = list(slice(*t).indices(shape[i]))
-        else:
-            s %= shape[i]
-            s = [s, s + 1, 1]
-        new.append(s)
-    return new
-
-
-def test():
-    n = [8, 8, 8, 8]
-    s = expand_slices(n, [])
-    assert(s == [[0, 8, 1], [0, 8, 1], [0, 8, 1], [0, 8, 1]])
-    s = expand_slices(n, [0, ':-4', '-4:', ':'])
-    assert(s == [[0, 1, 1], [0, 4, 1], [4, 8, 1], [0, 8, 1]])
-    return
 
 
 def main():

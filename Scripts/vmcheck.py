@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""
-Velocity model statistics
-"""
 import os
 
 

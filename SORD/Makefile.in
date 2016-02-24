@@ -119,7 +119,7 @@ clean:
 distclean: clean
 	rm Makefile
 
-CONFIG = {{ "process": "$(PROCESS)", "thread": "$(THREAD)", "realsize": "$(REALSIZE)" }}
+CONFIG = {{ "process": "$(PROCESS)", "thread": "$(THREAD)", "realsize": $(REALSIZE) }}
 
 config.json: sord.x
 	echo '$(CONFIG)' > config.json

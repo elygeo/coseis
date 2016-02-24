@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""
-LOH.1 - Plot FK/SOM comparison.
-"""
 import os
 import json
 import numpy as np

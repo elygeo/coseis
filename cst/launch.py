@@ -117,8 +117,7 @@ def configure(*args, **kwargs):
 
 def prepare(job=None, **kwargs):
     """
-    Compute resource usage. Loop over queue configurations and if resources
-    exceeded, try another queue
+    Compute resource usage.
     """
     if job is None:
         job = configure(**kwargs)

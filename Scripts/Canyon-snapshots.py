@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""
-Plot snapshots
-"""
 import os
 import json
 import numpy as np

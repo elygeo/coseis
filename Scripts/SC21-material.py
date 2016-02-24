@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""
-Material model extraction from CVM
-"""
 import os
 import json
 import shutil
