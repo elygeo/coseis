@@ -15,21 +15,21 @@
 ! imaginary acc = i*w* real velocity
 
 ! Wrapper
-! u  : acceleration time history
+! u : acceleration time history
 ! dt : time step length
-! w  : angular frequency = 2 pi / T
-! d  : damping ratio
-! n  : number of samples (automatically determined)
-subroutine rspectra( z, u, dt, w, d, n )
+! w : angular frequency = 2 pi / T
+! d : damping ratio
+! n : number of samples (automatically determined)
+subroutine rspectra(z, u, dt, w, d, n)
 implicit none
 real, intent(out) :: z(3)
 real, intent(in) :: u(n), dt, w, d
 integer, intent(in) :: n
 !f2py intent(hide) :: n
-if ( w > 0.4 * acos(0.0) / dt ) then
-    call ucmpmx( z, u, dt, w, d, n-1 )
+if (w > 0.4 * acos(0.0) / dt) then
+    call ucmpmx(z, u, dt, w, d, n-1)
 else
-    call cmpmax( z, u, dt, w, d, n-1 )
+    call cmpmax(z, u, dt, w, d, n-1)
 end if
 end subroutine
 

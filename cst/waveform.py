@@ -4,7 +4,6 @@ Waveform data tools.
 import numpy as np
 
 
-
 def csmip_vol2(filename, max_year=2050):
     """
     Read strong motion record in CSMIP Volume 2 format.

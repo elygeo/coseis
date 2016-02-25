@@ -49,9 +49,9 @@ def configure(force=False, **kwargs):
     # configure
     cfg = copy.deepcopy(defaults)
     cfg = cst.job.prepare(
-        defaults = cfg,
-        name = 'cvms',
-        executable = os.path.join('.', 'cvms.x'),
+        defaults=cfg,
+        name='cvms',
+        executable=os.path.join('.', 'cvms.x'),
         **kwargs
     )
 
@@ -61,9 +61,8 @@ def configure(force=False, **kwargs):
             for k, v in d.items():
                 cfg[k] = v
 
-    # download source code
     ver = cfg['version']
-    if ver == None:
+    if ver is None:
         cfg['version'] = ver = versions[-1]
     else:
         assert ver in versions
@@ -84,7 +83,7 @@ def configure(force=False, **kwargs):
 
     # makefile
     m = open('Makefile.in').read()
-    m = m.format(machine = cfg['machine'])
+    m = m.format(machine=cfg['machine'])
     open(bld + 'Makefile', 'w').write(m)
 
     # finished
@@ -203,6 +202,3 @@ def extract(lon, lat, dep, prop=['rho', 'vp', 'vs'], **kwargs):
     shutil.rmtree('cvms-tmp')
 
     return out
-
-if __name__ == '__main__':
-    make()

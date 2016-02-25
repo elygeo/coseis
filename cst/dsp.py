@@ -6,19 +6,17 @@ import math
 
 try:
     from cst.rspectra import rspectra
+    assert(rspectra)
 except ImportError:
+    pass
+
+
+def build():
+    from numpy.distutils.core import setup, Extension
     cwd = os.getcwd()
-    d = os.path.dirname(__file__)
-    if d:
-        os.chdir(d)
-    try:
-        from numpy.distutils.core import setup, Extension
-        ext = [Extension('rspectra', ['rspectra.f90'])]
-        setup(ext_modules=ext, script_args=['build_ext', '--inplace'])
-    except:
-        pass
-    finally:
-        from cst.rspectra import rspectra
+    os.chdir(os.path.dirname(__file__))
+    ext = [Extension('rspectra', ['rspectra.f90'])]
+    setup(ext_modules=ext, script_args=['build_ext', '--inplace'])
     os.chdir(cwd)
 
 

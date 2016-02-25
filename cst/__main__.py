@@ -1,12 +1,5 @@
-#!/usr/bin/env python3
-"""
-Computational Seismology Tools
-"""
-
-import sys
-while '' in sys.path:
-    sys.path.remove('')
 import os
+import sys
 import json
 
 def json_args(argv):
@@ -46,5 +39,6 @@ def main():
         else:
             args.append(k)
 
-if __name__ == '__main__':
-    main()
+print(__name__)
+print(__file__)
+print(sys.argv)

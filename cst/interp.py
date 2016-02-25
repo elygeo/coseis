@@ -5,7 +5,12 @@ import os
 
 try:
     from cst.interp_ import trinterp
+    assert(trinterp)
 except ImportError:
+    pass
+
+
+def build():
     from distutils.core import setup, Extension
     import numpy as np
     cwd = os.getcwd()
@@ -14,7 +19,6 @@ except ImportError:
     ext = [Extension('interp_', ['interp_.c'], include_dirs=incl)]
     setup(ext_modules=ext, script_args=['build_ext', '--inplace'])
     os.chdir(cwd)
-    from cst.interp_ import trinterp
 
 
 def interp1(
