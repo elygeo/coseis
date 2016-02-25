@@ -1,27 +1,12 @@
-#!/usr/bin/env python3
 """
-SCEC Community Fault Model (CFM) tools.
+CFM: SCEC Community Fault Model tools.
 """
-
-import sys
-while '' in sys.path:
-    sys.path.remove('')
 import os
 import math
 import json
-import getopt
 import urllib
 import zipfile
 
-home = os.path.dirname(__file__)
-home = os.path.realpath(home)
-home = os.path.dirname(home)
-conf = os.path.join(home, 'conf.json')
-conf = json.load(open(conf))
-if 'repo' in conf:
-    repo = conf['repository']
-else:
-    repo = os.path.join(home, 'Repo')
 projection = {'proj': 'utm', 'zone': 11, 'datum': 'NAD27'}
 
 
@@ -32,16 +17,16 @@ def catalog(version='CFM4-socal-primary'):
     not already present.
     """
     import numpy as np
-    from cst import gocad
+    import cst.gocad
 
-    url = 'http://structure.harvard.edu/cfm/download/vdo/SCEC_VDO.jar'
-    path = os.path.join(repo, 'CFM4', version) + os.sep
+    u = 'http://structure.harvard.edu/cfm/download/vdo/SCEC_VDO.jar'
+    path = os.path.join(cst.repo, 'CFM4', version) + os.sep
 
     if not os.path.exists(path):
-        f = os.path.join(repo, 'SCEC-VDO.jar')
+        f = cst.repo + 'SCEC-VDO.jar'
         if not os.path.exists(f):
-            print('Downloading %s' % url)
-            urllib.urlretrieve(url, f)
+            print('Downloading', u)
+            urllib.urlretrieve(u, f)
         zp = zipfile.ZipFile(f)
         src = os.path.join('data', 'Faults', version)
         os.makedirs(path)
@@ -50,7 +35,7 @@ def catalog(version='CFM4-socal-primary'):
             if base != src or not key.endswith('.ts'):
                 continue
             key = key[:-3]
-            tsurf = gocad.tsurf(zp.read(f))
+            tsurf = cst.gocad.tsurf(zp.read(f))
             if len(tsurf) > 1:
                 raise Exception('Not expecting more than 1 tsurf')
             data = tsurf[0][1]
@@ -75,8 +60,6 @@ def tree():
 
 
 def search(items, split=1, maxsplit=3):
-
-    # search the catalog
     cat = catalog()
     if items == []:
         match = cat
@@ -129,8 +112,9 @@ def read(fault, version='CFM4-socal-primary'):
     """
     Read triangulated surface data.
     """
+    import cst
     import numpy as np
-    path = os.path.join(repo, 'CFM4', version) + os.sep
+    path = os.path.join(cst.repo, 'CFM4', version) + os.sep
     f, i = (fault + ':').split(':')[:2]
     d = np.load(path + f + '.npz')
     x = d['vtx']
@@ -353,7 +337,8 @@ def quad_mesh(vtx, tri, delta, drape=False, clean_top=False):
           |  0 0 (aa+bb)/d |
     """
     import numpy as np
-    from cst import interp, geodata
+    import cst.data
+    import cst.interp
 
     # remove topography
     x, y, z = vtx
@@ -362,7 +347,7 @@ def quad_mesh(vtx, tri, delta, drape=False, clean_top=False):
         import pyproj
         proj = pyproj.Proj(**projection)
         lon, lat = proj(x, y, inverse=True)
-        z = geodata.dem([lon, lat]) - z
+        z = cst.data.dem([lon, lat]) - z
         del(lon, lat)
 
     # get plane orientation
@@ -388,7 +373,7 @@ def quad_mesh(vtx, tri, delta, drape=False, clean_top=False):
     x = np.arange(x[0], x[1] + 1)
     z = np.arange(z[0], z[1] + 1)
     z, x = np.meshgrid(z, x)
-    y = interp.trinterp([xi, zi], yi, tri, [x, z])
+    y = cst.interp.trinterp([xi, zi], yi, tri, [x, z])
     del(xi, yi, zi, tri)
     mask = np.isnan(y)
     y[mask] = y[~mask].mean()
@@ -507,10 +492,11 @@ def explore(prefix, faults):
         print('No faults found')
         return
 
-    import numpy as np
     import pyproj
-    from enthought.mayavi import mlab
-    from cst import interp, geodata
+    import cst.data
+    import cst.interp
+    import numpy as np
+    from mayavi import mlab
 
     # parameters
     extent = (-122.0, -114.0), (31.5, 37.5)
@@ -539,30 +525,30 @@ def explore(prefix, faults):
     fig.scene.disable_render = True
 
     # DEM
-    f = os.path.join(repo, 'CFM4', 'dem.npy')
+    f = os.path.join(cst.repo, 'CFM4', 'dem.npy')
     if os.path.exists(f):
         x, y, z = np.load(f)
     else:
-        x, y, z = geodata.dem(extent, mesh=True)
+        x, y, z = cst.data.dem(extent, mesh=True)
         extent = (x.min(), x.max()), (y.min(), y.max())
         x, y = proj(x, y)
         np.save(f, [x, y, z])
     mlab.mesh(x, y, z, color=(1, 1, 1), opacity=0.3)
 
     # base map
-    f = os.path.join(repo, 'CFM4', 'mapdata.npy')
+    f = os.path.join(cst.repo, 'CFM4', 'mapdata.npy')
     if os.path.exists(f):
         x, y, z = np.load(f)
     else:
         ddeg = 0.5 / 60.0
         x, y = np.c_[
-            geodata.mapdata(
+            cst.data.mapdata(
                 'coastlines', resolution, extent, 10.0, delta=ddeg),
             [float('nan'), float('nan')],
-            geodata.mapdata('borders', resolution, extent, delta=ddeg),
+            cst.data.mapdata('borders', resolution, extent, delta=ddeg),
         ]
         x -= 360.0
-        z = interp.interp2(extent, z, (x, y))
+        z = cst.interp.interp2(extent, z, (x, y))
         x, y = proj(x, y)
         i = np.isnan(z)
         x[i] = float('nan')
@@ -669,16 +655,8 @@ def explore(prefix, faults):
     return
 
 
-def main():
-    opts, argv = getopt.getopt(sys.argv[1:], 's:')
-    opts = dict(opts)
-    if '-s' in opts:
-        split = int(opts['-s'])
-        prefix, faults = search(argv, split)
-    else:
-        prefix, faults = search(argv)
-    explore(prefix, faults)
-
+def main(args, split=1):
+    explore(*search(args, split))
 
 fault_names = [{
     'BNRA': 'Basin and Range Fault Area',
@@ -869,7 +847,3 @@ fault_names = [{
     'WEST': 'Western',
     'WHIT': 'Whittier'
 }]
-
-
-if __name__ == '__main__':
-    main()

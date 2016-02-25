@@ -2,10 +2,6 @@
 1D velocity model tools.
 """
 
-import sys
-while '' in sys.path:
-    sys.path.remove('')
-
 
 def v30gtl(v30, vt, z, zt=350.0, a=0.5, b=2.0/3.0, c=2.0):
     """

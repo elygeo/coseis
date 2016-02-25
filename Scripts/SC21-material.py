@@ -3,14 +3,14 @@ import os
 import json
 import shutil
 import numpy as np
+import cst.job
 import cst.cvms
-import cst.util
 
 # parameters
-dx = 2000.0; nproc = 1
-dx = 200.0;  nproc = 60
-dx = 100.0;  nproc = 240
-dx = 500.0;  nproc = 2
+dx, nproc = 2000.0, 1
+dx, nproc = 200.0, 60
+dx, nproc = 100.0, 240
+dx, nproc = 500.0, 2
 delta = dx, dx, dx
 
 # projection
@@ -43,10 +43,10 @@ meta = {
 }
 
 # create run directory
-d = cvms.repo + 'SC21-Mesh-%.0f' % dx
+d = cst.repo + 'SC21-Mesh-%.0f' % dx
 os.mkdir(d)
 os.chdir(d)
-f = os.path.join(cst.cvms.home, 'Util', 'Mesh-Extrude.py')
+f = os.path.join(cst.home, 'Util', 'Mesh-Extrude.py')
 shutil.copy2(f, '.')
 meta = json.dumps(meta, indent=4, sort_keys=True)
 open('meta.json', 'w').write(meta)

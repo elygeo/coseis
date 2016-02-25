@@ -3,11 +3,12 @@ import os
 import json
 import glob
 import numpy as np
+import cst.job
 
 label = 'ACLF BG/Q'
 procs = []
 times = []
-path = os.path.join('..', 'Repository', 'Benchmark-SORD')
+path = cst.job.repo + 'Benchmark-SORD'
 
 for p in glob.glob(path + '-[0-9]*'):
     p += os.sep

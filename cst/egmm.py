@@ -2,10 +2,6 @@
 Empirical Ground Motion Model (EGMM).
 """
 
-import sys
-while '' in sys.path:
-    sys.path.remove('')
-
 
 def cbnga(T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb):
     """

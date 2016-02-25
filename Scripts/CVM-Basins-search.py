@@ -4,13 +4,14 @@ Locate the shallowest 2D isosurface in a volume.
 """
 import os
 import json
+import cst.job
 import numpy as np
 
 # parameters
 val = 2500.0
 cell = 0
 up = 0
-path = os.path.join('..', 'Repository', 'CVM-Basins', 'mesh') + os.sep
+path = cst.job.repo + 'CVM-Basins-Mesh' + os.sep
 meta = json.load(open(path + 'meta.json'))
 delta = meta['delta']
 shape = meta['shape']

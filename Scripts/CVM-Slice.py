@@ -2,9 +2,11 @@
 """
 Plot a depth plane extracted from the SCEC Community Velocity Model.
 """
+import cst.data
+import cst.cvms
+import cst.cvmh
 import numpy as np
 import matplotlib.pyplot as plt
-import cst.cvms, cst.cvmh, cst.data
 
 # parameters
 prop = 'rho'

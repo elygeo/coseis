@@ -1,26 +1,12 @@
 """
 SCEC Community Velocity Model (CVM-H) tools.
 """
-
-import sys
-while '' in sys.path:
-    sys.path.remove('')
 import os
 import io
-import json
 import gzip
 import urllib
 import tarfile
 
-home = os.path.dirname(__file__)
-home = os.path.realpath(home)
-home = os.path.dirname(home)
-conf = os.path.join(home, 'conf.json')
-conf = json.load(open(conf))
-if 'repo' in conf:
-    repo = conf['repository']
-else:
-    repo = os.path.join(home, 'Repo')
 projection = {'proj': 'utm', 'zone': 11, 'datum': 'NAD27', 'ellps': 'clrk66'}
 extent = (131000.0, 828000.0), (3431000.0, 4058000.0), (-200000.0, 4900.0)
 prop2d = {'topo': '1', 'base': '2', 'moho': '3'}
@@ -35,11 +21,12 @@ voxet3d = {
 
 def vs30_model(x, y, version='Wills+Wald', method='nearest'):
     import numpy as np
-    from cst import geodata, interp
+    import cst.data
+    import cst.interp
     if version not in ['Wills', 'Wald', 'Wills+Wald']:
         raise Exception()
     if 'Wald' in version:
-        z = geodata.vs30_wald(x, y, method=method)
+        z = cst.data.vs30_wald(x, y, method=method)
     else:
         z = np.empty_like(x)
         z.fill(float('nan'))
@@ -48,7 +35,7 @@ def vs30_model(x, y, version='Wills+Wald', method='nearest'):
         x0 = -121.12460921883338
         y0 = 32.53426695497164
         u = 'http://earth.usc.edu/~gely/cvm-data/Vs30-Wills-CVMH.npy.gz'
-        f = os.path.join(repo, 'Vs30-Wills-CVMH.npy')
+        f = cst.repo + 'Vs30-Wills-CVMH.npy'
         if not os.path.exists(f):
             print('Downloading %s' % u)
             d = urllib.urlopen(u)
@@ -59,7 +46,7 @@ def vs30_model(x, y, version='Wills+Wald', method='nearest'):
         xlim = x0, x0 + delta * (w.shape[0] - 1)
         ylim = y0, y0 + delta * (w.shape[1] - 1)
         extent = xlim, ylim
-        interp.interp2(
+        cst.interp.interp2(
             extent, w, (x, y), z, method=method,
             bound=True, mask=True, no_data_val=0)
     return z
@@ -115,27 +102,27 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version=None):
     bound: (x0, x1), (y0, y1), (z0, z1)
     data: Array of properties
     """
-    from cst import gocad
+    import cst.gocad
 
     if version is None:
         version = versions[-1]
-    path = os.path.join(repo, 'CVMH-%s' % version)
+    path = cst.repo + 'CVMH-%s' % version
     if version[:2] == 'vx':
-        url = 'http://structure.harvard.edu/cvm-h/download/%s.tar.bz2'
-        base = '%s/bin'
+        u = 'http://structure.harvard.edu/cvm-h/download/%s.tar.bz2'
         f = path + '.bztar'
+        base = '%s/bin'
     else:
-        url = 'http://hypocenter.usc.edu/research/cvmh/11.9.0/cvmh-%s.tar.gz'
-        base = 'cvmh-%s/model'
+        u = 'http://hypocenter.usc.edu/research/cvmh/11.9.0/cvmh-%s.tar.gz'
         f = path + '.tgz'
-    url %= version
+        base = 'cvmh-%s/model'
+    u %= version
     base %= version
 
     # download if not found
     if not os.path.exists(path):
         if not os.path.exists(f):
-            print('Downloading %s' % url)
-            urllib.urlretrieve(url, f)
+            print('Downloading %s' % u)
+            urllib.urlretrieve(u, f)
         print('Extracting %s' % f)
         tar = tarfile.open(f)
         os.mkdir(path)
@@ -155,7 +142,7 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version=None):
             vp, vs, tag = prop3d['vp'], prop3d['vs'], prop3d['tag']
             vid = voxet3d[vox][0]
             voxfile = os.path.join(path, vid + '.vo')
-            vox = gocad.voxet(voxfile, [vp, vs, tag])['1']
+            vox = cst.gocad.voxet(voxfile, [vp, vs, tag])['1']
             w = vox['AXIS']['W'][2]
             d1 = vox['PROP'][vp]['DATA']
             d2 = vox['PROP'][vs]['DATA']
@@ -192,16 +179,16 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version=None):
 
     # load voxet
     if prop is None:
-        return gocad.voxet(voxfile)
+        return cst.gocad.voxet(voxfile)
     prop = prop.lower()
     if prop in prop2d:
         pid = prop2d[prop]
     else:
         pid = prop3d[prop]
     if no_data_value is None and prop in prop3d:
-        vox = gocad.voxet(voxfile, [pid], alternate='-filled')['1']
+        vox = cst.gocad.voxet(voxfile, [pid], alternate='-filled')['1']
     else:
-        vox = gocad.voxet(voxfile, [pid], no_data_value=no_data_value)['1']
+        vox = cst.gocad.voxet(voxfile, [pid], no_data_value=no_data_value)['1']
 
     # extent
     x, y, z = vox['AXIS']['O']
@@ -249,17 +236,17 @@ class Model():
 
     def __call__(self, x, y, z=None, out=None, interpolation='nearest'):
         import numpy as np
-        from cst import interp
+        import cst.interp
         if out is None:
             out = np.empty_like(x)
             out.fill(float('nan'))
         for extent, bound, data in self.voxet:
             if z is None:
                 data = data.reshape(data.shape[:2])
-                interp.interp2(
+                cst.interp.interp2(
                     extent[:2], data, (x, y), out, interpolation, bound)
             else:
-                interp.interp3(
+                cst.interp.interp3(
                     extent, data, (x, y, z), out, interpolation, bound)
         return out
 
@@ -390,6 +377,3 @@ def extract(x, y, z, vm=['rho', 'vp', 'vs'], by_depth=True, **kwargs):
         else:
             out += [f(z, by_depth=by_depth)]
     return np.array(out)
-
-if __name__ == '__main__':
-    cvmh_voxet()

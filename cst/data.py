@@ -1,15 +1,6 @@
 """
 Data retrieval and processing tools.
 """
-
-# TODO
-# Quaternary Fault Database
-# ftp://hazards.cr.usgs.gov/maps/qfault/
-# http://earthquake.usgs.gov/hazards/qfaults/KML/Quaternaryall.zip
-
-import sys
-while '' in sys.path:
-    sys.path.remove('')
 import os
 import io
 import json
@@ -18,11 +9,12 @@ import math
 import zipfile
 import subprocess
 import urllib.request
+import cst
 
-home = os.path.dirname(__file__)
-home = os.path.realpath(home)
-home = os.path.dirname(home)
-repo = os.path.join(home, 'Repo')
+# TODO
+# Quaternary Fault Database
+# ftp://hazards.cr.usgs.gov/maps/qfault/
+# http://earthquake.usgs.gov/hazards/qfaults/KML/Quaternaryall.zip
 
 
 def upsample(f):
@@ -140,30 +132,29 @@ def etopo1(downsample=1):
     http://www.ngdc.noaa.gov/mgg/global/global.html
     """
     import numpy as np
-    filename0 = os.path.join(repo, 'DEM0060.npy')
-    filename = os.path.join(repo, 'DEM%04d.npy' % (60 * downsample))
-    url = (
+    f = cst.repo + 'DEM0060.npy'
+    g = cst.repo + 'DEM%04d.npy' % (60 * downsample)
+    u = (
         'http://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/'
         'ice_surface/grid_registered/binary/etopo1_ice_g_i2.zip'
     )
-    shape = 10801, 21601
-    if not os.path.exists(filename0):
-        print('Retrieving %s' % url)
-        data = urllib.request.urlopen(url)
-        data = io.BytesIO(data.read())
-        data = zipfile.ZipFile(data)
-        data = data.read('etopo1_ice_g_i2.bin')
-        data = np.fromstring(data, '<i2').reshape(shape).T[:, ::-1]
-        print('Creating %s' % filename0)
-        np.save(filename0, data)
-        del(data)
-    if not os.path.exists(filename):
-        data = np.load(filename0, mmap_mode='c')
-        data = downsample_sphere(data, downsample)
-        print('Creating %s' % filename)
-        np.save(filename, data)
-        del(data)
-    return np.load(filename, mmap_mode='c')
+    n = 10801, 21601
+    if not os.path.exists(f):
+        print('Retrieving %s' % u)
+        z = urllib.request.urlopen(u)
+        z = io.BytesIO(z.read())
+        z = zipfile.ZipFile(z)
+        z = z.read('etopo1_ice_g_i2.bin')
+        z = np.fromstring(z, '<i2').reshape(n).T[:, ::-1]
+        print('Creating %s' % f)
+        np.save(f, z)
+    if not os.path.exists(g):
+        z = np.load(f, mmap_mode='c')
+        z = downsample_sphere(z, downsample)
+        print('Creating %s' % g)
+        np.save(g, z)
+    z = np.load(g, mmap_mode='c')
+    return z
 
 
 def globe30(tile=(0, 1), fill=True):
@@ -185,7 +176,7 @@ def globe30(tile=(0, 1), fill=True):
         fill: Fill missing data (ocean basins) with ETOPO1 bathymetry.
     """
     import numpy as np
-    filename = os.path.join(repo, 'DEM0030-%s%s.npy' % tile)
+    filename = cst.repo + 'DEM0030-%s%s.npy' % tile
     url = 'http://www.ngdc.noaa.gov/mgg/topo/DATATILES/elev/%s10g.gz'
     tiles = ('im', 'jn', 'ko', 'lp'), ('ae', 'bf', 'cg', 'dh')
     shape = 10800, 10800
@@ -249,7 +240,7 @@ def dem(coords, scale=1.0, downsample=0, mesh=False):
         elev: array of elevation values at the interpolation points
     """
     import numpy as np
-    from cst import interp
+    import cst.interp
     x, y = np.asarray(coords)
     sample = x.size > 2 or y.size > 2
     if sample:
@@ -291,7 +282,7 @@ def dem(coords, scale=1.0, downsample=0, mesh=False):
             res *= 2
     z = z * scale  # always do this to convert to float
     if sample:
-        return interp.interp2(extent, z, (x, y))
+        return cst.interp.interp2(extent, z, (x, y))
     elif mesh:
         delta = 1.0 / res
         n = z.shape
@@ -309,8 +300,8 @@ def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):
     Wald, et al. Vs30 map.
     """
     import numpy as np
-    from cst import interp
-    f = os.path.join(repo, 'Vs30-Wald-%s.npy') % region.replace('_', '-')
+    import cst.interp
+    f = os.path.join(cst.repo, 'Vs30-Wald-%s.npy') % region.replace('_', '-')
     u = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/%s.grd.gz'
     if not os.path.exists(f):
         u = u % region
@@ -341,7 +332,7 @@ def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):
     extent = xlim, ylim
     z = np.load(f, mmap_mode='c')[j0:j1+1, k0:k1+1]
     if sample:
-        z = interp.interp2(extent, z, (x, y), method=method)
+        z = cst.interp.interp2(extent, z, (x, y), method=method)
         return z
     elif mesh:
         n = z.shape
@@ -384,7 +375,7 @@ def mapdata(
         'http://www.ngdc.noaa.gov/mgg/shorelines/'
         'data/gshhg/latest/gshhg-bin-2.3.4.zip'
     )
-    d = os.path.join(repo, 'GSHHS')
+    d = os.path.join(cst.repo, 'GSHHS')
     if not os.path.exists(d):
         print('Retrieving %s' % url)
         data = urllib.request.urlopen(url)
@@ -395,7 +386,7 @@ def mapdata(
     name = {'c': 'GSHHS coastlines', 'r': 'WDB rivers', 'b': 'WDB borders'}
     name = name[kind[0]]
     kind = {'c': 'gshhs', 'r': 'wdb_rivers', 'b': 'wdb_borders'}[kind[0]]
-    filename = os.path.join(repo, 'GSHHS/%s_%s.b' % (kind, resolution[0]))
+    filename = os.path.join(cst.repo, 'GSHHS/%s_%s.b' % (kind, resolution[0]))
     data = np.fromfile(filename, '>i')
     if kind != 'gshhs':
         min_area = 0.0
@@ -454,10 +445,10 @@ def us_place_names():
     """
     import numpy as np
 
-    filename = os.path.join(repo, 'US-Place-Names.npy')
-    url = 'http://geonames.usgs.gov/docs/stategaz/US_CONCISE.zip'
-    cols = 1, 2, 3, 5, 9, 10, 15
-    dtype = [
+    u = 'http://geonames.usgs.gov/docs/stategaz/US_CONCISE.zip'
+    f = cst.repo + 'US-Place-Names.npy'
+    c = 1, 2, 3, 5, 9, 10, 15
+    t = [
         ('name', 'S84'),
         ('class', 'S15'),
         ('state', 'S2'),
@@ -466,17 +457,16 @@ def us_place_names():
         ('lon', 'f'),
         ('elev', 'i'),
     ]
-    if not os.path.exists(filename):
-        print('Retrieving %s' % url)
-        data = urllib.request.urlopen(url)
-        data = io.BytesIO(data.read())
-        data = zipfile.ZipFile(data)
-        data = data.open(data.namelist()[0])
-        data = np.genfromtxt(
-            data, delimiter='|', skip_header=1, usecols=cols, dtype=dtype)
-        np.save(filename, data)
-        del(data)
-    return np.load(filename, mmap_mode='c')
+    if not os.path.exists(f):
+        print('Retrieving %s' % u)
+        x = urllib.request.urlopen(u)
+        x = io.BytesIO(x.read())
+        x = zipfile.ZipFile(x)
+        x = x.open(x.namelist()[0])
+        x = np.genfromtxt(x, delimiter='|', skip_header=1, usecols=c, dtype=t)
+        np.save(f, x)
+        del(x)
+    return np.load(f, mmap_mode='c')
 
 
 def engdahl_cat():
@@ -485,9 +475,9 @@ def engdahl_cat():
     http://earthquake.usgs.gov/data/centennial/
     """
     import numpy as np
-    filename = os.path.join(repo, 'Engdahl-Centennial-Cat.npy')
-    url = 'http://earthquake.usgs.gov/data/centennial/centennial_Y2K.CAT'
-    d = [
+    f = cst.repo + 'Engdahl-Centennial-Cat.npy'
+    u = 'http://earthquake.usgs.gov/data/centennial/centennial_Y2K.CAT'
+    t = [
         6, ('icat',   'S6'),
         1, ('asol',   'S1'),
         5, ('isol',   'S5'),
@@ -506,13 +496,13 @@ def engdahl_cat():
         3, ('msc',    'S3'),
         6, ('mdo',    'S6'),
     ]
-    if not os.path.exists(filename):
-        print('Retrieving %s' % url)
-        data = urllib.request.urlopen(url)
-        data = np.genfromtxt(data, dtype=d[1::2], delimiter=d[0::2])
-        np.save(filename, data)
-        del(data)
-    return np.load(filename, mmap_mode='c')
+    if not os.path.exists(f):
+        print('Retrieving %s' % u)
+        x = urllib.request.urlopen(u)
+        x = np.genfromtxt(x, dtype=t[1::2], delimiter=t[0::2])
+        np.save(f, x)
+        del(x)
+    return np.load(f, mmap_mode='c')
 
 
 def lsh_cat():
@@ -521,9 +511,9 @@ def lsh_cat():
     http://www.rsmas.miami.edu/personal/glin/LSH.html
     """
     import numpy as np
-    filename = os.path.join(repo, 'LSH-Catalog.npy')
-    url = "http://www.rsmas.miami.edu/personal/glin/LSH_files/LSH_1.12"
-    dtype = [
+    f = cst.repo + 'LSH-Catalog.npy'
+    u = "http://www.rsmas.miami.edu/personal/glin/LSH_files/LSH_1.12"
+    t = [
         ('year',    'u2'),
         ('month',   'u1'),
         ('day',     'u1'),
@@ -548,13 +538,13 @@ def lsh_cat():
         ('rer_z',   'f4'),
         ('type',    'S2'),
     ]
-    if not os.path.exists(filename):
-        print('Retrieving %s' % url)
-        data = urllib.request.urlopen(url)
-        data = np.genfromtxt(data, dtype=dtype)
-        np.save(filename, data)
-        del(data)
-    return np.load(filename, mmap_mode='c')
+    if not os.path.exists(f):
+        print('Retrieving %s' % u)
+        x = urllib.request.urlopen(u)
+        x = np.genfromtxt(x, dtype=t)
+        np.save(f, x)
+    x = np.load(f, mmap_mode='c')
+    return x
 
 
 def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
@@ -577,7 +567,7 @@ def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
 
     # locations
     v0, v1 = version
-    path = os.path.join(repo, 'CyberShake') + os.sep
+    path = cst.repo + 'CyberShake' + os.sep
     host = 'intensity.usc.edu'
     erf = '/home/scec-00/cybershk/reports/'
     srf = (
@@ -652,6 +642,3 @@ def download():
     mapdata()
     globe30()
     etopo1()
-
-if __name__ == '__main__':
-    download()

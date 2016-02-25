@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 import os
 import json
+import cst.dsp
 import numpy as np
 import matplotlib.pyplot as plt
-import cst.signal
 
-os.chdir(os.path.join('..', 'Repository', 'LOH1'))
+os.chdir(cst.repo + 'LOH1')
 
 # parameters
 meta = json.load(open('meta.json'))
@@ -53,7 +53,7 @@ m = np.array(m) * 0.2
 v = np.dot(m, v)
 
 # replace Brune source with Gaussian source
-v = cst.signal.brune2gauss(v, dt, tau, sigma)
+v = cst.dsp.brune2gauss(v, dt, tau, sigma)
 print(np.sqrt(np.sum(v * v, 0).max()))
 
 # plot waveforms

@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 import os
 import json
+import cst.job
 import numpy as np
 import matplotlib.pyplot as plt
 
 # parameters
 exp = 0.5
 clim = 0.0, 0.000001
-p = os.path.join('..', 'Repository', 'Canyon')
-os.chdir(p)
+os.chdir(cst.job.repo + 'Canyon')
 
 # metadata
 meta = json.load('meta.json')

@@ -1,10 +1,6 @@
 """
-Signal processing tools.
+Digital Signal Processing tools.
 """
-
-import sys
-while '' in sys.path:
-    sys.path.remove('')
 import os
 import math
 

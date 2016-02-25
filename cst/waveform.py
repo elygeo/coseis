@@ -1,10 +1,8 @@
 """
 Waveform data tools.
 """
+import numpy as np
 
-import sys
-while '' in sys.path:
-    sys.path.remove('')
 
 
 def csmip_vol2(filename, max_year=2050):
@@ -14,7 +12,6 @@ def csmip_vol2(filename, max_year=2050):
     California Strong Motion Instrumentation Program:
     http://www.strongmotioncenter.org
     """
-    import numpy as np
 
     # read file
     ss = open(filename).readlines()

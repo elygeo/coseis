@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 import os
 import json
+import cst.kostrov
 import numpy as np
 import matplotlib.pyplot as plt
-import cst.kostrov
 
-p = os.path.join('..', 'Repository', 'Kostrov')
-os.chdir(p)
+os.chdir(cst.repo + 'Kostrov')
 
 # parameters
 meta = json.load(open('parameters.json'))

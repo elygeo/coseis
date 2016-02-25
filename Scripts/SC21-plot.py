@@ -4,15 +4,11 @@ PEER Lifelines program task 1A02, Problem SC2.1
 """
 import os
 import json
+import cst.dsp
 import numpy as np
 import matplotlib.pyplot as plt
-import cst.signal
 
-# sim dir
-p = os.path.join('..', 'Repository', 'PEER-SC2.1-0200')
-p = os.path.join('..', 'Repository', 'PEER-SC2.1-2000')
-p = os.path.join('..', 'Repository', 'PEER-SC2.1-0500')
-p = os.path.join('..', 'Repository', 'PEER-SC2.1-0100')
+p = cst.repo + 'PEER-SC2.1-0200'
 os.chdir(p)
 
 # parameters
@@ -36,7 +32,7 @@ m = np.array(m) * 0.2
 v = np.dot(m, v)
 
 # deconvolve Brune pulse and replace with Gaussian
-v = cst.signal.brune2gauss(v, dt, tau, sigma)
+v = cst.dsp.brune2gauss(v, dt, tau, sigma)
 print(np.sqrt(np.sum(v * v, 0).max()))
 
 # setup figure

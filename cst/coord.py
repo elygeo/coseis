@@ -1,10 +1,6 @@
 """
 Coordinate conversion tools.
 """
-
-import sys
-while '' in sys.path:
-    sys.path.remove('')
 import math
 
 rearth = 6370000.0
@@ -379,6 +375,3 @@ def compass(azimuth, radians=False):
         'W', 'WNW', 'NW', 'NNW',
     )
     return names[int((azimuth / 22.5 + 0.5) % 16.0)]
-
-if __name__ == '__main__':
-    test()

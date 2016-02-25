@@ -1,18 +1,12 @@
-#!/usr/bin/env python3
 """
 Swap byte order.
-
--dtype=<NumPy dtype>  Default is native float
 """
-
-import sys
-while '' in sys.path:
-    sys.path.remove('')
 import os
+import sys
+import numpy as np
 
 
-def swab(src, dst, verbose=False, dtype='f', block=64*1024*1024):
-    import numpy as np
+def swab(src, dst, verbose=True, dtype='f', block=64*1024*1024):
     nb = np.dtype(dtype).itemsize
     n = os.path.getsize(src)
     if n == 0 or n % nb != 0:
@@ -34,20 +28,6 @@ def swab(src, dst, verbose=False, dtype='f', block=64*1024*1024):
     return
 
 
-def main():
-    if not sys.argv[1:]:
-        raise SystemExit(__doc__)
-    files = []
-    args = {'verbose': True}
-    for k in sys.argv[1:]:
-        if k[0] == '-':
-            k, v = k.split('=')
-            k = k.lstrip('-')
-            args[k] = v
-        else:
-            files.append(k)
-    for f in files:
-        swab(f, f + '.swab', **args)
-
-if __name__ == '__main__':
-    main()
+def main(args, *kw):
+    for f in args:
+        swab(f, f + '.swab', **kw)

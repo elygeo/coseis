@@ -1,42 +1,35 @@
 #!/usr/bin/env python3
 import os
-import cst.sord, cst.job
+import cst.job
+import cst.sord
 
-prm = {}
-
-# step size
+# step size options
 dx, dt = 50.0, 0.004
 dx, dt = 100.0, 0.015
 dx, dt = 200.0, 0.03
 dx, dt = 200.0, 0.016
-
-# dimensions
 nx = int(6000.0 / dx + 1.0001)
 nt = int(3.0 / dt + 1.0001)
-prm['delta'] = [dx, dx, dx, dt]
-prm['shape'] = [nx, nx, nx, nt]
-prm['nproc3'] = [1, 1, 2]
-prm['nproc3'] = [1, 1, 1]
 
-# boundary conditions & hypocenter
-prm['bc1'] = ['+node', '+node', '+node']; reg = 0.0
-prm['bc1'] = ['+cell', '+cell', '+cell']; reg = 0.5
-prm['bc2'] = ['pml', 'pml', 'pml']
+# registration options
+bc, reg = '+node', 0.0
+bc, reg = '+cell', 0.5
 
-# source properties
-i = reg
-val = 1.0
-tau = 0.1
-prm['pxx'] = ([i, i, i, []], '.', val, 'brune', tau)
-prm['pyy'] = ([i, i, i, []], '.', val, 'brune', tau)
-prm['pzz'] = ([i, i, i, []], '.', val, 'brune', tau)
-
-# material
-prm['rho'] = [2670.0]
-prm['vp'] = [6000.0]
-prm['vs'] = [3464.0]
-prm['gam'] = [0.0]
-prm['hourglass'] = [1.0, 1.0]
+prm = {
+    'nproc3': [1, 1, 1],
+    'shape': [nx, nx, nx, nt],
+    'delta': [dx, dx, dx, dt],
+    'bc1': [bc, bc, bc],
+    'bc2': ['pml', 'pml', 'pml'],
+    'hourglass': [1.0, 1.0],
+    'rho': [2670.0],
+    'vp': [6000.0],
+    'vs': [3464.0],
+    'gam': [0.0],
+    'pxx': [([reg, reg, reg, []], '.', 1.0, 'brune', 0.1)],
+    'pyy': [([reg, reg, reg, []], '.', 1.0, 'brune', 0.1)],
+    'pzz': [([reg, reg, reg, []], '.', 1.0, 'brune', 0.1)],
+}
 
 # receivers FIXME
 x = reg
@@ -54,14 +47,12 @@ for f in 'vx', 'vy', 'vz':
 
 # snapshots
 j = int(reg + 0.5)
+t = [None, None, 10]
 for f in 'vx', 'vy', 'vz':
-    prm[f] += [
-        ([j, [], [], [None, None, 10]], '=>', 'snap-%s.bin' % f),
-    ]
+    prm[f] += [([j, [], [], t], '=>', 'snap-%s.bin' % f)]
 
 # run sord
-d = cst.sord.repo + 'Explosion'
+d = cst.job.repo + 'Explosion'
 os.mkdir(d)
 os.chdir(d)
-cfg = cst.sord.run(prm)
-cst.job.launch(cfg)
+cst.job.launch(cst.sord.stage(prm))

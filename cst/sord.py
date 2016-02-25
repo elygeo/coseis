@@ -1,24 +1,11 @@
-#!/usr/bin/env python3
 """
 Support Operator Rupture Dynamics
 """
-
-import sys
-while '' in sys.path:
-    sys.path.remove('')
 import os
+import sys
 import json
 import shutil
 import subprocess
-
-home = os.path.dirname(__file__)
-home = os.path.realpath(home)
-home = os.path.dirname(home) + os.sep
-repo = os.path.join(home, 'Repo') + os.sep
-try:
-    conf = json.load(open(home + 'conf.json'))
-except:
-    conf = {}
 
 parameters = {
     'nproc3': [1, 1, 1],
@@ -254,7 +241,7 @@ def expand_slices(shape, slices):
         else:
             s = (s % n, s % n + 1, 1)
         ss.append(s)
-    return new
+    return ss
 
 
 def f90modules(path):
@@ -271,8 +258,9 @@ def f90modules(path):
 
 
 def configure(force=False):
+    import cst
     cwd = os.getcwd()
-    os.chdir(os.path.join(home, 'SORD'))
+    os.chdir(cst.home + 'SORD')
     if force or not os.path.exists('Makefile'):
         rules = []
         objects = []
@@ -292,7 +280,8 @@ def configure(force=False):
                 objects.append(o)
         objects = ' \\\n        '.join(objects)
         rules = '	\n\n'.join(rules)
-        c = conf['machine']
+        # FIXME c = conf['machine']
+        c = 'FIXME'
         m = open('Makefile.in').read()
         m = m.format(machine=c, objects=objects, rules=rules)
         open('Makefile', 'w').write(m)
@@ -301,13 +290,14 @@ def configure(force=False):
 
 
 def make(force=False):
+    import cst
     configure(force)
-    p = os.path.join(home, 'SORD')
     if force:
-        subprocess.check_call(['make', '-C', p, 'clean'])
-    subprocess.check_call(['make', '-C', p, '-j', '4'])
-    p = os.path.join(home, 'SORD', 'config.json')
-    return json.load(open(p))
+        subprocess.check_call(['make', '-C', cst.home + 'SORD', 'clean'])
+    subprocess.check_call(['make', '-C', cst.home + 'SORD', '-j', '4'])
+    c = os.path.join(cst.home, 'SORD', 'config.json')
+    c = json.load(open(c))
+    return c
 
 
 def prepare(prm, fio):
@@ -485,6 +475,7 @@ def prepare(prm, fio):
 
 
 def stage(args=None, **kwargs):
+    import cst
     if args is None:
         args = {}
     args.update(kwargs)
@@ -552,7 +543,7 @@ def stage(args=None, **kwargs):
         m = (1 + (nt + 10) * nm // 70000000) * 60
     job['minutes'] = m
 
-    f = os.path.join(home, 'SORD', 'sord.x')
+    f = os.path.join(cst.home, 'SORD', 'sord.x')
     shutil.copy2(f, '.')
     if prm['debug'] > 2:
         os.mkdir('debug')
@@ -583,26 +574,3 @@ def stage(args=None, **kwargs):
     open('meta.json', 'w').write(out)
 
     return job
-
-
-def main():
-    if not sys.argv[1:]:
-        print(json.dumps(parameters, indent=4, sort_keys=True))
-        raise SystemExit(__doc__)
-    args = {}
-    for k in sys.argv[1:]:
-        if k[0] == '-':
-            k = k.lstrip('-')
-            if '=' in k:
-                k, v = k.split('=')
-                if len(v) and not v[0].isalpha():
-                    v = json.loads(v)
-                args[k] = v
-            else:
-                args[k] = True
-        else:
-            args.update(json.load(k))
-    run(args)
-
-if __name__ == '__main__':
-    main()

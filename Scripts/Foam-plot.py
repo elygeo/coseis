@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 import os
 import json
+import cst.job
 import numpy as np
 import matplotlib.pyplot as plt
 
 # metadata
 id_ = '00'
 id_ = '20'
-p = os.path.join('..', 'Repository', 'Foam-' + id_)
-os.chdir(p)
+os.chdir(cst.job.repo + 'Foam-' + id_)
 meta = json.load(open('meta.json'))
 
 # off-fault displacement plot

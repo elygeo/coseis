@@ -1,17 +1,13 @@
 """
 Seismic source tools.
 """
-
-import sys
-while '' in sys.path:
-    sys.path.remove('')
+import numpy as np
 
 
 def magarea(A):
     """
     Various earthquake magnitude area relations.
     """
-    import numpy as np
     A = np.array(A, copy=False, ndmin=1)
     i = A > 537.0
     Mw = 3.98 + np.log10(A)
@@ -29,7 +25,6 @@ def areamag(Mw):
     """
     Various inverse earthquake magnitude area relations.
     """
-    import numpy as np
     Mw = np.array(Mw, copy=False, ndmin=1)
     A = 10 ** (Mw - 3.98)
     i = A > 537.0
@@ -47,7 +42,6 @@ def mw(moment, units='mks'):
     """
     Moment magnitude
     """
-    import numpy as np
     if units == 'mks':
         m = (np.log10(moment) - 9.05) / 1.5
     else:

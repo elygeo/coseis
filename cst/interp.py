@@ -1,10 +1,6 @@
 """
 Interpolation tools.
 """
-
-import sys
-while '' in sys.path:
-    sys.path.remove('')
 import os
 
 try:

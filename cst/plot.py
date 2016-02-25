@@ -1,28 +1,15 @@
-#!/usr/bin/env python3
 """
 Quick multi-purpose plotting from the command line or Python.
 Reads text, binary, JSON, NumPy, or SAC files.
-
-Options:
-
---dtype: str         NumPy data type
---shape: [int, ...]  Array dimensions
---step: int          Decimate data
---power: val         Exponent power applied to data
---clim: [val, val]   Color scale limit
---transpose: bool    Transpose data
-
 """
-
-import sys
-while '' in sys.path:
-    sys.path.remove('')
 import os
 import json
+import numpy as np
+import matplotlib.pyplot as plt
+from numpy.lib.npyio import format as npy
 
 
 def stats(f, msg=''):
-    import numpy as np
     if f.size == 0:
         rmin = float('nan')
         rmax = float('nan')
@@ -36,13 +23,9 @@ def stats(f, msg=''):
     return
 
 
-def quickplot(
+def main(
     files, dtype='f', shape=[], step=0, power=0, clim=[], transpose=False
 ):
-    import numpy as np
-    from numpy.lib.npyio import format as npy
-    import matplotlib.pyplot as plt
-
     shape0 = shape
     dtype0 = dtype.replace('l', '<').replace('b', '>')
     fig = plt.figure(figsize=(12, 7.2))
@@ -146,27 +129,3 @@ def quickplot(
                 fig.ginput(1, 0, False)
         fig.canvas.draw()
         fig.ginput(1, 0, False)
-
-
-def main():
-    if not sys.argv[1:]:
-        raise SystemExit(__doc__)
-    args = {}
-    files = []
-    for k in sys.argv[1:]:
-        if k[0] == '-':
-            k = k.lstrip('-')
-            if '=' in k:
-                k, v = k.split('=')
-                if len(v) and not v[0].isalpha():
-                    v = json.loads(v)
-                args[k] = v
-            else:
-                args[k] = True
-        else:
-            files.append(k)
-    quickplot(files, **args)
-
-
-if __name__ == '__main__':
-    main()

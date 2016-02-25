@@ -1,11 +1,6 @@
-#!/usr/bin/env python3
 """
 Configure and launch jobs.
 """
-
-import sys
-while '' in sys.path:
-    sys.path.remove('')
 import os
 import re
 import json
@@ -63,26 +58,6 @@ class typed_dict(dict):
         if not isinstance(self[k], type(v)):
             raise TypeError(k, self[k], v)
         dict.__setitem__(self, k, v)
-
-
-def json_args(argv):
-    d = {}
-    l = []
-    for k in argv:
-        if k[0] == '-':
-            k = k.lstrip('-')
-            if '=' in k:
-                k, v = k.split('=')
-                if len(v) and not v[0].isalpha():
-                    v = json.loads(v)
-                d[k] = v
-            else:
-                d[k] = True
-        elif k[0] in '{[':
-            d.update(json.loads(k))
-        else:
-            l.append(k)
-    return d, l
 
 
 def hostname():
@@ -218,11 +193,7 @@ def launch(job=None, **kwargs):
     return job
 
 
-def main():
-    d = json_args(sys.argv[1:])
-    d = configure(d)
-    d = json.dumps(d, indent=4, sort_keys=True)
-    print(d)
-
-if __name__ == '__main__':
-    main()
+def main(args, **kw):
+    if not args:
+        print(__doc__)
+    # FIXME

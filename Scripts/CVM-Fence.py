@@ -3,9 +3,11 @@
 Reproduce Magistrale (2000) Fig. 10 fence diagram.
 """
 import pyproj
+import cst.data
+import cst.cvms
+import cst.cvmh
 import numpy as np
-from enthought.mayavi import mlab
-import cst.cvms, cst.cvmh, cst.data
+from mayavi import mlab
 
 # parameters
 model = 'S'; version = '2.2'

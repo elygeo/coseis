@@ -1,14 +1,10 @@
 """
 Kostrov circular expanding crack analytical solution.
 """
-
-import sys
-while '' in sys.path:
-    sys.path.remove('')
+import numpy as np
 
 
 def cee_integrand(x, a2, b2):
-    import numpy as np
     return (
         ((x + 0.5 * b2) ** 2.0 - x * np.sqrt((x + b2) * (x + a2))) /
         ((x + 1.0) * (x + 1.0) * np.sqrt(x + b2))
@@ -16,7 +12,6 @@ def cee_integrand(x, a2, b2):
 
 
 def cee_integral(a2, b2):
-    import numpy as np
     from scipy import integrate
     return integrate.quad(cee_integrand, 0.0, np.Inf, args=(a2, b2))[0]
 
@@ -26,7 +21,6 @@ def cee(a, b):
     a: Ratio of rupture to P-wave velocity, vrup/vp.
     b: Ratio of rupture to S-wave velocity, vrup/vs.
     """
-    import numpy as np
     a2 = a * a
     b2 = b * b
     f = np.vectorize(cee_integral)
@@ -46,7 +40,6 @@ def slip_rate(rho, vp, vs, vrup, dtau, r, t, C=None):
     C: optional C parameter from Dahlen (1974) Eqn (44).
        If not supplied, C is computed from vrup, vp and vs.
     """
-    import numpy as np
     t0 = r / vrup
     if C is None:
         C = cee(vrup / vp, vrup / vs)

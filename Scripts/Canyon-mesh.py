@@ -4,6 +4,7 @@
 """
 import os
 import math
+import cst.job
 import numpy as np
 
 # parameters
@@ -51,8 +52,8 @@ print('dx10 = ', (x[-1, 0] - x[-2, 0], y[-1, 1] - y[-1, 0]))
 print('dx11 = ', (x[-1, -2] - x[-1, -1], y[-1, -1] - y[-2, -1]))
 
 # write files
-p = os.path.join('..', 'Repository', 'Canyon')
-os.makedirs(p)
+p = cst.job.repo + 'Canyon'
+os.mkdir(p)
 os.chdir(p)
 x.T.astype('f').tofile('x.bin')
 y.T.astype('f').tofile('y.bin')

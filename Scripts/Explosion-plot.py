@@ -2,26 +2,24 @@
 import os
 import math
 import json
+import cst.job
+import cst.dsp
+import cst.coord
 import numpy as np
 import matplotlib.pyplot as plt
-import cst.coord, cst.signal
 
-path = os.path.join('..', 'Repository', 'Explosion')
-os.chdir(path)
+os.chdir(cst.job.repo + 'Explosion')
 
-# parameters
-meta = json.load(open('parameters.json'))
-dx, dy, dz, dt = meta['delta']
-tau = meta['pxx'][-1]
-rho = meta['rho']
-vp = meta['vp']
-vs = meta['vs']
+d = json.load(open('parameters.json'))
+dx, dy, dz, dt = d['delta']
+tau = d['pxx'][-1]
+rho = d['rho']
+vp = d['vp']
+vs = d['vs']
 
-# metadata
 meta = json.load(open('meta.json'))
 reg = meta['indices']['p1-vx.bin'][0]
 
-# loop over stations
 for sta in 'p1', 'p2', 'p3', 'p4', 'p5', 'p6':
 
     # read time histories
@@ -52,8 +50,8 @@ for sta in 'p1', 'p2', 'p3', 'p4', 'p5', 'p6':
     cutoff = 0.0
     cutoff = vp / (20.0 * dx)
     if cutoff:
-        v  = cst.signal.filter(v,  dt, cutoff, 'lowpass', 2, 1)
-        va = cst.signal.filter(va, dt, cutoff, 'lowpass', 2, 1)
+        v  = cst.dsp.filter(v,  dt, cutoff, 'lowpass', 2, 1)
+        va = cst.dsp.filter(va, dt, cutoff, 'lowpass', 2, 1)
 
     # plot figure
     fig = plt.figure()
@@ -68,4 +66,3 @@ for sta in 'p1', 'p2', 'p3', 'p4', 'p5', 'p6':
         ax.set_title(name + ' ' + str([x, y, z]))
         fig.savefig('Explosion.png')
     fig.show()
-

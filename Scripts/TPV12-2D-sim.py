@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 import os
 import math
-import numpy as np
+import cst.job
 import cst.sord
+import numpy as np
 
 # FIXME: prestress not correct
 
@@ -12,26 +13,33 @@ nx = 2
 ny = int(16500.0 / dx + 21.5)
 nz = int(12000.0 / dx + 120.5)
 nt = int(8.0 / dt + 1.5)
-
-prm = {}
-
-prm['delta'] = [dx, dx, dx, dt]
-prm['shape'] = [nx, ny, nz, nt]
-prm['nproc3'] = [1, 1, 2]
-
-# boundary conditions
-prm['bc1'] = ['+node', 'free', 'free']
-prm['bc2'] = ['+node', 'pml',  'free']
-
-# mesh
 alpha = math.sin(math.pi / 3.0)
-prm['affine'] = [
-    [1.0, 0.0,   0.0],
-    [0.0, alpha, 0.0],
-    [0.0, 0.5,   1.0]
-]
-prm['n1expand'] = [0, 0, 50]
-prm['n2expand'] = [0, 0, 50]
+
+prm = {
+    'affine': [
+        [1.0, 0.0,   0.0],
+        [0.0, alpha, 0.0],
+        [0.0, 0.5,   1.0],
+    ],
+    'shape': [nx, ny, nz, nt],
+    'delta': [dx, dx, dx, dt],
+    'nproc3': [1, 1, 2],
+    'bc1': ['+node', 'free', 'free'],
+    'bc2': ['+node', 'pml', 'free'],
+    'n1expand': [0, 0, 50],
+    'n2expand': [0, 0, 50],
+    'hourglass': [1.0, 2.0],
+    'rho': [2700.0],
+    'vp': [5716.0],
+    'vs': [3300.0],
+    'faultnormal': '+z'
+    'co': [200000.0]
+    'dc': [0.5]
+    'mud': [0.1]
+    'sxx': [([0, ':'], '=<', 'sxx.bin')],
+    'syy': [([0, ':'], '=<', 'syy.bin')],
+    'szz': [([0, ':'], '=<', 'szz.bin')],
+}
 
 # hypocenter
 y = 12000.0 / dx
@@ -42,24 +50,11 @@ prm['hypocenter'] = hypo = [0.0, y, z]
 k = int(15000.0 / dx + 0.5)
 l0 = int(z - 3000.0 / dx + 0.5)
 l1 = int(z + 3000.0 / dx + 0.5)
-
-# material properties
-prm['rho'] = [2700.0]
-prm['vp'] = [5716.0]
-prm['vs'] = [3300.0]
 prm['gam'] = [0.2, ([[], [k], [l0, l1]], '==', 0.02)]
-prm['hourglass'] = 1.0, 2.0
 
 # fault parameters
 k = int(15000.0 / dx) + 1
-prm['faultnormal'] = '+z'
-prm['co'] = [200000.0]
-prm['dc'] = [0.5]
-prm['mud'] = [0.1]
 prm['mus'] = [10000.0, ([[], [k]], '=', 0.7)]
-prm['sxx'] = ([0, ':'], '=<', 'sxx.bin')
-prm['syy'] = ([0, ':'], '=<', 'syy.bin')
-prm['szz'] = ([0, ':'], '=<', 'szz.bin')
 
 # nucleation
 i = int(1500.0 / dx + 0.5)
@@ -70,15 +65,14 @@ prm['mus'] = [
 ]
 
 # fault time histories
-for k in 0, 15, 30, 45, 75, 120:
-    y = k * 100.0 / dx
-    for f in (
-        'sux', 'suy', 'suz',
-        'svx', 'svy', 'svz',
-        'tsx', 'tsy', 'tsz', 'tnm',
-    ):
-        if f not in prm:
-            prm[f] = []
+for f in (
+    'sux', 'suy', 'suz',
+    'svx', 'svy', 'svz',
+    'tsx', 'tsy', 'tsz', 'tnm',
+):
+    prm[f] = []
+    for k in 0, 15, 30, 45, 75, 120:
+        y = k * 100.0 / dx
         s = 'faultst%03ddp000-%s.bin' % (k, f)
         prm[f] += [([0.0, y, []], '.>', s)]
 
@@ -112,10 +106,10 @@ x[k:] = y[k:]
 z[k:] = y[k:]
 
 # run SORD
-d = cst.sord.repo + 'TVP12-2D'
+d = cst.repo + 'TVP12-2D'
 os.mkdir(d)
 os.chdir(d)
 x.astype('f').tofile('sxx.bin')
 y.astype('f').tofile('syy.bin')
 z.astype('f').tofile('szz.bin')
-cst.sord.run(prm)
+cst.job.launch(cst.sord.stage(prm))

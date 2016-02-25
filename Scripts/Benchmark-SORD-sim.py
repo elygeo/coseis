@@ -32,7 +32,7 @@ for i in power[::-1]:
     n = 2 ** i
     prm['nproc3'] = [2, n, n]
     prm['shape'] = [points, n * points, n * points, prm['itio']]
-    d = cst.sord.repo + 'Benchmark-SORD-%s' % i
+    d = cst.job.repo + 'Benchmark-SORD-%s' % i
     os.mkdir(d)
     os.chdir(d)
     cfg = cst.sord.stage(prm)

@@ -3,10 +3,6 @@ Utilities for Graves Standard Rupture Format (SRF).
 
 SRF is documented at http://epicenter.usc.edu/cmeportal/docs/srf4.pdf
 """
-
-import sys
-while '' in sys.path:
-    sys.path.remove('')
 import os
 import math
 import gzip

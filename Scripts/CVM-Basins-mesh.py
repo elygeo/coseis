@@ -5,6 +5,7 @@ Simple SoCal mesh generation and CVM-S extraction.
 import os
 import json
 import numpy as np
+import cst.job
 import cst.cvms
 
 # parameters
@@ -32,8 +33,8 @@ meta = {
 }
 
 # run dir
-p = os.path.join('..', 'Repository', 'CVM-Basins')
-os.makedirs(p)
+p = os.job.repo + 'CVM-Basins'
+os.mkdir(p)
 os.chdir(p)
 
 # save data

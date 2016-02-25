@@ -1,11 +1,8 @@
 """
 Southern California Earthquake Data Center (SCEDC) tools.
 """
-
-import sys
-while '' in sys.path:
-    sys.path.remove('')
 import os
+import sys
 import time
 import struct
 import socket

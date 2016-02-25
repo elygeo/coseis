@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import subprocess
+import cst.job
 import cst.sord
 prm = {
     'shape': [61, 61, 61, 60],
@@ -14,8 +14,7 @@ prm = {
     'vx':  [([[], [], 30, -1], '=>', 'vx.bin')],
     'vy':  [([[], [], 30, -1], '=>', 'vy.bin')],
 }
-d = cst.sord.repo + 'Example'
+d = cst.repo + 'Example'
 os.mkdir(d)
 os.chdir(d)
-cst.sord.stage(prm)
-subprocess.check_call(['./sord.x'])
+cst.jon.launch(cst.sord.stage(prm))

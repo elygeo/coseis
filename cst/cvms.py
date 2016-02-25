@@ -1,27 +1,11 @@
 """
 SCEC Community Velocity Model - Magistrale version
 """
-
-# FIXME conf and build stuff
-
-import sys
-while '' in sys.path:
-    sys.path.remove('')
 import os
 import json
 import copy
 import shutil
 import subprocess
-
-home = os.path.dirname(__file__)
-home = os.path.realpath(home)
-home = os.path.dirname(home)
-conf = os.path.join(home, 'conf.json')
-conf = json.load(open(conf))
-if 'repo' in conf:
-    repo = conf['repository']
-else:
-    repo = os.path.join(home, 'Repo')
 
 versions = ['2.2', '3.0', '4.0']
 
@@ -55,16 +39,16 @@ defaults = {
 
 
 def configure(force=False, **kwargs):
-    from cst import conf
+    import cst.job
 
     # source directory
     cwd = os.getcwd()
-    FIXME
+    # FIXME
     os.chdir(__file__[:-3])
 
     # configure
     cfg = copy.deepcopy(defaults)
-    cfg = conf.prepare(
+    cfg = cst.job.prepare(
         defaults = cfg,
         name = 'cvms',
         executable = os.path.join('.', 'cvms.x'),
@@ -83,14 +67,13 @@ def configure(force=False, **kwargs):
         cfg['version'] = ver = versions[-1]
     else:
         assert ver in versions
-    download(ver)
 
     # build directory
-    FIXME
+    # FIXME
     bld = 'build-%s' % ver + os.sep
     if not os.path.exists(bld):
         os.mkdir(bld)
-        p = os.path.join(repo, 'CVMS-%s' % ver, 'src') + os.sep
+        p = os.path.join(cst.repo, 'CVMS-%s' % ver, 'src') + os.sep
         for f in os.listdir(p):
             shutil.copy2(p + f, bld + f)
 
@@ -128,7 +111,7 @@ def run(**kwargs):
     """
     Stage and launch job
     """
-    from . import util
+    import cst.job
 
     print('CVM-S')
 
@@ -149,7 +132,7 @@ def run(**kwargs):
         cfg['execute'] = cfg['executable']
 
     # link data files
-    p = os.path.join(repo, 'CVMS-%s' % cfg['version'], 'data')
+    p = os.path.join(cst.repo, 'CVMS-%s' % cfg['version'], 'data')
     for f in os.listdir(p):
         g = os.path.join(p, f)
         os.link(g, f)
@@ -162,7 +145,7 @@ def run(**kwargs):
     open('cvms.in', 'w').write(input_template.format(**cfg))
 
     # start job
-    util.launch(cfg)
+    cst.job.launch(cfg)
 
     return cfg
 

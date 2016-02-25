@@ -5,15 +5,18 @@ Visualization using Mayavi and Matplotlib
 import os
 import Image
 import pyproj
+import cst.job
+import cst.plt
+import cst.viz
+import cst.data
 import numpy as np
 import matplotlib.pyplot as plt
-from enthought.mayavi import mlab
-import cst.data, cst.viz, cst.plt
+from mayavi import mlab
 
 # parameters
 outfile = 'CVM-Basins.png'; dpi = 150.0
 outfile = 'CVM-Basins.pdf'; dpi = 300.0
-path = os.path.join('..', 'Repository', 'CVM-Basins') + os.sep
+path = cst.job.repo + 'CVM-Basins' + os.sep
 proj = pyproj.Proj(proj='tmerc', lon_0=-117.25, lat_0=33.75, k=0.001)
 title = 'SCEC Community\nVelocity Model'
 legend = 'Depth to Vs = 2.5 km/s'

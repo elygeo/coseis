@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import os
+import cst.kostrov
 import numpy as np
 import matplotlib.pyplot as plt
-import cst.kostrov
 
 b = 0.9  # Vrup / Vs ratio
 a = b / np.sqrt(3.0)  # Poisson solid

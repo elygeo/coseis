@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import os
+import cst.bin2npy
 import numpy as np
 import matplotlib.pyplot as plt
-import cst.bin2npy
 
 # simulation directory
 d = cst.repo + 'SORD-Exampls'

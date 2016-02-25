@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
+import cst.dsp
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 def spectrum(
     h, dt=1.0, shift=False, tzoom=10.0, db=None,
     legend=None, title='Forier spectrum', axes=None
 ):
-    """
-    Plot a time signal and it's Fourier spectrum.
-    """
-    import numpy as np
-    import matplotlib.pyplot as plt
-
     h = np.asarray(h)
     n = h.shape[-1]
     H = np.fft.rfft(h) * 2 / n
@@ -73,18 +70,10 @@ def spectrum(
         ax.legend(legend, loc='lower left')
 
     plt.draw()
-
     return axes
 
 
 def test():
-    """
-    Test spectrum plot
-    """
-    import numpy as np
-    import matplotlib.pyplot as plt
-    from cst import dsp
-
     n = 3200
     dt = 0.002
     fbp = 2.0, 8.0
@@ -96,20 +85,20 @@ def test():
     t = np.arange(n) * dt - n // 2 * dt
     x = time_function('delta', t)
     leg, y = zip(
-        ('Butter 1x2', dsp.filter(x, dt, flp, 'lowpass', 1, 1)),
-        ('Butter 2x2',  dsp.filter(x, dt, flp, 'lowpass', 2, 1)),
-        ('Butter 2x-2', dsp.filter(x, dt, flp, 'lowpass', 2, -1)),
-        ('Hann filter',  dsp.filter(x, dt, flp, 'hann', 0, 0)),
-        ('Brune',  dsp.time_function('brune', t, tau)),
+        ('Butter 1x2', cst.dsp.filter(x, dt, flp, 'lowpass', 1, 1)),
+        ('Butter 2x2',  cst.dsp.filter(x, dt, flp, 'lowpass', 2, 1)),
+        ('Butter 2x-2', cst.dsp.filter(x, dt, flp, 'lowpass', 2, -1)),
+        ('Hann filter',  cst.dsp.filter(x, dt, flp, 'hann', 0, 0)),
+        ('Brune',  cst.dsp.time_function('brune', t, tau)),
         (r'Ga $\sqrt{2\ln 2}\tau$',
-            dsp.time_function('gaussian', t, tau * np.sqrt(2 * np.log(2)))),
+            cst.dsp.time_function('gaussian', t, tau * np.sqrt(2*np.log(2)))),
         (r'Decon $\sqrt{2}\tau$',
-            dsp.brune2gauss(x, dt, tau, tau * np.sqrt(2))),
-        # ('Hann', dsp.time_function('hann', t, tau)),
+            cst.dsp.brune2gauss(x, dt, tau, tau * np.sqrt(2))),
+        # ('Hann', cst.dsp.time_function('hann', t, tau)),
         # ('Ricker1',
-        #     dsp.time_function('ricker1', t - 0.5 * dt, tau).cumsum() * dt),
+        #   cst.dsp.time_function('ricker1', t - 0.5 * dt, tau).cumsum() * dt),
         # ('Ricker2',
-        #     dsp.time_function('ricker2', t - dt, tau).cumsum().cumsum() *
+        #     cst.dsp.time_function('ricker2', t - dt, tau).cumsum().cumsum() *
         #     dt * dt),
     )
     y = np.asarray(y) * scale
@@ -120,7 +109,7 @@ def test():
 
     # Butterworth lowpass
     t = np.arange(n) * dt - n // 2 * dt
-    x = dsp.time_function('delta', t)
+    x = cst.dsp.time_function('delta', t)
     leg, y = zip(
         ('2 pole ',    filter(x, dt, flp, 'lowpass', 2, 0)),
         ('4 pole ',    filter(x, dt, flp, 'lowpass', 4, 0)),
@@ -136,7 +125,7 @@ def test():
 
     # Butterworth bandpass
     t = np.arange(n) * dt
-    x = dsp.time_function('delta', t)
+    x = cst.dsp.time_function('delta', t)
     leg, y = zip(
         ('2 pole ',    filter(x, dt, fbp, 'bandpass', 2, 0)),
         ('4 pole ',    filter(x, dt, fbp, 'bandpass', 4, 0)),
@@ -150,13 +139,13 @@ def test():
 
     # Brune deconvolution to Gaussian filter
     t = np.arange(n) * dt - n // 2 * dt
-    x = dsp.time_function('delta', t)
+    x = cst.dsp.time_function('delta', t)
     leg, y = zip(
-        (r'$\tau$', dsp.brune2gauss(x, dt, tau, tau)),
+        (r'$\tau$', cst.dsp.brune2gauss(x, dt, tau, tau)),
         (r'$\sqrt{2\ln 2}\tau$',
-            dsp.brune2gauss(x, dt, tau, tau*np.sqrt(2 * np.log(2)))),
-        (r'$\sqrt{2}\tau$', dsp.brune2gauss(x, dt, tau, tau * np.sqrt(2))),
-        (r'$2\tau$', dsp.brune2gauss(x, dt, tau, tau * 2)),
+            cst.dsp.brune2gauss(x, dt, tau, tau*np.sqrt(2 * np.log(2)))),
+        (r'$\sqrt{2}\tau$', cst.dsp.brune2gauss(x, dt, tau, tau * np.sqrt(2))),
+        (r'$2\tau$', cst.dsp.brune2gauss(x, dt, tau, tau * 2)),
     )
     y = np.asarray(y) * scale
     y = np.fft.ifftshift(y, axes=[-1])
@@ -167,7 +156,6 @@ def test():
     plt.ion()
     plt.show()
     return
-
 
 if __name__ == '__main__':
     test()
