@@ -40,39 +40,24 @@ frequent and it has known bugs!
 
 ## Install
 
-1.  If on Mac OS X, first install [Xcode] from the App Store. From the Xcode
-    preferences pane, install the Command Line Tools. Then install [Homebrew],
-    followed by [Git] and [Fortran] with::
+1.  Mac OS X only: Install [Xcode] from the App Store followed by the Xcode the
+    Command Line Tools with::
 
-        brew install git gfortran
+        xcode-select --install
 
-    OpenMP is broken in GCC 4.3 on Lion, so if you need multiprocessing speed-up,
-    install either [MPICH] or a newer [GCC] version.  Optionally, install and
-    [Anaconda] for visualization and analysis. 
+2.  Mac OS X only: Install [Homebrew] and use it to install [Fortran] with::
 
-2.  Clone the source code from the [Coseis GitHub repository]
+        brew install gfortran
+
+3.  Clone the source code from the [Coseis GitHub repository]
     (http://github.com/gely/coseis):
 
         git clone git://github.com/gely/coseis.git
 
-3.  Set path variables for the Python module and executables. For bash shell,
-    with the code located in your home directory (for example) add these lines
-    to
+4.  Setup python to be able to find the `cst` package:
 
-        export PYTHONPATH="$HOME/coseis"
-        export PATH="$PATH:$HOME/coseis/bin"
-
-4.  Run the `setup.py` script to test your configuration. This will display
-    all of the configuration parameters::
-
-        python setup.py
-
-5.  These parameters may be customized by creating a file `cst/conf/site.py`.
-    For example, the account for billing of service units, and email address for
-    notifications may be specified in `site.py` module with::
-
-        account = 'your_project_name_here'
-        email = 'your.email@address.here'
+        cd Coseis
+        python -m cst setup
 
 [Xcode]:    http://itunes.apple.com/us/app/xcode/id497799835
 [Homebrew]: http://mxcl.github.com/homebrew/
@@ -86,7 +71,7 @@ frequent and it has known bugs!
 
 To run the test suite interactively::
 
-    cd cst/tests
+    cd Tests
     python test_runner.py --run=exec
 
 Or, submit a job for batch processing::
@@ -96,11 +81,6 @@ Or, submit a job for batch processing::
 After completion, a report is printed to the screen (or saved in
 `run/test_suite/test_suite.output`)::
 
-    PASSED: doctest.testmod(cst.util)
-    PASSED: doctest.testmod(cst.coord)
-    PASSED: doctest.testmod(cst.sord)
-    PASSED: cst.tests.syntax.test()
-    PASSED: cst.tests.configure.test()
     PASSED: cst.tests.hello_mpi.test()
     PASSED: cst.tests.point_source.test()
     PASSED: cst.tests.pml_boundary.test()

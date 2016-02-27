@@ -38,15 +38,12 @@ defaults = {
 }
 
 
-def configure(force=False, **kwargs):
+def configure(force=False, **kw):
     import cst.job
 
-    # source directory
     cwd = os.getcwd()
-    # FIXME
-    os.chdir(__file__[:-3])
+    os.chdir(cst.repo)
 
-    # configure
     cfg = copy.deepcopy(defaults)
     cfg = cst.job.prepare(
         defaults=cfg,
@@ -55,7 +52,6 @@ def configure(force=False, **kwargs):
         **kwargs
     )
 
-    # machine specific options
     for k, d in cfg['machine_opts'].items():
         if k in cfg['machine']:
             for k, v in d.items():
@@ -67,8 +63,6 @@ def configure(force=False, **kwargs):
     else:
         assert ver in versions
 
-    # build directory
-    # FIXME
     bld = 'build-%s' % ver + os.sep
     if not os.path.exists(bld):
         os.mkdir(bld)
@@ -76,26 +70,20 @@ def configure(force=False, **kwargs):
         for f in os.listdir(p):
             shutil.copy2(p + f, bld + f)
 
-    # header file
     f = open('in.h.in').read()
     f = f.format(max_samples=cfg['max_samples'])
     open(bld + 'in.h', 'w').write(f)
 
-    # makefile
     m = open('Makefile.in').read()
     m = m.format(machine=cfg['machine'])
     open(bld + 'Makefile', 'w').write(m)
 
-    # finished
     os.chdir(cwd)
 
     return cfg
 
 
 def make(force=False, **kwargs):
-    """
-    Build the code
-    """
     cfg = configure(force, **kwargs)
     p = os.path.join(__file__[:-3], 'build-%s' % cfg['version']) + os.sep
     if force:
@@ -107,17 +95,9 @@ def make(force=False, **kwargs):
 
 
 def run(**kwargs):
-    """
-    Stage and launch job
-    """
     import cst.job
-
-    print('CVM-S')
-
-    # configure and build code
     cfg = make(**kwargs)
 
-    # check memory usage
     p = (cfg['nsample'] - 1) // cfg['max_samples'] + 1
     n = (cfg['nsample'] - 1) // cfg['nproc'] + 1
     if p > cfg['nproc']:
@@ -126,24 +106,18 @@ def run(**kwargs):
             (cfg['nsample'], p, n)
         )
 
-    # disable MPI launch
     if cfg['process'] == 'serial':
         cfg['execute'] = cfg['executable']
 
-    # link data files
     p = os.path.join(cst.repo, 'CVMS-%s' % cfg['version'], 'data')
     for f in os.listdir(p):
         g = os.path.join(p, f)
         os.link(g, f)
 
-    # link executable
     f = os.path.join(__file__[:-3], 'build-%s' % cfg['version'], 'cvms.x')
     os.link(f, 'cvms.x')
 
-    # create input file
     open('cvms.in', 'w').write(input_template.format(**cfg))
-
-    # start job
     cst.job.launch(cfg)
 
     return cfg
@@ -156,48 +130,39 @@ def extract(lon, lat, dep, prop=['rho', 'vp', 'vs'], **kwargs):
     lon, lat, dep: Coordinate arrays
     prop: 'rho', 'vp', or 'vs'
     nproc: Optional, number of processes
-
     Returns: (rho, vp, vs) material arrays
     """
     import numpy as np
 
-    # sanitize arrays
     lon = np.asarray(lon, 'f')
     lat = np.asarray(lat, 'f')
     dep = np.asarray(dep, 'f')
+
     shape = dep.shape
     nsample = dep.size
 
-    # create temp directory
     cwd = os.getcwd()
     if os.path.exists('cvms-tmp'):
         shutil.rmtree('cvms-tmp')
     os.mkdir('cvms-tmp')
     os.chdir('cvms-tmp')
 
-    # save input files
     cfg = configure(**kwargs)
+
     lon.tofile(cfg['file_lon'])
     lat.tofile(cfg['file_lat'])
     dep.tofile(cfg['file_dep'])
     del(lon, lat, dep)
 
-    # run jon
     run(nsample=nsample, **kwargs)
 
-    # read output
     out = []
     if type(prop) not in [list, tuple]:
         prop = [prop]
     for v in prop:
-        f = {
-            'rho': cfg['file_rho'],
-            'vp':  cfg['file_vp'],
-            'vs':  cfg['file_vs'],
-        }[v.lower()]
+        f = cfg['file_' + v.lower()]
         out += [np.fromfile(f, 'f').reshape(shape)]
 
-    # clean up
     os.chdir(cwd)
     shutil.rmtree('cvms-tmp')
 
