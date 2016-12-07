@@ -34,12 +34,12 @@ end if
 end subroutine
 
 subroutine cmpmax(z, ug, dt, w, d, kug)
-real ug(*), x(2,3), z(3), c(3)
+real ug(*), x1(3), x2(3), z(3), c(3)
 wd = sqrt(1.0 - d * d) * w
 w2 = w * w
 w3 = w2 * w
 do i = 1, 3
-    x(1,i) = 0.0
+    x1(i) = 0.0
     z(i) = 0.0
 end do
 f1 = 2.0 * d / (w3 * dt)
@@ -59,27 +59,27 @@ do k = 1, kug
     z2 = f2 * ug(k)
     z3 = f1 * dug
     z4 = z1 / dt
-    b = x(1,1) + z2 - z3
-    a = f4 * x(1,2) + f5 * b + f4 * z4
-    x(2,1) = a * g1 + b * g2 + z3 - z2 - z1
-    x(2,2) = a * h1 - b * h2 - z4
-    x(2,3) = -f6 * x(2,2) - w2 * x(2,1)
+    b = x1(1) + z2 - z3
+    a = f4 * x1(2) + f5 * b + f4 * z4
+    x2(1) = a * g1 + b * g2 + z3 - z2 - z1
+    x2(2) = a * h1 - b * h2 - z4
+    x2(3) = -f6 * x2(2) - w2 * x2(1)
     do l = 1, 3
-        c(l) = abs(x(2,l))
+        c(l) = abs(x2(l))
         if (c(l) .gt. z(l)) z(l) = c(l)
-        x(1,l) = x(2,l)
+        x1(l) = x2(l)
     end do
 end do
 end subroutine
 
 subroutine ucmpmx(z, ug, dt0, w, d, kug)
-real ug(*), z(3), c(3), x(2,3)
+real ug(*), z(3), c(3), x1(3), x2(3)
 pr = 4.0 * acos(0.0) / w
 wd = sqrt(1.0 - d * d) * w
 w2 = w * w
 w3 = w2 * w
 do i = 1, 3
-    x(1,i) = 0.0
+    x1(i) = 0.0
     z(i) = 0.0
 end do
 f2 = 1.0 / w2
@@ -104,15 +104,15 @@ do k = 1, kug
     z4 = z1 / dt
     do is = 1, ns
         z2 = f2 * g
-        b = x(1,1) + z2 - z3
-        a = f4 * x(1,2) + f5 * b + f4 * z4
-        x(2,1) = a * g1 + b * g2 + z3 - z2 - z1
-        x(2,2) = a * h1 - b * h2 - z4
-        x(2,3) = -f6*x(2,2) - w2 * x(2,1)
+        b = x1(1) + z2 - z3
+        a = f4 * x1(2) + f5 * b + f4 * z4
+        x2(1) = a * g1 + b * g2 + z3 - z2 - z1
+        x2(2) = a * h1 - b * h2 - z4
+        x2(3) = -f6 * x2(2) - w2 * x2(,1)
         do l = 1, 3
-            c(l) = abs(x(2,l))
+            c(l) = abs(x2(l))
             if (c(l) .gt. z(l)) z(l) = c(l)
-            x(1,l) = x(2,l)
+            x1(l) = x2(l)
         end do
         g = g + dug
     end do

@@ -4,12 +4,6 @@ Digital Signal Processing tools.
 import os
 import math
 
-try:
-    from cst.rspectra import rspectra
-    assert(rspectra)
-except ImportError:
-    pass
-
 
 def build():
     from numpy.distutils.core import setup, Extension
@@ -19,6 +13,13 @@ def build():
     setup(ext_modules=ext, script_args=['build_ext', '--inplace'])
     os.chdir(cwd)
 
+try:
+    from cst.rspectra import rspectra
+except ImportError:
+    build()
+    from cst.rspectra import rspectra
+assert(rspectra)
+
 
 def time_function(pulse, t, tau=1.0):
     """
@@ -27,8 +28,7 @@ def time_function(pulse, t, tau=1.0):
     pulse: function name (see source code below for available types).
     t: array of time samples.
     tau: characteristic time.
-
-    Returns an function samples.
+    Returns function samples at times in t.
     """
     import numpy as np
 
@@ -117,7 +117,6 @@ def filter(x, dt, fcorner, btype='lowpass', order=2, repeat=0, mode='same'):
     order: number of poles.
     repeat: 0 = single pass, 1 = two pass, -1 = two pass, zero-phase.
     mode: 'full' or 'same', see np.convolve
-
     Returns an array of filtered samples.
     """
     import numpy as np
