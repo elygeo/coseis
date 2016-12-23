@@ -49,7 +49,7 @@ def configure(force=False, **kw):
         defaults=cfg,
         name='cvms',
         executable=os.path.join('.', 'cvms.x'),
-        **kwargs
+        **kw
     )
 
     for k, d in cfg['machine_opts'].items():

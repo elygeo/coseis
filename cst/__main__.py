@@ -1,6 +1,6 @@
-import os
 import sys
 import json
+
 
 def json_args(argv):
     d = {}

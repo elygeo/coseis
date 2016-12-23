@@ -2,8 +2,6 @@
 SCEC Community Velocity Model (CVM-H) tools.
 """
 import os
-import io
-import gzip
 import urllib
 import tarfile
 
@@ -34,14 +32,7 @@ def vs30_model(x, y, version='Wills+Wald', method='nearest'):
         delta = 0.000439344930055
         x0 = -121.12460921883338
         y0 = 32.53426695497164
-        u = 'http://earth.usc.edu/~gely/cvm-data/Vs30-Wills-CVMH.npy.gz'
         f = cst.repo + 'Vs30-Wills-CVMH.npy'
-        if not os.path.exists(f):
-            print('Downloading %s' % u)
-            d = urllib.urlopen(u)
-            d = io.StringIO(d.read())
-            d = gzip.GzipFile(fileobj=d).read()
-            open(f, 'w').write(d)
         w = np.load(f, mmap_mode='c')
         xlim = x0, x0 + delta * (w.shape[0] - 1)
         ylim = y0, y0 + delta * (w.shape[1] - 1)

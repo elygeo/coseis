@@ -607,11 +607,11 @@ def explore(prefix, faults):
             representation='surface',
             color=color_bg,
         ).actor.actor.property
-        i = m['centroid_lon']
         u = m['centroid_x'], m['centroid_y'], m['centroid_z']
         if single_fault:
             surfs.append((isurf, u, s, p))
         else:
+            i = m['centroid_lon']
             surfs.append((i, u, s, p))
     surfs = [i[1:] for i in sorted(surfs)]
 

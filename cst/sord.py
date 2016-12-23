@@ -142,7 +142,7 @@ fieldnames = {
     'say': ['f~', '\ddot s_y', 'Slip acceleration'],
     'saz': ['f~', '\ddot s_z', 'Slip acceleration'],
     'sam': ['f~', '|\ddot s|', 'Slip acceleration magnitude'],
-    'svz': ['f~', '\dot s_x', 'Slip velocity'],
+    'svx': ['f~', '\dot s_x', 'Slip velocity'],
     'svy': ['f~', '\dot s_y', 'Slip velocity'],
     'svz': ['f~', '\dot s_z', 'Slip velocity'],
     'svm': ['f~', '|\dot s|', 'Slip velocity magnitude'],
