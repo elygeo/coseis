@@ -18,7 +18,7 @@ Coseis is an open-source toolkit for earthquake simulation featuring:
 
 - SCEC Community Velocity Models (CVM) codes, with MPI parallelization for
   [Magistrale version](http://www.data.scec.org/3Dvelocity/) (CVM-S), and new
-  [geotechnical layer implementation](http://earth.usc.edu/~gely/vs30gtl/) for
+  [geotechnical layer implementation](http://elygeo.net/2016-Vs30GTL-Ely+4/) for
   the [Harvard version](http://structure.harvard.edu/cvm-h/) (CVM-H).
 
 - Utilities for mesh generation, coordinate projection, and visualization.
@@ -30,7 +30,7 @@ Coseis is written by [Geoffrey Ely] with contributions from Steven Day,
 Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou.  It is licensed under
 [BSD] terms.
 
-[Geoffrey Ely]: http://earth.usc.edu/~gely/
+[Geoffrey Ely]: http://elygeo.net/
 [BSD]:          http://opensource.org/licenses/BSD-2-Clause
 
 <div class="warn">
@@ -63,7 +63,6 @@ frequent and it has known bugs!
 [Homebrew]: http://mxcl.github.com/homebrew/
 [Git]:      http://git-scm.com/
 [Fortran]:  http://r.research.att.com/tools/
-[MPICH]:    http://www.mcs.anl.gov/research/projects/mpich2/
 [GCC]:      http://gcc.gnu.org/
 [Anaconda]: https://store.continuum.io/cshop/anaconda/
 
