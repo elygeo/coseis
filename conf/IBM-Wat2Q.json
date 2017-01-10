@@ -1,0 +1,11 @@
+{
+"maxcores": 16,
+"maxnodes": 1024,
+"maxram": 16384,
+"mode": "smp",
+"mode_opts": {
+    "vn": {"nthread": 1, "ppn_range": [1, 2, 4, 8, 16, 32]},
+    "smp": {"nthread": 32, "ppn_range": [1]}
+},
+"execute": "runjob --verbose=INFO --block $COBALT_PARTNAME ${{COBALT_SHAPE:+--shape}} $COBALT_SHAPE ${{COBALT_CORNER:+--corner}} $COBALT_CORNER --envs BG_SHAREDMEMSIZE=32MB PAMID_VERBOSE=1 VPROF_PROFILE=yes -n {nproc} -p {ppn} --exe {executable}"
+}

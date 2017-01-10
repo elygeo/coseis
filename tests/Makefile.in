@@ -1,0 +1,48 @@
+# Options
+MACHINE = {machine}
+THREAD = omp
+
+# Default: GNU Compiler Collection
+CC = mpicc
+FC = mpif90 
+CFLAGS = $(LDFLAGS)
+# -pedantic
+FFLAGS = $(LDFLAGS) -fimplicit-none
+LDFLAGS = -g -O3 -Wall
+LIBS =
+ifeq ($(THREAD), omp)
+    LDFLAGS += -fopenmp
+endif
+
+# ALCF IBM Blue Gene/Q
+ifeq ($(MACHINE), ALCF-BGQ)
+    CC = mpixlc_r
+    FC = mpixlf2003_r
+    CLFAGS = $(LDFLAGS) -qlist -qreport
+    FFLAGS = $(LDFLAGS) -qlist -qreport
+    LDFLAGS = -g -O3 -qsuppress=cmpmsg
+    LIBS = -lSPI_upci_cnk
+    ifeq ($(THREAD), omp)
+        LDFLAGS += -qsmp=omp:noauto
+        LIBS += /home/morozov/HPM/lib/libmpihpm_smp.a
+    else
+        LIBS += /home/morozov/HPM/lib/libmpihpm.a
+    endif
+    LIBS += /bgsys/drivers/ppcfloor/bgpm/lib/libbgpm.a
+endif
+
+# Rules
+all: hello.c.x hello.f.x
+
+clean:
+	rm -rf *.pyc run hello.?.x hello.?.x.dSYM
+
+distclean: clean
+	rm Makefile
+
+hello.c.x: hello.c Makefile
+	$(CC) $(CFLAGS) -o $@ $< $(LIBS)
+
+hello.f.x: hello.f90 Makefile
+	$(FC) $(FFLAGS) -o $@ $< $(LIBS)
+
