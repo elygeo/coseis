@@ -2,8 +2,6 @@
 
 ### Computational Seismology Tools {#subtitle}
 
----
-
 <nav>
 [Install](#install)
 [Examples](#examples)
@@ -11,7 +9,6 @@
 [Code](https://github.com/gely/coseis/)
 </nav>
 
----
 
 ## Summary
 

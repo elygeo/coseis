@@ -23,9 +23,9 @@
   h1 { font-size: 3rem; }
   h2 { font-size: 1.5rem; }
   h3 { font-size: 1.25rem; }
-  h2, h3, p, ul, ol, pre { margin: 1rem auto; max-width: 32rem; }
+  h2, h3, p, ul, ol, pre { margin: 1rem auto; max-width: 36rem; }
   h1, h2, h3 { margin-top: 3rem; page-break-after: avoid; }
-  h1, h2, nav a {
+  h1, h2 {
   text-transform: uppercase;
   font-weight: normal;
   font-family:
@@ -39,7 +39,6 @@
   h1, h3#subtitle, nav { text-align: center; }
   h3#subtitle {
   font-weight: normal;
-  font-family: 'Courier';
   margin-top: -0.75rem;
   }
   pre {
@@ -95,16 +94,12 @@ python SORD-Example-ploy.py</code></pre>
 <p>[Note about a change from previous versions: The <code>fieldio</code> parameter has been removed, and instead each field I/O parameter is a separate list.]</p>
 <p>Multi-dimensional field arrays may be accessed for input and out through a list of operations that includes reading from and writing to disk, as well as assigning to scalar values or time-dependent functions. In the quick test above, <code>rho</code>, <code>vp</code>, <code>vs</code>, <code>v1</code>, and <code>v2</code> are examples of 3- and 4-D fields. The full list of available fields is given in <a href="../cst/sord/fieldnames.yaml">cst/sord/fieldnames.yaml</a>.</p>
 <p>Field variables are categorized in four ways: (1) static vs. dynamic, (2) settable vs. output only, (3) node vs. cell registration, and (4) volume vs. fault surface. For example, density <code>rho</code> is a static, settable, cell, volume variable. Slip path length <code>sl</code> is a dynamic, output, node, fault variable.</p>
-<p>Field operations may specify a slice, indicating a subregion of the array, using Python slicing notation. Indices are 0-based. Slices can be specified either with a string, or using the helper function <code>cst.sord.get_slices()</code>. Empty brackets <code>[]</code> are shorthand for the entire array. Here are some examples:</p>
-<pre><code>s_ = cst.sord.get_slices()
-j = 10
-k = 20
-&#39;[]&#39;           # Entire 4D volume
-&#39;[10,20,1,:]&#39;  # Single cell, full time history
-&#39;[:,:,:,-1]&#39;   # Full 3D volume, last time step
-s_[j,k,1,-1]   # Single node, last time step
-s_[j,:,:,::10] # j=10 node surface, every 10th time step</code></pre>
-<p>FIXME: this section is unfinished.:</p>
+<p>Field operations may specify a subregion of the array by giving slicing indices for each dimention. The 0-based indices can be either, a sigle index, empty brackets <code>[]</code> as shorthand for the entire array, of arguments to the python <code>slice()</code> function, which can be either [start], [start, stop] or [start, stop, step]. Here are some examples:</p>
+<pre><code>[10, 20, 1, []]             # Single cell, full time history
+[10, 20, 1, -1]             # Single node, last time step
+[[], [], [], -1]            # Full 3D volume, last time step
+[10, [], [], [0, None, 10]] # j=10 node surface, every 10th time step</code></pre>
+<p>FIXME: this section is unfinished.</p>
 <pre><code>f = val                         # Set f to value
 f = ([], &#39;=&#39;, val)              # Set f slice to value
 f = ([], &#39;+&#39;, val)              # Add value to f slice
@@ -114,7 +109,7 @@ f = ([], &#39;&lt;=&#39;, &#39;filename&#39;)      # Read filename into f
 f = ([], &#39;=&gt;&#39;, &#39;filename&#39;)      # Write f into filename</code></pre>
 <p>A dot (<code>.</code>) indicates sub-cell positioning via weighted averaging. In this case the spatial indices are single logical coordinates that may vary continuously over the range. The fractional part of the index determines the weights. For example, an index of 3.2 to the 1D variable f would specify the weighted average: 0.8 * f(3) + 0.2 * f(4).</p>
 <p>Reading and writing to disk uses flat binary files where j is the fastest changing index, and t is the slowest changing index. Mode ‘R’ extrapolates any singleton dimensions to fill the entire array. This is useful for reading 1D or 2D models into 3D simulations, obviating the need to store (possibly very large) 3D material and mesh coordinate files.</p>
-<p>For a list of available time functions, see the <code>time_function</code> subroutine in <a href="../cst/sord/src/util.f90">util.f90</a>. The routine can be easily modified to add new time functions. Time functions can be offset in time with the <code>tm0</code> initial time parameter.</p>
+<p>For a list of available time functions, see the <code>time_function</code> subroutine in <a href="cst/sord/util.f90">util.f90</a>. The routine can be easily modified to add new time functions. Time functions can be offset in time with the <code>tm0</code> initial time parameter.</p>
 <h3 id="boundary-conditions">Boundary Conditions</h3>
 <p>Boundary conditions for the six faces of the model domain are specified by the parameters <code>bc1</code> (near-size, x, y, and z faces) and <code>bc2</code> (far-side, x, y, and x faces). The symmetry boundary conditions can be used to reduce computations for problems where they are applicable. These are not used for specifying internal slip boundaries. However, for problems with symmetry across a slip surface, the fault may be placed at the boundary and combined with an anti-mirror symmetry condition. The following BC types are supported:</p>
 <p><strong>‘free’</strong>: Vacuum free-surface. Stress is zero in cells outside the boundary.</p>
