@@ -12,8 +12,8 @@ __pycache__
 *.sha1
 *.x
 *.dSYM
-/Repo/*
-/Tests/Makefile
+/repo/*
+/tests/Makefile
 /CVMS/Makefile
-/SORD/Makefile
-/SORD/config.json
+/sord/Makefile
+/sord/config.json

@@ -1,6 +1,8 @@
-# COSEIS
+# Coseis
 
 ### Computational Seismology Tools {#subtitle}
+
+---
 
 <nav>
 [Install](#install)
@@ -8,6 +10,8 @@
 [SORD](SORD.html)
 [Code](https://github.com/gely/coseis/)
 </nav>
+
+---
 
 ## Summary
 
@@ -18,8 +22,8 @@ Coseis is an open-source toolkit for earthquake simulation featuring:
 
 - SCEC Community Velocity Models (CVM) codes, with MPI parallelization for
   [Magistrale version](http://www.data.scec.org/3Dvelocity/) (CVM-S), and new
-  [geotechnical layer implementation](http://elygeo.net/2016-Vs30GTL-Ely+4/) for
-  the [Harvard version](http://structure.harvard.edu/cvm-h/) (CVM-H).
+  [geotechnical layer implementation](http://elygeo.net/2016-Vs30GTL-Ely+4.html
+  for the [Harvard version](http://structure.harvard.edu/cvm-h/) (CVM-H).
 
 - Utilities for mesh generation, coordinate projection, and visualization.
 
@@ -38,26 +42,27 @@ Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou.  It is licensed under
 frequent and it has known bugs!
 </div>
 
+
 ## Install
 
-1.  Mac OS X only: Install [Xcode] from the App Store followed by the Xcode the
-    Command Line Tools with::
+For MacOS only, install [Xcode] from the App Store followed by the Xcode the
+Command Line Tools with:
 
-        xcode-select --install
+    xcode-select --install
 
-2.  Mac OS X only: Install [Homebrew] and use it to install [Fortran] with::
+For MacOS only, install [Homebrew] and use it to install [Fortran] with:
 
-        brew install gfortran
+    brew install gfortran
 
-3.  Clone the source code from the [Coseis GitHub repository]
-    (http://github.com/gely/coseis):
+Clone the source code from the [Coseis GitHub repository]
+(http://github.com/gely/coseis):
 
-        git clone git://github.com/gely/coseis.git
+    git clone git://github.com/gely/coseis.git
 
-4.  Setup python to be able to find the `cst` package:
+Setup python to be able to find the `cst` package:
 
-        cd Coseis
-        python -m cst setup
+    cd coseis
+    python -m cst setup
 
 [Xcode]:    http://itunes.apple.com/us/app/xcode/id497799835
 [Homebrew]: http://mxcl.github.com/homebrew/
@@ -66,54 +71,56 @@ frequent and it has known bugs!
 [GCC]:      http://gcc.gnu.org/
 [Anaconda]: https://store.continuum.io/cshop/anaconda/
 
-## Testing
 
-To run the test suite interactively::
+## Test
 
-    cd Tests
+To run the test suite interactively:
+
+    cd tests
     python test_runner.py --run=exec
 
-Or, submit a job for batch processing::
+Or, submit a job for batch processing:
 
     python test_runner.py --run=submit
 
 After completion, a report is printed to the screen (or saved in
-`run/test_suite/test_suite.output`)::
+`run/test_suite/test_suite.output`):
 
     PASSED: cst.tests.hello_mpi.test()
     PASSED: cst.tests.point_source.test()
     PASSED: cst.tests.pml_boundary.test()
     PASSED: cst.tests.kostrov.test()
 
+
 ## Examples
 
 ### CVM depth plane
 
-![](../Figures/CVM-Slice-Vs-S.png)
+![](figs/CVM-Slice-Vs-S.png)
 
-![](../Figures/CVM-Slice-Vs-H.png)
+![](figs/CVM-Slice-Vs-H.png)
 
 Extract S-wave velocity at 500 meters depth. Plot using Matplotlib:
 
-[CVM-Slice.py](../scripts/CVM-Slice.py)
+[CVM-Slice.py](scripts/CVM-Slice.py)
 
 ### CVM-S fence diagram
 
-![](../Figures/CVM-Fence-Vp-S.png)
+![](figs/CVM-Fence-Vp-S.png)
 
 Build a fence diagram similar to Magistrale (2000) figure 10. Plot using
 Mayavi
 
-[CVM-Fence.py](../scripts/CVM-Fence.py)
+[CVM-Fence.py](scripts/CVM-Fence.py)
 
 ### CVM-S basin depth
 
-![](../Figures/CVM-Basins.png)
+![](figs/CVM-Basins.png)
 
 Extract 3D mesh and search for the shallowest surface of Vs = 2.5 km/s. Plot
 over topography using Mayavi.
 
-[CVM-Basins-mesh.py](../scripts/CVM-Basins-mesh.py)  
-[CVM-Basins-search.py](../scripts/CVM-Basins-search.py)  
-[CVM-Basins-plot.py](../scripts/CVM-Basins-plot.py)  
+[CVM-Basins-mesh.py](scripts/CVM-Basins-mesh.py)  
+[CVM-Basins-search.py](scripts/CVM-Basins-search.py)  
+[CVM-Basins-plot.py](scripts/CVM-Basins-plot.py)  
 

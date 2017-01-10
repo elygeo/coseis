@@ -7,11 +7,12 @@
 [Pubs](#publications)
 [Guide](#user-guide)
 [Performance](#memory-usage-and-scaling)
-[Coseis](index.html)
-[Code](https://github.com/gely/coseis/tree/master/SORD)
+[Coseis](Coseis.html)
+[Code](https://github.com/gely/coseis/tree/master/sord)
 </nav>
 
-![](../Figures/SORD-SAF-Surface.jpg)
+![](figs/SORD-SAF-Surface.jpg)
+
 
 ## Summary
 
@@ -34,6 +35,7 @@ code is portable and tested with a variety of Fortran 95 compilers, MPI
 implementations, and operating systems (Linux, Mac OS X, IBM AIX, SUN
 Solaris).
 
+
 ## Publications
 
 The first two papers give (for wave propagation and spontaneous rupture,
@@ -41,21 +43,22 @@ respectively) the formulation, numerical algorithm, and verification of
 the SORD method. The third paper presents an application to simulating
 earthquakes in southern California.
 
-1.  Ely, G. P., S. M. Day, and J.-B. Minster (2008), [A support-operator
-    method for visco-elastic wave modeling in 3D heterogeneous
-    media](http://www.usc.edu/~gely/pub/2008-GJI-Ely+2.pdf), *Geophys.
-    J. Int.*, *172* (1), 331-344,
-    [doi:10.1111/j.1365-246X.2007.03633.x](http://dx.doi.org/10.1111/j.1365-246X.2007.03633.x).
-2.  Ely, G. P., S. M. Day, and J.-B. Minster (2009), [A support-operator
-    method for 3D rupture
-    dynamics](http://www.usc.edu/~gely/pub/2009-GJI_Ely+2.pdf),
-    *Geophys. J. Int.*, *177* (3), 1140-1150,
-    [doi:10.1111/j.1365-246X.2009.04117.x](http://dx.doi.org/10.1111/j.1365-246X.2009.04117.x).
-3.  Ely, G. P., S. M. Day, and J.-B. Minster (2010), [Dynamic rupture
-    models for the southern San Andreas
-    fault](http://www.usc.edu/~gely/pub/2010-BSSA-Ely+2.pdf), *Bull.
-    Seism. Soc. Am.*, *100* (1), 131-150,
-    [doi:10.1785/0120090187](http://dx.doi.org/10.1785/0120090187).
+Ely, G. P., S. M. Day, and J.-B. Minster (2008), A support-operator method for
+visco-elastic wave modeling in 3D heterogeneous media, *Geophys. J. Int.*,
+*172* (1), 331-344,
+[doi:10.1111/j.1365-246X.2007.03633.x](http://dx.doi.org/10.1111/j.1365-246X.2007.03633.x).
+[[PDF]](http://gji.oxfordjournals.org/content/172/1/331.full.pdf)
+
+Ely, G. P., S. M. Day, and J.-B. Minster (2009), A support-operator method for
+3D rupture dynamics, *Geophys. J. Int.*, *177* (3), 1140-1150,
+[doi:10.1111/j.1365-246X.2009.04117.x](http://dx.doi.org/10.1111/j.1365-246X.2009.04117.x).
+[[PDF]](http://gji.oxfordjournals.org/content/177/3/1140.full.pdf)
+
+Ely, G. P., S. M. Day, and J.-B. Minster (2010), Dynamic rupture models for the
+southern San Andreas fault, *Bull. Seism. Soc. Am.*, *100* (1), 131-150,
+[doi:10.1785/0120090187](http://dx.doi.org/10.1785/0120090187).
+[[PDF]](http://elygeo.net/2010-BSSA-Ely+2.pdf)
+
 
 ## User Guide
 
@@ -65,28 +68,22 @@ Run a simple point source explosion test and plot a 2D slice of particle
 velocity:
 
     cd scripts
-    make SORD-Example.mk
+    python SORD-Example-sim.py
+    python SORD-Example-ploy.py
 
 Plotting requires Matplotlib, and the result should look like this:
 
-![](../Figures/SORD-Example.svg)
-
-This illustrates the simplest way to run SORD, that is to execute the
-`sord` command giving a parameter file in [YAML](http://www.yaml.org) or
-[JSON](http://www.json.org) format. The parameter file for this example
-is as follows:
+![](figs/SORD-Example.svg)
 
 ### Python Scripting
 
-A more powerful way to run the code is with a Python script. The basic
-procedure is to import the `cst` module, create a dictionary of
+The general procedure is to import the `cst` module, create a dictionary of
 parameters, and pass that dictionary to the `cst.sord.run()` function.
-Parameters are either job-control or simulation parameters. Defaults for
-these two types of parameters are given in
-[cst/conf/default.yaml](../cst/conf/default.yaml) and
-[cst/sord/parameters.yaml](../cst/sord/parameters.yaml), respectively.
-Machine specific job-control parameters may also be present in the
-`cst/conf` directory that supersede the defaults.
+Parameters are either job-control or simulation parameters. Defaults for these
+two types of parameters are given in [cst.job.defaults](cst/job.py) and
+[cst.sord.parameters](cst/sord.py), respectively. Machine specific job-control
+parameters may also be present in the `conf` directory that supersede the
+defaults.
 
 It maybe be helpful to look through example applications in the
 `scripts` directory, and return to this document for further description
@@ -167,11 +164,11 @@ following BC types are supported:
 **'free'**: Vacuum free-surface. Stress is zero in cells outside the
 boundary.
 
-![](../Figures/SORD-BC0.svg)
+![](figs/SORD-BC0.svg)
 
 **'rigid'**: Rigid surface. Displacement is zero at the boundary.
 
-![](../Figures/SORD-BC3.svg)
+![](figs/SORD-BC3.svg)
 
 **'+node'**: Mirror symmetry at the node. Normal displacement is zero at
 the boundary. Useful for a boundary corresponding to (a) the plane
@@ -179,7 +176,7 @@ orthogonal to the two nodal planes of a double-couple point source, (b)
 the plane normal to the mode-III axis of a symmetric rupture, or (c) the
 zero-width axis of a 2D plane strain problem.
 
-![](../Figures/SORD-BC1.svg)
+![](figs/SORD-BC1.svg)
 
 **'-node'**: Anti-mirror symmetry at the node. Tangential displacement
 is zero at the boundary. Useful for a boundary corresponding to (a) the
@@ -187,18 +184,18 @@ nodal planes of a double-couple point source, (b) the plane normal to
 the mode-II axis of a symmetric rupture, or (c) the zero-width axis of a
 2D antiplane strain problem.
 
-![](../Figures/SORD-BC-1.svg)
+![](figs/SORD-BC-1.svg)
 
 **'+cell'**: Mirror symmetry at the cell. Same as type 1, but centered
 on the cell.
 
-![](../Figures/SORD-BC2.svg)
+![](figs/SORD-BC2.svg)
 
 **'-cell'**: Anti-mirror symmetry at the cell. Same as type -1, but
 centered on the cell. Can additionally be used when the boundary
 corresponds to the slip surface of a symmetric rupture.
 
-![](../Figures/SORD-BC-2.svg)
+![](figs/SORD-BC-2.svg)
 
 **'pml'**: Perfectly match layer (PML) absorbing boundary.
 
@@ -269,6 +266,7 @@ the anti-plane axis, to reduce computations eight-fold:
     bc1 = ['free', 'free', 'free']
     bc2 = ['anti-n', 'mirror-n', 'anti-c'
 
+
 ## Memory Usage and Scaling
 
 For rectilinear meshes, 23 single precision (four-byte) memory variables
@@ -299,5 +297,5 @@ per time step per one million mesh points. SORD scalability has been
 benchmarked up to 64 thousand processors at ALCF. The following chart is
 the wall-time per step per core (click for PDF):
 
-[![](../Figures/SORD-MPI-Benchmark.png)](../Figures/SORD-MPI-Benchmark.pdf)
+[![](figs/SORD-MPI-Benchmark.png)](figs/SORD-MPI-Benchmark.pdf)
 

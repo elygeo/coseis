@@ -1,38 +1,53 @@
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
 <style type="text/css">
-html {
-font-family: sans-serif;
-font-size: 1.125em;
-line-height: 1.4;
-max-width: 36em;
-margin-left: auto;
-margin-right: auto;
+body {
 -webkit-text-size-adjust: 100%;
+font-family: Georgia, serif;
+line-height: 1.5rem;
+word-wrap: break-word;
 }
-a { color: #06a; text-decoration: none; }
-h1 { color: #900; margin-bottom: 0 }
-h3#subtitle { margin-top: 0; }
+a { color: currentColor; }
+img { display: block; }
+img, table, figure { margin: 1rem auto; max-width: 100%; }
+h1 { font-size: 3rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+h2, h3, p, ul, ol, pre { margin: 1rem auto; max-width: 32rem; }
+h1, h2, h3 { margin-top: 3rem; page-break-after: avoid; }
+h1, h2, nav a {
+text-transform: uppercase;
+font-weight: normal;
+font-family:
+'Montserrat',
+'Gill Sans',
+'Gill Sans MT',
+'Gill Sans Nova',
+'Verdana',
+sans-serif;
+}
+h1, h3#subtitle, nav { text-align: center; }
+h3#subtitle {
+font-weight: normal;
+font-family: 'Courier';
+margin-top: -0.75rem;
+}
 pre {
-padding: 0.5em;
+padding: 0.5rem 1rem;
 border: 1px solid #ccc;
-background-color: #eee;
-line-height: 1;
-overflow: auto;
+line-height: 1rem;
 }
-figure { margin: 0; }
-img { max-width: 100%; display: block; margin: 1em auto; }
-nav { font-family: sans-serif; }
+div.warn p {
+padding: 0.5rem 1rem;
+border: 1px solid #ccc;
+background-color: #ffd;
+}
 nav a {
-display: inline-block;
-background-color: #eee;
+Xdisplay: inline-block;
+text-decoration: none;
 padding: 0.2em 0.6em;
 margin: 0.1em 0;
 border: 1px solid #ccc;
 cursor: pointer;
 }
-nav a:hover, a:active { background-color: #ccc; }
-div.warn p {
-padding: 0.5em;
-border: 1px solid #ccc;
-background-color: #ffd;
-}
+nav a:hover, a:active { text-decoration: underline; }
 </style>
