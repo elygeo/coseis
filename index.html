@@ -63,14 +63,15 @@
   </style>
 </head>
 <body>
-<h1 id="coseis">Coseis</h1>
+<h1 id="coseis">COSEIS</h1>
 <h3 id="subtitle">Computational Seismology Tools</h3>
-<p><nav> <a href="#install">Install</a> <a href="#examples">Examples</a> <a href="SORD.html">SORD</a> <a href="https://github.com/gely/coseis/">Code</a> </nav></p>
+<p><span><a href="http://elygeo.net/coseis/" class="uri">http://elygeo.net/coseis/</a><br />
+<a href="https://github.com/gely/coseis/" class="uri">https://github.com/gely/coseis/</a></span></p>
 <h2 id="summary">Summary</h2>
 <p>Coseis is an open-source toolkit for earthquake simulation featuring:</p>
 <ul>
-<li><p>The Support Operator Rupture Dynamics (SORD) code for modeling spontaneous rupture and 3D wave propagation.</p></li>
-<li><p>SCEC Community Velocity Models (CVM) codes, with MPI parallelization for <a href="http://www.data.scec.org/3Dvelocity/">Magistrale version</a> (CVM-S), and new [geotechnical layer implementation](http://elygeo.net/2016-Vs30GTL-Ely+4.html for the <a href="http://structure.harvard.edu/cvm-h/">Harvard version</a> (CVM-H).</p></li>
+<li><p>The Support Operator Rupture Dynamics (<a href="SORD.html">SORD</a>) code for modeling spontaneous rupture and 3D wave propagation.</p></li>
+<li><p>SCEC Community Velocity Models (CVM) codes, with MPI parallelization for <a href="http://www.data.scec.org/3Dvelocity/">Magistrale version</a> (CVM-S), and new <a href="http://elygeo.net/2016-Vs30GTL-Ely+4.html">geotechnical layer implementation</a> for the <a href="http://structure.harvard.edu/cvm-h/">Harvard version</a> (CVM-H).</p></li>
 <li><p>Utilities for mesh generation, coordinate projection, and visualization.</p></li>
 </ul>
 <p>The primary interface is through a Python module which (for high-performance components) wraps Fortran parallelized with hybrid OpenMP and MPI.</p>
