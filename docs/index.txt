@@ -1,9 +1,9 @@
 # COSEIS
 
-### Computational Seismology Tools {#subtitle}
+### Computational Seismology Tools
 
-[ <http://elygeo.net/coseis/>  
-<https://github.com/gely/coseis/> ]{}
+<http://elygeo.net/coseis/>  
+<https://github.com/gely/coseis/>
 
 
 ## Summary
@@ -14,10 +14,10 @@ Coseis is an open-source toolkit for earthquake simulation featuring:
   spontaneous rupture and 3D wave propagation.
 
 - SCEC Community Velocity Models (CVM) codes, with MPI parallelization for
-  [Magistrale version](http://www.data.scec.org/3Dvelocity/) (CVM-S), and new
+  [Magistrale version](https://scec.usc.edu/scecpedia/CVM-S4) (CVM-S), and new
   [geotechnical layer
   implementation](http://elygeo.net/2016-Vs30GTL-Ely+4.html) for the [Harvard
-  version](http://structure.harvard.edu/cvm-h/) (CVM-H).
+  version](http://scec.usc.edu/scecpedia/CVM-H) (CVM-H).
 
 - Utilities for mesh generation, coordinate projection, and visualization.
 
@@ -33,7 +33,8 @@ Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou.  It is licensed under
 
 <div class="warn">
 **WARNING**: Coseis is a research code under active development. Changes are
-frequent and it has known bugs!
+frequent and it has known bugs! The latest committed version may not be your
+best option or even working. Please contact me for guidance.
 </div>
 
 
@@ -48,8 +49,8 @@ For MacOS only, install [Homebrew] and use it to install [Fortran] with:
 
     brew install gfortran
 
-Clone the source code from the [Coseis GitHub repository]
-(http://github.com/gely/coseis):
+Clone the source code from the [Coseis GitHub
+repository](http://github.com/gely/coseis):
 
     git clone git://github.com/gely/coseis.git
 
@@ -59,11 +60,9 @@ Setup python to be able to find the `cst` package:
     python -m cst setup
 
 [Xcode]:    http://itunes.apple.com/us/app/xcode/id497799835
-[Homebrew]: http://mxcl.github.com/homebrew/
+[Homebrew]: http://brew.sh/
 [Git]:      http://git-scm.com/
 [Fortran]:  http://r.research.att.com/tools/
-[GCC]:      http://gcc.gnu.org/
-[Anaconda]: https://store.continuum.io/cshop/anaconda/
 
 
 ## Test

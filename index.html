@@ -14,16 +14,13 @@
   body {
   -webkit-text-size-adjust: 100%;
   font-family: Georgia, serif;
-  line-height: 1.5rem;
+  line-height: 1.4;
   word-wrap: break-word;
   }
   a { color: currentColor; }
   img { display: block; }
   img, table, figure { margin: 1rem auto; max-width: 100%; }
-  h1 { font-size: 3rem; }
-  h2 { font-size: 1.5rem; }
-  h3 { font-size: 1.25rem; }
-  h2, h3, p, ul, ol, pre { margin: 1rem auto; max-width: 36rem; }
+  h2, h3, p, ul, ol, pre { margin: 1em auto; max-width: 36rem; }
   h1, h2, h3 { margin-top: 3rem; page-break-after: avoid; }
   h1, h2 {
   text-transform: uppercase;
@@ -36,10 +33,19 @@
   'Verdana',
   sans-serif;
   }
-  h1, h3#subtitle, nav { text-align: center; }
-  h3#subtitle {
-  font-weight: normal;
-  margin-top: -0.75rem;
+  h1 { font-size: 3rem; margin-bottom: 0; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+  h1, h1 + h3, h1 + h3 + p {
+  text-align: center;
+  line-height: 1;
+  }
+  h1 + h3 {
+  margin-top: 1rem;
+  }
+  h1 + h3 + p a {
+  font-family: monospace;
+  text-decoration: none;
   }
   pre {
   padding: 0.5rem 1rem;
@@ -49,42 +55,32 @@
   div.warn p {
   padding: 0.5rem 1rem;
   border: 1px solid #ccc;
-  background-color: #ffd;
   }
-  nav a {
-  Xdisplay: inline-block;
-  text-decoration: none;
-  padding: 0.2em 0.6em;
-  margin: 0.1em 0;
-  border: 1px solid #ccc;
-  cursor: pointer;
-  }
-  nav a:hover, a:active { text-decoration: underline; }
   </style>
 </head>
 <body>
 <h1 id="coseis">COSEIS</h1>
-<h3 id="subtitle">Computational Seismology Tools</h3>
-<p><span><a href="http://elygeo.net/coseis/" class="uri">http://elygeo.net/coseis/</a><br />
-<a href="https://github.com/gely/coseis/" class="uri">https://github.com/gely/coseis/</a></span></p>
+<h3 id="computational-seismology-tools">Computational Seismology Tools</h3>
+<p><a href="http://elygeo.net/coseis/" class="uri">http://elygeo.net/coseis/</a><br />
+<a href="https://github.com/gely/coseis/" class="uri">https://github.com/gely/coseis/</a></p>
 <h2 id="summary">Summary</h2>
 <p>Coseis is an open-source toolkit for earthquake simulation featuring:</p>
 <ul>
 <li><p>The Support Operator Rupture Dynamics (<a href="SORD.html">SORD</a>) code for modeling spontaneous rupture and 3D wave propagation.</p></li>
-<li><p>SCEC Community Velocity Models (CVM) codes, with MPI parallelization for <a href="http://www.data.scec.org/3Dvelocity/">Magistrale version</a> (CVM-S), and new <a href="http://elygeo.net/2016-Vs30GTL-Ely+4.html">geotechnical layer implementation</a> for the <a href="http://structure.harvard.edu/cvm-h/">Harvard version</a> (CVM-H).</p></li>
+<li><p>SCEC Community Velocity Models (CVM) codes, with MPI parallelization for <a href="https://scec.usc.edu/scecpedia/CVM-S4">Magistrale version</a> (CVM-S), and new <a href="http://elygeo.net/2016-Vs30GTL-Ely+4.html">geotechnical layer implementation</a> for the <a href="http://scec.usc.edu/scecpedia/CVM-H">Harvard version</a> (CVM-H).</p></li>
 <li><p>Utilities for mesh generation, coordinate projection, and visualization.</p></li>
 </ul>
 <p>The primary interface is through a Python module which (for high-performance components) wraps Fortran parallelized with hybrid OpenMP and MPI.</p>
 <p>Coseis is written by <a href="http://elygeo.net/">Geoffrey Ely</a> with contributions from Steven Day, Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou. It is licensed under <a href="http://opensource.org/licenses/BSD-2-Clause">BSD</a> terms.</p>
 <div class="warn">
-<p><strong>WARNING</strong>: Coseis is a research code under active development. Changes are frequent and it has known bugs!</p>
+<p><strong>WARNING</strong>: Coseis is a research code under active development. Changes are frequent and it has known bugs! The latest committed version may not be your best option or even working. Please contact me for guidance.</p>
 </div>
 <h2 id="install">Install</h2>
 <p>For MacOS only, install <a href="http://itunes.apple.com/us/app/xcode/id497799835">Xcode</a> from the App Store followed by the Xcode the Command Line Tools with:</p>
 <pre><code>xcode-select --install</code></pre>
-<p>For MacOS only, install <a href="http://mxcl.github.com/homebrew/">Homebrew</a> and use it to install <a href="http://r.research.att.com/tools/">Fortran</a> with:</p>
+<p>For MacOS only, install <a href="http://brew.sh/">Homebrew</a> and use it to install <a href="http://r.research.att.com/tools/">Fortran</a> with:</p>
 <pre><code>brew install gfortran</code></pre>
-<p>Clone the source code from the [Coseis GitHub repository] (http://github.com/gely/coseis):</p>
+<p>Clone the source code from the <a href="http://github.com/gely/coseis">Coseis GitHub repository</a>:</p>
 <pre><code>git clone git://github.com/gely/coseis.git</code></pre>
 <p>Setup python to be able to find the <code>cst</code> package:</p>
 <pre><code>cd coseis

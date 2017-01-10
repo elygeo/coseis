@@ -3,16 +3,13 @@
 body {
 -webkit-text-size-adjust: 100%;
 font-family: Georgia, serif;
-line-height: 1.5rem;
+line-height: 1.4;
 word-wrap: break-word;
 }
 a { color: currentColor; }
 img { display: block; }
 img, table, figure { margin: 1rem auto; max-width: 100%; }
-h1 { font-size: 3rem; }
-h2 { font-size: 1.5rem; }
-h3 { font-size: 1.25rem; }
-h2, h3, p, ul, ol, pre { margin: 1rem auto; max-width: 36rem; }
+h2, h3, p, ul, ol, pre { margin: 1em auto; max-width: 36rem; }
 h1, h2, h3 { margin-top: 3rem; page-break-after: avoid; }
 h1, h2 {
 text-transform: uppercase;
@@ -25,10 +22,19 @@ font-family:
 'Verdana',
 sans-serif;
 }
-h1, h3#subtitle, nav { text-align: center; }
-h3#subtitle {
-font-weight: normal;
-margin-top: -0.75rem;
+h1 { font-size: 3rem; margin-bottom: 0; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+h1, h1 + h3, h1 + h3 + p {
+text-align: center;
+line-height: 1;
+}
+h1 + h3 {
+margin-top: 1rem;
+}
+h1 + h3 + p a {
+font-family: monospace;
+text-decoration: none;
 }
 pre {
 padding: 0.5rem 1rem;
@@ -38,15 +44,5 @@ line-height: 1rem;
 div.warn p {
 padding: 0.5rem 1rem;
 border: 1px solid #ccc;
-background-color: #ffd;
 }
-nav a {
-Xdisplay: inline-block;
-text-decoration: none;
-padding: 0.2em 0.6em;
-margin: 0.1em 0;
-border: 1px solid #ccc;
-cursor: pointer;
-}
-nav a:hover, a:active { text-decoration: underline; }
 </style>
