@@ -2,14 +2,9 @@
 
 ### Support Operator Rupture Dynamics {#subtitle}
 
-<nav>
-[Summary](#summary)
-[Pubs](#publications)
-[Guide](#user-guide)
-[Performance](#memory-usage-and-scaling)
-[Coseis](Coseis.html)
-[Code](https://github.com/gely/coseis/tree/master/sord)
-</nav>
+<http://elygeo.net/coseis/SORD.html>  
+<https://github.com/gely/coseis/tree/master/sord/>
+
 
 ![](figs/SORD-SAF-Surface.jpg)
 
