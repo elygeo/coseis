@@ -13,31 +13,36 @@
   body {
   -webkit-text-size-adjust: 100%;
   font-family: Georgia, serif;
-  line-height: 1.5;
   word-wrap: break-word;
+  margin: 1rem;
   }
   a { color: currentColor; }
-  img { margin: 2rem auto; display: block; max-width: 100%; }
-  table, figure { margin: 2rem auto; max-width: 100%; }
-  h2, h3, p, ul, ol, pre { margin: 1em auto; max-width: 36rem; }
-  h1, h2, h3 { margin-top: 3rem; page-break-after: avoid; }
+  p { line-height: 1.5; }
+  sub, sup { line-height: 0; }
+  img, figure {
+  margin: 1rem auto;
+  max-width: 100%;
+  }
+  h1, h2, h3, p, ul, ol, pre {
+  margin: 1rem auto;
+  max-width: 36rem;
+  }
+  h1, h2, h3 {
+  margin-top: 2rem;
+  page-break-after: avoid;
+  }
   h1, h2 {
   text-transform: uppercase;
-  font-family: 'Avenir', sans-serif;
-  font-weight: 600;
+  font-family: 'Gill Sans', sans-serif;
+  font-weight: 500;
   }
-  h1 { font-size: 3rem; margin-bottom: 0; }
-  h2 { font-size: 1.5rem; }
-  h3 { font-size: 1.25rem; }
-  h1 + h3, h1 + h3 + p, h1 { text-align: center; }
-  h1 + h3 { margin-top: 1rem; }
-  h1 + h3 + p a { text-decoration: none; }
-  pre {
-  padding: 0.5rem 1rem;
-  border: 1px solid #ccc;
-  line-height: 1rem;
-  }
-  div.warn p {
+  h1 { font-weight: 600; margin: 0 auto; text-align: center; }
+  h1 + h2 { font-weight: 100; margin: 0 auto; text-align: center; }
+  h1 + h2 + p { margin: 0 auto; text-align: center; }
+  h1 + h2 + p a { text-decoration: none; }
+  pre { font-family: 'Menlo', monospace; }
+  pre, div.warn p {
+  box-sizing: border-box;
   padding: 0.5rem 1rem;
   border: 1px solid #ccc;
   }
@@ -45,13 +50,13 @@
 </head>
 <body>
 <h1 id="coseis">COSEIS</h1>
-<h3 id="computational-seismology-tools">Computational Seismology Tools</h3>
-<p><a href="http://elygeo.net/coseis/" class="uri">http://elygeo.net/coseis/</a><br />
-<a href="https://github.com/gely/coseis/" class="uri">https://github.com/gely/coseis/</a></p>
+<h2 id="computational-seismology-tools">Computational Seismology Tools</h2>
+<p><a href="https://github.com/gely/coseis/">github.com/gely/coseis</a><br />
+<a href="http://elygeo.net/coseis/">elygeo.net/coseis</a></p>
 <h2 id="summary">Summary</h2>
-<p>Coseis is an open-source toolkit for earthquake simulation featuring:</p>
+<p>Coseis is a toolkit for earthquake simulation featuring:</p>
 <ul>
-<li><p>The Support Operator Rupture Dynamics (<a href="SORD.html">SORD</a>) code for modeling spontaneous rupture and 3D wave propagation.</p></li>
+<li><p>The Support Operator Rupture Dynamics (<a href="http://elygeo.net/SORD.html">SORD</a>) code for modeling spontaneous rupture and 3D wave propagation.</p></li>
 <li><p>SCEC Community Velocity Models (CVM) codes, with MPI parallelization for <a href="https://scec.usc.edu/scecpedia/CVM-S4">Magistrale version</a> (CVM-S), and new <a href="http://elygeo.net/2016-Vs30GTL-Ely+4.html">geotechnical layer implementation</a> for the <a href="http://scec.usc.edu/scecpedia/CVM-H">Harvard version</a> (CVM-H).</p></li>
 <li><p>Utilities for mesh generation, coordinate projection, and visualization.</p></li>
 </ul>
@@ -83,27 +88,27 @@ PASSED: cst.tests.pml_boundary.test()
 PASSED: cst.tests.kostrov.test()</code></pre>
 <h2 id="examples">Examples</h2>
 <h3 id="cvm-depth-plane">CVM depth plane</h3>
+<p>Extract S-wave velocity at 500 meters depth. Plot using Matplotlib:</p>
+<p><a href="scripts/CVM-Slice.py">CVM-Slice.py</a></p>
 <figure>
 <img src="figs/CVM-Slice-Vs-S.png" />
 </figure>
 <figure>
 <img src="figs/CVM-Slice-Vs-H.png" />
 </figure>
-<p>Extract S-wave velocity at 500 meters depth. Plot using Matplotlib:</p>
-<p><a href="scripts/CVM-Slice.py">CVM-Slice.py</a></p>
 <h3 id="cvm-s-fence-diagram">CVM-S fence diagram</h3>
+<p>Build a fence diagram similar to Magistrale (2000) figure 10. Plot using Mayavi</p>
+<p><a href="scripts/CVM-Fence.py">CVM-Fence.py</a></p>
 <figure>
 <img src="figs/CVM-Fence-Vp-S.png" />
 </figure>
-<p>Build a fence diagram similar to Magistrale (2000) figure 10. Plot using Mayavi</p>
-<p><a href="scripts/CVM-Fence.py">CVM-Fence.py</a></p>
 <h3 id="cvm-s-basin-depth">CVM-S basin depth</h3>
-<figure>
-<img src="figs/CVM-Basins.png" />
-</figure>
 <p>Extract 3D mesh and search for the shallowest surface of Vs = 2.5 km/s. Plot over topography using Mayavi.</p>
 <p><a href="scripts/CVM-Basins-mesh.py">CVM-Basins-mesh.py</a><br />
 <a href="scripts/CVM-Basins-search.py">CVM-Basins-search.py</a><br />
 <a href="scripts/CVM-Basins-plot.py">CVM-Basins-plot.py</a></p>
+<figure>
+<img src="figs/CVM-Basins.png" />
+</figure>
 </body>
 </html>
