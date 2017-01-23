@@ -12,8 +12,9 @@
 
 Coseis is a toolkit for earthquake simulation featuring:
 
-- The Support Operator Rupture Dynamics ([SORD](http://elygeo.net/sord.html))
-  code for modeling spontaneous rupture and 3D wave propagation.
+- The Support Operator Rupture Dynamics
+  ([SORD](http://elygeo.net/coseis/sord.html)) code for modeling spontaneous
+  rupture and 3D wave propagation.
 
 - SCEC Community Velocity Models (CVM) codes, with MPI parallelization for
   [Magistrale version](https://scec.usc.edu/scecpedia/CVM-S4) (CVM-S), and new
