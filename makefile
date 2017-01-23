@@ -1,7 +1,8 @@
 all : index.html sord.html
 
-sord.html : docs/%.txt docs/style.html makefile
+index.html : README.md docs/style.html makefile
 	pandoc -sSH docs/style.html -w html5 $< -o $@
 
-%.html : docs/%.txt docs/style.html makefile
+sord.html : docs/SORD.txt docs/style.html makefile
 	pandoc -sSH docs/style.html -w html5 $< -o $@
+

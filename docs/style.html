@@ -1,18 +1,19 @@
 <style type="text/css">
-body {
+html {
 -webkit-text-size-adjust: 100%;
 font-family: Georgia, serif;
 word-wrap: break-word;
-margin: 1rem;
 }
+body { margin: 2rem 1rem; }
 a { color: currentColor; }
 p { line-height: 1.5; }
 sub, sup { line-height: 0; }
 img, figure {
-margin: 1rem auto;
+display: block;
+margin: 2rem auto;
 max-width: 100%;
 }
-h1, h2, h3, p, ul, ol, pre {
+h1, h2, h3, p, ul, ol, pre, table {
 margin: 1rem auto;
 max-width: 36rem;
 }
@@ -22,14 +23,19 @@ page-break-after: avoid;
 }
 h1, h2 {
 text-transform: uppercase;
-font-family: 'Gill Sans', sans-serif;
+font-family: 'Gill Sans', 'Gill Sans MT', 'Avenir', sans-serif;
 font-weight: 500;
 }
-h1 { font-weight: 600; margin: 0 auto; text-align: center; }
+h1 { font-weight: 600; margin-bottom: 0; text-align: center; }
 h1 + h2 { font-weight: 100; margin: 0 auto; text-align: center; }
-h1 + h2 + p { margin: 0 auto; text-align: center; }
+h1 + h2 + p {
+font-family: -apple-system, 'BlinkMacSystemFont', sans-serif;
+font-weight: 100;
+text-align: center;
+margin: 0 auto;
+}
 h1 + h2 + p a { text-decoration: none; }
-pre { font-family: 'Menlo', monospace; }
+pre { overflow: auto; font-family: 'Menlo', monospace; }
 pre, div.warn p {
 box-sizing: border-box;
 padding: 0.5rem 1rem;
