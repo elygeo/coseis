@@ -1,14 +1,14 @@
 <style type="text/css">
 html {
 -webkit-text-size-adjust: 100%;
-font-family: '-apple-system', 'BlinkMacSystemFont', sans-serif;
+font-family: Georgia, serif;
 line-height: 1.4;
 word-wrap: break-word;
 }
 body { margin: 2rem 0.5rem; }
 p { line-height: 1.4; }
 sub, sup { line-height: 0; }
-h1, h2, h3, p, ul, ol, pre, table {
+h1, h2, h3, p, ul, ol, pre, table, .ref {
 margin: 1rem auto;
 max-width: 36rem;
 }
@@ -26,6 +26,7 @@ margin-bottom: 0;
 }
 h1 + h2,
 h1 + h2 + p {
+font-family: '-apple-system', 'BlinkMacSystemFont', sans-serif;
 font-weight: 100;
 text-align: center;
 margin: 0 auto;
@@ -38,10 +39,18 @@ display: block;
 margin: 2rem auto;
 max-width: 100%;
 }
-pre { font-family: 'Menlo', monospace; }
+code {
+font-family: 'Menlo', monospace;
+line-height: 1;
+}
 pre, div.warn p {
 padding: 0.5rem 1rem;
 border: 1px solid #ccc;
+}
+.eprint {
+font-family: '-apple-system', 'BlinkMacSystemFont', sans-serif;
+font-size: 0.9rem;
+text-decoration: none;
 }
 @page { margin: 0.75in 0.25in; }
 @media print {

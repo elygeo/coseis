@@ -1,0 +1,54 @@
+[{
+"id": "2008-GJI-Ely+2",
+"type": "article-journal",
+"issued": {"date-parts": [[2008]]},
+"container-title": "Geophys. J. Int.",
+"volume": "172",
+"issue": "1",
+"page": "331-344",
+"DOI": "10.1111/j.1365-246X.2007.03633.x",
+"eprint": "http://gji.oxfordjournals.org/content/172/1/331.full.pdf",
+"title": "A support-operator method for visco-elastic wave modeling in 3D heterogeneous media",
+"author": [
+  {"family": "Ely", "given": "G."},
+  {"family": "Day", "given": "S."},
+  {"family": "Minster", "given": "J.-B."}
+],
+"abstract": "We apply the method of support operators (SOM) to solve the 3-D, viscoelastic equations of motion for use in earthquake simulations. SOM is a generalized finite-difference method that can utilize meshes of arbitrary structure and incorporate irregular geometry. Our implementation uses a 3-D, logically rectangular, hexahedral mesh. Calculations are second-order in space and time. A correction term is employed for suppression of spurious zero-energy modes (hourglass oscillations). We develop a free surface boundary condition, and an absorbing boundary condition using the method of perfectly matched layers (PML). Numerical tests using a layered material model in a highly deformed mesh show good agreement with the frequency-wavenumber method, for resolutions greater than 10 nodes per wavelength. We also test a vertically incident P wave on a semi-circular canyon, for which results match boundary integral solutions at resolutions greater that 20 nodes per wavelength. We also demonstrate excellent parallel scalability of our code."
+},
+{
+"id": "2009-GJI-Ely+2",
+"type": "article-journal",
+"issued": {"date-parts": [[2009]]},
+"container-title": "Geophys. J. Int.",
+"volume": "177",
+"issue": "3",
+"page": "1140-1150",
+"DOI": "10.1111/j.1365-246X.2009.04117.x",
+"eprint": "http://gji.oxfordjournals.org/content/177/3/1140.full.pdf",
+"title": "A support-operator method for 3D rupture dynamics",
+"author": [
+  {"family": "Ely", "given": "G."},
+  {"family": "Day", "given": "S."},
+  {"family": "Minster", "given": "J.-B."}
+],
+"abstract": "We present a numerical method to simulate spontaneous shear crack propagation within a heterogeneous, 3-D, viscoelastic medium. Wave motions are computed on a logically rectangular hexahedral mesh, using the generalized finite-difference method of Support Operators (SOM). This approach enables modelling of non-planar surfaces and non-planar fault ruptures. Our implementation, the Support Operator Rupture Dynamics (SORD) code, is highly scalable, enabling large-scale, multiprocessors calculations. The fault surface is modelled by coupled double nodes, where rupture occurs as dictated by the local stress conditions and a frictional failure law. The method successfully performs test problems developed for the Southern California Earthquake Center (SCEC)/U.S. Geological Survey (USGS) dynamic earthquake rupture code validation exercise, showing good agreement with semi-analytical boundary integral method results. We undertake further dynamic rupture tests to quantify numerical errors introduced by shear deformations to the hexahedral mesh. We generate a family of meshes distorted by simple shearing, in the along-strike direction, up to a maximum of 73°. For SCEC/USGS validation problem number 3, grid-induced errors increase with mesh shear angle, with the logarithm of error approximately proportional to angle over the range tested. At 73°, rms misfits are about 10 per cent for peak slip rate, and 0.5 per cent for both rupture time and total slip, indicating that the method (which, up to now, we have applied mainly to near-vertical strike-slip faulting) is also capable of handling geometries appropriate to low-angle surface-rupturing thrust earthquakes. Additionally, we demonstrate non-planar rupture effects, by modifying the test geometry to include, respectively, cylindrical curvature and sharp kinks."
+},
+{
+"id": "2010-BSSA-Ely+2",
+"type": "article-journal",
+"issued": {"date-parts": [[2010]]},
+"container-title": "Bull. Seism. Soc. Am.",
+"volume": "100",
+"issue": "1",
+"page": "131-150",
+"DOI": "10.1785/0120090187",
+"eprint": "http://elygeo.net/2010-BSSA-Ely+2.pdf",
+"title": "Dynamic rupture models for the southern San Andreas fault",
+"author": [
+  {"family": "Ely", "given": "G."},
+  {"family": "Day", "given": "S."},
+  {"family": "Minster", "given": "J.-B."}
+],
+"abstract": "Dynamic rupture, and resultant ground motions up to 0.25 Hz, are simulated for an Mw 7.6 earthquake on the southern San Andreas fault. Spontaneous rupture is modeled with slip-weakening friction, and 3D viscoelastic wave solutions are computed with a support-operator numerical method. The initial traction model is derived from inversions of the Mw 7.3 1992 Landers strong ground-motion records, and borrows heavily from that used for the TeraShake2 simulations by Olsen et al. (2008). Heterogeneity in the traction model leads to focusing of the rupture front, and the focusing produces cases of supershear rupture velocity in asperities (areas of high initial traction), as well as cases of high peak slip rate and cohesive zone contraction in antiasperities. Separate solutions are computed for version 3.0 and 4.0, respectively, of the Southern California Earthquake Center Community Velocity Model (SCEC-CVM). We also compare the case of a flat ground surface (a common simplification made for finite-difference simulations) to the case of the ground surface conformed to regional topography. The overall distribution of simulated ground motion intensity is consistent with that derived from the empirical model of Campbell and Bozorgnia (2008), in the sense that the bulk of simulated pseudospectral velocity (PSV) values are within the 68% confidence intervals of the empirical model. Simulated PSVs corresponding to low probability in the empirical model are principally associated with basin wave-guide and directivity effects. An important example, first identified by the TeraShake1 simulations (Olsen et al., 2006), is the stronger than expected ground motions at the site of Montebello due to a basin wave-guide effect. We find that this effect is lessened for version 4.0 of the SCEC-CVM, relative to version 3.0, due to a shallower model for the Chino basin."
+}]

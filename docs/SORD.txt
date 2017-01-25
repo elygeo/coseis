@@ -28,28 +28,12 @@ of Fortran 95 compilers, MPI implementations, and operating systems (Linux, Mac
 OS X, IBM AIX, SUN Solaris).
 
 
-## Publications
+## Background
 
-The first two papers give (for wave propagation and spontaneous rupture,
-respectively) the formulation, numerical algorithm, and verification of the
-SORD method. The third paper presents an application to simulating earthquakes
-in southern California.
-
-Ely, G. P., S. M. Day, and J.-B. Minster (2008), A support-operator method for
-visco-elastic wave modeling in 3D heterogeneous media, *Geophys. J. Int.*,
-*172* (1), 331-344,
-[doi:10.1111/j.1365-246X.2007.03633.x](http://dx.doi.org/10.1111/j.1365-246X.2007.03633.x).
-[[PDF]](http://gji.oxfordjournals.org/content/172/1/331.full.pdf)
-
-Ely, G. P., S. M. Day, and J.-B. Minster (2009), A support-operator method for
-3D rupture dynamics, *Geophys. J. Int.*, *177* (3), 1140-1150,
-[doi:10.1111/j.1365-246X.2009.04117.x](http://dx.doi.org/10.1111/j.1365-246X.2009.04117.x).
-[[PDF]](http://gji.oxfordjournals.org/content/177/3/1140.full.pdf)
-
-Ely, G. P., S. M. Day, and J.-B. Minster (2010), Dynamic rupture models for the
-southern San Andreas fault, *Bull. Seism. Soc. Am.*, *100* (1), 131-150,
-[doi:10.1785/0120090187](http://dx.doi.org/10.1785/0120090187).
-[[PDF]](http://elygeo.net/2010-BSSA-Ely+2.pdf)
+The formulation, numerical algorithm, and verification of the SORD method are
+described in @2008-GJI-Ely+2 for wave propagation, and @2009-GJI-Ely+2 for
+spontaneous rupture. @2010-BSSA-Ely+2 presents an application to simulating
+earthquakes in southern California.
 
 
 ## User Guide
@@ -277,4 +261,7 @@ to 64 thousand processors at ALCF. The following chart is the wall-time per
 step per core (click for PDF):
 
 [![](figs/SORD-MPI-Benchmark.png)](figs/SORD-MPI-Benchmark.pdf)
+
+
+## References {.bib}
 
