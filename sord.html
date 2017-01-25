@@ -12,45 +12,52 @@
   <style type="text/css">
   html {
   -webkit-text-size-adjust: 100%;
-  font-family: Georgia, serif;
+  font-family: '-apple-system', 'BlinkMacSystemFont', sans-serif;
+  line-height: 1.4;
   word-wrap: break-word;
   }
-  body { margin: 2rem 1rem; }
-  a { color: currentColor; }
-  p { line-height: 1.5; }
+  body { margin: 2rem 0.5rem; }
+  p { line-height: 1.4; }
   sub, sup { line-height: 0; }
-  img, figure {
-  display: block;
-  margin: 2rem auto;
-  max-width: 100%;
-  }
   h1, h2, h3, p, ul, ol, pre, table {
   margin: 1rem auto;
   max-width: 36rem;
   }
   h1, h2, h3 {
+  font-family: 'Gill Sans', 'Gill Sans MT', 'Avenir', sans-serif;
+  text-transform: uppercase;
+  font-weight: 500;
+  line-height: 1.2;
   margin-top: 2rem;
   page-break-after: avoid;
   }
-  h1, h2 {
-  text-transform: uppercase;
-  font-family: 'Gill Sans', 'Gill Sans MT', 'Avenir', sans-serif;
-  font-weight: 500;
+  h1 {
+  text-align: center;
+  margin-bottom: 0;
   }
-  h1 { font-weight: 600; margin-bottom: 0; text-align: center; }
-  h1 + h2 { font-weight: 100; margin: 0 auto; text-align: center; }
+  h1 + h2,
   h1 + h2 + p {
-  font-family: -apple-system, 'BlinkMacSystemFont', sans-serif;
   font-weight: 100;
   text-align: center;
   margin: 0 auto;
   }
-  h1 + h2 + p a { text-decoration: none; }
-  pre { overflow: auto; font-family: 'Menlo', monospace; }
+  h1 + h2 + p a, .email { text-decoration: none; }
+  a:active, a:focus, a:hover { text-decoration: underline; }
+  a { color: currentColor; }
+  img, figure {
+  display: block;
+  margin: 2rem auto;
+  max-width: 100%;
+  }
+  pre { font-family: 'Menlo', monospace; }
   pre, div.warn p {
-  box-sizing: border-box;
   padding: 0.5rem 1rem;
   border: 1px solid #ccc;
+  }
+  @page { margin: 0.75in 0.25in; }
+  @media print {
+  html { font-size: 12px; }
+  body { margin: 0; }
   }
   </style>
 </head>
