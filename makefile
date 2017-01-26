@@ -8,7 +8,6 @@ sord.html : docs/SORD.txt docs/header.html makefile
 	-M link-citations \
 	--csl=docs/chicago-mod.csl \
 	--filter=pandoc-citeproc \
-	--filter=pandoc-scholar.py \
 	--bibliography=docs/bibliography.json \
 	$< -o $@
 

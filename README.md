@@ -1,6 +1,6 @@
 # COSEIS
 
-## Computational Seismology Tools
+# Computational Seismology Tools
 
 [github.com/gely/coseis](https://github.com/gely/coseis/)  
 [elygeo.net/coseis](http://elygeo.net/coseis/)  

@@ -1,6 +1,6 @@
 # SORD
 
-## Support Operator Rupture Dynamics {#subtitle}
+# Support Operator Rupture Dynamics
 
 [github.com/gely/coseis](https://github.com/gely/coseis/)  
 [elygeo.net/coseis](http://elygeo.net/coseis/sord.html)  
@@ -23,9 +23,9 @@ non-planar ruptures and surface topography
 
 SORD simulations are configured with Python scripts. Underlying computations
 are coded in Fortran 95 and parallelized for multi-processor execution using
-Message Passing Interface (MPI). The code is portable and tested with a variety
-of Fortran 95 compilers, MPI implementations, and operating systems (Linux, Mac
-OS X, IBM AIX, SUN Solaris).
+Message Passing Interface (MPI) and OpenMP. The code is portable and tested
+with a variety of Fortran 95 compilers, MPI implementations, and UNIX-like
+operating systems (Linux, MacOS, IBM AIX, etc.).
 
 
 ## Background

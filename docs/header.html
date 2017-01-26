@@ -1,58 +1,86 @@
 <style type="text/css">
 html {
 -webkit-text-size-adjust: 100%;
-font-family: Georgia, serif;
-line-height: 1.4;
 word-wrap: break-word;
 }
-body { margin: 2rem 0.5rem; }
-p { line-height: 1.4; }
-sub, sup { line-height: 0; }
-h1, h2, h3, p, ul, ol, pre, table, .ref {
-margin: 1rem auto;
-max-width: 36rem;
+body {
+margin: 2rem 0.5rem;
+}
+a {
+color: currentColor;
+}
+sub, sup {
+line-height: 0;
 }
 h1, h2, h3 {
-font-family: 'Gill Sans', 'Gill Sans MT', 'Avenir', sans-serif;
+font-family: 'Gill Sans', 'Gill Sans MT', Avenir, sans-serif;
+font-weight: 600;
 text-transform: uppercase;
-font-weight: 500;
-line-height: 1.2;
-margin-top: 2rem;
 page-break-after: avoid;
 }
 h1 {
 text-align: center;
-margin-bottom: 0;
+margin: 0;
 }
-h1 + h2,
-h1 + h2 + p {
-font-family: '-apple-system', 'BlinkMacSystemFont', sans-serif;
-font-weight: 100;
+h1 + h1 {
+font-size: 1.5rem;
+font-weight: 200;
+}
+h1 + p {
+font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+font-weight: 200;
 text-align: center;
-margin: 0 auto;
+max-width: none;
+margin: 0;
 }
-h1 + h2 + p a, .email { text-decoration: none; }
-a:active, a:focus, a:hover { text-decoration: underline; }
-a { color: currentColor; }
-img, figure {
+h1 + p a, .email {
+text-decoration: none;
+}
+a:active, a:focus, a:hover {
+text-decoration: underline;
+}
+h2, h3 {
+max-width: 36rem;
+margin: 2rem auto 1rem auto;
+}
+p, ul, table, .ref, #refs div {
+font-family: Georgia, serif;
+line-height: 1.4;
+max-width: 36rem;
+page-break-inside: avoid;
+margin: 1rem auto;
+}
+figure {
+margin: 2rem 0;
+}
+img {
 display: block;
-margin: 2rem auto;
+margin: auto;
 max-width: 100%;
 }
 code {
-font-family: 'Menlo', monospace;
-line-height: 1;
+font-family: Menlo, monospace, serif;
+font-size: 0.875rem;
 }
-pre, div.warn p {
-padding: 0.5rem 1rem;
-border: 1px solid #ccc;
+pre {
+font-family: Menlo, monospace, serif;
+background: #eee;
+max-width: 36rem;
+padding: 1rem;
+margin: 1rem auto;
+}
+.warn p {
+background: #fee;
+padding: 1rem;
 }
 .eprint {
-font-family: '-apple-system', 'BlinkMacSystemFont', sans-serif;
-font-size: 0.9rem;
+font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+font-size: 0.875rem;
 text-decoration: none;
 }
-@page { margin: 0.75in 0.25in; }
+@page {
+margin: 0.75in 0.25in;
+}
 @media print {
 html { font-size: 12px; }
 body { margin: 0; }
