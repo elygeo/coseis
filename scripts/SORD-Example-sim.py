@@ -17,4 +17,4 @@ prm = {
 d = cst.repo + 'Example'
 os.mkdir(d)
 os.chdir(d)
-cst.jon.launch(cst.sord.stage(prm))
+cst.job.launch(cst.sord.stage(prm))

@@ -1,6 +1,6 @@
 # SORD
 
-# Support Operator Rupture Dynamics
+# Support Operator Rupture Dynamics
 
 [github.com/gely/coseis](https://github.com/gely/coseis/)  
 [elygeo.net/coseis](http://elygeo.net/coseis/sord.html)  
@@ -260,7 +260,7 @@ time step per one million mesh points. SORD scalability has been benchmarked up
 to 64 thousand processors at ALCF. The following chart is the wall-time per
 step per core (click for PDF):
 
-[![](figs/SORD-MPI-Benchmark.png)](figs/SORD-MPI-Benchmark.pdf)
+![](figs/SORD-Benchmark.svg)
 
 
 ## References {.bib}

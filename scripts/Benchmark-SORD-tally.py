@@ -1,24 +1,25 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import os
 import json
-import glob
 import numpy as np
-import cst.job
 
-label = 'ACLF BG/Q'
-procs = []
-times = []
-path = cst.job.repo + 'Benchmark-SORD'
-
-for p in glob.glob(path + '-[0-9]*'):
-    p += os.sep
-    meta = json.load(open(p + 'meta.json'))
-    p = p + 'prof-8step.bin'
-    if os.path.exists(p):
-        t = np.fromfile(p, meta.dtype)
-        x, y, z = meta.nproc3
+out = []
+for p in os.listdir('.'):
+    meta = p + '/meta.json'
+    if os.path.exists(meta):
+        meta = json.load(open(meta))
+        x, y, z = meta['nproc3']
         n = x * y * z
-        procs.append(n)
-        times.append(t[1:-1].mean())
+        f = p + '/prof-8step.bin'
+        t = np.fromfile(f, meta['dtype'])
+        t = float(t[1:-1].mean())
+        out.append('[%s, %s]' % (n, t))
+out = '[\n' + ',\n'.join(out) + '\n]\n'
 
-json.dumps(zip(times, procs), indent=0)
+x, y, z = meta['shape'][:3]
+m = x * y * z
+f = 546 * m / t / 10 ** 12
+print('Elements per core: %s' % (m / n))
+print('TFlops: %s' % f)
+print('[Cores, Time/Step]')
+print(out)

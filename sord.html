@@ -12,10 +12,12 @@
   <style type="text/css">
   html {
   -webkit-text-size-adjust: 100%;
+  font-family: Georgia, serif;
+  line-height: 1.5;
   word-wrap: break-word;
   }
   body {
-  margin: 2rem 0.5rem;
+  margin: 2rem 0.75rem;
   }
   a {
   color: currentColor;
@@ -31,10 +33,10 @@
   }
   h1 {
   text-align: center;
+  line-height: 1.25;
   margin: 0;
   }
   h1 + h1 {
-  font-size: 1.5rem;
   font-weight: 200;
   }
   h1 + p {
@@ -42,9 +44,9 @@
   font-weight: 200;
   text-align: center;
   max-width: none;
-  margin: 0;
+  margin-top: 0;
   }
-  h1 + p a, .email {
+  h1 + p a {
   text-decoration: none;
   }
   a:active, a:focus, a:hover {
@@ -55,11 +57,9 @@
   margin: 2rem auto 1rem auto;
   }
   p, ul, table, .ref, #refs div {
-  font-family: Georgia, serif;
-  line-height: 1.4;
   max-width: 36rem;
-  page-break-inside: avoid;
   margin: 1rem auto;
+  page-break-inside: avoid;
   }
   figure {
   margin: 2rem 0;
@@ -100,7 +100,7 @@
 </head>
 <body>
 <h1 id="sord">SORD</h1>
-<h1 id="supportoperator-rupturedynamics">Support Operator Rupture Dynamics</h1>
+<h1 id="support-operator-rupture-dynamics">Support Operator Rupture Dynamics</h1>
 <p><a href="https://github.com/gely/coseis/">github.com/gely/coseis</a><br />
 <a href="http://elygeo.net/coseis/sord.html">elygeo.net/coseis</a></p>
 <figure>
@@ -237,7 +237,9 @@ bc2 = [&#39;anti-n&#39;, &#39;mirror-n&#39;, &#39;anti-c&#39;</code></pre>
 </tbody>
 </table>
 <p>On current hardware, computation time is on the order of the one second per time step per one million mesh points. SORD scalability has been benchmarked up to 64 thousand processors at ALCF. The following chart is the wall-time per step per core (click for PDF):</p>
-<p><a href="figs/SORD-MPI-Benchmark.pdf"><img src="figs/SORD-MPI-Benchmark.png" /></a></p>
+<figure>
+<img src="figs/SORD-Benchmark.svg" />
+</figure>
 <h2 id="references" class="unnumbered bib">References</h2>
 <div id="refs" class="references">
 <div id="ref-2008-GJI-Ely+2">

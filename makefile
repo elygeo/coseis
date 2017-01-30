@@ -1,10 +1,10 @@
 all : index.html sord.html
 
-index.html : README.md docs/header.html makefile
-	pandoc -Ssw html5 -H docs/header.html $< -o $@
+index.html : README.md docs/style.html makefile
+	pandoc -Ssw html5 -H docs/style.html $< -o $@
 
-sord.html : docs/SORD.txt docs/header.html makefile
-	pandoc -Ssw html5 -H docs/header.html \
+sord.html : docs/SORD.txt docs/style.html makefile
+	pandoc -Ssw html5 -H docs/style.html \
 	-M link-citations \
 	--csl=docs/chicago-mod.csl \
 	--filter=pandoc-citeproc \
