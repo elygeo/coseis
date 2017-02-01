@@ -7,6 +7,11 @@ import json
 import shutil
 import subprocess
 
+src_path = os.path.dirname(__file__)
+src_path = os.path.realpath(src_path)
+src_path = os.path.dirname(src_path)
+src_path = os.path.join(src_path, 'sord')
+
 parameters = {
     'nproc3': [1, 1, 1],
     'nthread': -1,
@@ -258,9 +263,8 @@ def f90modules(path):
 
 
 def configure(force=False):
-    import cst
     cwd = os.getcwd()
-    os.chdir(cst.home + 'sord')
+    os.chdir(src_path)
     if force or not os.path.exists('Makefile'):
         rules = []
         objects = []
@@ -290,14 +294,13 @@ def configure(force=False):
 
 
 def make(force=False):
-    import cst
     configure(force)
     if force:
-        x = 'make', '-C', cst.home + 'sord', 'clean'
+        x = 'make', '-C', src_path, 'clean'
         subprocess.check_call(x)
-    x = 'make', '-C', cst.home + 'sord', '-j', '4'
+    x = 'make', '-C', src_path, '-j', '4'
     subprocess.check_call(x)
-    x = os.path.join(cst.home, 'sord', 'config.json')
+    x = os.path.join(src_path, 'config.json')
     x = json.load(open(x))
     return x
 
@@ -477,7 +480,6 @@ def prepare(prm, fio):
 
 
 def stage(args=None, **kwargs):
-    import cst
     if args is None:
         args = {}
     args.update(kwargs)
@@ -545,7 +547,7 @@ def stage(args=None, **kwargs):
         m = (1 + (nt + 10) * nm // 70000000) * 60
     job['minutes'] = m
 
-    f = os.path.join(cst.home, 'sord', 'sord.x')
+    f = os.path.join(src_path, 'sord.x')
     shutil.copy2(f, '.')
     if prm['debug'] > 2:
         os.mkdir('debug')

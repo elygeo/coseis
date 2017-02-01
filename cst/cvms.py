@@ -6,6 +6,7 @@ import json
 import copy
 import shutil
 import subprocess
+from .. import repository
 
 versions = ['2.2', '3.0', '4.0']
 
@@ -39,13 +40,13 @@ defaults = {
 
 
 def configure(force=False, **kw):
-    import cst.job
+    from . import job
 
     cwd = os.getcwd()
-    os.chdir(cst.repo)
+    os.chdir(repository)
 
     cfg = copy.deepcopy(defaults)
-    cfg = cst.job.prepare(
+    cfg = job.prepare(
         defaults=cfg,
         name='cvms',
         executable=os.path.join('.', 'cvms.x'),
@@ -66,7 +67,7 @@ def configure(force=False, **kw):
     bld = 'build-%s' % ver + os.sep
     if not os.path.exists(bld):
         os.mkdir(bld)
-        p = os.path.join(cst.repo, 'CVMS-%s' % ver, 'src') + os.sep
+        p = os.path.join(repository, 'CVMS-%s' % ver, 'src') + os.sep
         for f in os.listdir(p):
             shutil.copy2(p + f, bld + f)
 
@@ -95,7 +96,7 @@ def make(force=False, **kwargs):
 
 
 def run(**kwargs):
-    import cst.job
+    from . import job
     cfg = make(**kwargs)
 
     p = (cfg['nsample'] - 1) // cfg['max_samples'] + 1
@@ -109,7 +110,7 @@ def run(**kwargs):
     if cfg['process'] == 'serial':
         cfg['execute'] = cfg['executable']
 
-    p = os.path.join(cst.repo, 'CVMS-%s' % cfg['version'], 'data')
+    p = os.path.join(repository, 'CVMS-%s' % cfg['version'], 'data')
     for f in os.listdir(p):
         g = os.path.join(p, f)
         os.link(g, f)
@@ -118,7 +119,7 @@ def run(**kwargs):
     os.link(f, 'cvms.x')
 
     open('cvms.in', 'w').write(input_template.format(**cfg))
-    cst.job.launch(cfg)
+    job.launch(cfg)
 
     return cfg
 

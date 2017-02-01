@@ -221,7 +221,7 @@ def write_sord(path, srf, delta=(1, 1, 1), proj=None, dbytes=4):
     proj: function to project lon/lat to logical model coordinates
     dbytes: 4 or 8
     """
-    from cst import coord
+    from . import coord
 
     # setup
     meta, data = srf
@@ -333,7 +333,7 @@ def write_awp(
     interp: interpolation method, linear or cubic
     """
     import numpy as np
-    from cst import coord
+    from . import coord
 
     fh = open_(fh)
 
@@ -417,7 +417,7 @@ def write_coulomb(path, srf, proj, scut=0):
     scut: slip-rate below which values are not output
     """
     import numpy as np
-    from cst import coord
+    from . import coord
 
     # slip components
     meta, data = srf
@@ -467,21 +467,26 @@ def write_coulomb(path, srf, proj, scut=0):
 
 coulomb_fmt = '  1' + 4*' %10.4f' + ' 100' + 5*' %10.4f' + '    Fault 1'
 
-coulomb_header = """\
-header line 1
-header line 2
-#reg1=  0  #reg2=  0  #fixed=  {nsource}  sym=  1
- PR1=       0.250     PR2=       0.250   DEPTH=      12.209
-  E1=     8.000e+005   E2=     8.000e+005
-XSYM=       .000     YSYM=       .000
-FRIC=          0.400
-S1DR=         19.000 S1DP=         -0.010 S1IN=        100.000 S1GD=          0.000
-S2DR=         89.990 S2DP=         89.990 S2IN=         30.000 S2GD=          0.000
-S3DR=        109.000 S3DP=         -0.010 S3IN=          0.000 S3GD=          0.000
-
-  #   X-start    Y-start     X-fin      Y-fin   Kode  rt.lat    reverse   dip angle     top      bot
-xxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx
-"""
+coulomb_header = '\n'.join(
+    'header line 1',
+    'header line 2',
+    '#reg1=  0  #reg2=  0  #fixed=  {nsource}  sym=  1',
+    ' PR1=       0.250     PR2=       0.250   DEPTH=      12.209',
+    '  E1=     8.000e+005   E2=     8.000e+005',
+    'XSYM=       .000     YSYM=       .000',
+    'FRIC=          0.400',
+    'S1DR=         19.000 S1DP=         -0.010 '
+    'S1IN=        100.000 S1GD=          0.000',
+    'S2DR=         89.990 S2DP=         89.990 '
+    'S2IN=         30.000 S2GD=          0.000',
+    'S3DR=        109.000 S3DP=         -0.010 '
+    'S3IN=          0.000 S3GD=          0.000',
+    '',
+    '  #   X-start    Y-start     X-fin      Y-fin   Kode  rt.lat  '
+    '  reverse   dip angle     top      bot',
+    'xxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxx xxxxxxxxxx '
+    'xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx'
+)
 
 coulomb_footer = """
    Grid Parameters

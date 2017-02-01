@@ -15,10 +15,10 @@ def build():
     os.chdir(cwd)
 
 try:
-    from cst.interp_ import trinterp
+    from .interp_ import trinterp
 except ImportError:
     build()
-    from cst.interp_ import trinterp
+    from .interp_ import trinterp
 assert(trinterp)
 
 

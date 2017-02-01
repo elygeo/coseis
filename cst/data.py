@@ -9,7 +9,7 @@ import math
 import zipfile
 import subprocess
 import urllib.request
-import cst
+from .. import repository
 
 # TODO
 # Quaternary Fault Database
@@ -132,8 +132,8 @@ def etopo1(downsample=1):
     http://www.ngdc.noaa.gov/mgg/global/global.html
     """
     import numpy as np
-    f = cst.repo + 'DEM0060.npy'
-    g = cst.repo + 'DEM%04d.npy' % (60 * downsample)
+    f = repository + 'DEM0060.npy'
+    g = repository + 'DEM%04d.npy' % (60 * downsample)
     u = (
         'http://www.ngdc.noaa.gov/mgg/global/relief/ETOPO1/data/'
         'ice_surface/grid_registered/binary/etopo1_ice_g_i2.zip'
@@ -176,7 +176,7 @@ def globe30(tile=(0, 1), fill=True):
         fill: Fill missing data (ocean basins) with ETOPO1 bathymetry.
     """
     import numpy as np
-    filename = cst.repo + 'DEM0030-%s%s.npy' % tile
+    filename = repository + 'DEM0030-%s%s.npy' % tile
     url = 'http://www.ngdc.noaa.gov/mgg/topo/DATATILES/elev/%s10g.gz'
     tiles = ('im', 'jn', 'ko', 'lp'), ('ae', 'bf', 'cg', 'dh')
     shape = 10800, 10800
@@ -240,7 +240,7 @@ def dem(coords, scale=1.0, downsample=0, mesh=False):
         elev: array of elevation values at the interpolation points
     """
     import numpy as np
-    import cst.interp
+    from . import interp
     x, y = np.asarray(coords)
     sample = x.size > 2 or y.size > 2
     if sample:
@@ -282,7 +282,7 @@ def dem(coords, scale=1.0, downsample=0, mesh=False):
             res *= 2
     z = z * scale  # always do this to convert to float
     if sample:
-        return cst.interp.interp2(extent, z, (x, y))
+        return interp.interp2(extent, z, (x, y))
     elif mesh:
         delta = 1.0 / res
         n = z.shape
@@ -300,8 +300,8 @@ def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):
     Wald, et al. Vs30 map.
     """
     import numpy as np
-    import cst.interp
-    f = os.path.join(cst.repo, 'Vs30-Wald-%s.npy') % region.replace('_', '-')
+    from . import interp
+    f = os.path.join(repository, 'Vs30-Wald-%s.npy') % region.replace('_', '-')
     u = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/%s.grd.gz'
     if not os.path.exists(f):
         u = u % region
@@ -332,7 +332,7 @@ def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):
     extent = xlim, ylim
     z = np.load(f, mmap_mode='c')[j0:j1+1, k0:k1+1]
     if sample:
-        z = cst.interp.interp2(extent, z, (x, y), method=method)
+        z = interp.interp2(extent, z, (x, y), method=method)
         return z
     elif mesh:
         n = z.shape
@@ -375,7 +375,7 @@ def mapdata(
         'http://www.ngdc.noaa.gov/mgg/shorelines/'
         'data/gshhg/latest/gshhg-bin-2.3.5.zip'
     )
-    d = os.path.join(cst.repo, 'GSHHS')
+    d = os.path.join(repository, 'GSHHS')
     if not os.path.exists(d):
         print('Retrieving %s' % url)
         data = urllib.request.urlopen(url)
@@ -386,7 +386,9 @@ def mapdata(
     name = {'c': 'GSHHS coastlines', 'r': 'WDB rivers', 'b': 'WDB borders'}
     name = name[kind[0]]
     kind = {'c': 'gshhs', 'r': 'wdb_rivers', 'b': 'wdb_borders'}[kind[0]]
-    filename = os.path.join(cst.repo, 'GSHHS/%s_%s.b' % (kind, resolution[0]))
+    filename = os.path.join(
+        repository, 'GSHHS/%s_%s.b' % (kind, resolution[0])
+    )
     data = np.fromfile(filename, '>i')
     if kind != 'gshhs':
         min_area = 0.0
@@ -446,7 +448,7 @@ def us_place_names():
     import numpy as np
 
     u = 'http://geonames.usgs.gov/docs/stategaz/US_CONCISE.zip'
-    f = cst.repo + 'US-Place-Names.npy'
+    f = repository + 'US-Place-Names.npy'
     c = 1, 2, 3, 5, 9, 10, 15
     t = [
         ('name', 'S84'),
@@ -475,7 +477,7 @@ def engdahl_cat():
     http://earthquake.usgs.gov/data/centennial/
     """
     import numpy as np
-    f = cst.repo + 'Engdahl-Centennial-Cat.npy'
+    f = repository + 'Engdahl-Centennial-Cat.npy'
     u = 'http://earthquake.usgs.gov/data/centennial/centennial_Y2K.CAT'
     t = [
         6, ('icat',   'S6'),
@@ -511,7 +513,7 @@ def lsh_cat():
     http://www.rsmas.miami.edu/personal/glin/LSH.html
     """
     import numpy as np
-    f = cst.repo + 'LSH-Catalog.npy'
+    f = repository + 'LSH-Catalog.npy'
     u = "http://www.rsmas.miami.edu/personal/glin/LSH_files/LSH_1.12"
     t = [
         ('year',    'u2'),
@@ -563,11 +565,11 @@ def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
     Returns (metadata, data) SRF dictionaries
     """
     import numpy as np
-    from cst import srf as srflib
+    from . import srf as srflib
 
     # locations
     v0, v1 = version
-    path = cst.repo + 'CyberShake' + os.sep
+    path = repository + 'CyberShake' + os.sep
     host = 'intensity.usc.edu'
     erf = '/home/scec-00/cybershk/reports/'
     srf = (

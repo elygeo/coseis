@@ -14,10 +14,10 @@ def build():
     os.chdir(cwd)
 
 try:
-    from cst.rspectra import rspectra
+    from .rspectra import rspectra
 except ImportError:
     build()
-    from cst.rspectra import rspectra
+    from .rspectra import rspectra
 assert(rspectra)
 
 
