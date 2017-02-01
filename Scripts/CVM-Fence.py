@@ -10,13 +10,13 @@ import numpy as np
 from mayavi import mlab
 
 # parameters
-model = 'S'; version = '2.2'
-model = 'S'; version = None
-model = 'H'; version = None
+model, version = 'S', '2.2'
+model, version = 'S', None
+model, version = 'H', None
 prop, vmin, vmax = 'Vs', 500, 4000
 prop, vmin, vmax = 'Vp', 1600, 6400
-dx = 400.0; dz = 100.0; nz = 101
-dx = 200.0; dz = 50.0; nz = 201
+dx, dz, nz = 400.0, 100.0, 101
+dx, dz, nz = 200.0, 50.0, 201
 transpose = False
 
 # projection
@@ -50,11 +50,11 @@ for i in range(0, len(ll), 2):
     y = ll[i][1], ll[i+1][1]
     x, y = proj(x, y)
     dr = np.sqrt(np.diff(x) ** 2 + np.diff(y) ** 2)
-    r  = np.r_[0.0, np.cumsum(dr) ]
-    n  = int(r[-1] / dx + 1.5)
+    r = np.r_[0.0, np.cumsum(dr)]
+    n = int(r[-1] / dx + 1.5)
     ri = np.linspace(0.0, r[-1], n)
-    x  = np.interp(ri, r, x)
-    y  = np.interp(ri, r, y)
+    x = np.interp(ri, r, x)
+    y = np.interp(ri, r, y)
     nn += [n]
     xx += [x]
     yy += [y]
@@ -84,7 +84,7 @@ zz *= -3.0
 # setup figure
 pixels = 640, 360
 size = pixels[0], pixels[1] + 63
-fig = mlab.figure(None, size=size, bgcolor=(1,1,1), fgcolor=(0,0,0))
+fig = mlab.figure(None, size=size, bgcolor=(1, 1, 1), fgcolor=(0, 0, 0))
 mlab.clf()
 fig.scene.disable_render = True
 fig.scene.set_size(pixels)
@@ -101,9 +101,9 @@ for n in nn:
     h.module_manager.scalar_lut_manager.lut.table = lut
     i += n
     if 1:
-        x = np.concatenate([x[:,0], x[::-1,-1], x[:1,0]])
-        y = np.concatenate([y[:,0], y[::-1,-1], y[:1,0]])
-        z = np.concatenate([z[:,0], z[::-1,-1], z[:1,0]])
+        x = np.concatenate([x[:, 0], x[::-1, -1], x[:1, 0]])
+        y = np.concatenate([y[:, 0], y[::-1, -1], y[:1, 0]])
+        z = np.concatenate([z[:, 0], z[::-1, -1], z[:1, 0]])
         mlab.plot3d(x, y, z, line_width=0.5, tube_radius=None)
 
 # plot coastline
@@ -114,7 +114,7 @@ x, y = proj(x, y)
 x[i] = np.nan
 y[i] = np.nan
 z = np.zeros_like(x)
-mlab.plot3d(x, y, z, color=(0,0,0), line_width=0.5, tube_radius=None)
+mlab.plot3d(x, y, z, color=(0, 0, 0), line_width=0.5, tube_radius=None)
 
 # orient camera and save figure
 mlab.view(-90, 45, 2e6, (0, 0, -2e4))
@@ -124,5 +124,4 @@ f = 'CVM-Fence-%s-%s.png' % (prop, model)
 print(f)
 mlab.savefig(f, magnification=1)
 fig.scene.disable_render = False
-#mlab.show()
-
+# mlab.show()

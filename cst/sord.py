@@ -260,7 +260,7 @@ def f90modules(path):
 def configure(force=False):
     import cst
     cwd = os.getcwd()
-    os.chdir(cst.home + 'SORD')
+    os.chdir(cst.home + 'sord')
     if force or not os.path.exists('Makefile'):
         rules = []
         objects = []
@@ -293,11 +293,13 @@ def make(force=False):
     import cst
     configure(force)
     if force:
-        subprocess.check_call(['make', '-C', cst.home + 'SORD', 'clean'])
-    subprocess.check_call(['make', '-C', cst.home + 'SORD', '-j', '4'])
-    c = os.path.join(cst.home, 'SORD', 'config.json')
-    c = json.load(open(c))
-    return c
+        x = 'make', '-C', cst.home + 'sord', 'clean'
+        subprocess.check_call(x)
+    x = 'make', '-C', cst.home + 'sord', '-j', '4'
+    subprocess.check_call(x)
+    x = os.path.join(cst.home, 'sord', 'config.json')
+    x = json.load(open(x))
+    return x
 
 
 def prepare(prm, fio):
@@ -543,7 +545,7 @@ def stage(args=None, **kwargs):
         m = (1 + (nt + 10) * nm // 70000000) * 60
     job['minutes'] = m
 
-    f = os.path.join(cst.home, 'SORD', 'sord.x')
+    f = os.path.join(cst.home, 'sord', 'sord.x')
     shutil.copy2(f, '.')
     if prm['debug'] > 2:
         os.mkdir('debug')

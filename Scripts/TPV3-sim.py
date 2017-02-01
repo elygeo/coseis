@@ -66,7 +66,7 @@ for dx, np in runs:
             ([i1, i1], '=', 72.9e+6),
             ([i0, i1], '=', 75.8e+6),
             ([i1, i0], '=', 75.8e+6),
-        ]
+        ],
         'x':    [([j, k, -2], '>', 'x.bin')],
         'y':    [([j, k, -2], '>', 'y.bin')],
         'psv':  [([j, k, -1], '>', 'psv.bin')],
@@ -88,7 +88,7 @@ for dx, np in runs:
         ]
 
     # run SORD
-    d = cst.sord.repo + 'TPV3-%03.0f' % dx
+    d = cst.repo + 'TPV3-%03.0f' % dx
     os.mkdir(d)
     os.chdir(d)
     cst.sord.run(prm)

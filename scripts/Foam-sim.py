@@ -83,7 +83,7 @@ prm['uy'] += [([0, k, [l], []], '=>', 'off-fault.bin')]
 # prm['vy'] = [([[], k, [l], [None, None, 10]], '=>', 'xsec.bin')]
 
 # run SORD
-d = cst.sord.repo + 'Foam-%02.0f' % (weakzone * 100)
+d = cst.repo + 'Foam-%02.0f' % (weakzone * 100)
 os.mkdir(d)
 os.chdir(d)
 cst.job.launch(cst.sord.stage(prm))

@@ -52,7 +52,7 @@ for f in 'vx', 'vy', 'vz':
     prm[f] += [([j, [], [], t], '=>', 'snap-%s.bin' % f)]
 
 # run sord
-d = cst.job.repo + 'Explosion'
+d = cst.repo + 'Explosion'
 os.mkdir(d)
 os.chdir(d)
 cst.job.launch(cst.sord.stage(prm))

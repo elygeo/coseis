@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 # parameters
 exp = 0.5
 clim = 0.0, 0.000001
-os.chdir(cst.job.repo + 'Canyon')
+os.chdir(cst.repo + 'Canyon')
 
 # metadata
 meta = json.load('meta.json')

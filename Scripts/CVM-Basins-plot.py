@@ -14,20 +14,20 @@ import matplotlib.pyplot as plt
 from mayavi import mlab
 
 # parameters
-outfile = 'CVM-Basins.png'; dpi = 150.0
-outfile = 'CVM-Basins.pdf'; dpi = 300.0
-path = cst.job.repo + 'CVM-Basins' + os.sep
+outfile, dpi = 'CVM-Basins.png', 150.0
+outfile, dpi = 'CVM-Basins.pdf', 300.0
+path = cst.repo + 'CVM-Basins' + os.sep
 proj = pyproj.Proj(proj='tmerc', lon_0=-117.25, lat_0=33.75, k=0.001)
 title = 'SCEC Community\nVelocity Model'
 legend = 'Depth to Vs = 2.5 km/s'
 ticklabels = '0', '4', '8 km'
 ticks = 0, 4, 8
 colormap = [
-    (0, 0.001, 2, 3), # value
-    (1, 1, 1, 1), # red
-    (0, 0, 1, 1), # green
-    (0, 0, 0, 1), # blue
-    (0, 1, 1, 1), # alpha
+    (0, 0.001, 2, 3),  # value
+    (1, 1, 1, 1),  # red
+    (0, 0, 1, 1),  # green
+    (0, 0, 0, 1),  # blue
+    (0, 1, 1, 1),  # alpha
 ]
 colorexp = 1.0
 colorlim = ticks[0], ticks[-1]
@@ -42,7 +42,8 @@ ppi = 100
 
 
 # Matplotlib section
-plt.rc('lines',
+plt.rc(
+    'lines',
     solid_joinstyle='round',
     solid_capstyle='round',
     dash_joinstyle='round',
@@ -83,22 +84,28 @@ ax.plot(x, y, 'o', ms=2.3, mfc='w', mec='k', mew=1.5, alpha=0.4)
 ax.plot(x, y, 'o', ms=2.3, mfc='w', mec='k', mew=0, alpha=1.0)
 va = sites[2::5]
 ha = sites[3::5]
-s  = sites[4::5]
+s = sites[4::5]
 dy = {'top': -5, 'baseline': 5}
 for i in range(len(s)):
-    cst.plt.text(ax, x[i], y[i]+dy[va[i]], s[i], ha=ha[i], va=va[i], size=7,
-        weight='bold', color='w', edgecolor='k')
+    cst.plt.text(
+        ax, x[i], y[i]+dy[va[i]], s[i], ha=ha[i], va=va[i], size=7,
+        weight='bold', color='w', edgecolor='k'
+    )
 
 # legend
 w = 50.0 / (axis[1] - axis[0])
 rect = 0.142 - w, 0.08, 2 * w, 0.02
 cmap = cst.plt.colormap(colormap, colorexp)
-cst.plt.colorbar(fig0, cmap, colorlim, legend, rect, ticks, ticklabels, size=7,
-     weight='bold', color='w', edgecolor='k')
+cst.plt.colorbar(
+    fig0, cmap, colorlim, legend, rect, ticks, ticklabels, size=7,
+    weight='bold', color='w', edgecolor='k'
+)
 leg = fig0.add_axes([0, 0, 1, 1])
 leg.set_axis_off()
-cst.plt.text(leg, 0.87, 0.95, title, ha='center', va='top', size=10,
-     weight='bold', color='w', edgecolor='k')
+cst.plt.text(
+    leg, 0.87, 0.95, title, ha='center', va='top', size=10,
+    weight='bold', color='w', edgecolor='k'
+)
 
 # create overlay
 if outfile.endwith('pdf'):
@@ -107,7 +114,7 @@ else:
     aa = 3
     mask = cst.plt.savefig(fig0, dpi=aa*dpi, transparent=True)
     over = cst.plt.savefig(fig0, dpi=aa*dpi, background='k')
-    over[:,:,3] = mask[:,:,3]
+    over[:, :, 3] = mask[:, :, 3]
     over = Image.fromarray(over, 'RGBA')
     over = over.resize(pixels, Image.ANTIALIAS)
 plt.close(0)
@@ -116,9 +123,9 @@ plt.close(0)
 # Mayavi section
 x, y = inches
 size = int(ppi * x + 2), int(ppi * y + 48)
-#mlab.options.offscreen = True
+# mlab.options.offscreen = True
 fig = mlab.figure('Viz', size=size)
-#fig.scene.off_screen_rendering = True
+# fig.scene.off_screen_rendering = True
 fig.scene.disable_render = True
 fig.scene.set_size(pixels)
 fig.scene.render_window.aa_frames = 8
@@ -126,11 +133,11 @@ mlab.clf()
 
 # topography
 cmap = [
-    (-5, -3, -2, -1,  1,  2,  3,  5), # value
-    ( 0,  0, 10, 10, 15, 15, 25, 25), # red
-    (10, 10, 20, 20, 25, 30, 25, 25), # green
-    (38, 38, 40, 40, 25, 20, 17, 17), # blue
-    (80, 80, 80, 80, 80, 80, 80, 80), # alpha
+    (-5, -3, -2, -1,  1,  2,  3,  5),  # value
+    (0,  0,  10, 10, 15, 15, 25, 25),  # red
+    (10, 10, 20, 20, 25, 30, 25, 25),  # green
+    (38, 38, 40, 40, 25, 20, 17, 17),  # blue
+    (80, 80, 80, 80, 80, 80, 80, 80),  # alpha
 ]
 x, y, z = cst.data.dem(extent, scale=0.001, downsample=-1)
 s = np.maximum(0.01, z)
@@ -172,7 +179,7 @@ surf.parent.parent.filter.splitting = False
 surf = surf.mlab_source
 
 # camera
-mlab.view(0, 0, 600, (0,0,0), figure=fig)
+mlab.view(0, 0, 600, (0, 0, 0), figure=fig)
 fig.scene.parallel_projection = True
 fig.scene.camera.parallel_scale = axis[3]
 

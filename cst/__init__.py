@@ -11,7 +11,9 @@ if '' in sys.path:
 home = os.path.dirname(__file__)
 home = os.path.realpath(home)
 home = os.path.dirname(home) + os.sep
-repo = os.path.join(home, 'Repo') + os.sep
+repo = os.path.join(home, 'repo') + os.sep
+
+print(repo)
 
 if sys.argv[1:] == ['setup']:
     d = site.USER_SITE

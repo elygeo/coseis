@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 # metadata
 id_ = '00'
 id_ = '20'
-os.chdir(cst.job.repo + 'Foam-' + id_)
+os.chdir(cst.repo + 'Foam-' + id_)
 meta = json.load(open('meta.json'))
 
 # off-fault displacement plot
@@ -16,13 +16,15 @@ f = 'off-fault'
 dx, dy = meta['deltas'][f + '.bin']
 s = np.load(f + '.npy')
 nx, ny = s.shape
-e = np.diff(s[:,-1]) / dx
+e = np.diff(s[:, -1]) / dx
 i = int(0.05 / dy)
-s = -1000.0 * s[:,i:]
+s = -1000.0 * s[:, i:]
 extent = 0, (nx - 1) * dx * 100.0, i * dy * 1000.0, (ny - 1) * dy * 1000.0
 fig = plt.figure(figsize=(4.8, 6.4))
 ax = fig.add_subplot(111)
-im = ax.imshow(s.T, interpolation='nearest', origin='lower', aspect='auto', extent=extent)
+im = ax.imshow(
+    s.T, interpolation='nearest', origin='lower', aspect='auto', extent=extent
+)
 ax.set_title('Surface displacement (mm)')
 ax.set_xlabel('Distance from fault (cm)')
 ax.set_ylabel('Time (ms)')

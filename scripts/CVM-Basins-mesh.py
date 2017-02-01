@@ -9,8 +9,8 @@ import cst.job
 import cst.cvms
 
 # parameters
-delta = 0.25 / 60.0, 0.25 / 60.0, 20.0;   nproc = 512
-delta = 1.0  / 60.0, 1.0  / 60.0, 1000.0; nproc = 1
+nproc, delta = 512, [0.25 / 60, 0.25 / 60, 20.0]
+nproc, delta = 1,   [1.0 / 60, 1.0 / 60, 1000.0]
 extent = (-120.5, -112.5), (31.0, 36.0), (0.0, 11000.0)
 
 # node locations
@@ -33,7 +33,7 @@ meta = {
 }
 
 # run dir
-p = os.job.repo + 'CVM-Basins'
+p = os.repo + 'CVM-Basins'
 os.mkdir(p)
 os.chdir(p)
 

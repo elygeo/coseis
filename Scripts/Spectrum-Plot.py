@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import math
 import cst.dsp
 import numpy as np
 import matplotlib.pyplot as plt
@@ -83,7 +84,7 @@ def test():
 
     # filter comparison
     t = np.arange(n) * dt - n // 2 * dt
-    x = time_function('delta', t)
+    x = cst.dsp.time_function('delta', t)
     leg, y = zip(
         ('Butter 1x2', cst.dsp.filter(x, dt, flp, 'lowpass', 1, 1)),
         ('Butter 2x2',  cst.dsp.filter(x, dt, flp, 'lowpass', 2, 1)),

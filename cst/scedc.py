@@ -33,7 +33,7 @@ class stp():
     Example:
 
     # download waveforms in SAC format and save station list:
-    import cst
+    import cst.scedc
     with cst.scedc.stp('scedc') as stp:
         stp('status')
         stp(['sac', 'gain on'])

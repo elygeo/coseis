@@ -40,5 +40,5 @@ prm = {
     ],
 }
 
-os.chdir(cst.job.repo + 'Canyon')
+os.chdir(cst.repo + 'Canyon')
 cst.job.launch(cst.sord.stage(prm))

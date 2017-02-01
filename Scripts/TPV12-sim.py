@@ -17,8 +17,8 @@ nt = int(8.0 / dt + 1.5)
 alpha = math.sin(math.pi / 3.0)
 
 prm = {
-    'shape': [nx, ny, nz, nt]
-    'delta': [dx, dx, dx, dt]
+    'shape': [nx, ny, nz, nt],
+    'delta': [dx, dx, dx, dt],
     'nproc3': [1, 1, 2],
     'bc1': ['-node', 'free', 'free'],
     'bc2': ['pml', 'pml', 'free'],

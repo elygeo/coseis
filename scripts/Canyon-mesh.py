@@ -4,8 +4,9 @@
 """
 import os
 import math
-import cst.job
+import cst
 import numpy as np
+import matplotlib.pyplot as plt
 
 # parameters
 L = 11.0
@@ -39,27 +40,26 @@ for i in range(1, n1-1):
 
 # print mesh properties
 vp = 2.0
-dy = y[0,1] - y[0,0]
+dy = y[0, 1] - y[0, 0]
 dt = dy * 1.5 / vp / math.sqrt(3.0)
 print('shape = ', (n1, n2))
 print('nt > ', L / vp / dt)
 print('dt < ', dt)
 print('L = ', L)
 print('L / n = ', L / n)
-print('dx00 = ', (x[1, 0]  - x[0, 0],  y[0, 1]  - y[0, 0]))
-print('dx01 = ', (x[0, -2] - x[0, -1], y[1, -1] - y[0, -1]))
-print('dx10 = ', (x[-1, 0] - x[-2, 0], y[-1, 1] - y[-1, 0]))
+print('dx00 = ', (x[1, 0] - x[0, 0],     y[0, 1] - y[0, 0]))
+print('dx01 = ', (x[0, -2] - x[0, -1],   y[1, -1] - y[0, -1]))
+print('dx10 = ', (x[-1, 0] - x[-2, 0],   y[-1, 1] - y[-1, 0]))
 print('dx11 = ', (x[-1, -2] - x[-1, -1], y[-1, -1] - y[-2, -1]))
 
 # write files
-p = cst.job.repo + 'Canyon'
+p = cst.repo + 'Canyon'
 os.mkdir(p)
 os.chdir(p)
 x.T.astype('f').tofile('x.bin')
 y.T.astype('f').tofile('y.bin')
 
 # plot
-import matplotlib.pyplot as plt
 fig = plt.gcf()
 fig.clf()
 ax = fig.add_subplot(111)

@@ -11,7 +11,7 @@ import numpy as np
 val = 2500.0
 cell = 0
 up = 0
-path = cst.job.repo + 'CVM-Basins-Mesh' + os.sep
+path = cst.repo + 'CVM-Basins-Mesh' + os.sep
 meta = json.load(open(path + 'meta.json'))
 delta = meta['delta']
 shape = meta['shape']

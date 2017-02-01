@@ -373,7 +373,7 @@ def mapdata(
 
     url = (
         'http://www.ngdc.noaa.gov/mgg/shorelines/'
-        'data/gshhg/latest/gshhg-bin-2.3.4.zip'
+        'data/gshhg/latest/gshhg-bin-2.3.5.zip'
     )
     d = os.path.join(cst.repo, 'GSHHS')
     if not os.path.exists(d):

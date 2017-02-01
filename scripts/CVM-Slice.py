@@ -39,8 +39,10 @@ for vs, tag in [
 ]:
     fig = plt.figure(figsize=(6.4, 4.8))
     ax = plt.gca()
-    im = ax.imshow(vs, extent=lon+lat, cmap=cmap, vmin=vmin, vmax=vmax,
-        origin='lower', interpolation='nearest')
+    im = ax.imshow(
+        vs, extent=lon+lat, cmap=cmap, vmin=vmin, vmax=vmax, origin='lower',
+        interpolation='nearest'
+    )
     fig.colorbar(im, orientation='horizontal').set_label(label)
     ax.plot(x - 360.0, y, 'k-')
     ax.set_aspect(1.0 / np.cos(33.75 / 180.0 * np.pi))
@@ -49,4 +51,3 @@ for vs, tag in [
     f = 'CVM-Slice-%s-%s.png' % (prop, tag)
     print(f)
     fig.savefig(f)
-

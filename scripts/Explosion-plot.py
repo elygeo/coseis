@@ -8,7 +8,7 @@ import cst.coord
 import numpy as np
 import matplotlib.pyplot as plt
 
-os.chdir(cst.job.repo + 'Explosion')
+os.chdir(cst.repo + 'Explosion')
 
 d = json.load(open('parameters.json'))
 dx, dy, dz, dt = d['delta']
@@ -43,14 +43,16 @@ for sta in 'p1', 'p2', 'p3', 'p4', 'p5', 'p6':
     m0 = 3.0 * rho * vp * vp - 4.0 * rho * vs * vs
     t = np.arange(0.5, nt) * dt
     ta = t + r / vp
-    va = (m0 * np.exp(-t / tau) * (t * vp / r - t / tau + 1.0)
-            / (4.0 * np.pi * rho * vp * vp * vp * tau * tau * r))
+    va = (
+        m0 * np.exp(-t / tau) * (t * vp / r - t / tau + 1.0) /
+        (4.0 * np.pi * rho * vp * vp * vp * tau * tau * r)
+    )
 
     # lowpass filter
     cutoff = 0.0
     cutoff = vp / (20.0 * dx)
     if cutoff:
-        v  = cst.dsp.filter(v,  dt, cutoff, 'lowpass', 2, 1)
+        v = cst.dsp.filter(v,  dt, cutoff, 'lowpass', 2, 1)
         va = cst.dsp.filter(va, dt, cutoff, 'lowpass', 2, 1)
 
     # plot figure
