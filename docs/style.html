@@ -3,7 +3,6 @@ html {
 -webkit-text-size-adjust: 100%;
 font-family: Georgia, serif;
 line-height: 1.5;
-word-wrap: break-word;
 }
 body {
 margin: 2rem 0.75rem;
@@ -42,11 +41,14 @@ text-decoration: none;
 a:active, a:focus, a:hover {
 text-decoration: underline;
 }
+.ref a {
+word-wrap: break-word;
+}
 h2, h3 {
 max-width: 36rem;
 margin: 2rem auto 1rem auto;
 }
-p, ul, table, .ref, #refs div {
+p, ul, table, .ref {
 max-width: 36rem;
 margin: 1rem auto;
 page-break-inside: avoid;
@@ -54,7 +56,7 @@ page-break-inside: avoid;
 figure {
 margin: 2rem 0;
 }
-img {
+img, svg {
 display: block;
 margin: auto;
 max-width: 100%;
@@ -63,12 +65,19 @@ code {
 font-family: Menlo, monospace, serif;
 font-size: 0.875rem;
 }
+:not(pre) > code {
+background: #eee;
+padding: 0.2rem;
+}
 pre {
 font-family: Menlo, monospace, serif;
-background: #eee;
+line-height: 1.25;
+white-space: pre-wrap;
 max-width: 36rem;
+background: #eee;
 padding: 1rem;
 margin: 1rem auto;
+page-break-inside: avoid;
 }
 .warn p {
 background: #fee;
