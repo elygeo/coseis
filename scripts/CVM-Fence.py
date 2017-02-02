@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 """
 Reproduce Magistrale (2000) Fig. 10 fence diagram.
 """

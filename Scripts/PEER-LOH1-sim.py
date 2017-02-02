@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """
 PEER Lifelines program task 1A01, Problem LOH.1
 Layer over a halfspace model with buried double-couple source.

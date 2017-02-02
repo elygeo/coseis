@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """
 Simple SoCal mesh generation and CVM-S extraction.
 """

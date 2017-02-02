@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """
 Plot a depth plane extracted from the SCEC Community Velocity Model.
 """

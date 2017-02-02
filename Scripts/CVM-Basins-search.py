@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """
 Locate the shallowest 2D isosurface in a volume.
 """

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """
 PEER Lifelines program task 1A02, Problem SC2.1
 SCEC Community Velocity Model, version 2.2 with double-couple point source.

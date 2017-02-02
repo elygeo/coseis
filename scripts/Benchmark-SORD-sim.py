@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import os
 import cst.job
 import cst.sord
@@ -19,7 +19,7 @@ power = range(6)  # Challenger
 
 prm = {
     'minutes': 20,
-    'diffop': 'exac',
+    # 'diffop': 'exac',
     'diffop': 'save',
     'itstats': 9999,
     'itio': 128,

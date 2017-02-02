@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """
 PEER Lifelines program task 1A02, Problem SC2.1
 """
