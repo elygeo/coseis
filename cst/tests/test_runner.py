@@ -1,8 +1,7 @@
-#!/usr/bin/env python
 import os
 import shutil
 from . import hello
-from cst import sord, conf
+from .. import job, sord
 
 hello.make()
 sord.make()
@@ -12,7 +11,7 @@ d = os.path.join('run', 'test_suite')
 os.makedirs(d)
 shutil.copy2('test_suite.py', d)
 os.chdir(d)
-job = conf.launch(
+job.launch(
     mode='script',
     execute='python test_suite.py',
     nproc=6,

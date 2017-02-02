@@ -14,6 +14,7 @@ def build():
     setup(ext_modules=ext, script_args=['build_ext', '--inplace'])
     os.chdir(cwd)
 
+
 try:
     from .interp_ import trinterp
 except ImportError:

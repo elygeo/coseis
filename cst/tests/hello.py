@@ -1,13 +1,12 @@
-#!/usr/bin/env python
 import os
 import shutil
 import subprocess
-from cst import conf
+from .. import job
 
 
 def make():
     cwd = os.getcwd()
-    cfg = conf.configure()
+    cfg = job.configure()
     path = os.path.dirname(__file__)
     path = os.path.realpath(path)
     os.chdir(path)
@@ -30,7 +29,7 @@ def test(**kwargs):
     os.makedirs(d)
     os.chdir(d)
     shutil.copy2(f, '.')
-    conf.launch(
+    job.launch(
         executable='./hello.c.x',
         nthread=2,
         nproc=2,
@@ -45,7 +44,7 @@ def test(**kwargs):
     os.makedirs(d)
     os.chdir(d)
     shutil.copy2(f, '.')
-    conf.launch(
+    job.launch(
         executable='./hello.f.x',
         nthread=2,
         nproc=2,
@@ -56,6 +55,7 @@ def test(**kwargs):
     os.chdir(cwd)
 
     return
+
 
 if __name__ == '__main__':
     test()

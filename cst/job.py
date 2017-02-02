@@ -196,4 +196,4 @@ def launch(job=None, **kwargs):
 def main(args, **kw):
     if not args:
         print(__doc__)
-    # FIXME
+    # FIXME read json args or json file?

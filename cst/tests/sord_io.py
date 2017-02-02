@@ -1,8 +1,7 @@
-#!/usr/bin/env python
 """Test SORD parallelization with point source"""
 import os
 import numpy as np
-import cst
+from .. import sord
 
 
 def test(**kwargs):
@@ -14,7 +13,7 @@ def test(**kwargs):
     prm['shape'] = [6, 7, 8, 9]
 
     # output
-    fns = cst.sord.fieldnames()
+    fns = sord.fieldnames()
     x1 = [1.1, 1.1, 1.1]
     x2 = [9.9, 9.9, 9.9]
     ii = [4.4, 5.5, 6.6, 1]
@@ -29,7 +28,7 @@ def test(**kwargs):
             prm[k] += [([], op, 2.2)]
         for op in ['=@', '+@', '*@']:
             prm[k] += [([], op, x1, x2, 2.2)]
-        for func in cst.sord.tfuncs:
+        for func in sord.tfuncs:
             prm[k] += [([], '=', 2.2, func, 3.3)]
         prm[k] += [(ii, '.', 2.2)]
         for i, op in enumerate(['.<', '=<', '+<', '*<']):
@@ -53,7 +52,7 @@ def test(**kwargs):
     os.chdir(d)
     for f in infiles:
         np.array([1.0], 'f').tofile(f)
-    cst.sord.run(prm, **kwargs)
+    sord.run(prm, **kwargs)  # FIXME
     os.chdir(cwd)
 
 

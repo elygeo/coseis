@@ -1,9 +1,9 @@
-#!/usr/bin/env python
 """Kostrov circular crack test."""
 import os
 import json
 import numpy as np
-from cst import sord, kostrov
+from .. import sord
+from .. import kostrov
 
 
 def test(**kwargs):

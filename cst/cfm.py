@@ -658,6 +658,7 @@ def explore(prefix, faults):
 def main(args, split=1):
     explore(*search(args, split))
 
+
 fault_names = [{
     'BNRA': 'Basin and Range Fault Area',
     'CRFA': 'Coast Ranges Fault Area',

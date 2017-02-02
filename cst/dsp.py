@@ -13,6 +13,7 @@ def build():
     setup(ext_modules=ext, script_args=['build_ext', '--inplace'])
     os.chdir(cwd)
 
+
 try:
     from .rspectra import rspectra
 except ImportError:

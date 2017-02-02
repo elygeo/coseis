@@ -292,7 +292,6 @@ def dem(coords, scale=1.0, downsample=0, mesh=False):
         return (x, y, z)
     else:
         return extent, z
-topo = dem
 
 
 def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):

@@ -1,9 +1,10 @@
 #!/usr/bin/env python
-"""Test SORD parallelization with point source"""
+"""Test SORD parallelization with PML"""
 import os
 import json
 import numpy as np
-import cst
+from .. import job
+from .. import sord
 
 
 def test(**kwargs):
@@ -11,46 +12,46 @@ def test(**kwargs):
     # parameters
     prm = {
         'itstats': 1,
-        'shape': [5, 4, 2, 2],
+        'shape': [22, 22, 22, 11],
         'delta': [100.0, 100.0, 100.0, 0.0075],
         'rho': [2670.0],
         'vp': [6000.0],
         'vs': [3464.0],
         'gam': [0.3],
         'hourglass': [1.0, 1.0],
-        'bc1': ['free', 'free', 'free'],
-        'bc2': ['free', 'free', 'free'],
+        'bc1': ['pml', 'pml', 'pml'],
+        'bc2': ['pml', 'pml', 'pml'],
     }
 
     # output
-    fns = cst.sord.fieldnames()
+    fns = sord.fieldnames()
     for k, v in fns.items():
         if v[0][0] in 'nc':
             prm[k] = [([], '=>',  k + '.bin')]
 
     # potency source
-    prm['pxx'] += [([0, 0, 0, 0], '=', 1e10)]
-    prm['pyy'] += [([0, 0, 0, 0], '=', 1e10)]
-    prm['pzz'] += [([0, 0, 0, 0], '=', 1e10)]
+    prm['pxx'] += [([10, 10, 10, 0], '=', 1e10)]
+    prm['pyy'] += [([10, 10, 10, 0], '=', 1e10)]
+    prm['pzz'] += [([10, 10, 10, 0], '=', 1e10)]
 
     # master
     cwd = os.getcwd()
-    d0 = os.path.join('run', 'sord_mpi') + os.sep
+    d0 = os.path.join('run', 'sord_pml') + os.sep
     os.makedirs(d0)
     os.chdir(d0)
-    cst.sord.run(prm, **kwargs)
+    job.run(sord.stage(prm, **kwargs))
     meta = open('meta.json')
     dtype = json.load(meta)['dtype']
     os.chdir(cwd)
 
     # variations
     max_err_all_ = 0.0
-    for i, n in enumerate([[3, 1, 1], [2, 2, 1]]):
+    for i, n in enumerate([[4, 1, 1], [1, 2, 3]]):
         prm['nproc3'] = n
-        d = os.path.join('run', 'sord_mpi%s' % i) + os.sep
+        d = os.path.join('run', 'sord_pml%s' % i) + os.sep
         os.makedirs(d)
         os.chdir(d)
-        cst.sord.run(prm, **kwargs)
+        job.run(sord.stage(prm, **kwargs))
         os.chdir(cwd)
         max_err_ = 0.0
         for k in fns:

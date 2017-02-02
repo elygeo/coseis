@@ -465,6 +465,7 @@ def write_coulomb(path, srf, proj, scut=0):
         fh.write(coulomb_footer)
     return
 
+
 coulomb_fmt = '  1' + 4*' %10.4f' + ' 100' + 5*' %10.4f' + '    Fault 1'
 
 coulomb_header = '\n'.join(

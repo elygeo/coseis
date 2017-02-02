@@ -141,13 +141,18 @@ def test():
     # Brune deconvolution to Gaussian filter
     t = np.arange(n) * dt - n // 2 * dt
     x = cst.dsp.time_function('delta', t)
-    leg, y = zip(
-        (r'$\tau$', cst.dsp.brune2gauss(x, dt, tau, tau)),
-        (r'$\sqrt{2\ln 2}\tau$',
-            cst.dsp.brune2gauss(x, dt, tau, tau*np.sqrt(2 * np.log(2)))),
-        (r'$\sqrt{2}\tau$', cst.dsp.brune2gauss(x, dt, tau, tau * np.sqrt(2))),
-        (r'$2\tau$', cst.dsp.brune2gauss(x, dt, tau, tau * 2)),
-    )
+    leg = [
+        r'$\tau$',
+        r'$\sqrt{2\ln 2}\tau$',
+        r'$\sqrt{2}\tau$',
+        r'$2\tau$',
+    ]
+    y = [
+        cst.dsp.brune2gauss(x, dt, tau, tau),
+        cst.dsp.brune2gauss(x, dt, tau, tau*np.sqrt(2 * np.log(2))),
+        cst.dsp.brune2gauss(x, dt, tau, tau * np.sqrt(2)),
+        cst.dsp.brune2gauss(x, dt, tau, tau * 2),
+    ]
     y = np.asarray(y) * scale
     y = np.fft.ifftshift(y, axes=[-1])
     plt.figure(4)
@@ -157,6 +162,7 @@ def test():
     plt.ion()
     plt.show()
     return
+
 
 if __name__ == '__main__':
     test()

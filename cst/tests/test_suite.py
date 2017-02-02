@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from . import hello, sord_mpi, sord_pml, sord_kostrov
 
 
@@ -22,6 +21,7 @@ def test():
     print('\n' + '\n'.join(passed))
     print('\n' + '\n'.join(failed))
     return
+
 
 if __name__ == "__main__":
     test()

@@ -33,6 +33,7 @@ def beachball(fig, x, y):
     ax.axis('off')
     return
 
+
 xx = -12, -8, -4,  0,  4,  8, 12
 yy = -8, -4,  0,  4, 8
 
