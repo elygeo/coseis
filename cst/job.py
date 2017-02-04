@@ -3,6 +3,7 @@ Configure and launch jobs.
 """
 import os
 import re
+import sys
 import json
 import time
 import copy
@@ -193,7 +194,27 @@ def launch(job=None, **kwargs):
     return job
 
 
+def json_args(argv):
+    d = {}
+    l = []
+    for k in argv:
+        if k[0] == '-':
+            k = k.lstrip('-')
+            if '=' in k:
+                k, v = k.split('=')
+                if len(v) and not v[0].isalpha():
+                    v = json.loads(v)
+                d[k] = v
+            else:
+                d[k] = True
+        elif k[0] in '{[':
+            d.update(json.loads(k))
+        else:
+            l.append(k)
+    return d, l
+
+
 def main(args, **kw):
     if not args:
         print(__doc__)
-    # FIXME read json args or json file?
+    # FIXME get json_args

@@ -6,7 +6,7 @@ import json
 import copy
 import shutil
 import subprocess
-from .. import repository
+from . import repo as repository
 
 versions = ['2.2', '3.0', '4.0']
 

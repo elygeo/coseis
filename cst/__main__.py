@@ -1,6 +1,13 @@
 import sys
 import json
 
+for i in sys.path:
+    print(i)
+print(sys.argv)
+print(__file__)
+print(__name__)
+print(__package__)
+
 
 def json_args(argv):
     d = {}
@@ -21,7 +28,3 @@ def json_args(argv):
             l.append(k)
     return d, l
 
-
-print(__name__)
-print(__file__)
-print(sys.argv)

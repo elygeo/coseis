@@ -13,7 +13,7 @@ home = os.path.realpath(home)
 home = os.path.dirname(home) + os.sep
 repo = os.path.join(home, 'repo') + os.sep
 
-print(repo)
+print(12341234)
 
 if sys.argv[1:] == ['setup']:
     d = site.USER_SITE

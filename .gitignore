@@ -17,3 +17,4 @@ __pycache__
 /CVMS/Makefile
 /sord/Makefile
 /sord/config.json
+/scripts/*/

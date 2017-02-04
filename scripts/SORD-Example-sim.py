@@ -2,6 +2,7 @@
 import os
 import cst.job
 import cst.sord
+
 prm = {
     'shape': [61, 61, 61, 60],
     'delta': [100.0, 100.0, 100.0, 0.0075],
@@ -15,7 +16,8 @@ prm = {
     'vx':  [([[], [], 30, -1], '=>', 'vx.bin')],
     'vy':  [([[], [], 30, -1], '=>', 'vy.bin')],
 }
-d = cst.repo + 'Example'
+
+d = cst.repo + 'SORD-Example'
 os.mkdir(d)
 os.chdir(d)
 cst.job.launch(cst.sord.stage(prm))

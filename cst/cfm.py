@@ -6,7 +6,7 @@ import math
 import json
 import urllib
 import zipfile
-from .. import repo as repository
+from . import repo as repository
 
 projection = {'proj': 'utm', 'zone': 11, 'datum': 'NAD27'}
 
@@ -488,6 +488,7 @@ def explore(prefix, faults):
     Save a screen-shot                 S
     Help                             h ?
     """
+    doc = explore.__doc__  # must use hardcode function name to inspect doc
     if not faults:
         print('No faults found')
         return
@@ -639,8 +640,7 @@ def explore(prefix, faults):
             mlab.view(view_azimuth, view_elevation)
             fig.scene.camera.view_angle = view_angle
         elif k in '/?h':
-            import cst.cfm
-            print(cst.cfm.explore.__doc__)
+            print(doc)
         fig.scene.disable_render = False
         save[0] = isurf
         return

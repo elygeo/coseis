@@ -9,7 +9,7 @@ import math
 import zipfile
 import subprocess
 import urllib.request
-from .. import repository
+from . import repo as repository
 
 # TODO
 # Quaternary Fault Database

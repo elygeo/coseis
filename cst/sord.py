@@ -6,6 +6,7 @@ import sys
 import json
 import shutil
 import subprocess
+from . import job
 
 src_path = os.path.dirname(__file__)
 src_path = os.path.realpath(src_path)
