@@ -4,7 +4,12 @@ SCEC Community Velocity Model (CVM-H) tools.
 import os
 import urllib
 import tarfile
+import numpy as np
 from . import home
+from . import data
+from . import vm1d
+from . import gocad
+from . import interp
 
 repository = home + 'repo'
 projection = {'proj': 'utm', 'zone': 11, 'datum': 'NAD27', 'ellps': 'clrk66'}
@@ -20,9 +25,6 @@ voxet3d = {
 
 
 def vs30_model(x, y, version='Wills+Wald', method='nearest'):
-    import numpy as np
-    from . import data
-    from . import interp
     if version not in ['Wills', 'Wald', 'Wills+Wald']:
         raise Exception()
     if 'Wald' in version:
@@ -49,7 +51,6 @@ def nafe_drake(f):
     """
     Density derived from V_p via Nafe-Drake curve, Brocher (2005) eqn 1.
     """
-    import numpy as np
     f *= 0.001
     f = f * (
         1.6612 - f * (0.4721 - f * (0.0671 - f * (0.0043 - f * 0.000106))))
@@ -95,7 +96,6 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version=None):
     bound: (x0, x1), (y0, y1), (z0, z1)
     data: Array of properties
     """
-    from . import gocad
 
     if version is None:
         version = versions[-1]
@@ -204,7 +204,8 @@ class Model():
         3d property: 'vp', 'vs', or 'tag'
     voxet:
         3d voxet list: ['mantle', 'crust', 'lab']
-    no_data_value: None, 'nan', or float value. None = filled from below.
+    no_data_value: None or float value (can be float('nan').
+        None = filled from below.
     version: 'vx62', 'vx63', '11.2.0', 11.9.0' or None (default)
 
     Call parameters:
@@ -216,8 +217,8 @@ class Model():
     Returns property samples at coordinates (x, y, z)
     """
     def __init__(
-            self, prop, voxet=['mantle', 'crust'],
-            no_data_value=None, version=None):
+        self, prop, voxet=['mantle', 'crust'], no_data_value=None, version=None
+    ):
         self.prop = prop = prop.lower()
         if prop in prop2d:
             self.voxet = [cvmh_voxet(prop, version=version)]
@@ -228,8 +229,6 @@ class Model():
         return
 
     def __call__(self, x, y, z=None, out=None, interpolation='nearest'):
-        import numpy as np
-        from . import interp
         if out is None:
             out = np.empty_like(x)
             out.fill(float('nan'))
@@ -276,7 +275,6 @@ class Extraction():
         geographic=True,
         **kwargs
     ):
-        import numpy as np
         x = np.asarray(x)
         y = np.asarray(y)
         if isinstance(vm, str):
@@ -318,8 +316,6 @@ class Extraction():
         return
 
     def __call__(self, z, out=None, min_depth=None, by_depth=True):
-        import numpy as np
-        from . import vm1d
         x, y, z0, zt = self.x, self.y, self.z0, self.zt
         vm, interpolation = self.vm, self.interpolation
         z = np.asarray(z)
@@ -352,7 +348,6 @@ def extract(x, y, z, vm=['rho', 'vp', 'vs'], by_depth=True, **kwargs):
 
     Returns property samples at coordinates (x, y, z)
     """
-    import numpy as np
     x = np.asarray(x)
     y = np.asarray(y)
     if not isinstance(vm, (list, tuple)):

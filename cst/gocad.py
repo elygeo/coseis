@@ -52,6 +52,8 @@ def voxet(path, load_props=[], alternate='', no_data_value=None, buff=None):
     import numpy as np
     if buff is None:
         buff = open(path).read()
+    if no_data_value in ('nan', 'NaN', 'NAN'):
+        no_data_value = float('nan')
     buff = buff.strip().split('\n')
     cast = {}
     casters = {
@@ -100,9 +102,7 @@ def voxet(path, load_props=[], alternate='', no_data_value=None, buff=None):
                 if os.path.exists(f):
                     dtype = '>f%s' % p['ESIZE']
                     data = np.fromfile(f, dtype)
-                    if no_data_value in ('nan', 'NaN', 'NAN'):
-                        data[data == p['NO_DATA_VALUE']] = float('nan')
-                    elif no_data_value is not None:
+                    if no_data_value is not None:
                         data[data == p['NO_DATA_VALUE']] = no_data_value
                     p['DATA'] = data.reshape(n[::-1]).T
             voxet[id_] = {'HEADER': hdr, 'AXIS': axis, 'PROP': prop}

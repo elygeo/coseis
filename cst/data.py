@@ -86,13 +86,14 @@ def densify(xy, delta):
     for x1, y1 in xy[1:]:
         dx = x1 - x
         dy = y1 - y
-        n = int(math.sqrt(dx * dx + dy * dy) / delta)
-        dx /= (n + 1)
-        dy /= (n + 1)
-        for i in range(n):
-            x += dx
-            y += dy
-            xxyy.append((x, y))
+        if dx == dx and dy == dy:  # skip if nan
+            n = int(math.sqrt(dx * dx + dy * dy) / delta)
+            dx /= (n + 1)
+            dy /= (n + 1)
+            for i in range(n):
+                x += dx
+                y += dy
+                xxyy.append((x, y))
         x, y = x1, y1
         xxyy.append((x, y))
     return xxyy
@@ -347,6 +348,7 @@ def gshhg(
     resolution: 'crude', 'low', 'intermediate', 'high', or 'full'
     extent: (min_lon, max_lon), (min_lat, max_lat)
     delta: densify line segments to given delta.
+    clip: clipdata
     min_level, max_level: where levels 1-4 are
         1: coastline
         2: lake shore
@@ -370,16 +372,17 @@ def gshhg(
     name = {'c': 'GSHHS coastlines', 'r': 'WDB rivers', 'b': 'WDB borders'}
     name = name[kind[0]]
     kind = {'c': 'gshhs', 'r': 'wdb_rivers', 'b': 'wdb_borders'}[kind[0]]
-    filename = os.path.join(
-        repository, 'GSHHG/%s_%s.b' % (kind, resolution[0])
-    )
-    data = np.fromfile(filename, '>i')
     if kind != 'gshhs':
         min_area = 0.0
+    min_area *= 10
     if extent is not None:
         lon, lat = extent
         lon = lon[0] % 360, lon[1] % 360
         extent = lon, lat
+        west, east = 1000000 * lon[0], 1000000 * lon[1]
+        south, north = 1000000 * lat[0], 1000000 * lat[1]
+    f = os.path.join(repository, 'GSHHG/%s_%s.b' % (kind, resolution[0]))
+    data = np.fromfile(f, '>i')
     print('Reading %s resolution %s.' % (resolution, name))
     xx = []
     ii = 0
@@ -395,15 +398,12 @@ def gshhg(
             break
         if level < min_level:
             continue
-        area = hdr[7] * 0.1
-        if area < min_area:
+        if hdr[7] < min_area:
             continue
         if extent is not None:
-            west, east, south, north = hdr[3:7] * 1e-6
-            west, east, south, north = hdr[3:7] * 1e-6
             if (
-                east < lon[0] or north < lat[0] or
-                west > lon[1] or south > lat[1]
+                hdr[3] > east or hdr[5] > north or
+                hdr[4] < west or hdr[6] < south
             ):
                 continue
         x = 1e-6 * data[ii-2*n:ii].reshape(n, 2).astype('f')
@@ -414,7 +414,7 @@ def gshhg(
             x = clipdata(x, extent, clip)[0]
         elif delta:
             x = np.array(densify(x, delta))
-        xx += [x, [float('nan'), float('nan')]]
+        xx += [x, [[float('nan'), float('nan')]]]
     if xx:
         xx.pop()
         return np.concatenate(xx)
