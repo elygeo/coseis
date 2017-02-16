@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 import os
 import json
-import cst.kostrov
 import numpy as np
 import matplotlib.pyplot as plt
+import cst.kostrov
 
-os.chdir(cst.repo + 'Kostrov')
+os.chdir('repo/Kostrov')
 
 # parameters
 meta = json.load(open('parameters.json'))
@@ -40,4 +40,4 @@ for n in 20, 40:
 ax.set_xlim(0.0, t[-1])
 ax.set_xlabel('Time (s)')
 ax.set_ylabel('Slip velocity (m/s)')
-fig.savefig('Kostrov.pdf')
+fig.savefig('Kostrov.svg')

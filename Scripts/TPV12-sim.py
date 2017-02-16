@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import os
 import math
-import cst.sord
 import numpy as np
+import cst.sord
 
 # FIXME: prestress not correct
 
@@ -125,11 +125,10 @@ k = int(13800.0 / dx + 1.5)
 x[k:] = y[k:]
 z[k:] = y[k:]
 
-d = os.repo + 'TPV12'
+d = 'repo/TPV12'
 os.mkdir(d)
 os.chdir(d)
 x.astype('f').tofile('sxx.bin')
 y.astype('f').tofile('syy.bin')
 z.astype('f').tofile('szz.bin')
-
-cst.jon.launch(cst.sord.run(prm))
+cst.sord.run(prm)

@@ -92,5 +92,4 @@ if 0:
     ax.set_xlabel('Grid interval (m)')
     ax.set_ylabel('RMS difference (%)')
     fig.canvas.draw()
-    fig.savefig('tpv3-convergence.png')
-    fig.savefig('tpv3-convergence.pdf')
+    fig.savefig('tpv3-convergence.svg')

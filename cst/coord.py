@@ -283,8 +283,9 @@ class Transform():
     """
 
     def __init__(
-      self, proj=None, origin=None, scale=1.0, rotate=0.0,
-      translate=(0.0, 0.0), matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1))):
+        self, proj=None, origin=None, scale=1.0, rotate=0.0,
+        translate=(0.0, 0.0), matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1))
+    ):
         import numpy as np
         phi = math.pi / 180.0 * rotate
         if origin is None:

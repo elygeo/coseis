@@ -6,7 +6,7 @@ import sys
 import json
 import shutil
 import subprocess
-from . import job
+from . import job as joblib
 
 src_path = os.path.dirname(__file__)
 src_path = os.path.realpath(src_path)
@@ -507,7 +507,6 @@ def stage(args=None, **kwargs):
     cfg = make()  # process, thread, realsize
     prm, fio, meta = prepare(prm, fio)
 
-    job = {}
     job['name'] = 'sord'
     job['executable'] = s = os.path.join('.', 'sord.x')
     if cfg['process'] == 'serial':
@@ -579,3 +578,7 @@ def stage(args=None, **kwargs):
     open('meta.json', 'w').write(out)
 
     return job
+
+
+def run(args=None, **kwargs):
+    job = stage(args, **kwargs)

@@ -2,13 +2,12 @@
 import os
 import math
 import json
-import cst.job
-import cst.dsp
-import cst.coord
 import numpy as np
 import matplotlib.pyplot as plt
+import cst.dsp
+import cst.coord
 
-os.chdir(cst.repo + 'Explosion')
+os.chdir('repo/Explosion')
 
 d = json.load(open('parameters.json'))
 dx, dy, dz, dt = d['delta']
@@ -66,5 +65,5 @@ for sta in 'p1', 'p2', 'p3', 'p4', 'p5', 'p6':
     if sta == 'p2':
         name = 'Explosion point source'
         ax.set_title(name + ' ' + str([x, y, z]))
-        fig.savefig('Explosion.png')
+        fig.savefig('Explosion.svg')
     fig.show()

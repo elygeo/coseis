@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import math
-import cst.dsp
 import numpy as np
 import matplotlib.pyplot as plt
+import cst.dsp
 
 
 def spectrum(

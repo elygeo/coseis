@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import os
+import numpy as np
 
 
 def vmcheck():
-    import numpy as np
     vpmin, vsmin = 1500.0, 500.0
     vpmin, vsmin = 0.0, 0.0
     block = 16 * 1024 * 1024

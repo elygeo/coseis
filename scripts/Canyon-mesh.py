@@ -53,7 +53,7 @@ print('dx10 = ', (x[-1, 0] - x[-2, 0],   y[-1, 1] - y[-1, 0]))
 print('dx11 = ', (x[-1, -2] - x[-1, -1], y[-1, -1] - y[-2, -1]))
 
 # write files
-p = cst.repo + 'Canyon'
+p = 'repo/Canyon'
 os.mkdir(p)
 os.chdir(p)
 x.T.astype('f').tofile('x.bin')
@@ -71,5 +71,5 @@ ax.plot(x.T, y.T, 'k-')
 ax.plot(-x.T, y.T, 'k-')
 ax.axis('scaled')
 ax.axis([-2, 2, 2, -0.2])
-fig.savefig('Canyon-Mesh.pdf')
+fig.savefig('Canyon-Mesh.svg')
 fig.show()

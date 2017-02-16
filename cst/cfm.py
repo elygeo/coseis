@@ -2,47 +2,53 @@
 CFM: SCEC Community Fault Model tools.
 """
 import os
+import sys
 import math
 import json
-import urllib
-import zipfile
-from . import repo as repository
 
+try:
+    from urllib.request import urlopen
+except ImportError:
+    from urllib2 import urlopen
+
+import numpy as np
+from . import home
+from . import gocad
+
+repository = home + 'repo' + os.sep
 projection = {'proj': 'utm', 'zone': 11, 'datum': 'NAD27'}
 
 
-def catalog(version='CFM4-socal-primary'):
+def catalog(version='CFM5-socal-primary'):
     """
-    Return a dictionary of available faults. The dictionary key:value pair is
-    the fault name and number of segments. The CFM database is downloaded if
-    not already present.
+    Return a list of available faults. The CFM database is downloaded if not
+    already present.
     """
-    import numpy as np
-    from . import gocad
-
-    u = 'http://structure.harvard.edu/cfm/download/vdo/SCEC_VDO.jar'
-    path = os.path.join(repository, 'CFM4', version) + os.sep
-
+    url = (
+       'http://source.usc.edu/svn/scec_vdo_vtk/trunk/data/CFM/'
+       'CFM5_release_2014/'
+    )
+    path = os.path.join(repository, 'CFM', version) + os.sep
     if not os.path.exists(path):
-        f = repository + 'SCEC-VDO.jar'
-        if not os.path.exists(f):
-            print('Downloading', u)
-            urllib.urlretrieve(u, f)
-        zp = zipfile.ZipFile(f)
-        src = os.path.join('data', 'Faults', version)
+        print('Downloading CFM5')
         os.makedirs(path)
-        for f in zp.namelist():
-            base, key = os.path.split(f)
-            if base != src or not key.endswith('.ts'):
-                continue
-            key = key[:-3]
-            tsurf = gocad.tsurf(zp.read(f))
+        x = urlopen(url + 'doc/fault_area_table.dat').read()
+        open(path + 'fault_area_table.dat', 'wb').write(x)
+        cat = []
+        for k in x.split('\n')[2:]:
+            k = k.split()[0]
+            cat.append(k)
+            x = url + 'tsurf/%s/%s.ts' % (version, k)
+            x = urlopen(x).read()
+            tsurf = gocad.tsurf(x)
             if len(tsurf) > 1:
                 raise Exception('Not expecting more than 1 tsurf')
             data = tsurf[0][1]
-            np.savez(path + key + '.npz', **data)
-    cat = sorted(i[:-4] for i in os.listdir(path) if i.endswith('.npz'))
-
+            np.savez(path + k + '.npz', **data)
+        cat = '\n'.join(cat) + '\n'
+        open(path + 'catalog.txt', 'w').write(cat)
+    else:
+        open(path + 'catalog.txt').read().strip().split('\n')
     return cat
 
 
@@ -109,12 +115,12 @@ def search(items, split=1, maxsplit=3):
     return prefix, groups
 
 
-def read(fault, version='CFM4-socal-primary'):
+def read(fault, version='CFM5-socal-primary'):
     """
     Read triangulated surface data.
     """
     import numpy as np
-    path = os.path.join(repository, 'CFM4', version) + os.sep
+    path = os.path.join(repository, 'CFM', version) + os.sep
     f, i = (fault + ':').split(':')[:2]
     d = np.load(path + f + '.npz')
     x = d['vtx']
@@ -234,7 +240,6 @@ def tsurf_plane(vtx, tri):
     Find the center of mass, best-fit plane, and total surface area of a
     triangulated surface.
     """
-    import numpy as np
     import scipy.optimize
 
     # area normals
@@ -336,7 +341,6 @@ def quad_mesh(vtx, tri, delta, drape=False, clean_top=False):
     1/M = | -b a -ac/d     | / (aa + bb)
           |  0 0 (aa+bb)/d |
     """
-    import numpy as np
     from . import data
     from . import interp
 
@@ -414,7 +418,6 @@ def line_simplify(vtx, indices, area=None, nkeep=None):
     indices are removed. If both area and nkeep are given, priority is given to
     case that retains more detail.
     """
-    import numpy as np
 
     if nkeep is None:
         if area:
@@ -494,10 +497,11 @@ def explore(prefix, faults):
         return
 
     import pyproj
-    import numpy as np
     from mayavi import mlab
-    from . import interp
     from . import data
+    from . import interp
+
+    fault_names = json.load(open(home + 'data/CFM-Fault-Names.json'))
 
     # parameters
     extent = (-122.0, -114.0), (31.5, 37.5)
@@ -526,7 +530,7 @@ def explore(prefix, faults):
     fig.scene.disable_render = True
 
     # DEM
-    f = os.path.join(repository, 'CFM4', 'dem.npy')
+    f = os.path.join(repository, 'CFM', 'dem.npy')
     if os.path.exists(f):
         x, y, z = np.load(f)
     else:
@@ -537,16 +541,16 @@ def explore(prefix, faults):
     mlab.mesh(x, y, z, color=(1, 1, 1), opacity=0.3)
 
     # base map
-    f = os.path.join(repository, 'CFM4', 'mapdata.npy')
+    f = os.path.join(repository, 'CFM', 'mapdata.npy')
     if os.path.exists(f):
         x, y, z = np.load(f)
     else:
         ddeg = 0.5 / 60.0
         x, y = np.c_[
-            data.mapdata(
+            data.gshhg(
                 'coastlines', resolution, extent, 10.0, delta=ddeg),
             [float('nan'), float('nan')],
-            data.mapdata('borders', resolution, extent, delta=ddeg),
+            data.gshhg('borders', resolution, extent, delta=ddeg),
         ]
         x -= 360.0
         z = interp.interp2(extent, z, (x, y))
@@ -659,192 +663,5 @@ def main(args, split=1):
     explore(*search(args, split))
 
 
-fault_names = [{
-    'BNRA': 'Basin and Range Fault Area',
-    'CRFA': 'Coast Ranges Fault Area',
-    'ETRA': 'Eastern Transverse Ranges',
-    'GRFS': 'Garlock Fault System',
-    'GVFA': 'Great Valley Fault Area',
-    'MJVA': 'Mojave Fault Area',
-    'OCBA': 'Offshore Continental Borderland',
-    'OCCA': 'Offshore Central California',
-    'PNRA': 'Peninsular Ranges',
-    'SAFS': 'San Andreas Fault System',
-    'SALT': 'Salton Trough Fault Area',
-    'SNFA': 'Sierra Nevada Fault Area',
-    'WTRA': 'Western Tranverse Ranges'
-}, {
-    'AHTC': 'Ash Hill-Tank Canyon fault system',
-    'BBFS': 'Big Bear fault system',
-    'BCFZ': 'Blue Cut fault zone',
-    'BMFZ': 'Black Mountain fault zone',
-    'BPPM': 'Big Pine-Pine Mountain fault system',
-    'BRSZ': 'Brawley Seismic Zone',
-    'BWFZ': 'Blackwater fault zone',
-    'CBFZ': 'Coronado Bank fault zone',
-    'CEPS': 'Compton-Lower Elysian Park fault system',
-    'CHFZ': 'Calico-Hildalgo fault zone',
-    'CIFS': 'Channel Islands fault system',
-    'CLFZ': 'Cleghorn fault zone',
-    'CPFZ': 'Cerro Prieto fault zone',
-    'CREC': 'Camp Rock-Emerson-Copper Mtn fault zone',
-    'CRFS': 'Cross fault',
-    'CRSF': 'Cross fault',
-    'CSTL': 'Coastal faults',
-    'ELSZ': 'Elsinore-Laguna Salada fault zone',
-    'GLPS': 'Goldstone Lake-Paradise fault system',
-    'GMFS': 'Granite Mountains fault system',
-    'GRFZ': 'Garlock fault zone',
-    'HMFZ': 'Hunter Mountain fault zone',
-    'HPFZ': 'Harper Lake fault zone',
-    'HSFZ': 'Hosgri fault zone',
-    'HSLZ': 'Helendale-South Lockhart fault zone',
-    'HVFZ': 'Homestead Valley fault zone',
-    'IBFS': 'Inner Borderland fault system',
-    'IMFZ': 'Imperial fault zone',
-    'JVFZ': 'Johnson Valley fault zone',
-    'LDWZ': 'Ludlow fault zone',
-    'LILZ': 'Lake Isabella Lineament zone',
-    'LLFZ': 'Little Lake fault zone',
-    'LSBM': 'Little San Bernardino Mtns fault system',
-    'MHFZ': 'Mecca Hills-Hidden Springs fault system',
-    'MNXZ': 'Manix fault zone',
-    'MRFS': 'Mission Ridge fault system',
-    'NAFZ': 'Nacimiento fault zone',
-    'NBJD': 'Northern Baja Detachments?',
-    'NCFS': 'North Channel fault system',
-    'NDVZ': 'Northern Death Valley fault zone',
-    'NFTS': 'North Frontal thrust system',
-    'NIFZ': 'Newport-Inglewood fault zone',
-    'NIRC': 'Newport-Inglewood-Rose Canyon fault zone',
-    'NULL': 'undefined',
-    'ORFZ': 'Oak Ridge fault zone',
-    'OSMS': 'Oceanside-San Mateo fault system',
-    'OWFZ': 'Owens Valley fault zone',
-    'PBFZ': 'Pisgah-Bullion fault zone',
-    'PLFZ': 'Pleito fault zone',
-    'PMFZ': 'Pinto Mountain fault zone',
-    'PMVZ': 'Panamint Valley fault zone',
-    'PVFZ': 'Palos Verdes fault zone',
-    'SAFZ': 'San Andreas fault zone',
-    'SBCF': 'Santa Barbara Channel faults',
-    'SBTS': 'Southern Boundary Thrust system',
-    'SCCR': 'Santa Cruz-Catalina Ridge fault zone',
-    'SCFZ': 'South Cuyama fault zone',
-    'SDTZ': 'San Diego Trough fault zone',
-    'SDVZ': 'Southern Death Valley fault zone',
-    'SFFS': 'Southern Frontal fault system',
-    'SFNS': 'San Fernando fault system',
-    'SGFZ': 'San Gabriel fault zone',
-    'SGMF': 'San Gabriel Mountain faults',
-    'SGRP': 'San Gorgonio Pass fault system',
-    'SJFZ': 'San Jacinto fault zone',
-    'SJMZ': 'San Juan-Morales fault zone',
-    'SLCZ': 'Sisar-Lion Canyon fault zone',
-    'SMFZ': 'Sierra Madre fault zone',
-    'SNFZ': 'Southern Sierra Nevada fault zone',
-    'SOCZ': 'San Onofre-Carlsbad fault zone',
-    'SPBZ': 'San Pedro Basin fault zone',
-    'SSFZ': 'Santa Susana fault zone',
-    'SSRZ': 'Simi-Santa Rosa fault zone',
-    'SYFZ': 'Santa Ynez fault zone',
-    'TDRS': 'Temblor-Diablo Range fault system',
-    'TMFZ': 'Tiefort Mountains fault zone',
-    'WWFZ': 'White Wolf fault zone'
-}, {
-    '1857': '1857 rupture',
-    '1872': '1872 rupture',
-    '1992': '1992 rupture',
-    'ALCM': 'Agua Caliente-Laguna Mts.?',
-    'ANCP': 'Anacapa',
-    'ANZA': 'Anza',
-    'AGCL': 'Agua Caliente',
-    'ASHH': 'Ash Hill',
-    'BRMT': 'Burnt Mountain',
-    'BRSZ': 'Brawley Seismic Zone',
-    'CDVD': 'Canada-David',
-    'CHNH': 'Chino Hills',
-    'CHNO': 'Chino',
-    'CLCZ': 'Cholame-Carrizo',
-    'CMGF': 'Cucamonga fault',
-    'CNTR': 'Central',
-    'COAL': 'Coalinga',
-    'COAV': 'Coachella',
-    'CRCT': 'Cerro-Centinela',
-    'CRPR': 'Cerro Prieto basin',
-    'CSPC': 'Clamshell-Sawpit Canyon',
-    'CYMT': 'Coyote Mountain',
-    'CYTC': 'Coyote Creek',
-    'EAST': 'Eastern',
-    'EMCP': 'El_Mayor-Cucapah',
-    'EMRS': 'Emerson',
-    'EMTB': 'East Montebello',
-    'EQVS': 'Earthquake Valley',
-    'ERPK': 'Eureka Peak',
-    'GLDS': 'Goldstone Lake',
-    'GLIV': 'Glen Ivy',
-    'HMVS': 'Homestead Valley',
-    'HTSP': 'Hot Springs',
-    'IMPV': 'Imperial Valley',
-    'INDP': 'Independence',
-    'JNSV': 'Johnson Valley',
-    'JULN': 'Julian',
-    'KTLM': 'Kettleman Hills',
-    'LABS': 'Los Angeles Basin',
-    'LCKV': 'Lockwood Valley',
-    'LGSD': 'Laguna Salada',
-    'LSBM': 'Little San Bernardino Mtns',
-    'LSTH': 'Lost Hills',
-    'LVLK': 'Lavic Lake',
-    'MCHS': 'Mecca Hills-Hidden Springs',
-    'MJVS': 'Mojave',
-    'MRLS': 'Morales',
-    'MSNH': 'Mission Hills',
-    'MULT': 'multiple',
-    'NCPP': 'North Channel-Pitas Point',
-    'NE': 'Northeast',
-    'NTEW': 'Northeast-Northwest',
-    'NWPT': 'Newport',
-    'OCNS': 'Oceanside',
-    'OFFS': 'Offshore',
-    'PARK': 'Parkfield',
-    'PHLS': 'Peralta Hills',
-    'PLMS': 'Palomas',
-    'PMTS': 'Pine Mountain',
-    'PPMC': 'Pitas Point-Mid-Channel trend',
-    'PPT': 'Pitas Point',
-    'PPTV': 'Pitas Point-Ventura',
-    'PRDS': 'Paradise',
-    'RDMT': 'Red Mountain',
-    'RDNC': 'Redondo Canyon',
-    'RSCN': 'Rose Canyon',
-    'SANC': 'San Antonio Canyon',
-    'SBMT': 'San Bernardino Mountains',
-    'SBRN': 'San Bernardino',
-    'SCVA': 'Santa Clarita Valley',
-    'SFNV': 'San Fernando Valley',
-    'SGPS': 'San Gorgonio Pass',
-    'SGV': 'San Gabriel Valley',
-    'SJCV': 'San Jacinto-Claremont',
-    'SJMT': 'San Jacinto Mts',
-    'SJSH': 'San Jose Hills',
-    'SLTS': 'Salton Sea',
-    'SMMT': 'Santa Monica Mountains',
-    'SMNB': 'Santa Monica basin',
-    'SNCZ': 'Santa Cruz',
-    'SNRS': 'Santa Rosa',
-    'SPDB': 'San Pedro basin',
-    'SQJH': 'San Joaquin Hills',
-    'SSHS': 'Superstition Hills',
-    'SSMT': 'Superstition Mountain',
-    'STEW': 'Southeast-Southwest',
-    'TANK': 'Tank Canyon',
-    'TMBK': 'Thirty Mile Bank',
-    'TMCL': 'Temecula',
-    'USAF': 'Upper Santa Ana Valley',
-    'USAV': 'Upper Santa Ana Valley',
-    'VNTB': 'Ventura basin',
-    'VRDM': 'Verdugo Mountains',
-    'WEST': 'Western',
-    'WHIT': 'Whittier'
-}]
+if __name__ == '__main__':
+    main(sys.argv[1:])

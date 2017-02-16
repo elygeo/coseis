@@ -4,7 +4,6 @@ PEER Lifelines program task 1A01, Problem LOH.1
 Layer over a halfspace model with buried double-couple source.
 """
 import os
-import cst.job
 import cst.sord
 
 nthread, nproc = 1, 16
@@ -47,8 +46,7 @@ for i in range(10):
             ([x, y, 0.0, []], '.>', 'p%s-%s.bin' % (i, f)),
         ]
 
-p = cst.repo + 'LOH1'
+p = 'repo/LOH1'
 os.mkdir(p)
 os.chdir(p)
-d = cst.sord.stage(prm)
-cst.job.launch(d)
+cst.sord.run(prm)

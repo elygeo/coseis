@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 import os
 import json
-import cst.job
 import numpy as np
 import matplotlib.pyplot as plt
 
 # metadata
 id_ = '00'
 id_ = '20'
-os.chdir(cst.repo + 'Foam-' + id_)
+os.chdir('repo/Foam-' + id_)
 meta = json.load(open('meta.json'))
 
 # off-fault displacement plot
@@ -29,7 +28,7 @@ ax.set_title('Surface displacement (mm)')
 ax.set_xlabel('Distance from fault (cm)')
 ax.set_ylabel('Time (ms)')
 fig.colorbar(im)
-fig.savefig('Foam-%s-Off-Fault.png' % id_)
+fig.savefig('Foam-%s-Off-Fault.svg' % id_)
 
 # approximate static strain
 x = np.arange(nx - 1) * dx * 100.0 + dx * 50.0
@@ -38,7 +37,7 @@ ax = fig.add_subplot(111)
 ax.plot(x, e, 'k-')
 ax.set_xlabel('Distance from fault (cm)')
 ax.set_ylabel('Strain')
-fig.savefig('Foam-%s-Strain.pdf' % id_)
+fig.savefig('Foam-%s-Strain.svg' % id_)
 
 # acceleration plots
 fig = plt.figure(figsize=(4.8, 6.4))
@@ -61,4 +60,4 @@ for s, x, g in [
     ax.set_title('Acceleration')
     ax.set_xlabel('Time (ms)')
     ax.set_ylabel('Depth along fault (cm)')
-fig.savefig('Foam-%s-Acceleration.pdf' % id_)
+fig.savefig('Foam-%s-Acceleration.svg' % id_)

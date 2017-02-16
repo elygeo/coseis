@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 import os
 import json
-import cst
 import numpy as np
 
-os.chdir(cst.repo + 'TPV12-2D')
+os.chdir('repo/TPV12-2D')
 
 # parameters
 meta = json.load(open('meta.json'))

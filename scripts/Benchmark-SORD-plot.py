@@ -101,7 +101,7 @@ x = 64 + X
 y = 80 - Y
 out = [
     '<svg width="%s" height="auto"' % x +
-    ' viewBox="0 0 %s %s"' % (x, y) +
+    ' viewBox="%s %s %s %s"' % (-32, Y - 32, x, y) +
     ' fill="#fff" stroke="#fff"'
     ' xmlns="http://www.w3.org/2000/svg">',
     '<defs>',
@@ -113,8 +113,7 @@ out = [
     ' refX="4" refY="4" markerWidth="8" markerHeight="8">',
     '<path stroke="currentColor" stroke-width="1" d="M3 3h2v2h-2z" />',
     '</marker>',
-    '</defs>',
-    '<g transform="translate(32,%s)">' % (32 - Y)
+    '</defs>'
 ] + path + [
     '<g fill="none" stroke-width="8" font-size="16" text-anchor="middle"'
     ' font-family="-apple-system, sans-serif">'
@@ -123,7 +122,6 @@ out = [
     '<g fill="currentColor" stroke="none" font-size="16" text-anchor="middle"'
     ' font-family="-apple-system, sans-serif">'
 ] + text + [
-    '</g>',
     '</g>',
     '</svg>'
 ]

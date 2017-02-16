@@ -1,4 +1,7 @@
-from . import hello, sord_mpi, sord_pml, sord_kostrov
+from . import hello
+from . import sord_mpi
+from . import sord_pml
+from . import sord_kostrov
 
 
 def test():

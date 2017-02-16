@@ -6,8 +6,9 @@ import json
 import copy
 import shutil
 import subprocess
-from . import repo as repository
+from . import home
 
+repository = home + 'repo'
 versions = ['2.2', '3.0', '4.0']
 
 input_template = """\

@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import os
-import cst.job
 import cst.sord
 
 nx, ny, nz, nt = 301, 321, 2, 6000
@@ -40,5 +39,6 @@ prm = {
     ],
 }
 
-os.chdir(cst.repo + 'Canyon')
-cst.job.launch(cst.sord.stage(prm))
+os.chdir('repo/Canyon')
+os.chdir('repo/Canyon')
+cst.sord.run(prm))

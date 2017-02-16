@@ -63,7 +63,7 @@ class typed_dict(dict):
 
 def hostname():
     h = os.uname()
-    g = socket.getfqdn()
+    g = socket.getfqdn()  # FIXME this is slow. cache the result?
     host = ' '.join([h[0], h[4], h[1], g])
     for m, h in hostmap:
         if h in host:

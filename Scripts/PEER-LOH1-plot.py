@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 import os
 import json
-import cst.dsp
 import numpy as np
 import matplotlib.pyplot as plt
+import cst.dsp
 
-os.chdir(cst.repo + 'LOH1')
+os.chdir('repo/LOH1')
 
 # parameters
 meta = json.load(open('meta.json'))
@@ -62,7 +62,7 @@ ax[1].plot(t, v[1], 'k')
 ax[2].plot(t, v[2], 'k')
 
 # read Prose F/K results
-p = os.path.join('..', 'Data', 'LOH1-ProseFK-')
+p = cst.home + 'data/LOH1-ProseFK-'
 t = np.load(p + 'Time.npy')
 v1 = 1e5 * np.load(p + 'V-Radial.bin')
 v2 = 1e5 * np.load(p + 'V-Transverse.bin')
@@ -85,4 +85,4 @@ ax[2].plot(t, v[2], 'k--')[0].set_dashes((2, 0.5))
 
 # finish up
 ax[1].legend(['SOM', 'FK'], loc='lower left', frameon=False)
-fig.savefig('LOH1.pdf')
+fig.savefig('LOH1.svg')

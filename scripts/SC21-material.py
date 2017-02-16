@@ -3,7 +3,6 @@ import os
 import json
 import shutil
 import numpy as np
-import cst.job
 import cst.cvms
 
 # parameters
@@ -43,7 +42,7 @@ meta = {
 }
 
 # create run directory
-d = cst.repo + 'SC21-Mesh-%.0f' % dx
+d = 'repo/SC21-Mesh-%.0f' % dx
 os.mkdir(d)
 os.chdir(d)
 f = os.path.join(cst.home, 'Util', 'Mesh-Extrude.py')

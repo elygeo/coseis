@@ -5,29 +5,27 @@ Visualization using Mayavi and Matplotlib
 import os
 import Image
 import pyproj
-import cst.job
-import cst.plt
-import cst.viz
-import cst.data
 import numpy as np
 import matplotlib.pyplot as plt
 from mayavi import mlab
+import cst.plt
+import cst.viz
+import cst.data
 
 # parameters
-outfile, dpi = 'CVM-Basins.png', 150.0
-outfile, dpi = 'CVM-Basins.pdf', 300.0
-path = cst.repo + 'CVM-Basins' + os.sep
+outfile, dpi = 'CVM-Basins.svg', 300.0
+path = 'repo/CVM-Basins/'
 proj = pyproj.Proj(proj='tmerc', lon_0=-117.25, lat_0=33.75, k=0.001)
 title = 'SCEC Community\nVelocity Model'
 legend = 'Depth to Vs = 2.5 km/s'
 ticklabels = '0', '4', '8 km'
 ticks = 0, 4, 8
 colormap = [
-    (0, 0.001, 2, 3),  # value
-    (1, 1, 1, 1),  # red
-    (0, 0, 1, 1),  # green
-    (0, 0, 0, 1),  # blue
-    (0, 1, 1, 1),  # alpha
+    (0, 0.001, 2, 3),
+    (1, 1, 1, 1),
+    (0, 0, 1, 1),
+    (0, 0, 0, 1),
+    (0, 1, 1, 1),
 ]
 colorexp = 1.0
 colorlim = ticks[0], ticks[-1]
@@ -133,11 +131,11 @@ mlab.clf()
 
 # topography
 cmap = [
-    (-5, -3, -2, -1,  1,  2,  3,  5),  # value
-    (0,  0,  10, 10, 15, 15, 25, 25),  # red
-    (10, 10, 20, 20, 25, 30, 25, 25),  # green
-    (38, 38, 40, 40, 25, 20, 17, 17),  # blue
-    (80, 80, 80, 80, 80, 80, 80, 80),  # alpha
+    (-5, -3, -2, -1,  1,  2,  3,  5),
+    (0,  0,  10, 10, 15, 15, 25, 25),
+    (10, 10, 20, 20, 25, 30, 25, 25),
+    (38, 38, 40, 40, 25, 20, 17, 17),
+    (80, 80, 80, 80, 80, 80, 80, 80),
 ]
 x, y, z = cst.data.dem(extent, scale=0.001, downsample=-1)
 s = np.maximum(0.01, z)

@@ -4,14 +4,13 @@ Locate the shallowest 2D isosurface in a volume.
 """
 import os
 import json
-import cst.job
 import numpy as np
 
 # parameters
 val = 2500.0
 cell = 0
 up = 0
-path = cst.repo + 'CVM-Basins-Mesh' + os.sep
+path = 'repo/CVM-Basins-Mesh/'
 meta = json.load(open(path + 'meta.json'))
 delta = meta['delta']
 shape = meta['shape']
@@ -22,8 +21,7 @@ n1 = shape[0] * shape[1]
 n2 = shape[2]
 
 # iterate over depth planes looking for vertical isosurface crossings
-f = os.path.join(path, 'vs.bin')
-f = open(f, 'rb')
+f = open(path + 'vs.bin', 'rb')
 v2 = np.fromfile(f, 'f', n1)
 if up:
     z = 1e9 * np.ones_like(v2)

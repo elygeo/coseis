@@ -24,8 +24,9 @@ assert(trinterp)
 
 
 def interp1(
-  xlim, f, xi, fi=None, method='nearest', bound=False, mask=False,
-  no_data_val='nan'):
+    xlim, f, xi,
+    fi=None, method='nearest', bound=False, mask=False, no_data_val='nan'
+):
     """
     1D piecewise interpolation of function values specified on regular grid.
     xlim: Range (x_min, x_max) of coordinate space covered by `f`.
@@ -38,6 +39,7 @@ def interp1(
     mask: If true and `fi` is passed, non_data_vals are masked from output.
     no_data_val: value to insert for empty data.
     Returns an array of interpolated values, same shape as `xi`.
+    FIXME: transpose dimensions
     """
     import numpy as np
     f = np.asarray(f)
@@ -104,11 +106,13 @@ def interp1(
 
 
 def interp2(
-  xlim, f, xi, fi=None, method='nearest', bound=False, mask=False,
-  no_data_val='nan'):
+    xlim, f, xi,
+    fi=None, method='nearest', bound=False, mask=False, no_data_val='nan'
+):
     """
     2D piecewise interpolation of function values specified on regular grid.
     See 1D interp for documentation.
+    FIXME: transpose arrays
     """
     import numpy as np
     f = np.asarray(f)
@@ -190,11 +194,13 @@ def interp2(
 
 
 def interp3(
-  xlim, f, xi, fi=None, method='nearest', bound=False, mask=False,
-  no_data_val='nan'):
+    xlim, f, xi,
+    fi=None, method='nearest', bound=False, mask=False, no_data_val='nan'
+):
     """
     3D piecewise interpolation of function values specified on regular grid.
     See 1D interp for documentation.
+    FIXME: transpose arrays
     """
     import numpy as np
 
@@ -292,19 +298,17 @@ def interp3(
 def trinterp_np(x, f, t, xi, fi=None, no_data_val=float('nan')):
     """
     2D linear interpolation of function values specified on triangular mesh.
-    x:  shape (2, M) array of vertex coordinates.
+    x:  shape (M, 2) array of vertex coordinates.
     f:  shape (M) array of function values at the vertices.
-    t:  shape (3, N) array of vertex indices for the triangles.
-    xi: shape (2, ...) array of coordinates for the interpolation points.
+    t:  shape (N, 3) array of vertex indices for the triangles.
+    xi: shape (..., 2) array of coordinates for the interpolation points.
     Returns array of interpolated values, same shape as `xi[0]`.
     Note: This is the NumPy version. The Cython version is faster.
     """
     import numpy as np
 
-    x, y = x
-    xi, yi = xi
     if fi is None:
-        fi = np.empty_like(xi)
+        fi = np.empty_like(xi[..., 0])
         fi.fill(no_data_val)
 
     # tolerance
@@ -312,21 +316,20 @@ def trinterp_np(x, f, t, xi, fi=None, no_data_val=float('nan')):
     lmax = 1.000001
 
     # loop over triangles
-    for i0, i1, i2 in t.T:
+    for i0, i1, i2 in t:
 
         # barycentric coordinates
-        A00 = x[i1] - x[i0]
-        A01 = x[i2] - x[i0]
-        A10 = y[i1] - y[i0]
-        A11 = y[i2] - y[i0]
+        A00 = x[i1, 0] - x[i0, 0]
+        A01 = x[i2, 0] - x[i0, 0]
+        A10 = x[i1, 1] - x[i0, 1]
+        A11 = x[i2, 1] - x[i0, 1]
         d = A00 * A11 - A01 * A10
         if d == 0.0:
             continue
         d = 1.0 / d
-        b0 = xi - x[i0]
-        b1 = yi - y[i0]
-        l1 = d * A11 * b0 - d * A01 * b1
-        l2 = d * A00 * b1 - d * A10 * b0
+        b = xi - x[i0]
+        l1 = d * A11 * b[..., 0] - d * A01 * b[..., 1]
+        l2 = d * A00 * b[..., 1] - d * A10 * b[..., 0]
         l0 = 1.0 - l1 - l2
 
         # interpolate points inside triangle

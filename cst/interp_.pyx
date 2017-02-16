@@ -21,25 +21,22 @@ def trinterp(x, f, t, xi, fi=None, no_data_val=float('nan')):
     """
 
     # declarations
-    cdef np.ndarray[double, ndim=1, mode='c'] x_, y_, f_, xi_, yi_, fi_
-    cdef np.ndarray[int, ndim=1, mode='c'] i0_, i1_, i2_
+    cdef np.ndarray[double, ndim=2, mode='c'] x_, xi_
+    cdef np.ndarray[double, ndim=1, mode='c'] f_, fi_
+    cdef np.ndarray[int, ndim=2, mode='c'] t_
     cdef double A00, A01, A10, A11, b0, b1, d
     cdef double l0, l1, l2, lmin, lmax
     cdef int i0, i1, i2, i, j, k, m, n
 
     # tolerance
     lmin = -0.000001
-    lmax =  1.000001
+    lmax = 1.000001
 
     # input arrays
-    x_  = np.ascontiguousarray(x[0], 'd')
-    y_  = np.ascontiguousarray(x[1], 'd')
-    f_  = np.ascontiguousarray(f, 'd')
-    i0_ = np.ascontiguousarray(t[0], 'i')
-    i1_ = np.ascontiguousarray(t[1], 'i')
-    i2_ = np.ascontiguousarray(t[2], 'i')
-    xi_ = np.ascontiguousarray(xi[0], 'd').reshape(-1)
-    yi_ = np.ascontiguousarray(xi[1], 'd').reshape(-1)
+    x_ = np.ascontiguousarray(x, 'd')
+    f_ = np.ascontiguousarray(f, 'd')
+    t_ = np.ascontiguousarray(t, 'i')
+    xi_ = np.ascontiguousarray(xi, 'd').reshape(-1)
 
     # output array
     if fi == None:
@@ -54,24 +51,24 @@ def trinterp(x, f, t, xi, fi=None, no_data_val=float('nan')):
 
     # bounds check
     m = x_.shape[0]
-    if any(i0_ >= m) or any(i1_ >= m) or any(i2_ >= m):
+    if any(t_ >= m):
         raise ValueError('`t` indices out of bounds')
 
     # loop over interpolation points, then triangles
     k = 0
     m = xi_.shape[0]
-    n = i0_.shape[0]
+    n = t_.shape[0]
     for i in range(m):
         for j in range(n):
 
             # barycentric coordinates
-            i0 = i0_[k]
-            i1 = i1_[k]
-            i2 = i2_[k]
-            A00 = x_[i1] - x_[i0]
-            A01 = x_[i2] - x_[i0]
-            A10 = y_[i1] - y_[i0]
-            A11 = y_[i2] - y_[i0]
+            i0 = t_[k, 0]
+            i1 = t_[k, 1]
+            i2 = t_[k, 2]
+            A00 = x_[i1, 0] - x_[i0, 0]
+            A01 = x_[i2, 0] - x_[i0, 0]
+            A10 = x_[i1, 1] - x_[i0, 1]
+            A11 = x_[i2, 1] - x_[i0, 1]
             d = A00 * A11 - A01 * A10
 
             # if zero area triangle, move to the next one
@@ -84,8 +81,8 @@ def trinterp(x, f, t, xi, fi=None, no_data_val=float('nan')):
                 continue
 
             d = 1.0 / d
-            b0 = xi_[i] - x_[i0]
-            b1 = yi_[i] - y_[i0]
+            b0 = xi_[i, 0] - x_[i0, 0]
+            b1 = xi_[i, 1] - x_[i0, 1]
             l1 = d * A11 * b0 - d * A01 * b1
             l2 = d * A00 * b1 - d * A10 * b0
             l0 = 1.0 - l1 - l2
@@ -106,5 +103,5 @@ def trinterp(x, f, t, xi, fi=None, no_data_val=float('nan')):
             fi_[i] = l0 * f_[i0] + l1 * f_[i1] + l2 * f_[i2]
             break
 
-    return fi_.reshape(xi[0].shape)
+    return fi_.reshape(xi[..., 0].shape)
 

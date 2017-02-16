@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import os
-import cst.job
 import cst.sord
 
 prm = {
@@ -36,7 +35,7 @@ prm = {
     ]
 }
 
-d = cst.repo + 'Kostrov'
+d = 'repo/Kostrov'
 os.mkdir(d)
 os.chdir(d)
-cst.job.launch(cst.sord.stage(prm))
+cst.sord.run(prm)

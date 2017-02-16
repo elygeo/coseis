@@ -52,3 +52,8 @@ def main(files, *kw):
     for f in files:
         s = stats(f, *kw)
         print('%12g %12g %12g  %s  %s' % (s + (f,)))
+
+
+if __name__ == '__main__':
+    args, kw = job.json_args()
+    main(args, **kw)

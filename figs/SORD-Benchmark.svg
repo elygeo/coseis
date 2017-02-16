@@ -1,4 +1,4 @@
-<svg width="448" height="auto" viewBox="0 0 448 368" fill="#fff" stroke="#fff" xmlns="http://www.w3.org/2000/svg">
+<svg width="448" height="auto" viewBox="-32 -320 448 368" fill="#fff" stroke="#fff" xmlns="http://www.w3.org/2000/svg">
 <defs>
 <marker id="circle" refX="4" refY="4" markerWidth="8" markerHeight="8">
 <circle stroke="currentColor" stroke-width="1" r="1" cx="4" cy="4"/>
@@ -7,7 +7,6 @@
 <path stroke="currentColor" stroke-width="1" d="M3 3h2v2h-2z" />
 </marker>
 </defs>
-<g transform="translate(32,320)">
 <path fill="none" stroke="currentColor" stroke-width="1" d="
 M0 0h384v-288h-384z
 M0 0m48 -4v4m48 -4v4m48 -4v4m48 -4v4m48 -4v4m48 -4v4m48 -4v4
@@ -63,6 +62,5 @@ M384 0m-4 -48h4m-4 -48h4m-4 -48h4m-4 -48h4m-4 -48h4
 <text x="192" y="-102">ALCF Intrepid (1M elem/core)</text>
 <text x="192" y="-29">ALCF Vesta (1M elem/core)</text>
 <text x="192" y="40">Cores</text>
-</g>
 </g>
 </svg>

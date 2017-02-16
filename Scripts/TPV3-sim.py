@@ -88,7 +88,7 @@ for dx, np in runs:
         ]
 
     # run SORD
-    d = cst.repo + 'TPV3-%03.0f' % dx
+    d = 'repo/TPV3-%03.0f' % dx
     os.mkdir(d)
     os.chdir(d)
     cst.sord.run(prm)

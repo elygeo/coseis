@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 import os
 import math
-import cst.job
-import cst.sord
 import numpy as np
+import cst.sord
 
 # FIXME: prestress not correct
 
@@ -106,10 +105,10 @@ x[k:] = y[k:]
 z[k:] = y[k:]
 
 # run SORD
-d = cst.repo + 'TVP12-2D'
+d = 'repo/TVP12-2D'
 os.mkdir(d)
 os.chdir(d)
 x.astype('f').tofile('sxx.bin')
 y.astype('f').tofile('syy.bin')
 z.astype('f').tofile('szz.bin')
-cst.job.launch(cst.sord.stage(prm))
+cst.sord.run(prm)

@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 stations = 'P1a', 'P2a'
 stations = 'P1b', 'P2b'
 stations = 'P1', 'P2'
-path_bi = os.path.join('..', 'Data', 'TVP3-BI-')
+path_bi = '../data/TVP3-BI-'
 runs = '../Repository/TPV3-*'
 
 # loop over runs
@@ -63,8 +63,7 @@ for path in glob.glob(runs):
         # finish up
         ax.set_title(sta, position=(0.05, 0.83), ha='left', va='center')
         f = 'TPV3-%03d-%s' % (delta[0], sta)
-        fig.savefig(f + '.png')
-        fig.savefig(f + '.pdf')
+        fig.savefig(f + '.svg')
 
     # Rupture time contour
     fig = plt.figure(3)
@@ -98,5 +97,4 @@ for path in glob.glob(runs):
     ax.axis('image')
     ax.axis([-15, 0, -7.5, 0])
     f = 'TPV3-%03d-trup' % delta
-    fig.savefig(f + '.png')
-    fig.savefig(f + '.pdf')
+    fig.savefig(f + '.svg')

@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import os
-import cst.job
 import cst.sord
 
 # MPI
@@ -29,12 +28,14 @@ prm = {
     'vz': ([[], [], [], 0], '=~', 1.0),
 }
 
+cwd = os.getcwd()
+
 for i in power[::-1]:
     n = 2 ** i
     prm['nproc3'] = [2, n, n]
     prm['shape'] = [points, n * points, n * points, prm['itio']]
-    d = cst.repo + 'Benchmark-SORD-%s' % i
+    d = 'repo/Benchmark-SORD-%s' % i
     os.mkdir(d)
     os.chdir(d)
-    cfg = cst.sord.stage(prm)
-    cst.job.launch(cfg)
+    cst.sord.run(prm)
+    os.chdir(cwd)

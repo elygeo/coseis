@@ -1,15 +1,15 @@
 """
 Convert binary files to NumPy .npy format.
 
-Data types will be read from file 'meta.json' if it exists, or specified with
-command line options:
+Data types will be read from file 'meta.json' if it exists.
 """
 import os
+import sys
 import json
 import numpy as np
 
 
-def main(filenames, dtype='f', shape=[]):
+def convert(filenames, dtype='f', shape=[]):
     for fn in filenames:
         t = dtype
         n = shape
@@ -41,3 +41,7 @@ def main(filenames, dtype='f', shape=[]):
             x = x.reshape(n[::-1]).T
         print('%s: %s %s' % (fn, t, x.shape))
         np.save(g, x)
+
+
+if __name__ == '__main__':
+    convert(sys.argv[1:])

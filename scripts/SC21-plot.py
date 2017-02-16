@@ -4,11 +4,11 @@ PEER Lifelines program task 1A02, Problem SC2.1
 """
 import os
 import json
-import cst.dsp
 import numpy as np
 import matplotlib.pyplot as plt
+import cst.dsp
 
-p = cst.repo + 'PEER-SC2.1-0200'
+p = 'repo/PEER-SC2.1-0200'
 os.chdir(p)
 
 # parameters
@@ -68,5 +68,5 @@ if 0:
 
 # finish up
 fig.canvas.draw()
-fig.savefig('PEER-SC2.1.pdf', format='pdf')
+fig.savefig('PEER-SC2.1.svg')
 fig.show()

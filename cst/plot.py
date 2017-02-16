@@ -3,10 +3,12 @@ Quick multi-purpose plotting from the command line or Python.
 Reads text, binary, JSON, NumPy, or SAC files.
 """
 import os
+import sys
 import json
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy.lib.npyio import format as npy
+from . import job
 
 
 def stats(f, msg=''):
@@ -129,3 +131,9 @@ def main(
                 fig.ginput(1, 0, False)
         fig.canvas.draw()
         fig.ginput(1, 0, False)
+
+
+# FIXME untested
+if __name__ == '__main__':
+    args, kwargs = job.json_args(sys.argv[1:])
+    main(args, **kwargs)

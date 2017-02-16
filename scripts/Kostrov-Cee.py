@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import os
-import cst.kostrov
 import numpy as np
 import matplotlib.pyplot as plt
+import cst.kostrov
 
 b = 0.9  # Vrup / Vs ratio
 a = b / np.sqrt(3.0)  # Poisson solid
@@ -52,4 +52,4 @@ if 1:
         C = 0, 1, 0, 1
         ax.plot(b, C, '+r')
 
-fig.savefig('Kostrov-Cee.pdf')
+fig.savefig('Kostrov-Cee.svg')

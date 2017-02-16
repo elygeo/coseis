@@ -8,8 +8,16 @@ import gzip
 import math
 import zipfile
 import subprocess
-import urllib.request
-from . import repo as repository
+
+try:
+    from urllib.request import urlopen
+except ImportError:
+    from urllib2 import urlopen
+
+import numpy as np
+from . import home
+
+repository = home + 'repo' + os.sep
 
 # TODO
 # Quaternary Fault Database
@@ -21,9 +29,7 @@ def upsample(f):
     """
     Up-sample a 2D array by a factor of 2 by interpolation.
     """
-    import numpy as np
-    n = list(f.shape)
-    n[:2] = [n[0] * 2 - 1, n[1] * 2 - 1]
+    n = [f.shape[0] * 2 - 1, f.shape[1] * 2 - 1] + list(f.shape[2:])
     g = np.empty(n, f.dtype)
     g[0::2, 0::2] = f
     g[0::2, 1::2] = 0.5 * (f[:, :-1] + f[:, 1:])
@@ -36,7 +42,6 @@ def downsample(f, d):
     """
     Down-sample a 2D array by a factor d, with averaging.
     """
-    import numpy as np
     n = f.shape
     n = (n[0] + 1) // d, (n[1] + 1) // d
     g = np.zeros(n, f.dtype)
@@ -47,67 +52,58 @@ def downsample(f, d):
     return g
 
 
-def clipdata(x, y, extent, lines=1):
+def clipdata(x, extent, lines=1):
     """
     Clip data outside extent.
-
-    x, y: data coordinates
+    x is data coordinates with dimenstions (n, 2)
     extent: (xmin, xmax), (ymin, ymax)
-    lines: 0 = points, assume no connectivity.
-           1 = line segments, include one extra point past the boundary.
-           -1 = line segments, do not include extra point past the boundary.
+    lines:
+        0: points, assume no connectivity.
+        1: line segments, include one extra point past the boundary.
+        -1: line segments, do not include extra point past the boundary.
     """
-    import numpy as np
     x = np.asarray(x)
-    y = np.asarray(y)
-    x1, x2 = extent[0]
-    y1, y2 = extent[1]
-    i = (x >= x1) & (x <= x2) & (y >= y1) & (y <= y2)
+    (x1, x2), (y1, y2) = extent
+    i = (x[:, 0] >= x1) & (x[:, 0] <= x2)
+    i &= (x[:, 1] >= y1) & (x[:, 1] <= y2)
     if lines:
         if lines > 0:
             i[:-1] = i[:-1] | i[1:]
             i[1:] = i[:-1] | i[1:]
         x[~i] = float('nan')
-        y[~i] = float('nan')
         i[1:] = i[:-1] | i[1:]
-    return x[i], y[i], i
+    return x[i], i
 
 
-def densify(x, y, delta):
+def densify(xy, delta):
     """
     Piecewise up-sample line segments with spacing delta.
     """
-    import numpy as np
-    x = np.asarray(x)
-    y = np.asarray(y)
-    if x.size <= 1:
-        return np.array([x, y])
-    dx = np.diff(x)
-    dy = np.diff(y)
-    r = np.sqrt(dx * dx + dy * dy)
-    xx = [[x[0]]]
-    yy = [[y[0]]]
-    for i in range(r.size):
-        if r[i] > delta:
-            ri = np.arange(delta, r[i], delta)
-            xx += [np.interp(ri, [0.0, r[i]], x[i:i+2])]
-            yy += [np.interp(ri, [0.0, r[i]], y[i:i+2])]
-        xx += [[x[i+1]]]
-        yy += [[y[i+1]]]
-    xx = np.concatenate(xx)
-    yy = np.concatenate(yy)
-    return np.array([xx, yy])
+    if len(xy) <= 1:
+        return xy
+    x, y = xy[0]
+    xxyy = [(x, y)]
+    for x1, y1 in xy[1:]:
+        dx = x1 - x
+        dy = y1 - y
+        n = int(math.sqrt(dx * dx + dy * dy) / delta)
+        dx /= (n + 1)
+        dy /= (n + 1)
+        for i in range(n):
+            x += dx
+            y += dy
+            xxyy.append((x, y))
+        x, y = x1, y1
+        xxyy.append((x, y))
+    return xxyy
 
 
 def downsample_sphere(f, d):
     """
-    Down-sample node-registered spherical surface with averaging.
-
-    The indices of the 2D array f are, respectively, longitude and latitude.
-    d is the decimation interval which should be odd to preserve nodal
-    registration.
+    Down-sample node-registered spherical surface with averaging. The indices
+    of the 2D array f are longitude and latitude. d is the decimation interval
+    which should be odd to preserve nodal registration.
     """
-    import numpy as np
     n = f.shape
     i = np.arange(d) - (d - 1) / 2
     jj = np.arange(0, n[0], d)
@@ -131,7 +127,6 @@ def etopo1(downsample=1):
     ETOPO1 Global Relief Model.
     http://www.ngdc.noaa.gov/mgg/global/global.html
     """
-    import numpy as np
     f = repository + 'DEM0060.npy'
     g = repository + 'DEM%04d.npy' % (60 * downsample)
     u = (
@@ -141,7 +136,7 @@ def etopo1(downsample=1):
     n = 10801, 21601
     if not os.path.exists(f):
         print('Retrieving %s' % u)
-        z = urllib.request.urlopen(u)
+        z = urlopen(u)
         z = io.BytesIO(z.read())
         z = zipfile.ZipFile(z)
         z = z.read('etopo1_ice_g_i2.bin')
@@ -159,23 +154,20 @@ def etopo1(downsample=1):
 
 def globe30(tile=(0, 1), fill=True):
     """
-    Global Land One-km Base Elevation DEM.
+    Retrieve Global Land One-km Base Elevation DEM.
     Missing bathymetry is optionally filled with ETOPO1.
     http://www.ngdc.noaa.gov/mgg/topo/globe.html
-
-    Parameters:
-        tile: 90 x 90 deg tile indices:
-            (0, 0): W Antarctica, S Pacific
-            (1, 0): W Antarctica, S America, S Atlantic
-            (2, 0): E Antarctica, S Africa, Indian Ocean
-            (3, 0): E Antarctica, Australia
-            (0, 1): W N America, N Pacific
-            (1, 1): E N America, W Africa, W Europe, N Atlantic
-            (2, 1): W Asia, Africa, E Europe
-            (3, 1): E Asia, W Pacific
-        fill: Fill missing data (ocean basins) with ETOPO1 bathymetry.
+    tile: 90 x 90 degree tile indices:
+        (0, 0): W Antarctica, S Pacific
+        (1, 0): W Antarctica, S America, S Atlantic
+        (2, 0): E Antarctica, S Africa, Indian Ocean
+        (3, 0): E Antarctica, Australia
+        (0, 1): W N America, N Pacific
+        (1, 1): E N America, W Africa, W Europe, N Atlantic
+        (2, 1): W Asia, Africa, E Europe
+        (3, 1): E Asia, W Pacific
+    fill: Fill missing data (ocean basins) with ETOPO1 bathymetry.
     """
-    import numpy as np
     filename = repository + 'DEM0030-%s%s.npy' % tile
     url = 'http://www.ngdc.noaa.gov/mgg/topo/DATATILES/elev/%s10g.gz'
     tiles = ('im', 'jn', 'ko', 'lp'), ('ae', 'bf', 'cg', 'dh')
@@ -187,7 +179,7 @@ def globe30(tile=(0, 1), fill=True):
             t = tiles[k][j][i]
             u = url % t
             print('Retrieving %s' % u)
-            f = urllib.request.urlopen(u)
+            f = urlopen(u)
             f = io.BytesIO(f.read())
             z += gzip.GzipFile(fileobj=f).read()
         z = np.fromstring(z, '<i2').reshape(shape).T[:, ::-1]
@@ -222,29 +214,28 @@ def dem(coords, scale=1.0, downsample=0, mesh=False):
     """
     Extract digital elevation model for given region.
 
-    Parameters:
-        coords: (lon, lat)
-            If length of lon and lat are 2, they specify the region limits,
-            otherwise they specify interpolation points
-        scale: Scaling factor for elevation data
-        downsample:
-            <0: Upsample by factor of 2
-            0:  GLOBE 30 sec, with missing data filled by ETOPO1
-            1:  ETOPO1 60 sec
-            >1: Down-sample factor for ETOPO1
+    coords: (lon, lat)
+        If length of lon and lat are 2, they specify the region limits,
+        otherwise they specify interpolation points
+    scale: Scaling factor for elevation data
+    downsample:
+        <0: Upsample by factor of 2
+        0:  GLOBE 30 sec, with missing data filled by ETOPO1
+        1:  ETOPO1 60 sec
+        >1: Down-sample factor for ETOPO1
+    mesh: return coordinate mesh with topo
 
     Returns (when given region limits):
         lon, lat, elev: 2D arrays for regular mesh
-
     Returns (when given interpolation points):
         elev: array of elevation values at the interpolation points
     """
-    import numpy as np
-    from . import interp
-    x, y = np.asarray(coords)
-    sample = x.size > 2 or y.size > 2
+    sample = len(coords) > 2
     if sample:
-        i = ~(np.isnan(x) | np.isnan(y))
+        coords = np.asarray(coords)
+        i = ~np.isnan(coords).max(-1)
+        x = coords[..., 0]
+        y = coords[..., 1]
         xlim = x[i].min(), x[i].max()
         ylim = y[i].min(), y[i].max()
     else:
@@ -282,7 +273,8 @@ def dem(coords, scale=1.0, downsample=0, mesh=False):
             res *= 2
     z = z * scale  # always do this to convert to float
     if sample:
-        return interp.interp2(extent, z, (x, y))
+        from . import interp
+        return interp.interp2(extent, z, coords)
     elif mesh:
         delta = 1.0 / res
         n = z.shape
@@ -298,14 +290,13 @@ def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):
     """
     Wald, et al. Vs30 map.
     """
-    import numpy as np
     from . import interp
     f = os.path.join(repository, 'Vs30-Wald-%s.npy') % region.replace('_', '-')
     u = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/%s.grd.gz'
     if not os.path.exists(f):
         u = u % region
         print('Retrieving %s' % u)
-        z = urllib.request.urlopen(u).read()
+        z = urlopen(u).read()
         z = io.BytesIO(z)
         z = gzip.GzipFile(fileobj=z).read()[19512:]
         z = np.fromstring(z, '>f').reshape((2400, 2280)).T
@@ -343,41 +334,35 @@ def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):
         return extent, z
 
 
-def mapdata(
+def gshhg(
     kind=None, resolution='high', extent=None, min_area=0.0, min_level=0,
     max_level=4, delta=None, clip=1
 ):
     """
-    Reader for the Global Self-consistent, Hierarchical, High-resolution
-    Shoreline database (GSHHS) by Wessel and Smith.  WGS-84 ellipsoid.
-
-    Parameters:
-        kind: 'coastlines', 'rivers', 'borders', or None
-        resolution: 'crude', 'low', 'intermediate', 'high', or 'full'
-        extent: (min_lon, max_lon), (min_lat, max_lat)
-        delta: densify line segments to given delta.
-        min_level, max_level: where levels 1-4 are (1) coastline, (2)
-            lakeshore, (3) island-in-lake shore, and (4) lake-in-island-in-lake
-            shore.
-
-    Returns (x, y) coordinates arrays.
-
-    Reference:
-    Wessel, P., and W. H. F. Smith, A Global Self-consistent, Hierarchical,
-    High-resolution Shoreline Database, J. Geophys. Res., 101, 8741-8743, 1996.
+    Global Self-consistent, Hierarchical, High-resolution Geography Database
+    http://www.soest.hawaii.edu/wessel/gshhg/index.html
     http://www.ngdc.noaa.gov/mgg/shorelines/gshhs.html
-    http://www.soest.hawaii.edu/wessel/gshhs/index.html
-    """
-    import numpy as np
 
+    kind: 'coastlines', 'rivers', 'borders', or None
+    resolution: 'crude', 'low', 'intermediate', 'high', or 'full'
+    extent: (min_lon, max_lon), (min_lat, max_lat)
+    delta: densify line segments to given delta.
+    min_level, max_level: where levels 1-4 are
+        1: coastline
+        2: lake shore
+        3: island-in-lake shore
+        4: lake-in-island-in-lake shore
+    Returns N x 2 coordinate array.
+    """
+    # url = 'http://www.soest.hawaii.edu/pwessel/gshhg/gshhg-bin-2.3.6.zip'
     url = (
-        'http://www.ngdc.noaa.gov/mgg/shorelines/'
-        'data/gshhg/latest/gshhg-bin-2.3.5.zip'
+        'https://www.ngdc.noaa.gov/mgg/shorelines/'
+        'data/gshhg/latest/gshhg-bin-2.3.6.zip'
     )
-    d = os.path.join(repository, 'GSHHS')
+    d = repository + 'GSHHG'
     if not os.path.exists(d):
         print('Retrieving %s' % url)
-        data = urllib.request.urlopen(url)
+        data = urlopen(url)
         data = io.BytesIO(data.read())
         zipfile.ZipFile(data).extractall(d)
     if not kind:
@@ -386,7 +371,7 @@ def mapdata(
     name = name[kind[0]]
     kind = {'c': 'gshhs', 'r': 'wdb_rivers', 'b': 'wdb_borders'}[kind[0]]
     filename = os.path.join(
-        repository, 'GSHHS/%s_%s.b' % (kind, resolution[0])
+        repository, 'GSHHG/%s_%s.b' % (kind, resolution[0])
     )
     data = np.fromfile(filename, '>i')
     if kind != 'gshhs':
@@ -397,16 +382,14 @@ def mapdata(
         extent = lon, lat
     print('Reading %s resolution %s.' % (resolution, name))
     xx = []
-    yy = []
     ii = 0
-    nh = 11  # number of header values
-    nkeep = 0
+    nhead = 11
     ntotal = 0
     while ii < data.size:
         ntotal += 1
-        hdr = data[ii:ii+nh]
+        hdr = data[ii:ii+nhead]
         n = hdr[1]
-        ii += nh + 2 * n
+        ii += nhead + 2 * n
         level = hdr[2:3].view('i1')[3]
         if level > max_level:
             break
@@ -423,59 +406,25 @@ def mapdata(
                 west > lon[1] or south > lat[1]
             ):
                 continue
-        nkeep += 1
-        x, y = 1e-6 * np.array(data[ii-2*n:ii].reshape(n, 2).T, 'f')
+        x = 1e-6 * data[ii-2*n:ii].reshape(n, 2).astype('f')
         if extent is not None and clip != 0:
             if delta:
-                x, y = clipdata(x, y, extent, 1)[:2]
-                x, y = densify(x, y, delta)
-            x, y = clipdata(x, y, extent, clip)[:2]
+                x = clipdata(x, extent, 1)[0]
+                x = densify(x, delta)
+            x = clipdata(x, extent, clip)[0]
         elif delta:
-            x, y = densify(x, y, delta)
-        xx += [x, [float('nan')]]
-        yy += [y, [float('nan')]]
-    if nkeep:
-        xx = np.concatenate(xx)[:-1]
-        yy = np.concatenate(yy)[:-1]
-    return np.array([xx, yy], 'f')
-
-
-def us_place_names():
-    """
-    USGS place name database.
-    """
-    import numpy as np
-
-    u = 'http://geonames.usgs.gov/docs/stategaz/US_CONCISE.zip'
-    f = repository + 'US-Place-Names.npy'
-    c = 1, 2, 3, 5, 9, 10, 15
-    t = [
-        ('name', 'S84'),
-        ('class', 'S15'),
-        ('state', 'S2'),
-        ('county', 'S26'),
-        ('lat', 'f'),
-        ('lon', 'f'),
-        ('elev', 'i'),
-    ]
-    if not os.path.exists(f):
-        print('Retrieving %s' % u)
-        x = urllib.request.urlopen(u)
-        x = io.BytesIO(x.read())
-        x = zipfile.ZipFile(x)
-        x = x.open(x.namelist()[0])
-        x = np.genfromtxt(x, delimiter='|', skip_header=1, usecols=c, dtype=t)
-        np.save(f, x)
-        del(x)
-    return np.load(f, mmap_mode='c')
+            x = np.array(densify(x, delta))
+        xx += [x, [float('nan'), float('nan')]]
+    if xx:
+        xx.pop()
+        return np.concatenate(xx)
 
 
 def engdahl_cat():
     """
-    Engdahl Centennial Earthquake Catalog.
+    Engdahl Centennial Earthquake Catalog
     http://earthquake.usgs.gov/data/centennial/
     """
-    import numpy as np
     f = repository + 'Engdahl-Centennial-Cat.npy'
     u = 'http://earthquake.usgs.gov/data/centennial/centennial_Y2K.CAT'
     t = [
@@ -499,7 +448,7 @@ def engdahl_cat():
     ]
     if not os.path.exists(f):
         print('Retrieving %s' % u)
-        x = urllib.request.urlopen(u)
+        x = urlopen(u)
         x = np.genfromtxt(x, dtype=t[1::2], delimiter=t[0::2])
         np.save(f, x)
         del(x)
@@ -508,10 +457,9 @@ def engdahl_cat():
 
 def lsh_cat():
     """
-    Lin, Shearer, Hauksson southern California seismicity catalog.
+    Lin, Shearer, Hauksson southern California seismicity catalog
     http://www.rsmas.miami.edu/personal/glin/LSH.html
     """
-    import numpy as np
     f = repository + 'LSH-Catalog.npy'
     u = "http://www.rsmas.miami.edu/personal/glin/LSH_files/LSH_1.12"
     t = [
@@ -541,7 +489,7 @@ def lsh_cat():
     ]
     if not os.path.exists(f):
         print('Retrieving %s' % u)
-        x = urllib.request.urlopen(u)
+        x = urlopen(u)
         x = np.genfromtxt(x, dtype=t)
         np.save(f, x)
     x = np.load(f, mmap_mode='c')
@@ -550,20 +498,13 @@ def lsh_cat():
 
 def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
     """
-    Fetch CyberShake SRF sources.
-
+    CyberShake SRF sources.
     Must have account on intensity.usc.edu with auto SSH authentication.
-
-    Parameters:
-
     isrc: source ID
     irup: rupture ID
     islip: slip variation ID
     ihypo: hypocenter ID
-
-    Returns (metadata, data) SRF dictionaries
     """
-    import numpy as np
     from . import srf as srflib
 
     # locations
@@ -637,9 +578,13 @@ def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
 
 
 def download():
+    print('Downloading all data sets')
     engdahl_cat()
-    us_place_names()
     lsh_cat()
-    mapdata()
+    gshhg()
     globe30()
     etopo1()
+
+
+if __name__ == '__main__':
+    download()

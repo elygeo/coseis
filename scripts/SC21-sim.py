@@ -5,7 +5,6 @@ SCEC Community Velocity Model, version 2.2 with double-couple point source.
 """
 import os
 import json
-import cst.job
 import cst.sord
 
 dx, nproc3 = 2000.0, [1, 1, 1]
@@ -13,7 +12,7 @@ dx, nproc3 = 200.0, [1, 2, 30]
 dx, nproc3 = 100.0, [1, 4, 60]
 dx, nproc3 = 500.0, [1, 1, 2]
 
-mesh = cst.repo + ('SC21-Mesh-%.0f' % dx) + os.sep
+mesh = os.realpath('repo/SC21-Mesh-%.0f/' % dx)
 meta = json.load(open(mesh + 'meta.json'))
 dx, dy, dz = meta['delta']
 nx, ny, nz = meta['shape']
@@ -47,9 +46,9 @@ for f in 'vx', 'vy', 'vz':
         k = int((16000.0 + 8000.0 * i) / dy)
         prm[f] += [([j, k, 0, []], '=>', 'p%s-%s.bin' % (i, f))]
 
-d = cst.repo + 'PEER-SC2.1-%.0f' % dx
+d = 'repo/PEER-SC2.1-%.0f' % dx
 os.mkdir(d)
 os.chdir(d)
 for v in 'rho', 'vp', 'vs':
     os.link(mesh + 'mesh-' + v + '.bin', '.')
-cst.job.launch(cst.sord.stage(prm))
+cst.sord.run(prm)

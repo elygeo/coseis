@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import os
-import cst.job
 import cst.sord
 
 # step size options
@@ -52,7 +51,7 @@ for f in 'vx', 'vy', 'vz':
     prm[f] += [([j, [], [], t], '=>', 'snap-%s.bin' % f)]
 
 # run sord
-d = cst.repo + 'Explosion'
+d = 'repo/Explosion'
 os.mkdir(d)
 os.chdir(d)
-cst.job.launch(cst.sord.stage(prm))
+cst.sord.run(prm)
