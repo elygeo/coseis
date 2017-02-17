@@ -77,7 +77,9 @@ def clipdata(x, extent, lines=1):
 
 def densify(xy, delta):
     """
-    Piecewise up-sample line segments with spacing delta.
+    Piecewise up-sample line segments with spacing delta. Not appropriate for
+    geographic coordinates at high latitude with large delta (does not trace
+    great-circle arc).
     """
     if len(xy) <= 1:
         return xy
@@ -86,7 +88,7 @@ def densify(xy, delta):
     for x1, y1 in xy[1:]:
         dx = x1 - x
         dy = y1 - y
-        if dx == dx and dy == dy:  # skip if nan
+        if dx == dx and dy == dy:  # not NaN
             n = int(math.sqrt(dx * dx + dy * dy) / delta)
             dx /= (n + 1)
             dy /= (n + 1)
@@ -97,6 +99,64 @@ def densify(xy, delta):
         x, y = x1, y1
         xxyy.append((x, y))
     return xxyy
+
+
+def simplify(vtx, closepath=False, max_area=0):
+    """
+    Remove vertices from a line starting with the smallest vertex area until
+    max_area is reached (Visvalingam's algorithm). Vertex area is that of the
+    triangle formed by a vertex with it's two neighbors. The closepath
+    parameter indicates that the endpoints are connected to form a polygon.
+    """
+    area = max_area * max_area
+    vtx = list(vtx)
+    n = len(vtx)
+    m = 1
+    if closepath:
+        m = 0
+    while n > m + m:
+        amin = area
+        imin = None
+        for i in range(m, n - m):
+            j = (i - 1) % n
+            k = (i + 1) % n
+            a = ((vtx[j][0] - vtx[i][0]) * (vtx[k][1] - vtx[i][1]))
+            a -= ((vtx[j][1] - vtx[i][1]) * (vtx[k][0] - vtx[i][0]))
+            a = a * a
+            if a <= amin:
+                amin = a
+                imin = i
+        if imin is None:
+            break
+        vtx.pop(imin)
+        n -= 1
+    return vtx
+
+
+def simplify_indexed(vtx, indices, closepath=False, max_area=0):
+    area = max_area * max_area
+    indices = list(indices)
+    n = len(indices)
+    m = 1
+    if closepath:
+        m = 0
+    while n > m + m:
+        amin = area
+        imin = None
+        for i in range(m, n - m):
+            j = indices[(i - 1) % n]
+            k = indices[(i + 1) % n]
+            a = ((vtx[j][0] - vtx[i][0]) * (vtx[k][1] - vtx[i][1]))
+            a -= ((vtx[j][1] - vtx[i][1]) * (vtx[k][0] - vtx[i][0]))
+            a = a * a
+            if a <= amin:
+                amin = a
+                imin = i
+        if imin is None:
+            break
+        indices.pop(imin)
+        n -= 1
+    return indices
 
 
 def downsample_sphere(f, d):
@@ -337,7 +397,7 @@ def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):
 
 def gshhg(
     kind=None, resolution='high', extent=None, min_area=0.0, min_level=0,
-    max_level=4, delta=None, clip=1
+    max_level=4, delta=None
 ):
     """
     Global Self-consistent, Hierarchical, High-resolution Geography Database
@@ -407,17 +467,23 @@ def gshhg(
             ):
                 continue
         x = 1e-6 * data[ii-2*n:ii].reshape(n, 2).astype('f')
-        if extent is not None and clip != 0:
-            if delta:
-                x = clipdata(x, extent, 1)[0]
-                x = densify(x, delta)
-            x = clipdata(x, extent, clip)[0]
-        elif delta:
-            x = np.array(densify(x, delta))
-        xx += [x, [[float('nan'), float('nan')]]]
-    if xx:
-        xx.pop()
-        return np.concatenate(xx)
+        if delta:
+            x, y = densify(x, y, delta)
+        xx.append(x)
+    return xx
+    #     if extent is not None and clip != 0:
+    #         if delta:
+    #             x, y = clipdata(x, y, extent, 1)[:2]
+    #             x, y = densify(x, y, delta)
+    #         x, y = clipdata(x, y, extent, clip)[:2]
+    #     elif delta:
+    #         x, y = densify(x, y, delta)
+    #     xx += [x, [float('nan')]]
+    #     yy += [y, [float('nan')]]
+    # if nkeep:
+    #     xx = np.concatenate(xx)[:-1]
+    #     yy = np.concatenate(yy)[:-1]
+    # return np.array([xx, yy], 'f')
 
 
 def engdahl_cat():

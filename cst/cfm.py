@@ -139,6 +139,8 @@ def tsurf_merge(tsurfs, fuse=-1.0, cull=-1.0, clean=True):
     fuse: separation tolerance for combining vertices.
     cull: area tolerance for triangle removal.
     clean: remove unused vertices.
+
+    FIXME: maybe some problems with transposed matrices
     """
     import numpy as np
 
@@ -189,7 +191,7 @@ def tsurf_merge(tsurfs, fuse=-1.0, cull=-1.0, clean=True):
         tri = np.arange(tri.size)[j].reshape(tri.shape)
         vtx = vtx[i]
 
-    return vtx.T, tri.T
+    return vtx, tri
 
 
 def tsurf_edges(tri):
@@ -199,7 +201,7 @@ def tsurf_edges(tri):
 
     # triangle list -> triangle node tree
     surf = {i: set() for i in set(tri.flat)}
-    for j, k, l in tri.T:
+    for j, k, l in tri:
         surf[j] |= set([k, l])
         surf[k] |= set([l, j])
         surf[l] |= set([j, k])
@@ -243,8 +245,8 @@ def tsurf_plane(vtx, tri):
     import scipy.optimize
 
     # area normals
-    x, y, z = vtx
-    j, k, l = tri
+    x, y, z = vtx.T
+    j, k, l = tri.T
     ux = x[k] - x[j]
     uy = y[k] - y[j]
     uz = z[k] - z[j]
@@ -345,7 +347,7 @@ def quad_mesh(vtx, tri, delta, drape=False, clean_top=False):
     from . import interp
 
     # remove topography
-    x, y, z = vtx
+    x, y, z = vtx.T
     del(vtx)
     if drape:
         import pyproj
@@ -402,61 +404,12 @@ def quad_mesh(vtx, tri, delta, drape=False, clean_top=False):
     return xi, yi, zi, mask
 
 
-def line_simplify(vtx, indices, area=None, nkeep=None):
-    """
-    Remove detail from a line or polygon beginning with the least significant
-    vertices using Visvalingam's algorithm. Vertex significance is determined
-    by the triangle area formed by a point and it's neighbors.
-
-    vtx: vertex coordinates.
-    indices: indices of vtx for the line or polygon.
-    area: maximum triangle area for vertex removal.
-    nkeep: minimum number of vertices to keep.
-
-    If the first and last indices match, then the line is assumed to be a
-    closed polygon. If neither area nor nkeep are given, then half of the
-    indices are removed. If both area and nkeep are given, priority is given to
-    case that retains more detail.
-    """
-
-    if nkeep is None:
-        if area:
-            nkeep = 3
-        else:
-            nkeep = max(3, len(indices) // 2)
-    x, y = vtx[:2]
-    polygon = indices[0] == indices[-1]
-    if polygon:
-        j = list(indices[:-1])
-    else:
-        j = list(indices)
-    del(vtx, indices)
-    while len(j) >= nkeep:
-        k = j[1:] + j[:1]
-        l = j[-1:] + j[:-1]
-        a = ((x[k] - x[j]) * (y[l] - y[j]))
-        a -= ((y[k] - y[j]) * (x[l] - x[j]))
-        a = a * a
-        if polygon:
-            i = np.argmin(a)
-        else:
-            i = np.argmin(a[1:-1]) + 1
-        if area and a[i] > area:
-            break
-        j.pop(i)
-    if len(j) == 2:
-        j = []
-    elif polygon:
-        j = j + j[:1]
-    return j
-
-
 def cubit_facet(vtx, tri, geographic=True):
     """
     Create CUBIT Facet File text representation
     """
-    x, y, z = vtx
-    j, k, l = tri
+    x, y, z = vtx.T
+    j, k, l = tri.T
 
     if geographic:
         import pyproj
@@ -546,6 +499,7 @@ def explore(prefix, faults):
         x, y, z = np.load(f)
     else:
         ddeg = 0.5 / 60.0
+        FIXME
         x, y = np.c_[
             data.gshhg(
                 'coastlines', resolution, extent, 10.0, delta=ddeg),
@@ -608,7 +562,7 @@ def explore(prefix, faults):
             s += [k[3].replace('_', ' ')]
         s += [name]
         p = mlab.triangular_mesh(
-            x, y, z, tri.T,
+            x, y, z, tri,
             representation='surface',
             color=color_bg,
         ).actor.actor.property
