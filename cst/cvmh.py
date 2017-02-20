@@ -42,8 +42,9 @@ def vs30_model(x, y, version='Wills+Wald', method='nearest'):
         ylim = y0, y0 + delta * (w.shape[1] - 1)
         extent = xlim, ylim
         interp.interp2(
-            extent, w, (x, y), z, method=method,
-            bound=True, mask=True, no_data_val=0)
+            extent, w, (x, y), z, method=method, bound=True, mask=True,
+            no_data_val=0
+        )
     return z
 
 
@@ -236,10 +237,12 @@ class Model():
             if z is None:
                 data = data.reshape(data.shape[:2])
                 interp.interp2(
-                    extent[:2], data, (x, y), out, interpolation, bound)
+                    extent[:2], data, (x, y), out, interpolation, bound
+                )
             else:
                 interp.interp3(
-                    extent, data, (x, y, z), out, interpolation, bound)
+                    extent, data, (x, y, z), out, interpolation, bound
+                )
         return out
 
 
