@@ -232,28 +232,7 @@ axis, to reduce computations eight-fold:
 
 ## Memory Usage and Scaling
 
-For rectilinear meshes, 23 single precision (four-byte) memory variables are
-required per mesh point. Curvilinear meshes have two options with a trade-off
-in memory usage vs. floating-point operations. Stored operators require 44
-variables per mesh point and give the best performance, while on-the-fly
-operators require 23 variables per mesh point at the cost of a factor of four
-increase in floating point operations. As CPU improvement tends to out-pace
-memory bandwidth improvement, in the future, on-the-fly operators may become
-faster than stored operators. The operator type is controlled by the `diffop`
-parameter, but can generally be left alone, as the default is to automatically
-detect rectilinear and curvilinear meshes and assign the proper operator type
-for fastest performance. The allowed values are:
-
------- -----------------------------------------------------------------------
-`cons` Mesh with constant mesh step size  
-`rect` Rectangular mesh  
-`para` Parallelepiped mesh  
-`quad` One-point quadrature  
-`exac` Exactly integrated elements  
-`save` Saved operators, nearly as fast as `rect`, but doubles the memory usage  
-`auto` Automatically choose `rect` or `save`  
------- -----------------------------------------------------------------------
-
+23 single precision (four-byte) memory variables are required per mesh point.
 On current hardware, computation time is on the order of the one second per
 time step per one million mesh points. SORD scalability has been benchmarked up
 to 64 thousand processors at ALCF.

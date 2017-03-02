@@ -384,9 +384,9 @@ def write_awp(
         t1 = t0[i], t0[i] + dt[i] * (n1 - 1)
         t2 = t0[i], t0[i] + dt[i] * (n2 - 1)
         t3 = t0[i], t0[i] + dt[i] * (n3 - 1)
-        s1 = interp.interp1(t1, s1, t, s(t), interp, bound=True)
-        s2 = interp.interp1(t2, s2, t, s(t), interp, bound=True)
-        s3 = interp.interp1(t3, s3, t, s(t), interp, bound=True)
+        s1 = interp.interp1(t1, s1, t, s(t), interp)
+        s2 = interp.interp1(t2, s2, t, s(t), interp)
+        s3 = interp.interp1(t3, s3, t, s(t), interp)
         ii = np.array([[jj[i], kk[i], ll[i]]], 'i')
         mm = np.array([
             m1[0, 0, i] * s1 + m2[0, 0, i] * s2 + m3[0, 0, i] * s3,

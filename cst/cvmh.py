@@ -17,11 +17,7 @@ extent = (131000.0, 828000.0), (3431000.0, 4058000.0), (-200000.0, 4900.0)
 prop2d = {'topo': '1', 'base': '2', 'moho': '3'}
 prop3d = {'vp': '1', 'vs': '3', 'tag': '2'}
 versions = ['vx62', 'vx63', '11.2.0', '11.9.0']
-voxet3d = {
-    'mantle': ('CVM_CM', False),
-    'crust':  ('CVM_LR', [(False, False), (False, False), (True, False)]),
-    'lab':    ('CVM_HR', True),
-}
+voxet3d = {'mantle': 'CVM_CM', 'crust': 'CVM_LR', 'lab': 'CVM_HR'}
 
 
 def vs30_model(x, y, version='Wills+Wald', method='nearest'):
@@ -41,10 +37,7 @@ def vs30_model(x, y, version='Wills+Wald', method='nearest'):
         xlim = x0, x0 + delta * (w.shape[0] - 1)
         ylim = y0, y0 + delta * (w.shape[1] - 1)
         extent = xlim, ylim
-        interp.interp2(
-            extent, w, (x, y), z, method=method, bound=True, mask=True,
-            no_data_val=0
-        )
+        interp.interp2(extent, w, (x, y), z, method=method)
     return z
 
 
@@ -94,7 +87,6 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version=None):
     Returns:
 
     extent: (x0, x1), (y0, y1), (z0, z1)
-    bound: (x0, x1), (y0, y1), (z0, z1)
     data: Array of properties
     """
 
@@ -134,7 +126,7 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version=None):
         for vox in voxet3d:
             print('Filling voxet %s %s' % (version, vox))
             vp, vs, tag = prop3d['vp'], prop3d['vs'], prop3d['tag']
-            vid = voxet3d[vox][0]
+            vid = voxet3d[vox]
             voxfile = os.path.join(path, vid + '.vo')
             vox = gocad.voxet(voxfile, [vp, vs, tag])['1']
             w = vox['AXIS']['W'][2]
@@ -166,9 +158,9 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version=None):
 
     # voxet ID
     if voxet in voxet3d:
-        vid, bound = voxet3d[voxet]
+        vid = voxet3d[voxet]
     else:
-        vid, bound = 'interfaces', None
+        vid = 'interfaces'
     voxfile = os.path.join(path, vid + '.vo')
 
     # load voxet
@@ -191,7 +183,7 @@ def cvmh_voxet(prop=None, voxet=None, no_data_value=None, version=None):
 
     # property data
     data = vox['PROP'][pid]['DATA']
-    return extent, bound, data
+    return extent, data
 
 
 class Model():
@@ -233,16 +225,12 @@ class Model():
         if out is None:
             out = np.empty_like(x)
             out.fill(float('nan'))
-        for extent, bound, data in self.voxet:
+        for extent, data in self.voxet:
             if z is None:
                 data = data.reshape(data.shape[:2])
-                interp.interp2(
-                    extent[:2], data, (x, y), out, interpolation, bound
-                )
+                interp.interp2(extent[:2], data, (x, y), out, interpolation)
             else:
-                interp.interp3(
-                    extent, data, (x, y, z), out, interpolation, bound
-                )
+                interp.interp3(extent, data, (x, y, z), out, interpolation)
         return out
 
 

@@ -12,7 +12,6 @@ real :: &
     rcrit, rexpand, rho_max, rho_min, slipvector(3), svtol, tm0, trelax, vdamp, &
     vp_max, vp_min, vpml, vrup, vs_max, vs_min
 character(16) :: source
-character(4) :: diffop
 character(2) :: faultnormal
 
 ! miscellaneous parameters
@@ -44,7 +43,6 @@ logical :: &
 
 ! 1d arrays
 real, allocatable, dimension(:) :: &
-    dx1, dx2, dx3,  & ! x, y, z rectangular element size
     dn1,            & ! pml node damping -2*d     / (2+d*dt)
     dn2,            & ! pml node damping  2       / (2+d*dt)
     dc1,            & ! pml cell damping (2-d*dt) / (2+d*dt)
@@ -58,9 +56,6 @@ real, allocatable, dimension(:,:,:,:) :: &
     p4, p5, p6,     & ! pml momentum far side
     g1, g2, g3,     & ! pml gradient near side
     g4, g5, g6        ! pml gradient far side
-
-! b matrix
-real, allocatable, dimension(:,:,:,:,:) :: bb
 
 ! volume fields
 real, allocatable, target, dimension(:,:,:) :: &

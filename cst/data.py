@@ -52,20 +52,21 @@ def downsample(f, d):
     return g
 
 
-def clipdata(x, extent, lines=1):
+def clipdata(x, xmin, xmax, lines=1):
     """
-    Clip data outside extent.
-    x is data coordinates with dimenstions (n, 2)
-    extent: (xmin, xmax), (ymin, ymax)
+    Clip out-of-range data.
+    x is data with dimensions (..., n)
+    xmin: lower bound with dimensions (n)
+    xmax: upper bound with dimensions (n)
     lines:
         0: points, assume no connectivity.
         1: line segments, include one extra point past the boundary.
         -1: line segments, do not include extra point past the boundary.
     """
     x = np.asarray(x)
-    (x1, x2), (y1, y2) = extent
-    i = (x[:, 0] >= x1) & (x[:, 0] <= x2)
-    i &= (x[:, 1] >= y1) & (x[:, 1] <= y2)
+    xmin = np.asarray(xmin)
+    xmax = np.asarray(xmax)
+    i = (x >= xmin).min(-1) & (x <= xmax).min(-1)
     if lines:
         if lines > 0:
             i[:-1] = i[:-1] | i[1:]
@@ -468,22 +469,20 @@ def gshhg(
                 continue
         x = 1e-6 * data[ii-2*n:ii].reshape(n, 2).astype('f')
         if delta:
-            x, y = densify(x, y, delta)
+            x = densify(x, delta)
         xx.append(x)
     return xx
     #     if extent is not None and clip != 0:
     #         if delta:
-    #             x, y = clipdata(x, y, extent, 1)[:2]
-    #             x, y = densify(x, y, delta)
-    #         x, y = clipdata(x, y, extent, clip)[:2]
+    #             x = clipdata(x, extent, 1)[:2]
+    #             x = densify(x, delta)
+    #         x = clipdata(x, extent, clip)[:2]
     #     elif delta:
-    #         x, y = densify(x, y, delta)
+    #         x = densify(x, delta)
     #     xx += [x, [float('nan')]]
-    #     yy += [y, [float('nan')]]
     # if nkeep:
     #     xx = np.concatenate(xx)[:-1]
-    #     yy = np.concatenate(yy)[:-1]
-    # return np.array([xx, yy], 'f')
+    # return xx
 
 
 def engdahl_cat():

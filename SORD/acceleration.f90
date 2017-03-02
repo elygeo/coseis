@@ -28,10 +28,10 @@ doid: do iid = 1, 3; id = modulo(ic + iid - 2, 3) + 1
 i1 = i1node
 i2 = i2node
 if (ic == id) then
-    call diff_cn(s1, w1, ic, id, i1, i2, diffop, bb, xx, dx1, dx2, dx3, dx)
+    call diff_cn(s1, w1, ic, id, i1, i2, xx, dx)
 else
     i = 6 - ic - id
-    call diff_cn(s1, w2, i, id, i1, i2, diffop, bb, xx, dx1, dx2, dx3, dx)
+    call diff_cn(s1, w2, i, id, i1, i2, xx, dx)
 end if
 
 ! pml region

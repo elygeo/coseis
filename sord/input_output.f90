@@ -49,7 +49,7 @@ call cbroadcast(str)
 
 ! read parameters
 read (str, *) &
-    affine, bc1, bc2, debug, delta, diffop, &
+    affine, bc1, bc2, debug, delta, &
     faultnormal, faultopening, &
     gam_max, gam_min, gridnoise, hourglass, hypocenter, &
     i1pml, i2pml, itio, itstats, mpin, mpout, &

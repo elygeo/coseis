@@ -17,6 +17,7 @@ j = nm(1)
 k = nm(2)
 l = nm(3)
 allocate ( &
+    xx(j,k,l,3), &
     vv(j,k,l,3), &
     uu(j,k,l,3), &
     w1(j,k,l,3), &

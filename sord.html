@@ -208,42 +208,9 @@ hypocenter = [20.0, 20.0, 20.5]
 bc1 = [&#39;free&#39;, &#39;free&#39;, &#39;free&#39;]
 bc2 = [&#39;anti-n&#39;, &#39;mirror-n&#39;, &#39;anti-c&#39;</code></pre>
 <h2 id="memory-usage-and-scaling">Memory Usage and Scaling</h2>
-<p>For rectilinear meshes, 23 single precision (four-byte) memory variables are required per mesh point. Curvilinear meshes have two options with a trade-off in memory usage vs. floating-point operations. Stored operators require 44 variables per mesh point and give the best performance, while on-the-fly operators require 23 variables per mesh point at the cost of a factor of four increase in floating point operations. As CPU improvement tends to out-pace memory bandwidth improvement, in the future, on-the-fly operators may become faster than stored operators. The operator type is controlled by the <code>diffop</code> parameter, but can generally be left alone, as the default is to automatically detect rectilinear and curvilinear meshes and assign the proper operator type for fastest performance. The allowed values are:</p>
-<table>
-<tbody>
-<tr class="odd">
-<td><code>cons</code></td>
-<td style="text-align: left;">Mesh with constant mesh step size</td>
-</tr>
-<tr class="even">
-<td><code>rect</code></td>
-<td style="text-align: left;">Rectangular mesh</td>
-</tr>
-<tr class="odd">
-<td><code>para</code></td>
-<td style="text-align: left;">Parallelepiped mesh</td>
-</tr>
-<tr class="even">
-<td><code>quad</code></td>
-<td style="text-align: left;">One-point quadrature</td>
-</tr>
-<tr class="odd">
-<td><code>exac</code></td>
-<td style="text-align: left;">Exactly integrated elements</td>
-</tr>
-<tr class="even">
-<td><code>save</code></td>
-<td style="text-align: left;">Saved operators, nearly as fast as <code>rect</code>, but doubles the memory usage</td>
-</tr>
-<tr class="odd">
-<td><code>auto</code></td>
-<td style="text-align: left;">Automatically choose <code>rect</code> or <code>save</code></td>
-</tr>
-</tbody>
-</table>
-<p>On current hardware, computation time is on the order of the one second per time step per one million mesh points. SORD scalability has been benchmarked up to 64 thousand processors at ALCF.</p>
-<div id="SORD-Benchmark">
-<svg width="448" height="auto" viewBox="0 0 448 368" fill="#fff" stroke="#fff" xmlns="http://www.w3.org/2000/svg">
+<p>23 single precision (four-byte) memory variables are required per mesh point. On current hardware, computation time is on the order of the one second per time step per one million mesh points. SORD scalability has been benchmarked up to 64 thousand processors at ALCF.</p>
+<dl>
+<dt><svg width="448" height="auto" viewBox="-32 -320 448 368" fill="#fff" stroke="#fff" xmlns="http://www.w3.org/2000/svg">
 <defs>
 <marker id="circle" refX="4" refY="4" markerWidth="8" markerHeight="8">
 <circle stroke="currentColor" stroke-width="1" r="1" cx="4" cy="4"/>
@@ -252,7 +219,6 @@ bc2 = [&#39;anti-n&#39;, &#39;mirror-n&#39;, &#39;anti-c&#39;</code></pre>
 <path stroke="currentColor" stroke-width="1" d="M3 3h2v2h-2z" />
 </marker>
 </defs>
-<g transform="translate(32,320)">
 <path fill="none" stroke="currentColor" stroke-width="1" d="
 M0 0h384v-288h-384z
 M0 0m48 -4v4m48 -4v4m48 -4v4m48 -4v4m48 -4v4m48 -4v4m48 -4v4
@@ -309,17 +275,17 @@ M384 0m-4 -48h4m-4 -48h4m-4 -48h4m-4 -48h4m-4 -48h4
 <text x="192" y="-29">ALCF Vesta (1M elem/core)</text>
 <text x="192" y="40">Cores</text>
 </g>
-</g>
 </svg>
-
-<p><strong>Figure.</strong> Weak-scaling benchmarks.</p>
-</div>
+</dt>
+<dd><p><strong>Figure.</strong> Weak-scaling benchmarks.</p>
+</dd>
+</dl>
 <h2 id="references" class="unnumbered bib">References</h2>
 <div id="ref-2008-GJI-Ely+2" class="ref">
-Ely, G., S. Day, and J.-B. Minster. 2008. “A Support-Operator Method for Visco-Elastic Wave Modeling in 3D Heterogeneous Media.” <em>Geophys. J. Int.</em> 172 (1): 331–44. doi:<a href="https://doi.org/10.1111/j.1365-246X.2007.03633.x">10.1111/j.1365-246X.2007.03633.x</a>. <a href="http://gji.oxfordjournals.org/content/172/1/331.full.pdf" class="eprint">⇩PDF</a>
+Ely, G., S. Day, and J.-B. Minster. 2008. “A Support-Operator Method for Visco-Elastic Wave Modeling in 3d Heterogeneous Media.” <em>Geophys. J. Int.</em> 172 (1): 331–44. doi:<a href="https://doi.org/10.1111/j.1365-246X.2007.03633.x">10.1111/j.1365-246X.2007.03633.x</a>. <a href="http://gji.oxfordjournals.org/content/172/1/331.full.pdf" class="eprint">⇩PDF</a>
 </div>
 <div id="ref-2009-GJI-Ely+2" class="ref">
-———. 2009. “A Support-Operator Method for 3D Rupture Dynamics.” <em>Geophys. J. Int.</em> 177 (3): 1140–50. doi:<a href="https://doi.org/10.1111/j.1365-246X.2009.04117.x">10.1111/j.1365-246X.2009.04117.x</a>. <a href="http://gji.oxfordjournals.org/content/177/3/1140.full.pdf" class="eprint">⇩PDF</a>
+———. 2009. “A Support-Operator Method for 3d Rupture Dynamics.” <em>Geophys. J. Int.</em> 177 (3): 1140–50. doi:<a href="https://doi.org/10.1111/j.1365-246X.2009.04117.x">10.1111/j.1365-246X.2009.04117.x</a>. <a href="http://gji.oxfordjournals.org/content/177/3/1140.full.pdf" class="eprint">⇩PDF</a>
 </div>
 <div id="ref-2010-BSSA-Ely+2" class="ref">
 ———. 2010. “Dynamic Rupture Models for the Southern San Andreas Fault.” <em>Bull. Seism. Soc. Am.</em> 100 (1): 131–50. doi:<a href="https://doi.org/10.1785/0120090187">10.1785/0120090187</a>. <a href="http://elygeo.net/2010-BSSA-Ely+2.pdf" class="eprint">⇩PDF</a>

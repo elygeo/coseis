@@ -22,7 +22,6 @@ parameters = {
     'itio': 50,
     'itbuff': 10,
     'debug': 0,
-    'diffop': 'auto',
     'shape': [41, 41, 41, 41],
     'delta': [100.0, 100.0, 100.0, 0.0075],
     'affine': [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
@@ -162,16 +161,6 @@ fieldnames = {
     'tarr': ['f~', 't_{arrest}', 'Arrest time'],
     '_psi': ['f~', '\psi', 'State variable'],
 }
-
-difference_operators = [
-    'auto',
-    'cons',
-    'rect',
-    'para',
-    'quad',
-    'exac',
-    'save',
-]
 
 boundary_conditions = {
     'free': 0,
@@ -533,12 +522,7 @@ def stage(args=None, **kwargs):
         raise Exception('MPI build required for multiprocessing')
 
     # resources
-    if prm['diffop'] in ('cons', 'rect'):
-        nvars = 20
-    elif prm['diffop'] in ('para', 'quad', 'exac'):
-        nvars = 23
-    else:
-        nvars = 44
+    nvars = 23
     nb = cfg['realsize']
     nm = (nl[0] + 2) * (nl[1] + 2) * (nl[2] + 2)
     job['pmem'] = (1 + nm * nvars * nb // 30000) * 32
