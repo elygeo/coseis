@@ -3,7 +3,6 @@ Configure and launch jobs.
 """
 import os
 import re
-import sys
 import json
 import time
 import copy

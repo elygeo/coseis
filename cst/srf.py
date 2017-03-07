@@ -6,6 +6,8 @@ SRF is documented at http://epicenter.usc.edu/cmeportal/docs/srf4.pdf
 import os
 import math
 import gzip
+import numpy as np
+from . import coord
 
 
 def open_(fh, mode='r'):
@@ -26,7 +28,6 @@ def read(fh):
     first dict 'meta' contains scalars and metadata. The second dict 'data'
     contains NumPy arrays.
     """
-    import numpy as np
 
     fh = open_(fh)
 
@@ -142,7 +143,6 @@ def write(fh, srf):
     """
     Write SRF file.
     """
-    import numpy as np
 
     fh = open_(fh)
 
@@ -221,7 +221,6 @@ def write_sord(path, srf, delta=(1, 1, 1), proj=None, dbytes=4):
     proj: function to project lon/lat to logical model coordinates
     dbytes: 4 or 8
     """
-    from . import coord
 
     # setup
     meta, data = srf
@@ -332,8 +331,6 @@ def write_awp(
     binary: If true, write AWP binary format, otherwise text format.
     interp: interpolation method, linear or cubic
     """
-    import numpy as np
-    from . import coord
 
     fh = open_(fh)
 
@@ -416,8 +413,6 @@ def write_coulomb(path, srf, proj, scut=0):
     proj: PyProj map projection instance
     scut: slip-rate below which values are not output
     """
-    import numpy as np
-    from . import coord
 
     # slip components
     meta, data = srf

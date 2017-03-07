@@ -565,4 +565,6 @@ def stage(args=None, **kwargs):
 
 
 def run(args=None, **kwargs):
+    FIXME
     job = stage(args, **kwargs)
+    return job

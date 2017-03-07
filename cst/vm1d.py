@@ -1,13 +1,14 @@
 """
 1D velocity model tools.
 """
+import numpy as np
+from . import interp
 
 
 def v30gtl(v30, vt, z, zt=350.0, a=0.5, b=2.0/3.0, c=2.0):
     """
     V30 derived GTL
     """
-    import numpy as np
     z = z / zt
     f = z + b * (z - z * z)
     g = a - (a + 3.0 * c) * z + c * z * z + 2.0 * c * np.sqrt(z)
@@ -22,7 +23,6 @@ def dreger(prop, depth):
     depth: Array of depth values in meters.
     Returns array of properties (kg/m^3 or m/s)
     """
-    import numpy as np
     m = {
         'z':   (5.5,  5.5, 16.0, 16.0, 35.0, 35.0),
         'rho': (2.4,  2.67, 2.67, 2.8,  2.8,  3.0),
@@ -42,7 +42,6 @@ def boore_rock(depth):
     Takes an array of depth values in meters.
     Returns an array of S-wave velocities in m/s.
     """
-    import numpy as np
     depth = np.asarray(depth)
     vs = np.empty_like(depth)
     vs.fill(float('nan'))
@@ -67,8 +66,6 @@ def boore_hard_rock(depth):
     Takes array of depth values in meters.
     Returns array of S-wave velocities in m/s.
     """
-    import numpy as np
-    from . import interp
     depth = np.asarray(depth)
     v = [
         2768.0, 2808.0, 2847.0, 2885.0, 2922.0, 2958.0, 2993.0, 3026.0,

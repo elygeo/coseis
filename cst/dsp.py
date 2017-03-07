@@ -3,6 +3,7 @@ Digital Signal Processing tools.
 """
 import os
 import math
+import numpy as np
 
 
 def build():
@@ -31,8 +32,6 @@ def time_function(pulse, t, tau=1.0):
     tau: characteristic time.
     Returns function samples at times in t.
     """
-    import numpy as np
-
     t = np.asarray(t)
     f = np.zeros_like(t)
     if pulse == 'const':
@@ -93,8 +92,6 @@ def brune2gauss(x, dt, tau, sigma=None, mode='same'):
     sigma: Gaussian spread.
     mode: 'same' or 'full' (see numpy.convolve).
     """
-    import numpy as np
-
     x = np.asarray(x)
     if sigma is None:
         sigma = math.sqrt(2.0) * tau
@@ -120,8 +117,6 @@ def filter(x, dt, fcorner, btype='lowpass', order=2, repeat=0, mode='same'):
     mode: 'full' or 'same', see np.convolve
     Returns an array of filtered samples.
     """
-    import numpy as np
-
     if not fcorner:
         return x
     if btype == 'hann':

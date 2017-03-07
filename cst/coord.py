@@ -2,6 +2,7 @@
 Coordinate conversion tools.
 """
 import math
+import numpy as np
 
 rearth = 6370000.0
 
@@ -93,8 +94,6 @@ def rot_sym_tensor(w1, w2, rot):
 
     Returns: (w1, w2) rotated tensor components
     """
-    import numpy as np
-
     rot = np.asarray(rot)
     m = np.diag(w1)
     m.flat[[5, 6, 1]] = w2
@@ -112,8 +111,6 @@ def eigvals_sym_tensor(w1, w2):
     w1: diagonal components w11, w22, w33
     w2: off-diagonal components w23, w31, w12
     """
-    import numpy as np
-
     m = np.diag(w1)
     m.flat[[5, 6, 1]] = w2
     m.flat[[7, 2, 3]] = w2
@@ -125,8 +122,6 @@ def rotmat(x, origin=(0, 0, 0), upvector=(0, 0, 1)):
     """
     Given a position vector x, find the rotation matrix to r,h,v coordinates.
     """
-    import numpy as np
-
     x = np.asarray(x) - np.asarray(origin)
     nr = x / np.sqrt((x * x).sum())
     nh = np.cross(upvector, nr)
@@ -151,7 +146,6 @@ def llr2xyz(x, y, z, inverse=False):
 
     x <-> lon, y <-> lat, z <-> r
     """
-    import numpy as np
     if inverse:
         r = np.sqrt(x * x + y * y + z * z)
         x = np.arctan2(y, x)
@@ -180,7 +174,6 @@ def euler_rotation(phi=0.0, theta=0.0, psi=0.0):
     East, North, Up to fault surface coordinates:
     m = euler_rotation(90 - strike, dip, rake)
     """
-    import numpy as np
     A = math.pi / 180.0 * phi
     B = math.pi / 180.0 * theta
     C = math.pi / 180.0 * psi
@@ -217,7 +210,6 @@ def rotation(lon, lat, projection, eps=100.0):
     local_components = dotmv(mat, components)
     local_strike = strike + theta
     """
-    import numpy as np
     dlon = eps * 180.0 / (math.pi * rearth) * np.cos(math.pi / 180.0 * lat)
     dlat = eps * 180.0 / (math.pi * rearth)
     lon = np.array([
@@ -245,7 +237,6 @@ def rotation3(lon, lat, dep, projection, eps=100.0):
     geographic coordinate system to components in the local system.
     local_components = dotmv(mat, components)
     """
-    import numpy as np
     dlon = eps * 180.0 / (math.pi * rearth) * np.cos(math.pi / 180.0 * lat)
     dlat = eps * 180.0 / (math.pi * rearth)
     lon = np.array([
@@ -286,7 +277,6 @@ class Transform():
         self, proj=None, origin=None, scale=1.0, rotate=0.0,
         translate=(0.0, 0.0), matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1))
     ):
-        import numpy as np
         phi = math.pi / 180.0 * rotate
         if origin is None:
             x, y = 0.0, 0.0
@@ -311,7 +301,6 @@ class Transform():
         self.proj = proj
 
     def __call__(self, x, y, **kwarg):
-        import numpy as np
         proj = self.proj
         x = np.asarray(x)
         y = np.asarray(y)

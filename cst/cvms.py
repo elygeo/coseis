@@ -6,7 +6,9 @@ import json
 import copy
 import shutil
 import subprocess
+import numpy as np
 from . import home
+from . import job
 
 repository = home + 'repo'
 versions = ['2.2', '3.0', '4.0']
@@ -41,7 +43,6 @@ defaults = {
 
 
 def configure(force=False, **kw):
-    from . import job
 
     cwd = os.getcwd()
     os.chdir(repository)
@@ -97,7 +98,6 @@ def make(force=False, **kwargs):
 
 
 def run(**kwargs):
-    from . import job
     cfg = make(**kwargs)
 
     p = (cfg['nsample'] - 1) // cfg['max_samples'] + 1
@@ -134,7 +134,6 @@ def extract(lon, lat, dep, prop=['rho', 'vp', 'vs'], **kwargs):
     nproc: Optional, number of processes
     Returns: (rho, vp, vs) material arrays
     """
-    import numpy as np
 
     lon = np.asarray(lon, 'f')
     lat = np.asarray(lat, 'f')

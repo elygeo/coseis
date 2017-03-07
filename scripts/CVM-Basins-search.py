@@ -2,7 +2,6 @@
 """
 Locate the shallowest 2D isosurface in a volume.
 """
-import os
 import json
 import numpy as np
 

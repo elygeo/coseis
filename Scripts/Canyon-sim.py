@@ -41,4 +41,4 @@ prm = {
 
 os.chdir('repo/Canyon')
 os.chdir('repo/Canyon')
-cst.sord.run(prm))
+cst.sord.run(prm)

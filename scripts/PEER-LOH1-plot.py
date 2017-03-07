@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import json
+import math
 import numpy as np
 import matplotlib.pyplot as plt
 import cst.dsp
@@ -72,9 +73,9 @@ v = np.array([v1, v2, v3])
 # convolve with Gaussian source
 dt = t[1] - t[0]
 n = int(6.0 * sigma / dt)
-tt = np.arange(-n, n+1) * dt
+tt = np.arange(-n, n + 1) * dt
 a = 0.5 / (sigma * sigma)
-b = dt * np.exp(-a * tt * tt) * np.sqrt(a / np.pi)
+b = dt * np.exp(-a * tt * tt) * math.sqrt(a / math.pi)
 v = np.apply_along_axis(np.convolve, -1, v, b, 'same')
 print(np.sqrt(np.sum(v * v, 0).max()))
 

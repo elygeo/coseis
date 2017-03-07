@@ -13,7 +13,9 @@ except ImportError:
 
 import numpy as np
 from . import home
+from . import data
 from . import gocad
+from . import interp
 
 repository = home + 'repo' + os.sep
 projection = {'proj': 'utm', 'zone': 11, 'datum': 'NAD27'}
@@ -119,7 +121,6 @@ def read(fault, version='CFM5-socal-primary'):
     """
     Read triangulated surface data.
     """
-    import numpy as np
     path = os.path.join(repository, 'CFM', version) + os.sep
     f, i = (fault + ':').split(':')[:2]
     d = np.load(path + f + '.npz')
@@ -142,7 +143,6 @@ def tsurf_merge(tsurfs, fuse=-1.0, cull=-1.0, clean=True):
 
     FIXME: maybe some problems with transposed matrices
     """
-    import numpy as np
 
     # merge surfaces
     n = 0
@@ -343,8 +343,6 @@ def quad_mesh(vtx, tri, delta, drape=False, clean_top=False):
     1/M = | -b a -ac/d     | / (aa + bb)
           |  0 0 (aa+bb)/d |
     """
-    from . import data
-    from . import interp
 
     # remove topography
     x, y, z = vtx.T
@@ -451,8 +449,6 @@ def explore(prefix, faults):
 
     import pyproj
     from mayavi import mlab
-    from . import data
-    from . import interp
 
     fault_names = json.load(open(home + 'data/CFM-Fault-Names.json'))
 

@@ -5,7 +5,7 @@ import numpy as np
 
 out = []
 for p in os.listdir('.'):
-    p += o.sep
+    p += os.sep
     f = p + 'prof-8step.bin'
     if os.path.exists(f):
         meta = json.load(open(p + 'meta.json'))

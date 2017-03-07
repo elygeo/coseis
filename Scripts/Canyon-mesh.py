@@ -4,7 +4,6 @@
 """
 import os
 import math
-import cst
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -15,7 +14,7 @@ n1, n2 = 301, 321
 
 # step sizes
 n = (n2 - 1) / 2
-dy0 = 0.5 * np.pi * r0 / (n2 - 1)
+dy0 = 0.5 * math.pi * r0 / (n2 - 1)
 dy1 = L / n
 
 # semicircle canyon

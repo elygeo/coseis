@@ -16,6 +16,7 @@ except ImportError:
 
 import numpy as np
 from . import home
+from . import interp
 
 repository = home + 'repo' + os.sep
 
@@ -102,16 +103,16 @@ def densify(xy, delta):
     return xxyy
 
 
-def simplify(vtx, closepath=False, max_area=0):
+def simplify(points, closepath=False, max_area=0):
     """
     Remove vertices from a line starting with the smallest vertex area until
     max_area is reached (Visvalingam's algorithm). Vertex area is that of the
     triangle formed by a vertex with it's two neighbors. The closepath
     parameter indicates that the endpoints are connected to form a polygon.
     """
+    p = list(points)
     area = max_area * max_area
-    vtx = list(vtx)
-    n = len(vtx)
+    n = len(p)
     m = 1
     if closepath:
         m = 0
@@ -121,22 +122,23 @@ def simplify(vtx, closepath=False, max_area=0):
         for i in range(m, n - m):
             j = (i - 1) % n
             k = (i + 1) % n
-            a = ((vtx[j][0] - vtx[i][0]) * (vtx[k][1] - vtx[i][1]))
-            a -= ((vtx[j][1] - vtx[i][1]) * (vtx[k][0] - vtx[i][0]))
+            a = ((p[j][0] - p[i][0]) * (p[k][1] - p[i][1]))
+            a -= ((p[j][1] - p[i][1]) * (p[k][0] - p[i][0]))
             a = a * a
             if a <= amin:
                 amin = a
                 imin = i
         if imin is None:
             break
-        vtx.pop(imin)
+        p.pop(imin)
         n -= 1
-    return vtx
+    return p
 
 
-def simplify_indexed(vtx, indices, closepath=False, max_area=0):
-    area = max_area * max_area
+def simplify_indexed(points, indices, closepath=False, max_area=0):
+    p = points
     indices = list(indices)
+    area = max_area * max_area
     n = len(indices)
     m = 1
     if closepath:
@@ -147,8 +149,8 @@ def simplify_indexed(vtx, indices, closepath=False, max_area=0):
         for i in range(m, n - m):
             j = indices[(i - 1) % n]
             k = indices[(i + 1) % n]
-            a = ((vtx[j][0] - vtx[i][0]) * (vtx[k][1] - vtx[i][1]))
-            a -= ((vtx[j][1] - vtx[i][1]) * (vtx[k][0] - vtx[i][0]))
+            a = ((p[j][0] - p[i][0]) * (p[k][1] - p[i][1]))
+            a -= ((p[j][1] - p[i][1]) * (p[k][0] - p[i][0]))
             a = a * a
             if a <= amin:
                 amin = a
@@ -335,7 +337,6 @@ def dem(coords, scale=1.0, downsample=0, mesh=False):
             res *= 2
     z = z * scale  # always do this to convert to float
     if sample:
-        from . import interp
         return interp.interp2(extent, z, coords)
     elif mesh:
         delta = 1.0 / res
@@ -352,7 +353,6 @@ def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):
     """
     Wald, et al. Vs30 map.
     """
-    from . import interp
     f = os.path.join(repository, 'Vs30-Wald-%s.npy') % region.replace('_', '-')
     u = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/%s.grd.gz'
     if not os.path.exists(f):

@@ -12,8 +12,8 @@ def cee_integrand(x, a2, b2):
 
 
 def cee_integral(a2, b2):
-    from scipy import integrate
-    return integrate.quad(cee_integrand, 0.0, np.Inf, args=(a2, b2))[0]
+    import scipy.integrate
+    return scipy.integrate.quad(cee_integrand, 0.0, np.Inf, args=(a2, b2))[0]
 
 
 def cee(a, b):

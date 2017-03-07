@@ -4,6 +4,7 @@ GOCAD data tools.
 paulbourke.net/dataformats/gocad/gocad.pdf
 """
 import os
+import numpy as np
 
 
 def header(buff, counter=0, casters=None):
@@ -49,7 +50,6 @@ def voxet(path, load_props=[], alternate='', no_data_value=None, buff=None):
     """
     GOCAD voxet reader
     """
-    import numpy as np
     if buff is None:
         buff = open(path).read()
     if no_data_value in ('nan', 'NaN', 'NAN'):
@@ -113,7 +113,6 @@ def tsurf(buff):
     """
     GOCAD triangulated surface reader
     """
-    import numpy as np
     buff = buff.strip().split('\n')
     tsurf = []
     counter = 0

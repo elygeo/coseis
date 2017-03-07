@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import math
 import numpy as np
 import matplotlib.pyplot as plt
 import cst.kostrov
@@ -24,14 +25,14 @@ ax.set_yticklabels(['0', 0.5, '1'])
 b = np.linspace(0, 1, 100)
 b[0] = 1e-160
 b[-1] -= 1e-16
-a = b / np.sqrt(3.0)
+a = b / math.sqrt(3.0)
 
 # plot curve
 ax.plot(b, cst.kostrov.cee(a, b), 'k-')
 
 # limiting cases for nu = 0.25, Dahlen (1974), eqn. (45)
 if 1:
-    C = b * 24.0 / 7.0 / np.pi
+    C = b * 24.0 / 7.0 / math.pi
     ax.plot(b, C, 'k--')
     b = 0.9,  1.0
     C = 0.81, 8.0 / 9.0

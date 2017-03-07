@@ -82,11 +82,11 @@ if 0:
     ax.text(0.8*dx[0], 0.8*ttres[0], 'Rupture time', ha='left', va='top')
     ax.text(dx[-1], 0.8*sures[-1], 'Slip', ha='center', va='top')
     ax.text(0.8*dx[6], svres[6],  'Peak slip rate', ha='right')
-    dx = [x for x in dx if x not in (30, 100, 300)]
+    dx = [i for i in dx if i not in (30, 100, 300)]
     ax.set_xlim(10, 750)
     ax.set_xticks(dx)
     ax.set_xticklabels(dx)
-    y = ['%g' % y for y in ax.get_yticks()]
+    y = ['%g' % i for i in ax.get_yticks()]
     ax.set_yticklabels(y)
     ax.yaxis.set_label_coords(-0.12, 0.5)
     ax.set_xlabel('Grid interval (m)')

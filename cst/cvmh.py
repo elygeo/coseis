@@ -225,12 +225,12 @@ class Model():
         if out is None:
             out = np.empty_like(x)
             out.fill(float('nan'))
-        for extent, data in self.voxet:
+        for extent, v in self.voxet:
             if z is None:
-                data = data.reshape(data.shape[:2])
-                interp.interp2(extent[:2], data, (x, y), out, interpolation)
+                v = v.reshape(v.shape[:2])
+                interp.interp2(extent[:2], v, (x, y), out, interpolation)
             else:
-                interp.interp3(extent, data, (x, y, z), out, interpolation)
+                interp.interp3(extent, v, (x, y, z), out, interpolation)
         return out
 
 

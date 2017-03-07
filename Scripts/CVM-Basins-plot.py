@@ -2,7 +2,6 @@
 """
 Visualization using Mayavi and Matplotlib
 """
-import os
 import Image
 import pyproj
 import numpy as np
