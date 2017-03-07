@@ -1,7 +1,9 @@
-"""Kostrov circular crack test."""
+"""
+Kostrov circular crack test.
+"""
 import os
 import json
-import numpy as np
+import numpy
 from .. import sord
 from .. import kostrov
 
@@ -68,7 +70,7 @@ def test(**kwargs):
     # compare with analytical solution
     for p in 'abcd':
         f = d + 'p20%s.bin' % p
-        dv = v - np.fromfile(f, dtype)[-1]
+        dv = v - numpy.fromfile(f, dtype)[-1]
         err = dv / v
         print(v, err)
         assert abs(err) < 0.015

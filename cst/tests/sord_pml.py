@@ -1,8 +1,9 @@
-#!/usr/bin/env python
-"""Test SORD parallelization with PML"""
+"""
+Test SORD parallelization with PML
+"""
 import os
 import json
-import numpy as np
+import numpy
 from .. import job
 from .. import sord
 
@@ -57,12 +58,12 @@ def test(**kwargs):
         for k in fns:
             f1 = d0 + k + '.bin'
             f2 = d + k + '.bin'
-            v1 = np.fromfile(f1, dtype)
-            v2 = np.fromfile(f2, dtype)
+            v1 = numpy.fromfile(f1, dtype)
+            v2 = numpy.fromfile(f2, dtype)
             dv = v1 - v2
-            e = np.abs(dv).max()
+            e = numpy.abs(dv).max()
             if e:
-                e /= np.abs(v1).max()
+                e /= numpy.abs(v1).max()
                 print('%s error: %s' % (k, e))
                 max_err_ = max(max_err_, e)
         print('max error: ', max_err_)

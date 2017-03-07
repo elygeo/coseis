@@ -6,7 +6,7 @@ Data types will be read from file 'meta.json' if it exists.
 import os
 import sys
 import json
-import numpy as np
+import numpy
 
 
 def convert(filenames, dtype='f', shape=[]):
@@ -36,11 +36,11 @@ def convert(filenames, dtype='f', shape=[]):
             f = fn + '.npy'
         if os.path.exists(f):
             return
-        x = np.fromfile(fn, t)
+        x = numpy.fromfile(fn, t)
         if n:
             x = x.reshape(n[::-1]).T
         print('%s: %s %s' % (fn, t, x.shape))
-        np.save(g, x)
+        numpy.save(g, x)
 
 
 if __name__ == '__main__':

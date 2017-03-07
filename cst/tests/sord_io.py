@@ -1,6 +1,8 @@
-"""Test SORD parallelization with point source"""
+"""
+Test SORD parallelization with point source
+"""
 import os
-import numpy as np
+import numpy
 from .. import sord
 
 
@@ -51,7 +53,7 @@ def test(**kwargs):
     os.makedirs(d + 'io')
     os.chdir(d)
     for f in infiles:
-        np.array([1.0], 'f').tofile(f)
+        numpy.array([1.0], 'f').tofile(f)
     sord.run(prm, **kwargs)  # FIXME
     os.chdir(cwd)
 

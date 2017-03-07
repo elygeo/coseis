@@ -1,3 +1,6 @@
+"""
+All tests
+"""
 from . import hello
 from . import sord_mpi
 from . import sord_pml

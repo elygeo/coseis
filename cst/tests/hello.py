@@ -1,4 +1,6 @@
-"""Test C and Fortran with MPI"""
+"""
+Test C and Fortran with MPI
+"""
 import os
 import shutil
 import subprocess

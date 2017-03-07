@@ -1,3 +1,6 @@
+"""
+Run tests suite
+"""
 import os
 import shutil
 from . import hello

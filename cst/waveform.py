@@ -1,7 +1,7 @@
 """
 Waveform data tools.
 """
-import numpy as np
+import numpy
 
 
 def csmip_vol2(filename, max_year=2050):
@@ -58,7 +58,7 @@ def csmip_vol2(filename, max_year=2050):
                 v += [float(ss[j][i:i+n]) for i in range(0, len(ss[j]) - 2, n)]
                 j += 1
             k = '%s%03d' % (w, orient)
-            data[k] = np.array(v)
+            data[k] = numpy.array(v)
 
         # trailer
         j += 1

@@ -4,7 +4,7 @@ GOCAD data tools.
 paulbourke.net/dataformats/gocad/gocad.pdf
 """
 import os
-import numpy as np
+import numpy
 
 
 def header(buff, counter=0, casters=None):
@@ -101,7 +101,7 @@ def voxet(path, load_props=[], alternate='', no_data_value=None, buff=None):
                 f = os.path.join(os.path.dirname(path), p['FILE'] + alternate)
                 if os.path.exists(f):
                     dtype = '>f%s' % p['ESIZE']
-                    data = np.fromfile(f, dtype)
+                    data = numpy.fromfile(f, dtype)
                     if no_data_value is not None:
                         data[data == p['NO_DATA_VALUE']] = no_data_value
                     p['DATA'] = data.reshape(n[::-1]).T
@@ -143,13 +143,13 @@ def tsurf(buff):
             s.append(int(f[1]) - 1)
         elif f[0] == 'TFACE':
             if t != []:
-                tri.append(np.array(t, 'i'))
+                tri.append(numpy.array(t, 'i'))
             t = []
         elif f[0] == 'END':
-            tri.append(np.array(t, 'i'))
-            x = np.array(x, 'f')
-            b = np.array(b, 'i')
-            s = np.array(s, 'i')
+            tri.append(numpy.array(t, 'i'))
+            x = numpy.array(x, 'f')
+            b = numpy.array(b, 'i')
+            s = numpy.array(s, 'i')
             for i, j in a:
                 tri[tri == i] = j
                 b[b == i] = j
