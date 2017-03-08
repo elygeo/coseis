@@ -274,8 +274,7 @@ def configure(force=False):
                 objects.append(o)
         objects = ' \\\n        '.join(objects)
         rules = '	\n\n'.join(rules)
-        # FIXME c = conf['machine']
-        c = 'FIXME'
+        c = joblib.hostname()[1]
         m = open('Makefile.in').read()
         m = m.format(machine=c, objects=objects, rules=rules)
         open('Makefile', 'w').write(m)
@@ -536,7 +535,7 @@ def stage(args=None, **kwargs):
     if prm['debug'] > 2:
         os.mkdir('debug')
 
-    out = [prm[k] for k in sorted(prm)]
+    out = [prm[i] for i in sorted(prm)]
     out = json.dumps(out) + '\n'
     for i in fio:
         out += json.dumps(i) + '\n'
@@ -546,25 +545,27 @@ def stage(args=None, **kwargs):
 
     d = {'little': '<', 'big': '>'}[sys.byteorder]
     meta['dtype'] = d + 'f%s' % cfg['realsize']
-
     prm.update({'~fieldio': fio})
 
-    out = json.dumps(args, indent=4, sort_keys=True)
-    open('parameters.json', 'w').write(out)
-
-    out = json.dumps(job, indent=4, sort_keys=True)
-    open('job.json', 'w').write(out)
-
-    out = json.dumps(prm, indent=4, sort_keys=True)
-    open('sord.json', 'w').write(out)
-
-    out = json.dumps(meta, indent=4, sort_keys=True)
-    open('meta.json', 'w').write(out)
+    json.dump(args, open('parameters.json', 'w'), indent=4, sort_keys=True)
+    json.dump(job, open('job.json', 'w'), indent=4, sort_keys=True)
+    json.dump(prm, open('sord.json', 'w'), indent=4, sort_keys=True)
+    json.dump(meta, open('meta.json', 'w'), indent=4, sort_keys=True)
 
     return job
 
 
 def run(args=None, **kwargs):
-    FIXME
     job = stage(args, **kwargs)
+    joblib.launch(job)
     return job
+
+
+if __name__ == '__main__':
+    if sys.argv[1:]:
+        args = {}
+        for i in sys.argv[1:]:
+            args.update(json.load(open(i)))
+    else:
+        args = json.load(sys.stdin)
+    run(args)

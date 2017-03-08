@@ -495,10 +495,9 @@ def explore(prefix, faults):
         x, y, z = np.load(f)
     else:
         ddeg = 0.5 / 60.0
-        FIXME
+        # FIXME
         x, y = np.c_[
-            data.gshhg(
-                'coastlines', resolution, extent, 10.0, delta=ddeg),
+            data.gshhg('coastlines', resolution, extent, 10.0, delta=ddeg),
             [float('nan'), float('nan')],
             data.gshhg('borders', resolution, extent, delta=ddeg),
         ]

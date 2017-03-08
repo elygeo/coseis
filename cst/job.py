@@ -3,6 +3,7 @@ Configure and launch jobs.
 """
 import os
 import re
+import sys
 import json
 import time
 import copy
@@ -62,7 +63,8 @@ class typed_dict(dict):
 
 def hostname():
     h = os.uname()
-    g = socket.getfqdn()  # FIXME this is slow. cache the result?
+    # g = socket.getfqdn()  # this is slow, gethostname() sufficient?
+    g = socket.gethostname()
     host = ' '.join([h[0], h[4], h[1], g])
     for m, h in hostmap:
         if h in host:
@@ -119,7 +121,7 @@ def prepare(job=None, **kwargs):
     if opts == []:
         opts = [(job['queue'], {})]
     elif job['queue']:
-        opts = [d for d in opts if d[0] == job['queue']]
+        opts = [i for i in opts if i[0] == job['queue']]
         if len(opts) == 0:
             raise Exception('Error: unknown queue: %s' % job['queue'])
     for q, d in opts:
@@ -193,27 +195,11 @@ def launch(job=None, **kwargs):
     return job
 
 
-def json_args(argv):
-    d = {}
-    l = []
-    for k in argv:
-        if k[0] == '-':
-            k = k.lstrip('-')
-            if '=' in k:
-                k, v = k.split('=')
-                if len(v) and not v[0].isalpha():
-                    v = json.loads(v)
-                d[k] = v
-            else:
-                d[k] = True
-        elif k[0] in '{[':
-            d.update(json.loads(k))
-        else:
-            l.append(k)
-    return d, l
-
-
-def main(args, **kw):
-    if not args:
-        print(__doc__)
-    # FIXME get json_args
+if __name__ == '__main__':
+    if sys.argv[1:]:
+        args = {}
+        for i in sys.argv[1:]:
+            args.update(json.load(open(i)))
+    else:
+        args = json.load(sys.stdin)
+    launch(**args)

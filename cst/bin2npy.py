@@ -44,4 +44,13 @@ def convert(filenames, dtype='f', shape=[]):
 
 
 if __name__ == '__main__':
-    convert(sys.argv[1:])
+    args = []
+    kw = {}
+    for i in sys.argv[1:]:
+        if i[:1] == '-':
+            kw['dtype'] = i.lstrip('-')
+        elif i[:1] + i[-1:] == '[]':
+            kw['shape'] = json.loads(i)
+        else:
+            args.append(i)
+    convert(args, **kw)

@@ -138,7 +138,6 @@ def extract(lon, lat, dep, prop=['rho', 'vp', 'vs'], **kwargs):
     lon = np.asarray(lon, 'f')
     lat = np.asarray(lat, 'f')
     dep = np.asarray(dep, 'f')
-
     shape = dep.shape
     nsample = dep.size
 
