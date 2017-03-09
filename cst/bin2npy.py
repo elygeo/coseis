@@ -27,32 +27,34 @@ def load(filenames, **metadata):
     return out
 
 
-def convert(filenames, **metadata):
+def convert(args, force=False, **metadata):
     meta = {'dtype': 'f', 'shape': []}
     meta.update(metadata)
-    for f in filenames:
-        if f == '-':
+    for i in args:
+        if i == '-':
             meta.update(json.load(sys.stdin))
             continue
-        elif f.endswith('.json'):
-            meta.update(json.load(open(f)))
+        elif i == '--force':
+            force = True
+        elif i.endswith('.json'):
+            meta.update(json.load(open(i)))
             continue
         dtype = meta['dtype']
-        if 'shapes' in meta and f in meta['shapes']:
-            shape = meta['shapes'][f]
+        if 'shapes' in meta and i in meta['shapes']:
+            shape = meta['shapes'][i]
         else:
             shape = meta['shape']
-        if f.endswith('.bin'):
-            g = f[:-4] + '.npy'
+        if i.endswith('.bin'):
+            f = i[:-4] + '.npy'
         else:
-            g = f + '.npy'
-        if os.path.exists(g):
+            f = i + '.npy'
+        if not force and os.path.exists(f):
             continue
-        x = numpy.fromfile(f, dtype)
+        x = numpy.fromfile(i, dtype)
         if shape:
             x = x.reshape(shape[::-1]).T
-        print('%s: %s %s' % (g, dtype, x.shape))
-        numpy.save(g, x)
+        print('%s: %s %s' % (f, dtype, x.shape))
+        numpy.save(f, x)
 
 
 if __name__ == '__main__':
