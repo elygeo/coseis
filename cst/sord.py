@@ -552,20 +552,20 @@ def stage(args=None, **kwargs):
     json.dump(prm, open('sord.json', 'w'), indent=4, sort_keys=True)
     json.dump(meta, open('meta.json', 'w'), indent=4, sort_keys=True)
 
-    return job
+    return job, meta
 
 
 def run(args=None, **kwargs):
-    job = stage(args, **kwargs)
+    job, meta = stage(args, **kwargs)
     joblib.launch(job)
-    return job
+    return meta
 
 
 if __name__ == '__main__':
-    if sys.argv[1:]:
-        args = {}
-        for i in sys.argv[1:]:
+    args = {}
+    for i in sys.argv[1:]:
+        if i == '-':
+            args.update(json.load(sys.stdin))
+        else:
             args.update(json.load(open(i)))
-    else:
-        args = json.load(sys.stdin)
     run(args)
