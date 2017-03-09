@@ -14,6 +14,7 @@ def load(filenames, **metadata):
     for f in filenames:
         if f.endswith('.json'):
             meta.update(json.load(open(f)))
+            continue
         dtype = meta['dtype']
         if 'shapes' in meta and f in meta['shapes']:
             shape = meta['shapes'][f]
@@ -30,8 +31,12 @@ def convert(filenames, **metadata):
     meta = {'dtype': 'f', 'shape': []}
     meta.update(metadata)
     for f in filenames:
-        if f.endswith('.json'):
+        if f == '-':
+            meta.update(json.load(sys.stdin))
+            continue
+        elif f.endswith('.json'):
             meta.update(json.load(open(f)))
+            continue
         dtype = meta['dtype']
         if 'shapes' in meta and f in meta['shapes']:
             shape = meta['shapes'][f]
@@ -42,7 +47,7 @@ def convert(filenames, **metadata):
         else:
             g = f + '.npy'
         if os.path.exists(g):
-            return
+            continue
         x = numpy.fromfile(f, dtype)
         if shape:
             x = x.reshape(shape[::-1]).T
