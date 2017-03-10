@@ -53,20 +53,18 @@ def downsample(f, d):
     return g
 
 
-def clipdata(x, xmin, xmax, lines=1):
+def clipdata(x, bounds, lines=1):
     """
     Clip out-of-range data.
-    x is data with dimensions (..., n)
-    xmin: lower bound with dimensions (n)
-    xmax: upper bound with dimensions (n)
+    x: data with dimensions (..., n)
+    bounds: lower and upper bound with dimensions (2, n)
     lines:
         0: points, assume no connectivity.
         1: line segments, include one extra point past the boundary.
         -1: line segments, do not include extra point past the boundary.
     """
     x = np.asarray(x)
-    xmin = np.asarray(xmin)
-    xmax = np.asarray(xmax)
+    xmin, xmax = np.asarray(bounds)
     i = (x >= xmin).min(-1) & (x <= xmax).min(-1)
     if lines:
         if lines > 0:
@@ -278,9 +276,9 @@ def dem(coords, scale=1.0, downsample=0, mesh=False):
     """
     Extract digital elevation model for given region.
 
-    coords: (lon, lat)
-        If length of lon and lat are 2, they specify the region limits,
-        otherwise they specify interpolation points
+    coords:
+        ((lon0, lat0), (lon1, lat1)) extent or
+        (..., 2) shape array of lon lat interpolation points.
     scale: Scaling factor for elevation data
     downsample:
         <0: Upsample by factor of 2
@@ -300,10 +298,10 @@ def dem(coords, scale=1.0, downsample=0, mesh=False):
         i = ~np.isnan(coords).max(-1)
         x = coords[..., 0]
         y = coords[..., 1]
-        xlim = x[i].min(), x[i].max()
-        ylim = y[i].min(), y[i].max()
+        lim0 = x[i].min(), y[i].min()
+        lim1 = x[i].max(), y[i].max()
     else:
-        xlim, ylim = coords
+        lim0, lim1 = coords
     if downsample > 0:
         res = 60 // downsample
         x0, y0 = -180.0, -90.0
@@ -311,14 +309,14 @@ def dem(coords, scale=1.0, downsample=0, mesh=False):
         res = 120
         x0 = -180.0 + 0.5 / res
         y0 = -90.0 + 0.5 / res
-    j0 = int(math.floor((xlim[0] - x0) % 360 * res))
-    j1 = int(math.ceil((xlim[1] - x0) % 360 * res))
-    k0 = int(math.floor((ylim[0] - y0) * res))
-    k1 = int(math.ceil((ylim[1] - y0) * res))
+    j0 = int(math.floor((lim0[0] - x0) % 360 * res))
+    k0 = int(math.floor((lim0[1] - y0) * res))
+    j1 = int(math.ceil((lim1[0] - x0) % 360 * res))
+    k1 = int(math.ceil((lim1[1] - y0) * res))
     delta = 1.0 / res
-    xlim = x0 + j0 * delta, x0 + j1 * delta
-    ylim = y0 + k0 * delta, y0 + k1 * delta
-    extent = xlim, ylim
+    lim0 = x0 + j0 * delta, y0 + k0 * delta
+    lim1 = x0 + j1 * delta, y0 + k1 * delta
+    extent = lim0, lim1
     if downsample > 0:
         z = etopo1(downsample)[j0:j1, k0:k1]
     else:
@@ -341,9 +339,10 @@ def dem(coords, scale=1.0, downsample=0, mesh=False):
     elif mesh:
         delta = 1.0 / res
         n = z.shape
-        x = xlim[0] + delta * np.arange(n[0])
-        y = ylim[0] + delta * np.arange(n[1])
-        y, x = np.meshgrid(y, x)
+        x = lim0[0] + delta * np.arange(n[0])
+        y = lim0[1] + delta * np.arange(n[1])
+        x, y = np.meshgrid(x, y, indexing='ij')
+        # y, x = np.meshgrid(y, x)
         return (x, y, z)
     else:
         return extent, z
@@ -405,9 +404,9 @@ def gshhg(
     http://www.soest.hawaii.edu/wessel/gshhg/index.html
     http://www.ngdc.noaa.gov/mgg/shorelines/gshhs.html
 
-    kind: 'coastlines', 'rivers', 'borders', or None
+    kind: 'c' for coastlines, 'r' for rivers, 'b' for borders, or None
     resolution: 'crude', 'low', 'intermediate', 'high', or 'full'
-    extent: (min_lon, max_lon), (min_lat, max_lat)
+    extent: (west, south), (east, north) lon/lat
     delta: densify line segments to given delta.
     clip: clipdata
     min_level, max_level: where levels 1-4 are
@@ -437,11 +436,11 @@ def gshhg(
         min_area = 0.0
     min_area *= 10
     if extent is not None:
-        lon, lat = extent
-        lon = lon[0] % 360, lon[1] % 360
-        extent = lon, lat
-        west, east = 1000000 * lon[0], 1000000 * lon[1]
-        south, north = 1000000 * lat[0], 1000000 * lat[1]
+        (west, south), (east, north) = extent
+        west = 1000000 * (west % 360)
+        east = 1000000 * (east % 360)
+        south *= 1000000
+        north *= 1000000
     f = os.path.join(repository, 'GSHHG/%s_%s.b' % (kind, resolution[0]))
     data = np.fromfile(f, '>i')
     print('Reading %s resolution %s.' % (resolution, name))
@@ -472,17 +471,6 @@ def gshhg(
             x = densify(x, delta)
         xx.append(x)
     return xx
-    #     if extent is not None and clip != 0:
-    #         if delta:
-    #             x = clipdata(x, extent, 1)[:2]
-    #             x = densify(x, delta)
-    #         x = clipdata(x, extent, clip)[:2]
-    #     elif delta:
-    #         x = densify(x, delta)
-    #     xx += [x, [float('nan')]]
-    # if nkeep:
-    #     xx = np.concatenate(xx)[:-1]
-    # return xx
 
 
 def engdahl_cat():
