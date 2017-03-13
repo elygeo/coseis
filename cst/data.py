@@ -396,24 +396,25 @@ def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):
 
 
 def gshhg(
-    kind=None, resolution='high', extent=None, min_area=0.0, min_level=0,
-    max_level=4, delta=None
+    kind=None, resolution='high', extent=None, area=-1, levels=[], delta=None
 ):
     """
     Global Self-consistent, Hierarchical, High-resolution Geography Database
     http://www.soest.hawaii.edu/wessel/gshhg/index.html
     http://www.ngdc.noaa.gov/mgg/shorelines/gshhs.html
 
-    kind: 'c' for coastlines, 'r' for rivers, 'b' for borders, or None
+    kind: coastlines, rivers, borders, or None
     resolution: 'crude', 'low', 'intermediate', 'high', or 'full'
     extent: (west, south), (east, north) lon/lat
+    area: minimum area in km^2
+    levels: list of levels to include
+        1: land
+        2: lake
+        3: island-in-lake
+        4: pond-in-island-in-lake
+        5: Antarctic ice-front
+        6: Antarctic grounding-line
     delta: densify line segments to given delta.
-    clip: clipdata
-    min_level, max_level: where levels 1-4 are
-        1: coastline
-        2: lake shore
-        3: island-in-lake shore
-        4: lake-in-island-in-lake shore
     Returns N x 2 coordinate array.
     """
     # url = 'http://www.soest.hawaii.edu/pwessel/gshhg/gshhg-bin-2.3.6.zip'
@@ -429,12 +430,27 @@ def gshhg(
         zipfile.ZipFile(data).extractall(d)
     if not kind:
         return
-    name = {'c': 'GSHHS coastlines', 'r': 'WDB rivers', 'b': 'WDB borders'}
-    name = name[kind[0]]
-    kind = {'c': 'gshhs', 'r': 'wdb_rivers', 'b': 'wdb_borders'}[kind[0]]
-    if kind != 'gshhs':
-        min_area = 0.0
-    min_area *= 10
+    break_level0 = -1
+    break_level1 = -1
+    if 'coastlines'.startswith(kind):
+        kind = 'gshhs'
+        for i in levels:
+            if i > break_level0 and i not in [5, 6]:
+                break_level0 = i
+        break_level1 = 4
+        # workaround for improperly sorted data in GSHHG
+        if resolution[0] == 'f' and break_level0 == 2:
+            break_level0 = 3
+    elif 'rivers'.startswith(kind):
+        kind = 'wdb_rivers'
+    elif 'borders'.startswith(kind):
+        kind = 'wdb_borders'
+        for i in levels:
+            if i > break_level0:
+                break_level0 = i
+        break_level1 = 13
+    else:
+        raise Exception
     if extent is not None:
         (west, south), (east, north) = extent
         west = 1000000 * (west % 360)
@@ -443,7 +459,6 @@ def gshhg(
         north *= 1000000
     f = os.path.join(repository, 'GSHHG/%s_%s.b' % (kind, resolution[0]))
     data = np.fromfile(f, '>i')
-    print('Reading %s resolution %s.' % (resolution, name))
     xx = []
     ii = 0
     nhead = 11
@@ -454,11 +469,11 @@ def gshhg(
         n = hdr[1]
         ii += nhead + 2 * n
         level = hdr[2:3].view('i1')[3]
-        if level > max_level:
-            break
-        if level < min_level:
+        if levels and level not in levels:
+            if level > break_level0 and level <= break_level1:
+                break
             continue
-        if hdr[7] < min_area:
+        if hdr[7] <= area:
             continue
         if extent is not None:
             if (

@@ -4,25 +4,26 @@ Interpolation functions
 import numpy as np
 
 
-def interp1(x, f, xi, fi=None, method='nearest'):
+def interp1(x, f, xi, fi=float('nan'), method='nearest'):
     """
     1D piecewise interpolation of function values specified on regular grid.
-    xlim: Range (x_min, x_max) of coordinate space covered by `f`.
+    x: Range (x_min, x_max) of coordinate space covered by `f`.
     f: Array of regularly spaced data values to be interpolated.
     xi: Array of coordinates for the interpolation points, same shape as `fi`.
     fi: Output array for the interpolated values, same shape as `xi`.
     method: Interpolation method, 'nearest' or 'linear'.
     Returns an array of interpolated values, same shape as `xi`.
     """
-    xi = np.asarray(xi)
-    if f.size == 0:
-        if fi is None:
-            fi = np.empty_like(xi)
-            fi.fill(float('nan'))
-        return fi
-    x = np.asarray(x)
     f = np.asarray(f)
-    n = np.array(f.shape)
+    n = np.array(f.shape[:1])
+    xi = np.asarray(xi)
+    m = xi.shape + len(f.shape[1:]) * (1,)
+    if f.size == 0:
+        if isinstance(fi, (int, float)):
+            f = np.empty(xi.shape + f.shape[1:], type(fi))
+            f.fill(fi)
+        return f
+    x = np.asarray(x)
     xi = (xi - x[0]) / (x[1] - x[0]) * (n - 1)
     if method == 'nearest':
         i = (xi + 0.5).astype('i')
@@ -33,20 +34,21 @@ def interp1(x, f, xi, fi=None, method='nearest'):
         i = xi.astype('i')
         i = np.maximum(i, 0)
         i = np.minimum(i, n - 2)
-        x = xi - i
+        x = (xi - i).reshape(m)
         f = (1 - x) * f[i] + x * f[i+1]
     else:
         raise Exception('Unknown interpolation method: %s' % method)
-    if fi is None:
-        fi = np.empty_like(xi)
-        fi.fill(float('nan'))
-    i = f == f & xi >= 0 & xi <= n - 1
+    if isinstance(fi, (int, float)):
+        x = np.empty(f.shape, type(fi))
+        x.fill(fi)
+        fi = x
+    i = (f == f) & ((xi >= 0) & (xi <= n - 1)).reshape(m)
     fi[i] = f[i]
-
     return fi
 
 
 def interp2(x, f, xi, fi=None, method='nearest'):
+    f = np.asarray(f)
     xi = np.asarray(xi)
     if f.size == 0:
         if fi is None:
@@ -54,8 +56,7 @@ def interp2(x, f, xi, fi=None, method='nearest'):
             fi.fill(float('nan'))
         return fi
     x = np.asarray(x)
-    f = np.asarray(f)
-    n = np.array(f.shape)
+    n = np.array(f.shape[:2])
     xi = (xi - x[0]) / (x[1] - x[0]) * (n - 1)
     if method == 'nearest':
         i = (xi + 0.5).astype('i')
@@ -80,12 +81,13 @@ def interp2(x, f, xi, fi=None, method='nearest'):
     if fi is None:
         fi = np.empty_like(xi)
         fi.fill(float('nan'))
-    i = f == f & xi >= 0 & xi <= n - 1
+    i = (f == f) & (xi >= 0) & (xi <= n - 1)
     fi[i] = f[i]
     return fi
 
 
 def interp3(x, f, xi, fi=None, method='nearest'):
+    f = np.asarray(f)
     xi = np.asarray(xi)
     if f.size == 0:
         if fi is None:
@@ -93,8 +95,7 @@ def interp3(x, f, xi, fi=None, method='nearest'):
             fi.fill(float('nan'))
         return fi
     x = np.asarray(x)
-    f = np.asarray(f)
-    n = np.array(f.shape)
+    n = np.array(f.shape[:3])
     xi = (xi - x[0]) / (x[1] - x[0]) * (n - 1)
     if method == 'nearest':
         i = (xi + 0.5).astype('i')
@@ -123,7 +124,7 @@ def interp3(x, f, xi, fi=None, method='nearest'):
     if fi is None:
         fi = np.empty_like(xi[..., 0])
         fi.fill(float('nan'))
-    i = f == f & xi >= 0 & xi <= n - 1
+    i = (f == f) & (xi >= 0) & (xi <= n - 1)
     fi[i] = f[i]
     return fi
 
