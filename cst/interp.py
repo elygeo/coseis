@@ -4,7 +4,7 @@ Interpolation functions
 import numpy as np
 
 
-def interp1(extent, f, x, out=float('nan'), method='nearest'):
+def interp1(extent, f, x, out=float('nan'), method='linear'):
     """
     1D piecewise interpolation of function values specified on regular grid.
     extent: Range (xmin, xmax) of coordinate space covered by `f`.
@@ -22,26 +22,27 @@ def interp1(extent, f, x, out=float('nan'), method='nearest'):
             f.fill(out)
         return f
     m = len(f.shape) - 1
-    n = f.shape[0]
+    n = f.shape[0] - 1
     a, b = extent
-    x = (x - a) / (b - a) * n
-    i = (x >= 0) & (x <= n)
+    i = (x >= a) & (x <= b)
     i = i.reshape(i.shape + m * (1,))
+    d = b - a
+    x = (x - a) * n
     if method == 'nearest':
-        x = (x + 0.5).astype('i')
-        x = np.minimum(x, n)
+        x = ((x + d / 2) / d).astype('i')
         x = np.maximum(x, 0)
+        x = np.minimum(x, n)
         f = f[x]
     elif method == 'linear':
-        j = x.astype('i')
-        j = np.minimum(j, n - 1)
+        j = (x / d).astype('i')
         j = np.maximum(j, 0)
+        j = np.minimum(j, n - 1)
         n = x.shape + m * (1,)
-        x = (x - j).reshape(n)
-        f = (1 - x) * f[j] + x * f[j+1]
+        x = (x - d * j).reshape(n)
+        f = ((d - x) * f[j] + x * f[j+1]) / d
     else:
         raise Exception('Unknown method: %s' % method)
-    i &= f == f
+    i = i & (f == f)
     if isinstance(out, (int, float)):
         f[~i] = out
         return f
@@ -61,19 +62,19 @@ def interp2(extent, f, x, out=float('nan'), method='nearest'):
     m = len(f.shape) - 2
     n = np.array(f.shape[:2]) - 1
     a, b = np.asarray(extent)
-    x = (x - a) / (b - a) * n
-    i = ((x >= 0) & (x <= n)).min(-1)
+    i = ((x >= a) & (x <= b)).min(-1)
     i = i.reshape(i.shape + m * (1,))
+    x = (x - a) * n / (b - a)
     if method == 'nearest':
         x = (x + 0.5).astype('i')
-        x = np.minimum(x, n)
         x = np.maximum(x, 0)
+        x = np.minimum(x, n)
         x, y = np.rollaxis(x, -1)
         f = f[x, y]
     elif method == 'linear':
         j = x.astype('i')
-        j = np.minimum(j, n - 1)
         j = np.maximum(j, 0)
+        j = np.minimum(j, n - 1)
         n = x.shape[-1:] + x.shape[:-1] + m * (1,)
         x, y = np.rollaxis(x - j, -1).reshape(n)
         j, k = np.rollaxis(j, -1)
@@ -105,19 +106,19 @@ def interp3(extent, f, x, out=float('nan'), method='nearest'):
     m = len(f.shape) - 3
     n = np.array(f.shape[:3]) - 1
     a, b = np.asarray(extent)
-    x = (x - a) / (b - a) * n
-    i = ((x >= 0) & (x <= n)).min(-1)
+    i = ((x >= a) & (x <= b)).min(-1)
     i = i.reshape(i.shape + m * (1,))
+    x = (x - a) * n / (b - a)
     if method == 'nearest':
         x = (x + 0.5).astype('i')
-        x = np.minimum(x, n)
         x = np.maximum(x, 0)
+        x = np.minimum(x, n)
         x, y, z = np.rollaxis(x, -1)
         f = f[x, y, z]
     elif method == 'linear':
         j = x.astype('i')
-        j = np.minimum(j, n - 1)
         j = np.maximum(j, 0)
+        j = np.minimum(j, n - 1)
         n = x.shape[-1:] + x.shape[:-1] + m * (1,)
         x, y, z = np.rollaxis(x - j, -1).reshape(n)
         j, k, l = np.rollaxis(j, -1)

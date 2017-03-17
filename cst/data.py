@@ -29,19 +29,21 @@ repository = home + 'repo' + os.sep
 def upsample(f):
     """
     Up-sample a 2D array by a factor of 2 by interpolation.
+    Result is scaled by a factor of 4.
     """
     n = [f.shape[0] * 2 - 1, f.shape[1] * 2 - 1] + list(f.shape[2:])
     g = np.empty(n, f.dtype)
-    g[0::2, 0::2] = f
-    g[0::2, 1::2] = 0.5 * (f[:, :-1] + f[:, 1:])
-    g[1::2, 0::2] = 0.5 * (f[:-1, :] + f[1:, :])
-    g[1::2, 1::2] = 0.25 * (f[:-1, :-1] + f[1:, 1:] + f[:-1, 1:] + f[1:, :-1])
+    g[0::2, 0::2] = 4 * f
+    g[0::2, 1::2] = 2 * (f[:, :-1] + f[:, 1:])
+    g[1::2, 0::2] = 2 * (f[:-1, :] + f[1:, :])
+    g[1::2, 1::2] = f[:-1, :-1] + f[1:, 1:] + f[:-1, 1:] + f[1:, :-1]
     return g
 
 
 def downsample(f, d):
     """
     Down-sample a 2D array by a factor d, with averaging.
+    Result is scaled by a factor of d squared.
     """
     n = f.shape
     n = (n[0] + 1) // d, (n[1] + 1) // d
@@ -49,7 +51,6 @@ def downsample(f, d):
     for k in range(d):
         for j in range(d):
             g += f[j::d, k::d]
-    g *= 1.0 / (d * d)
     return g
 
 
@@ -166,21 +167,27 @@ def downsample_sphere(f, d):
     of the 2D array f are longitude and latitude. d is the decimation interval
     which should be odd to preserve nodal registration.
     """
-    n = f.shape
-    i = np.arange(d) - (d - 1) / 2
-    jj = np.arange(0, n[0], d)
-    kk = np.arange(0, n[1], d)
-    nn = jj.size, kk.size
-    g = np.zeros(nn, f.dtype)
+    if d == 1:
+        return f
+    assert(d % 2 == 1)
+    f = np.asarray(f)
+    m, n = f.shape[:2]
+    i = np.arange(d) - (d - 1) // 2
+    jj = np.arange(0, m, d)
+    kk = np.arange(0, n, d)
+    g = np.zeros([jj.size, kk.size], f.dtype)
     jj, kk = np.ix_(jj, kk)
     for dk in i:
-        k = n[1] - 1 - abs(n[1] - 1 - abs(dk + kk))
+        k = n - 1 - abs(n - 1 - abs(dk + kk))
         for dj in i:
-            j = (jj + dj) % n[0]
+            j = (jj + dj) % m
             g = g + f[j, k]
-    g[:, 0] = g[:, 0].mean()
-    g[:, -1] = g[:, -1].mean()
-    g *= 1.0 / (d * d)
+    if g.dtype.kind == 'i':
+        g[:, 0] = g[:, 0].mean() + 0.5
+        g[:, -1] = g[:, -1].mean() + 0.5
+    else:
+        g[:, 0] = g[:, 0].mean()
+        g[:, -1] = g[:, -1].mean()
     return g
 
 
@@ -207,7 +214,11 @@ def etopo1(downsample=1):
         np.save(f, z)
     if not os.path.exists(g):
         z = np.load(f, mmap_mode='c')
-        z = downsample_sphere(z, downsample)
+        if downsample > 1:
+            z = downsample_sphere(z, downsample)
+            d = downsample * downsample
+            z += d // 2
+            z //= d
         print('Creating %s' % g)
         np.save(g, z)
     z = np.load(g, mmap_mode='c')
@@ -246,25 +257,23 @@ def globe30(tile=(0, 1), fill=True):
             z += gzip.GzipFile(fileobj=f).read()
         z = np.fromstring(z, '<i2').reshape(shape).T[:, ::-1]
         if fill:
-            n = shape[1] // 2
             m = shape[0] // 2
+            n = shape[1] // 2
             j = slice(tile[0] * n, tile[0] * n + n + 1)
             k = slice(tile[1] * m, tile[1] * m + m + 1)
-            x = 0.0625 * etopo1()[j, k]
+            x = etopo1()[j, k]
             y = np.empty_like(z)
-            i0 = slice(None, -1)
-            i1 = slice(1, None)
-            y[0::2, 0::2] = 9 * x[i0, i0] + x[i1, i1] + 3 * (
-                x[i0, i1] + x[i1, i0]) + 0.5
-            y[0::2, 1::2] = 9 * x[i0, i1] + x[i1, i0] + 3 * (
-                x[i0, i0] + x[i1, i1]) + 0.5
-            y[1::2, 0::2] = 9 * x[i1, i0] + x[i0, i1] + 3 * (
-                x[i1, i1] + x[i0, i0]) + 0.5
-            y[1::2, 1::2] = 9 * x[i1, i1] + x[i0, i0] + 3 * (
-                x[i1, i0] + x[i0, i1]) + 0.5
+            x00 = x[:-1, :-1]
+            x01 = x[:-1, 1:]
+            x10 = x[1:, :-1]
+            x11 = x[1:, 1:]
+            y[0::2, 0::2] = 9 * x00 + x11 + 3 * (x01 + x10)
+            y[0::2, 1::2] = 9 * x01 + x10 + 3 * (x00 + x11)
+            y[1::2, 0::2] = 9 * x10 + x01 + 3 * (x11 + x00)
+            y[1::2, 1::2] = 9 * x11 + x00 + 3 * (x10 + x01)
             del(x)
             i = z == -500
-            z[i] = y[i]
+            z[i] = (y[i] + 8) // 16
             del(y, i)
         print('Creating %s' % filename)
         np.save(filename, z)
@@ -272,14 +281,13 @@ def globe30(tile=(0, 1), fill=True):
     return np.load(filename, mmap_mode='c')
 
 
-def dem(coords, scale=1.0, downsample=0, mesh=False):
+def dem(coords, downsample=0, mesh=False):
     """
     Extract digital elevation model for given region.
 
     coords:
         ((lon0, lat0), (lon1, lat1)) extent or
         (..., 2) shape array of lon lat interpolation points.
-    scale: Scaling factor for elevation data
     downsample:
         <0: Upsample by factor of 2
         0:  GLOBE 30 sec, with missing data filled by ETOPO1
@@ -304,7 +312,7 @@ def dem(coords, scale=1.0, downsample=0, mesh=False):
         lim0, lim1 = coords
     if downsample > 0:
         res = 60 // downsample
-        x0, y0 = -180.0, -90.0
+        x0, y0 = -180, -90
     else:
         res = 120
         x0 = -180.0 + 0.5 / res
@@ -333,7 +341,6 @@ def dem(coords, scale=1.0, downsample=0, mesh=False):
         if downsample < 0:
             z = upsample(z)
             res *= 2
-    z = z * scale  # always do this to convert to float
     if sample:
         return interp.interp2(extent, z, coords)
     elif mesh:
@@ -342,7 +349,6 @@ def dem(coords, scale=1.0, downsample=0, mesh=False):
         x = lim0[0] + delta * np.arange(n[0])
         y = lim0[1] + delta * np.arange(n[1])
         x, y = np.meshgrid(x, y, indexing='ij')
-        # y, x = np.meshgrid(y, x)
         return (x, y, z)
     else:
         return extent, z
@@ -406,7 +412,7 @@ def gshhg(
     kind: coastlines, rivers, borders, or None
     resolution: 'crude', 'low', 'intermediate', 'high', or 'full'
     extent: (west, south), (east, north) lon/lat
-    area: minimum area in km^2
+    area: minimum area in 1/10 km^2
     levels: list of levels to include
         1: land
         2: lake
@@ -415,7 +421,7 @@ def gshhg(
         5: Antarctic ice-front
         6: Antarctic grounding-line
     delta: densify line segments to given delta.
-    Returns N x 2 coordinate array.
+    Returns N x 2 coordinate array in micro-degrees
     """
     # url = 'http://www.soest.hawaii.edu/pwessel/gshhg/gshhg-bin-2.3.6.zip'
     url = (
@@ -481,7 +487,7 @@ def gshhg(
                 hdr[4] < west or hdr[6] < south
             ):
                 continue
-        x = 1e-6 * data[ii-2*n:ii].reshape(n, 2).astype('f')
+        x = data[ii-2*n:ii].reshape(n, 2)
         if delta:
             x = densify(x, delta)
         xx.append(x)
