@@ -281,7 +281,7 @@ def globe30(tile=(0, 1), fill=True):
     return np.load(filename, mmap_mode='c')
 
 
-def dem(coords, downsample=0, mesh=False):
+def dem(coords, downsample=0):
     """
     Extract digital elevation model for given region.
 
@@ -289,11 +289,10 @@ def dem(coords, downsample=0, mesh=False):
         ((lon0, lat0), (lon1, lat1)) extent or
         (..., 2) shape array of lon lat interpolation points.
     downsample:
-        <0: Upsample by factor of 2
+        <0: Upsample by factor of 2. Elevation scaled by 4
         0:  GLOBE 30 sec, with missing data filled by ETOPO1
         1:  ETOPO1 60 sec
         >1: Down-sample factor for ETOPO1
-    mesh: return coordinate mesh with topo
 
     Returns (when given region limits):
         lon, lat, elev: 2D arrays for regular mesh
@@ -343,15 +342,13 @@ def dem(coords, downsample=0, mesh=False):
             res *= 2
     if sample:
         return interp.interp2(extent, z, coords)
-    elif mesh:
+    else:
         delta = 1.0 / res
         n = z.shape
         x = lim0[0] + delta * np.arange(n[0])
         y = lim0[1] + delta * np.arange(n[1])
         x, y = np.meshgrid(x, y, indexing='ij')
         return (x, y, z)
-    else:
-        return extent, z
 
 
 def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):

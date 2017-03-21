@@ -136,7 +136,8 @@ cmap = [
     (38, 38, 40, 40, 25, 20, 17, 17),
     (80, 80, 80, 80, 80, 80, 80, 80),
 ]
-x, y, z = cst.data.dem(extent, scale=0.001, downsample=-1)
+x, y, z = cst.data.dem(extent, downsample=-1)
+z *= 0.001
 s = np.maximum(0.01, z)
 i = (x + y) < -84.0
 s[i] = z[i]
