@@ -2,7 +2,7 @@
 Coordinate conversion tools.
 """
 import math
-import numpy as np
+import numpy
 
 rearth = 6370000.0
 
@@ -94,12 +94,12 @@ def rot_sym_tensor(w1, w2, rot):
 
     Returns: (w1, w2) rotated tensor components
     """
-    rot = np.asarray(rot)
-    m = np.diag(w1)
+    rot = numpy.asarray(rot)
+    m = numpy.diag(w1)
     m.flat[[5, 6, 1]] = w2
     m.flat[[7, 2, 3]] = w2
     m = dotmm(dotmm(rot, m), rot.T)
-    w1 = np.diag(m)
+    w1 = numpy.diag(m)
     w2 = m.flat[[5, 6, 1]]
     return w1, w2
 
@@ -111,10 +111,10 @@ def eigvals_sym_tensor(w1, w2):
     w1: diagonal components w11, w22, w33
     w2: off-diagonal components w23, w31, w12
     """
-    m = np.diag(w1)
+    m = numpy.diag(w1)
     m.flat[[5, 6, 1]] = w2
     m.flat[[7, 2, 3]] = w2
-    w = np.linalg.eigvalsh(m)
+    w = numpy.linalg.eigvalsh(m)
     return w
 
 
@@ -122,17 +122,17 @@ def rotmat(x, origin=(0, 0, 0), upvector=(0, 0, 1)):
     """
     Given a position vector x, find the rotation matrix to r,h,v coordinates.
     """
-    x = np.asarray(x) - np.asarray(origin)
-    nr = x / np.sqrt((x * x).sum())
-    nh = np.cross(upvector, nr)
+    x = numpy.asarray(x) - numpy.asarray(origin)
+    nr = x / numpy.sqrt((x * x).sum())
+    nh = numpy.cross(upvector, nr)
     if all(nh == 0.0):
-        nh = np.cross((1, 0, 0), nr)
+        nh = numpy.cross((1, 0, 0), nr)
     if all(nh == 0.0):
-        nh = np.cross((0, 1, 0), nr)
-    nh = nh / np.sqrt((nh * nh).sum())
-    nv = np.cross(nr, nh)
-    nv = nv / np.sqrt((nv * nv).sum())
-    return np.array([nr, nh, nv])
+        nh = numpy.cross((0, 1, 0), nr)
+    nh = nh / numpy.sqrt((nh * nh).sum())
+    nv = numpy.cross(nr, nh)
+    nv = nv / numpy.sqrt((nv * nv).sum())
+    return numpy.array([nr, nh, nv])
 
 
 def llr2xyz(x, y, z, inverse=False):
@@ -147,18 +147,18 @@ def llr2xyz(x, y, z, inverse=False):
     x <-> lon, y <-> lat, z <-> r
     """
     if inverse:
-        r = np.sqrt(x * x + y * y + z * z)
-        x = np.arctan2(y, x)
-        y = np.arcsin(z / r)
+        r = numpy.sqrt(x * x + y * y + z * z)
+        x = numpy.arctan2(y, x)
+        y = numpy.arcsin(z / r)
         x = 180.0 / math.pi * x
         y = 180.0 / math.pi * y
         return x, y, r
     else:
         x = math.pi / 180.0 * x
         y = math.pi / 180.0 * y
-        x_ = np.cos(x) * np.cos(y) * z
-        y_ = np.sin(x) * np.cos(y) * z
-        z = np.sin(y) * z
+        x_ = numpy.cos(x) * numpy.cos(y) * z
+        y_ = numpy.sin(x) * numpy.cos(y) * z
+        z = numpy.sin(y) * z
         return x_, y_, z
 
 
@@ -178,11 +178,11 @@ def euler_rotation(phi=0.0, theta=0.0, psi=0.0):
     B = math.pi / 180.0 * theta
     C = math.pi / 180.0 * psi
     del(phi, theta, psi)
-    c, s = np.cos(A), np.sin(A)
+    c, s = numpy.cos(A), numpy.sin(A)
     A = [c, s, 0], [-s, c, 0], [0,  0, 1]
-    c, s = np.cos(B), np.sin(B)
+    c, s = numpy.cos(B), numpy.sin(B)
     B = [1, 0, 0], [0,  c, s], [0, -s, c]
-    c, s = np.cos(C), np.sin(C)
+    c, s = numpy.cos(C), numpy.sin(C)
     C = [c, s, 0], [-s, c, 0], [0,  0, 1]
     return dotmm(dotmm(C, B), A)
 
@@ -210,22 +210,22 @@ def rotation(lon, lat, projection, eps=100.0):
     local_components = dotmv(mat, components)
     local_strike = strike + theta
     """
-    dlon = eps * 180.0 / (math.pi * rearth) * np.cos(math.pi / 180.0 * lat)
+    dlon = eps * 180.0 / (math.pi * rearth) * numpy.cos(math.pi / 180.0 * lat)
     dlat = eps * 180.0 / (math.pi * rearth)
-    lon = np.array([
+    lon = numpy.array([
         [lon - dlon, lon],
         [lon + dlon, lon],
     ])
-    lat = np.array([
+    lat = numpy.array([
         [lat, lat - dlat],
         [lat, lat + dlat],
     ])
     x, y = projection(lon, lat)
     x = x[1] - x[0]
     y = y[1] - y[0]
-    s = 1.0 / np.sqrt(x * x + y * y)
-    mat = np.array([s * x, s * y])
-    theta = 180.0 / math.pi * np.arctan2(mat[0], mat[1])
+    s = 1.0 / numpy.sqrt(x * x + y * y)
+    mat = numpy.array([s * x, s * y])
+    theta = 180.0 / math.pi * numpy.arctan2(mat[0], mat[1])
     theta = 0.5 * theta.sum(0) - 45.0
     return mat, theta
 
@@ -237,17 +237,17 @@ def rotation3(lon, lat, dep, projection, eps=100.0):
     geographic coordinate system to components in the local system.
     local_components = dotmv(mat, components)
     """
-    dlon = eps * 180.0 / (math.pi * rearth) * np.cos(math.pi / 180.0 * lat)
+    dlon = eps * 180.0 / (math.pi * rearth) * numpy.cos(math.pi / 180.0 * lat)
     dlat = eps * 180.0 / (math.pi * rearth)
-    lon = np.array([
+    lon = numpy.array([
         [lon - dlon, lon, lon],
         [lon + dlon, lon, lon],
     ])
-    lat = np.array([
+    lat = numpy.array([
         [lat, lat - dlat, lat],
         [lat, lat + dlat, lat],
     ])
-    dep = np.array([
+    dep = numpy.array([
         [dep, dep, dep - eps],
         [dep, dep, dep + eps],
     ])
@@ -255,8 +255,8 @@ def rotation3(lon, lat, dep, projection, eps=100.0):
     x = x[1] - x[0]
     y = y[1] - y[0]
     z = z[1] - z[0]
-    s = 1.0 / np.sqrt(x * x + y * y + z * z)
-    mat = np.array([s * x, s * y, s * z])
+    s = 1.0 / numpy.sqrt(x * x + y * y + z * z)
+    mat = numpy.array([s * x, s * y, s * z])
     return mat
 
 
@@ -285,25 +285,25 @@ class Transform():
             if proj is not None:
                 x, y = proj(x, y)
             if isinstance(x, (list, tuple)):
-                phi -= np.arctan2(y[1] - y[0], x[1] - x[0])
+                phi -= numpy.arctan2(y[1] - y[0], x[1] - x[0])
                 x = 0.5 * (x[0] + x[1])
                 y = 0.5 * (y[0] + y[1])
         mat = [[1, 0, -x], [0, 1, -y], [0, 0, 1]]
         if hasattr(proj, 'mat'):
-            mat = np.dot(mat, proj.mat)
+            mat = numpy.dot(mat, proj.mat)
             proj = proj.proj
-        c = scale * np.cos(phi)
-        s = scale * np.sin(phi)
+        c = scale * numpy.cos(phi)
+        s = scale * numpy.sin(phi)
         x, y = translate
-        mat = np.dot([[c, -s, x], [s, c, y], [0, 0, 1]], mat)
-        mat = np.dot(matrix, mat)
+        mat = numpy.dot([[c, -s, x], [s, c, y], [0, 0, 1]], mat)
+        mat = numpy.dot(matrix, mat)
         self.mat = mat
         self.proj = proj
 
     def __call__(self, x, y, **kwarg):
         proj = self.proj
-        x = np.asarray(x)
-        y = np.asarray(y)
+        x = numpy.asarray(x)
+        y = numpy.asarray(y)
         if kwarg.get('inverse') is not True:
             if proj is not None:
                 x, y = proj(x, y, **kwarg)
@@ -316,7 +316,7 @@ class Transform():
             x, y = solve2(self.mat[:2, :2], [x, y])
             if proj is not None:
                 x, y = proj(x, y, **kwarg)
-        return np.array([x, y])
+        return numpy.array([x, y])
 
 
 def test():

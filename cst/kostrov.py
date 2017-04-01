@@ -1,19 +1,20 @@
 """
 Kostrov circular expanding crack analytical solution.
 """
-import numpy as np
+import numpy
 
 
 def cee_integrand(x, a2, b2):
     return (
-        ((x + 0.5 * b2) ** 2.0 - x * np.sqrt((x + b2) * (x + a2))) /
-        ((x + 1.0) * (x + 1.0) * np.sqrt(x + b2))
+        ((x + 0.5 * b2) ** 2.0 - x * numpy.sqrt((x + b2) * (x + a2))) /
+        ((x + 1.0) * (x + 1.0) * numpy.sqrt(x + b2))
     )
 
 
 def cee_integral(a2, b2):
     import scipy.integrate
-    return scipy.integrate.quad(cee_integrand, 0.0, np.Inf, args=(a2, b2))[0]
+    x = scipy.integrate.quad(cee_integrand, 0.0, float('inf'), args=(a2, b2))
+    return x[0]
 
 
 def cee(a, b):
@@ -23,8 +24,8 @@ def cee(a, b):
     """
     a2 = a * a
     b2 = b * b
-    f = np.vectorize(cee_integral)
-    d = f(a2, b2) + 0.25 * b2 * (b + np.arccos(b) / np.sqrt(1.0 - b2))
+    f = numpy.vectorize(cee_integral)
+    d = f(a2, b2) + 0.25 * b2 * (b + numpy.arccos(b) / numpy.sqrt(1.0 - b2))
     return b * b2 / d
 
 
@@ -43,5 +44,5 @@ def slip_rate(rho, vp, vs, vrup, dtau, r, t, C=None):
     t0 = r / vrup
     if C is None:
         C = cee(vrup / vp, vrup / vs)
-    v = C * dtau / (rho * vs) * (t + t0) / np.sqrt(t * (t + 2.0 * t0))
+    v = C * dtau / (rho * vs) * (t + t0) / numpy.sqrt(t * (t + 2.0 * t0))
     return v
