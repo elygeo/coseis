@@ -14,7 +14,7 @@ try:
 except ImportError:
     from urllib2 import urlopen
 
-import numpy as np
+import numpy
 from . import home
 from . import interp
 
@@ -26,54 +26,75 @@ repository = home + 'repo' + os.sep
 # http://earthquake.usgs.gov/hazards/qfaults/KML/Quaternaryall.zip
 
 
-def upsample(f):
+def upsample2(x):
     """
     Up-sample a 2D array by a factor of 2 by interpolation.
     Result is scaled by a factor of 4.
     """
-    n = [f.shape[0] * 2 - 1, f.shape[1] * 2 - 1] + list(f.shape[2:])
-    g = np.empty(n, f.dtype)
-    g[0::2, 0::2] = 4 * f
-    g[0::2, 1::2] = 2 * (f[:, :-1] + f[:, 1:])
-    g[1::2, 0::2] = 2 * (f[:-1, :] + f[1:, :])
-    g[1::2, 1::2] = f[:-1, :-1] + f[1:, 1:] + f[:-1, 1:] + f[1:, :-1]
-    return g
+    n = [x.shape[0] * 2 - 1, x.shape[1] * 2 - 1] + list(x.shape[2:])
+    y = numpy.empty(n, x.dtype)
+    y[0::2, 0::2] = 4 * x
+    y[0::2, 1::2] = 2 * (x[:, :-1] + x[:, 1:])
+    y[1::2, 0::2] = 2 * (x[:-1, :] + x[1:, :])
+    y[1::2, 1::2] = x[:-1, :-1] + x[1:, 1:] + x[:-1, 1:] + x[1:, :-1]
+    return y
 
 
-def downsample(f, d):
+def upsample3(x):
+    """
+    Up-sample a 2D array by a factor of 3 by interpolation.
+    Result is scaled by a factor of 9.
+    """
+    n = [x.shape[0] * 3 - 2, x.shape[1] * 3 - 2] + list(x.shape[2:])
+    y = numpy.empty(n, x.dtype)
+    y[0::3, 0::3] = 9 * x
+    y[0::3, 1::3] = 6 * x[:, :-1] + 3 * x[:, 1:]
+    y[0::3, 2::3] = 6 * x[:, 1:] + 3 * x[:, :-1]
+    y[1::3, 0::3] = 6 * x[:-1, :] + 3 * x[1:, :]
+    y[2::3, 0::3] = 6 * x[1:, :] + 3 * x[:-1, :]
+    y[1::3, 1::3] = 4 * x[:-1, :-1] + x[1:, 1:] + 2 * (x[:-1, 1:] + x[1:, :-1])
+    y[1::3, 2::3] = 4 * x[:-1, 1:] + x[1:, :-1] + 2 * (x[:-1, :-1] + x[1:, 1:])
+    y[2::3, 1::3] = 4 * x[1:, :-1] + x[:-1, 1:] + 2 * (x[1:, 1:] + x[:-1, :-1])
+    y[2::3, 2::3] = 4 * x[1:, 1:] + x[:-1, :-1] + 2 * (x[1:, :-1] + x[:-1, 1:])
+    return y
+
+
+def downsample(x, d):
     """
     Down-sample a 2D array by a factor d, with averaging.
     Result is scaled by a factor of d squared.
     """
-    n = f.shape
+    n = x.shape
     n = (n[0] + 1) // d, (n[1] + 1) // d
-    g = np.zeros(n, f.dtype)
+    y = numpy.zeros(n, x.dtype)
     for k in range(d):
         for j in range(d):
-            g += f[j::d, k::d]
-    return g
+            y += x[j::d, k::d]
+    return y
 
 
-def clipdata(x, bounds, lines=1):
+def clipdata(x, bounds, overshoot=True, inside=False, separator=None):
     """
-    Clip out-of-range data.
-    x: data with dimensions (..., n)
-    bounds: lower and upper bound with dimensions (2, n)
-    lines:
-        0: points, assume no connectivity.
-        1: line segments, include one extra point past the boundary.
-        -1: line segments, do not include extra point past the boundary.
+    Clip data outside the bounds.
+    x: data with dimensions (n, ...)
+    bounds: lower and upper bound with dimensions (n, 2)
+    overshoot: include one adjacent point outside the bounds.
+    inside: clip data inside the bounds rather than outside.
+    separator: value to insert at clip boundaries.
     """
-    x = np.asarray(x)
-    xmin, xmax = np.asarray(bounds)
-    i = (x >= xmin).min(-1) & (x <= xmax).min(-1)
-    if lines:
-        if lines > 0:
-            i[:-1] = i[:-1] | i[1:]
-            i[1:] = i[:-1] | i[1:]
-        x[~i] = float('nan')
+    xmin, xmax = numpy.asarray(bounds).T
+    x = numpy.asarray(x).T
+    if inside:
+        i = (x <= xmin).max(-1) | (x >= xmax).max(-1)
+    else:
+        i = (x >= xmin).min(-1) & (x <= xmax).min(-1)
+    if overshoot:
+        i[:-1] = i[:-1] | i[1:]
         i[1:] = i[:-1] | i[1:]
-    return x[i], i
+    if separator is not None:
+        x[~i] = separator
+        i[1:] = i[:-1] | i[1:]
+    return x[i].T
 
 
 def densify(xy, delta):
@@ -170,13 +191,13 @@ def downsample_sphere(f, d):
     if d == 1:
         return f
     assert(d % 2 == 1)
-    f = np.asarray(f)
+    f = numpy.asarray(f)
     m, n = f.shape[:2]
-    i = np.arange(d) - (d - 1) // 2
-    jj = np.arange(0, m, d)
-    kk = np.arange(0, n, d)
-    g = np.zeros([jj.size, kk.size], f.dtype)
-    jj, kk = np.ix_(jj, kk)
+    i = numpy.arange(d) - (d - 1) // 2
+    jj = numpy.arange(0, m, d)
+    kk = numpy.arange(0, n, d)
+    g = numpy.zeros([jj.size, kk.size], f.dtype)
+    jj, kk = numpy.ix_(jj, kk)
     for dk in i:
         k = n - 1 - abs(n - 1 - abs(dk + kk))
         for dj in i:
@@ -209,19 +230,19 @@ def etopo1(downsample=1):
         z = io.BytesIO(z.read())
         z = zipfile.ZipFile(z)
         z = z.read('etopo1_ice_g_i2.bin')
-        z = np.fromstring(z, '<i2').reshape(n).T[:, ::-1]
+        z = numpy.fromstring(z, '<i2').reshape(n).T[:, ::-1]
         print('Creating %s' % f)
-        np.save(f, z)
+        numpy.save(f, z)
     if not os.path.exists(g):
-        z = np.load(f, mmap_mode='c')
+        z = numpy.load(f, mmap_mode='c')
         if downsample > 1:
             z = downsample_sphere(z, downsample)
             d = downsample * downsample
             z += d // 2
             z //= d
         print('Creating %s' % g)
-        np.save(g, z)
-    z = np.load(g, mmap_mode='c')
+        numpy.save(g, z)
+    z = numpy.load(g, mmap_mode='c')
     return z
 
 
@@ -255,14 +276,14 @@ def globe30(tile=(0, 1), fill=True):
             f = urlopen(u)
             f = io.BytesIO(f.read())
             z += gzip.GzipFile(fileobj=f).read()
-        z = np.fromstring(z, '<i2').reshape(shape).T[:, ::-1]
+        z = numpy.fromstring(z, '<i2').reshape(shape).T[:, ::-1]
         if fill:
             m = shape[0] // 2
             n = shape[1] // 2
             j = slice(tile[0] * n, tile[0] * n + n + 1)
             k = slice(tile[1] * m, tile[1] * m + m + 1)
             x = etopo1()[j, k]
-            y = np.empty_like(z)
+            y = numpy.empty_like(z)
             x00 = x[:-1, :-1]
             x01 = x[:-1, 1:]
             x10 = x[1:, :-1]
@@ -276,18 +297,18 @@ def globe30(tile=(0, 1), fill=True):
             z[i] = (y[i] + 8) // 16
             del(y, i)
         print('Creating %s' % filename)
-        np.save(filename, z)
+        numpy.save(filename, z)
         del(z)
-    return np.load(filename, mmap_mode='c')
+    return numpy.load(filename, mmap_mode='c')
 
 
 def dem(coords, downsample=0):
     """
     Extract digital elevation model for given region.
 
-    coords:
-        ((lon0, lat0), (lon1, lat1)) extent or
-        (..., 2) shape array of lon lat interpolation points.
+    coords: (lon, lat)
+        If length of lon and lat are 2, they specify the region limits,
+        otherwise they specify interpolation points
     downsample:
         <0: Upsample by factor of 2. Elevation scaled by 4
         0:  GLOBE 30 sec, with missing data filled by ETOPO1
@@ -299,16 +320,14 @@ def dem(coords, downsample=0):
     Returns (when given interpolation points):
         elev: array of elevation values at the interpolation points
     """
-    sample = len(coords) > 2
+    x, y = numpy.asarray(coords)
+    sample = x.size > 2 or y.size > 2
     if sample:
-        coords = np.asarray(coords)
-        i = ~np.isnan(coords).max(-1)
-        x = coords[..., 0]
-        y = coords[..., 1]
-        lim0 = x[i].min(), y[i].min()
-        lim1 = x[i].max(), y[i].max()
+        i = ~(numpy.isnan(x) | numpy.isnan(y))
+        xlim = x[i].min(), x[i].max()
+        ylim = y[i].min(), y[i].max()
     else:
-        lim0, lim1 = coords
+        xlim, ylim = coords
     if downsample > 0:
         res = 60 // downsample
         x0, y0 = -180, -90
@@ -316,14 +335,14 @@ def dem(coords, downsample=0):
         res = 120
         x0 = -180.0 + 0.5 / res
         y0 = -90.0 + 0.5 / res
-    j0 = int(math.floor((lim0[0] - x0) % 360 * res))
-    k0 = int(math.floor((lim0[1] - y0) * res))
-    j1 = int(math.ceil((lim1[0] - x0) % 360 * res))
-    k1 = int(math.ceil((lim1[1] - y0) * res))
+    j0 = int(math.floor((xlim[0] - x0) % 360 * res))
+    j1 = int(math.ceil((xlim[1] - x0) % 360 * res))
+    k0 = int(math.floor((ylim[0] - y0) * res))
+    k1 = int(math.ceil((ylim[1] - y0) * res))
     delta = 1.0 / res
-    lim0 = x0 + j0 * delta, y0 + k0 * delta
-    lim1 = x0 + j1 * delta, y0 + k1 * delta
-    extent = lim0, lim1
+    xlim = x0 + j0 * delta, x0 + j1 * delta
+    ylim = y0 + k0 * delta, y0 + k1 * delta
+    extent = xlim, ylim
     if downsample > 0:
         z = etopo1(downsample)[j0:j1, k0:k1]
     else:
@@ -337,17 +356,23 @@ def dem(coords, downsample=0):
         j0, j1 = j0 % n, j1 % n
         k0, k1 = k0 % n, k1 % n
         z = globe30(tile0)[j0:j1+1, k0:k1+1]
-        if downsample < 0:
-            z = upsample(z)
-            res *= 2
+        while downsample < -1:
+            if downsample % 3 == 0:
+                downsample //= 3
+                z = upsample3(z / 9.0)
+                res *= 3
+            elif downsample % 2 == 0:
+                downsample //= 2
+                z = upsample2(z * 0.25)
+                res *= 2
     if sample:
         return interp.interp2(extent, z, coords)
     else:
         delta = 1.0 / res
         n = z.shape
-        x = lim0[0] + delta * np.arange(n[0])
-        y = lim0[1] + delta * np.arange(n[1])
-        x, y = np.meshgrid(x, y, indexing='ij')
+        x = xlim[0] + delta * numpy.arange(n[0])
+        y = ylim[0] + delta * numpy.arange(n[1])
+        x, y = numpy.meshgrid(x, y, indexing='ij')
         return (x, y, z)
 
 
@@ -363,10 +388,10 @@ def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):
         z = urlopen(u).read()
         z = io.BytesIO(z)
         z = gzip.GzipFile(fileobj=z).read()[19512:]
-        z = np.fromstring(z, '>f').reshape((2400, 2280)).T
-        np.save(f, z)
-    x = np.asarray(x)
-    y = np.asarray(y)
+        z = numpy.fromstring(z, '>f').reshape((2400, 2280)).T
+        numpy.save(f, z)
+    x = numpy.asarray(x)
+    y = numpy.asarray(y)
     sample = x.size > 2 or y.size > 2
     if sample:
         xlim = x.min(), x.max()
@@ -384,15 +409,15 @@ def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):
     xlim = x0 + j0 * delta, x0 + j1 * delta
     ylim = y0 + k0 * delta, y0 + k1 * delta
     extent = xlim, ylim
-    z = np.load(f, mmap_mode='c')[j0:j1+1, k0:k1+1]
+    z = numpy.load(f, mmap_mode='c')[j0:j1+1, k0:k1+1]
     if sample:
         z = interp.interp2(extent, z, (x, y), method=method)
         return z
     elif mesh:
         n = z.shape
-        x = xlim[0] + delta * np.arange(n[0])
-        y = ylim[0] + delta * np.arange(n[1])
-        y, x = np.meshgrid(y, x)
+        x = xlim[0] + delta * numpy.arange(n[0])
+        y = ylim[0] + delta * numpy.arange(n[1])
+        y, x = numpy.meshgrid(y, x)
         return (x, y, z)
     else:
         return extent, z
@@ -408,7 +433,7 @@ def gshhg(
 
     kind: coastlines, rivers, borders, or None
     resolution: 'crude', 'low', 'intermediate', 'high', or 'full'
-    extent: (west, south), (east, north) lon/lat
+    extent: (west, east lon), (south, north lat)
     area: minimum area in 1/10 km^2
     levels: list of levels to include
         1: land
@@ -418,7 +443,7 @@ def gshhg(
         5: Antarctic ice-front
         6: Antarctic grounding-line
     delta: densify line segments to given delta.
-    Returns N x 2 coordinate array in micro-degrees
+    Returns list of (2, n) shape coordinate array in micro-degrees
     """
     # url = 'http://www.soest.hawaii.edu/pwessel/gshhg/gshhg-bin-2.3.6.zip'
     url = (
@@ -455,13 +480,13 @@ def gshhg(
     else:
         raise Exception
     if extent is not None:
-        (west, south), (east, north) = extent
+        (west, east), (south, north) = extent
         west = 1000000 * (west % 360)
         east = 1000000 * (east % 360)
         south *= 1000000
         north *= 1000000
     f = os.path.join(repository, 'GSHHG/%s_%s.b' % (kind, resolution[0]))
-    data = np.fromfile(f, '>i')
+    data = numpy.fromfile(f, '>i')
     xx = []
     ii = 0
     nhead = 11
@@ -487,7 +512,7 @@ def gshhg(
         x = data[ii-2*n:ii].reshape(n, 2)
         if delta:
             x = densify(x, delta)
-        xx.append(x)
+        xx.append(x.T)
     return xx
 
 
@@ -520,10 +545,10 @@ def engdahl_cat():
     if not os.path.exists(f):
         print('Retrieving %s' % u)
         x = urlopen(u)
-        x = np.genfromtxt(x, dtype=t[1::2], delimiter=t[0::2])
-        np.save(f, x)
+        x = numpy.genfromtxt(x, dtype=t[1::2], delimiter=t[0::2])
+        numpy.save(f, x)
         del(x)
-    return np.load(f, mmap_mode='c')
+    return numpy.load(f, mmap_mode='c')
 
 
 def lsh_cat():
@@ -561,9 +586,9 @@ def lsh_cat():
     if not os.path.exists(f):
         print('Retrieving %s' % u)
         x = urlopen(u)
-        x = np.genfromtxt(x, dtype=t)
-        np.save(f, x)
-    x = np.load(f, mmap_mode='c')
+        x = numpy.genfromtxt(x, dtype=t)
+        numpy.save(f, x)
+    x = numpy.load(f, mmap_mode='c')
     return x
 
 
@@ -607,7 +632,7 @@ def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
     else:
         print('Retrieving ' + os.path.basename(f))
         g = path + 'erf35_sources.txt'
-        g = np.loadtxt(g, 'i,S64', delimiter='\t', skiprows=1)
+        g = numpy.loadtxt(g, 'i,S64', delimiter='\t', skiprows=1)
         g = dict(g)[isrc]
         h = srf % (v0, v1, isrc, irup, isrc, irup)
         h = 'ssh', host, 'head -2 %s %s.variation.output' % (h, h)

@@ -4,7 +4,7 @@ SCEC Community Velocity Model (CVM-H) tools.
 import os
 import urllib
 import tarfile
-import numpy as np
+import numpy
 from . import home
 from . import data
 from . import vm1d
@@ -26,14 +26,14 @@ def vs30_model(x, y, version='Wills+Wald', method='nearest'):
     if 'Wald' in version:
         z = data.vs30_wald(x, y, method=method)
     else:
-        z = np.empty_like(x)
+        z = numpy.empty_like(x)
         z.fill(float('nan'))
     if 'Wills' in version:
         delta = 0.000439344930055
         x0 = -121.12460921883338
         y0 = 32.53426695497164
         f = repository + 'Vs30-Wills-CVMH.npy'
-        w = np.load(f, mmap_mode='c')
+        w = numpy.load(f, mmap_mode='c')
         xlim = x0, x0 + delta * (w.shape[0] - 1)
         ylim = y0, y0 + delta * (w.shape[1] - 1)
         extent = xlim, ylim
@@ -48,7 +48,7 @@ def nafe_drake(f):
     f *= 0.001
     f = f * (
         1.6612 - f * (0.4721 - f * (0.0671 - f * (0.0043 - f * 0.000106))))
-    f = np.maximum(f, 1.0) * 1000.0
+    f = numpy.maximum(f, 1.0) * 1000.0
     return f
 
 
@@ -223,7 +223,7 @@ class Model():
 
     def __call__(self, x, y, z=None, out=None, interpolation='nearest'):
         if out is None:
-            out = np.empty_like(x)
+            out = numpy.empty_like(x)
             out.fill(float('nan'))
         for extent, v in self.voxet:
             if z is None:
@@ -266,8 +266,8 @@ class Extraction():
         geographic=True,
         **kwargs
     ):
-        x = np.asarray(x)
-        y = np.asarray(y)
+        x = numpy.asarray(x)
+        y = numpy.asarray(y)
         if isinstance(vm, str):
             vm = Model(vm, **kwargs)
         if vm.prop in prop2d:
@@ -298,8 +298,8 @@ class Extraction():
             if vm.prop == 'vp':
                 v0 = ely_vp(v0)
             vt = vm(x, y, z0 - zt, interpolation=interpolation)
-            v0 = np.minimum(vt, v0)  # XXX new feature
-            if np.isnan(vt).any():
+            v0 = numpy.minimum(vt, v0)  # XXX new feature
+            if numpy.isnan(vt).any():
                 print('WARNING: NaNs in GTL')
             self.gtl = v0, vt
         self.x, self.y, self.z0, self.zt = x, y, z0, zt
@@ -309,9 +309,9 @@ class Extraction():
     def __call__(self, z, out=None, min_depth=None, by_depth=True):
         x, y, z0, zt = self.x, self.y, self.z0, self.zt
         vm, interpolation = self.vm, self.interpolation
-        z = np.asarray(z)
+        z = numpy.asarray(z)
         if out is None:
-            out = np.empty_like(z)
+            out = numpy.empty_like(z)
             out.fill(float('nan'))
         if by_depth is False:
             vm(x, y, z, out, interpolation)
@@ -339,8 +339,8 @@ def extract(x, y, z, vm=['rho', 'vp', 'vs'], by_depth=True, **kwargs):
 
     Returns property samples at coordinates (x, y, z)
     """
-    x = np.asarray(x)
-    y = np.asarray(y)
+    x = numpy.asarray(x)
+    y = numpy.asarray(y)
     if not isinstance(vm, (list, tuple)):
         vm = [vm]
     out = []
@@ -355,4 +355,4 @@ def extract(x, y, z, vm=['rho', 'vp', 'vs'], by_depth=True, **kwargs):
             out += [nafe_drake(f(z, by_depth=by_depth))]
         else:
             out += [f(z, by_depth=by_depth)]
-    return np.array(out)
+    return numpy.array(out)

@@ -11,7 +11,7 @@ try:
 except ImportError:
     from urllib2 import urlopen
 
-import numpy as np
+import numpy
 from . import home
 from . import data
 from . import gocad
@@ -46,7 +46,7 @@ def catalog(version='CFM5-socal-primary'):
             if len(tsurf) > 1:
                 raise Exception('Not expecting more than 1 tsurf')
             data = tsurf[0][1]
-            np.savez(path + k + '.npz', **data)
+            numpy.savez(path + k + '.npz', **data)
         cat = '\n'.join(cat) + '\n'
         open(path + 'catalog.txt', 'w').write(cat)
     else:
@@ -123,7 +123,7 @@ def read(fault, version='CFM5-socal-primary'):
     """
     path = os.path.join(repository, 'CFM', version) + os.sep
     f, i = (fault + ':').split(':')[:2]
-    d = np.load(path + f + '.npz')
+    d = numpy.load(path + f + '.npz')
     x = d['vtx']
     t = d['tri']
     b = d['border']
@@ -148,12 +148,12 @@ def tsurf_merge(tsurfs, fuse=-1.0, cull=-1.0, clean=True):
     n = 0
     vtx, tri = [], []
     for x, t, b, s in tsurfs:
-        t = np.vstack(t) + n
+        t = numpy.vstack(t) + n
         n += x.shape[0]
         vtx.append(x)
         tri.append(t)
-    vtx = np.vstack(vtx)
-    tri = np.vstack(tri)
+    vtx = numpy.vstack(vtx)
+    tri = numpy.vstack(tri)
 
     # remove small triangles
     if cull >= 0.0:
@@ -175,8 +175,8 @@ def tsurf_merge(tsurfs, fuse=-1.0, cull=-1.0, clean=True):
     # merge nearby points
     if fuse >= 0.0:
         tol = fuse * fuse
-        i, j = np.unique(tri, return_inverse=True)
-        tri = np.arange(tri.size)[j].reshape(tri.shape)
+        i, j = numpy.unique(tri, return_inverse=True)
+        tri = numpy.arange(tri.size)[j].reshape(tri.shape)
         vtx = vtx[i]
         for j in range(len(i)):
             x = vtx[j, 0] - vtx[j+1:, 0]
@@ -187,8 +187,8 @@ def tsurf_merge(tsurfs, fuse=-1.0, cull=-1.0, clean=True):
 
     # remove unused vertices
     if clean:
-        i, j = np.unique(tri, return_inverse=True)
-        tri = np.arange(tri.size)[j].reshape(tri.shape)
+        i, j = numpy.unique(tri, return_inverse=True)
+        tri = numpy.arange(tri.size)[j].reshape(tri.shape)
         vtx = vtx[i]
 
     return vtx, tri
@@ -258,7 +258,7 @@ def tsurf_plane(vtx, tri):
     wz = ux * vy - uy * vx
 
     # center of mass
-    a = 0.5 * np.sqrt(wx * wx + wy * wy + wz * wz)
+    a = 0.5 * numpy.sqrt(wx * wx + wy * wy + wz * wz)
     area = float(a.sum())
     d = 1.0 / (3.0 * area)
     x = d * float(((x[j] + x[k] + x[l]) * a).sum())
@@ -374,12 +374,12 @@ def quad_mesh(vtx, tri, delta, drape=False, clean_top=False):
     # quad mesh
     x = math.ceil(xi.min()), math.floor(xi.max())
     z = math.ceil(zi.min()), math.floor(zi.max())
-    x = np.arange(x[0], x[1] + 1)
-    z = np.arange(z[0], z[1] + 1)
-    z, x = np.meshgrid(z, x)
+    x = numpy.arange(x[0], x[1] + 1)
+    z = numpy.arange(z[0], z[1] + 1)
+    z, x = numpy.meshgrid(z, x)
     y = interp.trinterp([xi, zi], yi, tri, [x, z])
     del(xi, yi, zi, tri)
-    mask = np.isnan(y)
+    mask = numpy.isnan(y)
     y[mask] = y[~mask].mean()
 
     # cleanup surface trace
@@ -481,22 +481,22 @@ def explore(prefix, faults):
     # DEM
     f = os.path.join(repository, 'CFM', 'dem.npy')
     if os.path.exists(f):
-        x, y, z = np.load(f)
+        x, y, z = numpy.load(f)
     else:
         x, y, z = data.dem(extent, mesh=True)
         extent = (x.min(), x.max()), (y.min(), y.max())
         x, y = proj(x, y)
-        np.save(f, [x, y, z])
+        numpy.save(f, [x, y, z])
     mlab.mesh(x, y, z, color=(1, 1, 1), opacity=0.3)
 
     # base map
     f = os.path.join(repository, 'CFM', 'mapdata.npy')
     if os.path.exists(f):
-        x, y, z = np.load(f)
+        x, y, z = numpy.load(f)
     else:
         ddeg = 0.5 / 60.0
         # FIXME
-        x, y = np.c_[
+        x, y = numpy.c_[
             data.gshhg('coastlines', resolution, extent, 10.0, delta=ddeg),
             [float('nan'), float('nan')],
             data.gshhg('borders', resolution, extent, delta=ddeg),
@@ -504,10 +504,10 @@ def explore(prefix, faults):
         x -= 360.0
         z = interp.interp2(extent, z, (x, y))
         x, y = proj(x, y)
-        i = np.isnan(z)
+        i = numpy.isnan(z)
         x[i] = float('nan')
         y[i] = float('nan')
-        np.save(f, [x, y, z])
+        numpy.save(f, [x, y, z])
     mlab.plot3d(x, y, z, color=(0, 0, 0), line_width=1, tube_radius=None)
     mlab.view(view_azimuth, view_elevation)
     fig.scene.camera.view_angle = view_angle

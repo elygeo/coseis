@@ -6,7 +6,7 @@ import json
 import copy
 import shutil
 import subprocess
-import numpy as np
+import numpy
 from . import home
 from . import job
 
@@ -135,9 +135,9 @@ def extract(lon, lat, dep, prop=['rho', 'vp', 'vs'], **kwargs):
     Returns: (rho, vp, vs) material arrays
     """
 
-    lon = np.asarray(lon, 'f')
-    lat = np.asarray(lat, 'f')
-    dep = np.asarray(dep, 'f')
+    lon = numpy.asarray(lon, 'f')
+    lat = numpy.asarray(lat, 'f')
+    dep = numpy.asarray(dep, 'f')
     shape = dep.shape
     nsample = dep.size
 
@@ -161,7 +161,7 @@ def extract(lon, lat, dep, prop=['rho', 'vp', 'vs'], **kwargs):
         prop = [prop]
     for v in prop:
         f = cfg['file_' + v.lower()]
-        out += [np.fromfile(f, 'f').reshape(shape)]
+        out += [numpy.fromfile(f, 'f').reshape(shape)]
 
     os.chdir(cwd)
     shutil.rmtree('cvms-tmp')

@@ -15,12 +15,12 @@ def build():
     os.chdir(cwd)
 
 
-try:
-    from .rspectra import rspectra
-except ImportError:
-    build()
-    from .rspectra import rspectra
-assert(rspectra)
+# try:
+#     from .rspectra import rspectra
+# except ImportError:
+#     build()
+#     from .rspectra import rspectra
+# assert(rspectra)
 
 
 def time_function(pulse, t, tau=1.0):

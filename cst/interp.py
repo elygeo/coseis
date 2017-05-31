@@ -1,7 +1,7 @@
 """
 Interpolation functions
 """
-import numpy as np
+import numpy
 
 
 def interp1(extent, f, x, out=float('nan'), method='linear'):
@@ -13,36 +13,29 @@ def interp1(extent, f, x, out=float('nan'), method='linear'):
     out: Output array for the interpolated values or no-data-value.
     method: Interpolation method, 'nearest' or 'linear'.
     """
-    f = np.asarray(f)
-    x = np.asarray(x)
+    f = numpy.asarray(f)
+    x = numpy.asarray(x)
     if f.size == 0:
         if isinstance(out, (int, float)):
-            n = x.shape + f.shape[1:]
-            f = np.empty(n, type(out))
+            f = numpy.empty(x.shape, type(out))
             f.fill(out)
         return f
-    m = len(f.shape) - 1
-    n = f.shape[0] - 1
-    a, b = extent
-    i = (x >= a) & (x <= b)
-    i = i.reshape(i.shape + m * (1,))
-    d = b - a
-    x = (x - a) * n
+    lx = f.shape[0] - 1
+    x0, x1 = extent
+    i = (x >= x0) & (x <= x1)
+    x = (x - x0) * lx / (x1 - x0)
     if method == 'nearest':
-        x = ((x + d / 2) / d).astype('i')
-        x = np.maximum(x, 0)
-        x = np.minimum(x, n)
+        x = numpy.maximum(0, (x + 0.5).astype('i'))
+        x = numpy.minimum(x, lx)
         f = f[x]
     elif method == 'linear':
-        j = (x / d).astype('i')
-        j = np.maximum(j, 0)
-        j = np.minimum(j, n - 1)
-        n = x.shape + m * (1,)
-        x = (x - d * j).reshape(n)
-        f = ((d - x) * f[j] + x * f[j+1]) / d
+        j = numpy.maximum(0, x.astype('i'))
+        j = numpy.minimum(j, lx - 1)
+        x = x - j
+        f = (1 - x) * f[j] + x * f[j+1]
     else:
         raise Exception('Unknown method: %s' % method)
-    i = i & (f == f)
+    i &= f == f
     if isinstance(out, (int, float)):
         f[~i] = out
         return f
@@ -51,33 +44,32 @@ def interp1(extent, f, x, out=float('nan'), method='linear'):
 
 
 def interp2(extent, f, x, out=float('nan'), method='nearest'):
-    f = np.asarray(f)
-    x = np.asarray(x)
+    f = numpy.asarray(f)
+    x, y = numpy.asarray(x)
     if f.size == 0:
         if isinstance(out, (int, float)):
-            n = x.shape[:-1] + f.shape[2:]
-            f = np.empty(n, type(out))
+            f = numpy.empty(x.shape, type(out))
             f.fill(out)
         return f
-    m = len(f.shape) - 2
-    n = np.array(f.shape[:2]) - 1
-    a, b = np.asarray(extent)
-    i = ((x >= a) & (x <= b)).min(-1)
-    i = i.reshape(i.shape + m * (1,))
-    x = (x - a) * n / (b - a)
+    lx, ly = f.shape
+    lx, ly = lx - 1, ly - 1
+    [x0, x1], [y0, y1] = extent
+    i = (x >= x0) & (x <= x1) & (y >= y0) & (y <= y1)
+    x = (x - x0) * lx / (x1 - x0)
+    y = (y - y0) * ly / (y1 - y0)
     if method == 'nearest':
-        x = (x + 0.5).astype('i')
-        x = np.maximum(x, 0)
-        x = np.minimum(x, n)
-        x, y = np.rollaxis(x, -1)
+        x = numpy.maximum(0, (x + 0.5).astype('i'))
+        y = numpy.maximum(0, (y + 0.5).astype('i'))
+        x = numpy.minimum(x, lx)
+        y = numpy.minimum(y, ly)
         f = f[x, y]
     elif method == 'linear':
-        j = x.astype('i')
-        j = np.maximum(j, 0)
-        j = np.minimum(j, n - 1)
-        n = x.shape[-1:] + x.shape[:-1] + m * (1,)
-        x, y = np.rollaxis(x - j, -1).reshape(n)
-        j, k = np.rollaxis(j, -1)
+        j = numpy.maximum(0, x.astype('i'))
+        k = numpy.maximum(0, y.astype('i'))
+        j = numpy.minimum(j, lx - 1)
+        k = numpy.minimum(k, ly - 1)
+        x = x - j
+        y = y - k
         f = (
             (1 - x) * (1 - y) * f[j, k] +
             (1 - x) * y * f[j, k+1] +
@@ -95,33 +87,38 @@ def interp2(extent, f, x, out=float('nan'), method='nearest'):
 
 
 def interp3(extent, f, x, out=float('nan'), method='nearest'):
-    f = np.asarray(f)
-    x = np.asarray(x)
+    f = numpy.asarray(f)
+    x, y, z = numpy.asarray(x)
     if f.size == 0:
         if isinstance(out, (int, float)):
-            n = x.shape[:-1] + f.shape[3:]
-            f = np.empty(n, type(out))
+            f = numpy.empty(x.shape, type(out))
             f.fill(out)
         return f
-    m = len(f.shape) - 3
-    n = np.array(f.shape[:3]) - 1
-    a, b = np.asarray(extent)
-    i = ((x >= a) & (x <= b)).min(-1)
-    i = i.reshape(i.shape + m * (1,))
-    x = (x - a) * n / (b - a)
+    lx, ly, lz = f.shape
+    lx, ly, lz = lx - 1, ly - 1, lz - 1
+    [x0, x1], [y0, y1], [z0, z1] = extent
+    i = (x >= x0) & (x <= x1) & (y >= y0) & (y <= y1) & (z >= z0) & (z <= z1)
+    x = (x - x0) * lx / (x1 - x0)
+    y = (y - y0) * ly / (y1 - y0)
+    z = (z - z0) * lz / (z1 - z0)
     if method == 'nearest':
-        x = (x + 0.5).astype('i')
-        x = np.maximum(x, 0)
-        x = np.minimum(x, n)
-        x, y, z = np.rollaxis(x, -1)
+        x = numpy.maximum(0, (x + 0.5).astype('i'))
+        y = numpy.maximum(0, (y + 0.5).astype('i'))
+        z = numpy.maximum(0, (z + 0.5).astype('i'))
+        x = numpy.minimum(x, lx)
+        y = numpy.minimum(y, ly)
+        z = numpy.minimum(z, lz)
         f = f[x, y, z]
     elif method == 'linear':
-        j = x.astype('i')
-        j = np.maximum(j, 0)
-        j = np.minimum(j, n - 1)
-        n = x.shape[-1:] + x.shape[:-1] + m * (1,)
-        x, y, z = np.rollaxis(x - j, -1).reshape(n)
-        j, k, l = np.rollaxis(j, -1)
+        j = numpy.maximum(0, x.astype('i'))
+        k = numpy.maximum(0, y.astype('i'))
+        l = numpy.maximum(0, z.astype('i'))
+        j = numpy.minimum(j, lx - 1)
+        k = numpy.minimum(k, ly - 1)
+        l = numpy.minimum(l, lz - 1)
+        x = x - j
+        y = y - k
+        z = z - l
         f = (
             (1 - x) * (1 - y) * (1 - z) * f[j, k, l] +
             (1 - x) * (1 - y) * z * f[j, k, l+1] +
@@ -152,7 +149,7 @@ def interp_tri(x, f, t, xi, fi=None):
     Returns array of interpolated values, same shape as `xi[0]`.
     """
     if fi is None:
-        fi = np.empty_like(xi[..., 0])
+        fi = numpy.empty_like(xi[..., 0])
         fi.fill(float('nan'))
     lmin = -0.000001
     lmax = 1.000001

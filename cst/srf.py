@@ -6,7 +6,7 @@ SRF is documented at http://epicenter.usc.edu/cmeportal/docs/srf4.pdf
 import os
 import math
 import gzip
-import numpy as np
+import numpy
 from . import coord
 
 
@@ -73,9 +73,9 @@ def read(fh):
         't0', 'dt', 'slip1', 'slip2', 'slip3',
     )
     for k in keys_2i:
-        data[k] = np.empty(n, 'i')
+        data[k] = numpy.empty(n, 'i')
     for k in keys_2f:
-        data[k] = np.empty(n, 'f')
+        data[k] = numpy.empty(n, 'f')
     sv1, sv2, sv3 = [], [], []
     for i in range(n):
         k = fh.next().split() + fh.next().split()
@@ -97,7 +97,7 @@ def read(fh):
         data['nt2'][i] = nt2 = int(k[12])
         data['nt3'][i] = nt3 = int(k[14])
         sv = []
-        n = np.cumsum([nt1, nt2, nt3])
+        n = numpy.cumsum([nt1, nt2, nt3])
         while len(sv) < n[-1]:
             sv += fh.next().split()
         if len(sv) != n[-1]:
@@ -107,9 +107,9 @@ def read(fh):
         sv3 += [float(f) * u_cm for f in sv[n[1]:]]
 
     # slip velocity arrays
-    data['sv1'] = sv1 = np.array(sv1, 'f')
-    data['sv2'] = sv2 = np.array(sv2, 'f')
-    data['sv3'] = sv3 = np.array(sv3, 'f')
+    data['sv1'] = sv1 = numpy.array(sv1, 'f')
+    data['sv2'] = sv2 = numpy.array(sv2, 'f')
+    data['sv3'] = sv3 = numpy.array(sv3, 'f')
 
     # reshape array (only handles a single plane for now)
     if len(meta['plane']) == 1:
@@ -122,14 +122,14 @@ def read(fh):
     i2 = (data['nt2'] > 0).sum()
     i3 = (data['nt3'] > 0).sum()
     meta['nsource_nonzero'] = i1 + i2 + i3
-    i = np.argmin(data['t0'])
+    i = numpy.argmin(data['t0'])
     meta['hypocenter'] = [
         float(data['lon'].flat[i]),
         float(data['lat'].flat[i]),
         float(data['dep'].flat[i]),
     ]
     meta['area'] = a = float(data['area'].sum(dtype='d'))
-    meta['potency'] = p = float(np.sqrt(
+    meta['potency'] = p = float(numpy.sqrt(
         (data['area'] * data['slip1']).sum(dtype='d') ** 2 +
         (data['area'] * data['slip2']).sum(dtype='d') ** 2 +
         (data['area'] * data['slip3']).sum(dtype='d') ** 2
@@ -201,10 +201,10 @@ def write(fh, srf):
         s1 = data['sv1'][i1:i1+n1] * u_cm
         s2 = data['sv2'][i2:i2+n2] * u_cm
         s3 = data['sv3'][i3:i3+n3] * u_cm
-        s = np.concatenate([s1, s2, s3])
+        s = numpy.concatenate([s1, s2, s3])
         i = s.size // 6 * 6
-        np.savetxt(fh, s[:i].reshape([-1, 6]), '%13.5e', '')
-        np.savetxt(fh, s[i:].reshape([1, -1]), '%13.5e', '')
+        numpy.savetxt(fh, s[:i].reshape([-1, 6]), '%13.5e', '')
+        numpy.savetxt(fh, s[i:].reshape([1, -1]), '%13.5e', '')
         i1 += n1
         i2 += n2
         i3 += n3
@@ -367,7 +367,7 @@ def write_awp(
     del(s1, s2, n)
 
     # write file
-    s = np.zeros_like
+    s = numpy.zeros_like
     i1 = 0
     i2 = 0
     i3 = 0
@@ -384,8 +384,8 @@ def write_awp(
         s1 = interp.interp1(t1, s1, t, s(t), interp)
         s2 = interp.interp1(t2, s2, t, s(t), interp)
         s3 = interp.interp1(t3, s3, t, s(t), interp)
-        ii = np.array([[jj[i], kk[i], ll[i]]], 'i')
-        mm = np.array([
+        ii = numpy.array([[jj[i], kk[i], ll[i]]], 'i')
+        mm = numpy.array([
             m1[0, 0, i] * s1 + m2[0, 0, i] * s2 + m3[0, 0, i] * s3,
             m1[0, 1, i] * s1 + m2[0, 1, i] * s2 + m3[0, 1, i] * s3,
             m1[0, 2, i] * s1 + m2[0, 2, i] * s2 + m3[0, 2, i] * s3,
@@ -396,8 +396,8 @@ def write_awp(
         if binary:
             mm.astype('f').tofile(fh)
         else:
-            np.savetxt(fh, ii, '%d')
-            np.savetxt(fh, mm.T, '%14.6e')
+            numpy.savetxt(fh, ii, '%d')
+            numpy.savetxt(fh, mm.T, '%14.6e')
         i1 += n1
         i2 += n2
         i3 += n3
@@ -417,8 +417,8 @@ def write_coulomb(path, srf, proj, scut=0):
     # slip components
     meta, data = srf
     s1, s2 = data['slip1'], data['slip2']
-    s = np.sin(math.pi / 180.0 * data['rake'])
-    c = np.cos(math.pi / 180.0 * data['rake'])
+    s = numpy.sin(math.pi / 180.0 * data['rake'])
+    c = numpy.cos(math.pi / 180.0 * data['rake'])
     r1 = -c * s1 + s * s2
     r2 = s * s1 + c * s2
 
@@ -430,16 +430,16 @@ def write_coulomb(path, srf, proj, scut=0):
     y *= 0.001
     z *= 0.001
     delta = 0.0005 * meta['plane'][0]['delta'][0]
-    dx = delta * np.sin(math.pi / 180.0 * (data['stk'] + rot))
-    dy = delta * np.cos(math.pi / 180.0 * (data['stk'] + rot))
-    dz = delta * np.sin(math.pi / 180.0 * data['dip'])
+    dx = delta * numpy.sin(math.pi / 180.0 * (data['stk'] + rot))
+    dy = delta * numpy.cos(math.pi / 180.0 * (data['stk'] + rot))
+    dz = delta * numpy.sin(math.pi / 180.0 * data['dip'])
     x1, x2 = x - dx, x + dx
     y1, y2 = y - dy, y + dy
     z1, z2 = z - dz, z + dz
 
     # source file
-    i = (s1 ** 2 + s2 ** 2) > (np.sign(scut) * scut**2)
-    c = np.array([
+    i = (s1 ** 2 + s2 ** 2) > (numpy.sign(scut) * scut**2)
+    c = numpy.array([
         x1[i], y1[i],
         x2[i], y2[i],
         r1[i], r2[i],
@@ -448,15 +448,15 @@ def write_coulomb(path, srf, proj, scut=0):
     ]).T
     with open(path + 'source.inp', 'w') as fh:
         fh.write(coulomb_header.format(**meta))
-        np.savetxt(fh, c, coulomb_fmt)
+        numpy.savetxt(fh, c, coulomb_fmt)
         fh.write(coulomb_footer)
 
     # receiver file
     s1.fill(0.0)
-    c = np.array([x1, y1, x2, y2, s1, s1, data['dip'], z1, z2]).T
+    c = numpy.array([x1, y1, x2, y2, s1, s1, data['dip'], z1, z2]).T
     with open(path + 'receiver.inp', 'w') as fh:
         fh.write(coulomb_header.format(**meta))
-        np.savetxt(fh, c, coulomb_fmt)
+        numpy.savetxt(fh, c, coulomb_fmt)
         fh.write(coulomb_footer)
     return
 
