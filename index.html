@@ -116,9 +116,7 @@ body { margin: 0; }
 <h1 id="computational-seismology-tools">Computational Seismology Tools</h1>
 <p><a href="https://github.com/gely/coseis/">github.com/gely/coseis</a><br />
 <a href="http://elygeo.net/coseis/">elygeo.net/coseis</a></p>
-<figure>
-<img src="figs/Bigten.jpg" />
-</figure>
+<p><img src="figs/Bigten.jpg" /></p>
 <h2 id="summary">Summary</h2>
 <p>Coseis is a toolkit for earthquake simulation featuring:</p>
 <ul>
@@ -129,18 +127,22 @@ body { margin: 0; }
 <p>The primary interface is through a Python module which (for high-performance components) wraps Fortran parallelized with hybrid OpenMP and MPI.</p>
 <p>Coseis is written by <a href="http://elygeo.net/">Geoffrey Ely</a> with contributions from Steven Day, Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou. It is licensed under <a href="http://opensource.org/licenses/BSD-2-Clause">BSD</a> terms.</p>
 <div class="warn">
-<p><strong>DISCLAIMER</strong>: Coseis is a work-in-progress and frequently broken. You will likely need dig and understand the code to make it do what you want.</p>
+<p><strong>NOTICE</strong>: Coseis is currently only lightly maintained. You likely will need to dig in, understand the code, and fix things to use it. If you have (or know of) means to support planned improvements or custom requirements, please be in touch.</p>
 </div>
-<h2 id="install">Install</h2>
-<p>For MacOS only, install <a href="http://itunes.apple.com/us/app/xcode/id497799835">Xcode</a> from the App Store followed by the Xcode the Command Line Tools with:</p>
+<h2 id="install-macos-dependencies">Install MacOS Dependencies</h2>
+<p>Install <a href="http://itunes.apple.com/us/app/xcode/id497799835">Xcode</a> from the App Store followed by the Xcode the Command Line Tools with:</p>
 <pre><code>xcode-select --install</code></pre>
-<p>For MacOS only, install <a href="http://brew.sh/">Homebrew</a> and use it to install <a href="http://r.research.att.com/tools/">Fortran</a> with:</p>
-<pre><code>brew install gfortran</code></pre>
+<p>Install <a href="http://brew.sh/">Homebrew</a> and use it to install GCC (for Fortran), Python:</p>
+<pre><code>brew install gcc python3 </code></pre>
+<p>For analyisis and graphics also install VTK and usueful Python libs:</p>
+<pre><code>brew install vtk
+python -m pip install mayavi matplotlib pyproj obspy</code></pre>
+<h2 id="install-coseis">Install Coseis</h2>
 <p>Clone the source code from the <a href="http://github.com/gely/coseis">Coseis GitHub repository</a>:</p>
 <pre><code>git clone git://github.com/gely/coseis.git</code></pre>
 <p>Setup python to be able to find the <code>cst</code> package:</p>
 <pre><code>cd coseis
-python -m cst setup</code></pre>
+python -m cst.setup</code></pre>
 <h2 id="test">Test</h2>
 <p>To run the test suite interactively:</p>
 <pre><code>cd tests
@@ -164,9 +166,7 @@ PASSED: cst.tests.kostrov.test()</code></pre>
 python SORD-Example-sim.py
 python SORD-Example-ploy.py</code></pre>
 <p>Plotting requires Matplotlib, and the result should look like this:</p>
-<figure>
-<img src="figs/SORD-Example.svg" />
-</figure>
+<p><img src="figs/SORD-Example.svg" /></p>
 <h3 id="python-scripting">Python Scripting</h3>
 <p>The general procedure is to import the <code>cst</code> module, create a dictionary of parameters, and pass that dictionary to the <code>cst.sord.run()</code> function. Parameters are either job-control or simulation parameters. Defaults for these two types of parameters are given in <a href="cst/job.py">cst.job.defaults</a> and <a href="cst/sord.py">cst.sord.parameters</a>, respectively. Machine specific job-control parameters may also be present in the <code>conf</code> directory that supersede the defaults.</p>
 <p>It maybe be helpful to look through example applications in the <code>scripts</code> directory, and return to this document for further description of the simulation parameters.</p>
@@ -193,29 +193,17 @@ f = ([], &#39;=&gt;&#39;, &#39;filename&#39;)      # Write f into filename</code
 <h3 id="boundary-conditions">Boundary Conditions</h3>
 <p>Boundary conditions for the six faces of the model domain are specified by the parameters <code>bc1</code> (near-size, x, y, and z faces) and <code>bc2</code> (far-side, x, y, and x faces). The symmetry boundary conditions can be used to reduce computations for problems where they are applicable. These are not used for specifying internal slip boundaries. However, for problems with symmetry across a slip surface, the fault may be placed at the boundary and combined with an anti-mirror symmetry condition. The following BC types are supported:</p>
 <p><code>free</code>: Vacuum free-surface. Stress is zero in cells outside the boundary.</p>
-<figure>
-<img src="figs/SORD-BC0.svg" />
-</figure>
+<p><img src="figs/SORD-BC0.svg" /></p>
 <p><code>rigid</code>: Rigid surface. Displacement is zero at the boundary.</p>
-<figure>
-<img src="figs/SORD-BC3.svg" />
-</figure>
+<p><img src="figs/SORD-BC3.svg" /></p>
 <p><code>+node</code>: Mirror symmetry at the node. Normal displacement is zero at the boundary. Useful for a boundary corresponding to (a) the plane orthogonal to the two nodal planes of a double-couple point source, (b) the plane normal to the mode-III axis of a symmetric rupture, or (c) the zero-width axis of a 2D plane strain problem.</p>
-<figure>
-<img src="figs/SORD-BC1.svg" />
-</figure>
+<p><img src="figs/SORD-BC1.svg" /></p>
 <p><code>-node</code>: Anti-mirror symmetry at the node. Tangential displacement is zero at the boundary. Useful for a boundary corresponding to (a) the nodal planes of a double-couple point source, (b) the plane normal to the mode-II axis of a symmetric rupture, or (c) the zero-width axis of a 2D antiplane strain problem.</p>
-<figure>
-<img src="figs/SORD-BC-1.svg" />
-</figure>
+<p><img src="figs/SORD-BC-1.svg" /></p>
 <p><code>+cell</code>: Mirror symmetry at the cell. Same as type 1, but centered on the cell.</p>
-<figure>
-<img src="figs/SORD-BC2.svg" />
-</figure>
+<p><img src="figs/SORD-BC2.svg" /></p>
 <p><code>-cell</code>: Anti-mirror symmetry at the cell. Same as type -1, but centered on the cell. Can additionally be used when the boundary corresponds to the slip surface of a symmetric rupture.</p>
-<figure>
-<img src="figs/SORD-BC-2.svg" />
-</figure>
+<p><img src="figs/SORD-BC-2.svg" /></p>
 <p><code>pml</code>: Perfectly match layer (PML) absorbing boundary.</p>
 <p>Example: a 3D problem with a free surface at Z=0, and PML absorbing boundaries on all other boundary faces:</p>
 <pre><code>shape = [50, 50, 50, 100]
@@ -323,13 +311,13 @@ M384 0m-4 -48h4m-4 -48h4m-4 -48h4m-4 -48h4m-4 -48h4
 </dl>
 <h2 id="references" class="unnumbered bib">References</h2>
 <div id="ref-2008-GJI-Ely+2" class="ref">
-Ely, G., S. Day, and J.-B. Minster. 2008. “A Support-Operator Method for Visco-Elastic Wave Modeling in 3d Heterogeneous Media.” <em>Geophys. J. Int.</em> 172 (1): 331–44. doi:<a href="https://doi.org/10.1111/j.1365-246X.2007.03633.x">10.1111/j.1365-246X.2007.03633.x</a>. <a href="http://gji.oxfordjournals.org/content/172/1/331.full.pdf" class="eprint">⇩PDF</a>
+Ely, G., S. Day, and J.-B. Minster. 2008. “A Support-Operator Method for Visco-Elastic Wave Modeling in 3D Heterogeneous Media.” <em>Geophys. J. Int.</em> 172 (1): 331–44. <a href="https://doi.org/10.1111/j.1365-246X.2007.03633.x" class="uri">https://doi.org/10.1111/j.1365-246X.2007.03633.x</a>. <a href="http://gji.oxfordjournals.org/content/172/1/331.full.pdf" class="eprint">⇩PDF</a>
 </div>
 <div id="ref-2009-GJI-Ely+2" class="ref">
-———. 2009. “A Support-Operator Method for 3d Rupture Dynamics.” <em>Geophys. J. Int.</em> 177 (3): 1140–50. doi:<a href="https://doi.org/10.1111/j.1365-246X.2009.04117.x">10.1111/j.1365-246X.2009.04117.x</a>. <a href="http://gji.oxfordjournals.org/content/177/3/1140.full.pdf" class="eprint">⇩PDF</a>
+———. 2009. “A Support-Operator Method for 3D Rupture Dynamics.” <em>Geophys. J. Int.</em> 177 (3): 1140–50. <a href="https://doi.org/10.1111/j.1365-246X.2009.04117.x" class="uri">https://doi.org/10.1111/j.1365-246X.2009.04117.x</a>. <a href="http://gji.oxfordjournals.org/content/177/3/1140.full.pdf" class="eprint">⇩PDF</a>
 </div>
 <div id="ref-2010-BSSA-Ely+2" class="ref">
-———. 2010. “Dynamic Rupture Models for the Southern San Andreas Fault.” <em>Bull. Seism. Soc. Am.</em> 100 (1): 131–50. doi:<a href="https://doi.org/10.1785/0120090187">10.1785/0120090187</a>. <a href="http://elygeo.net/2010-BSSA-Ely+2.pdf" class="eprint">⇩PDF</a>
+———. 2010. “Dynamic Rupture Models for the Southern San Andreas Fault.” <em>Bull. Seism. Soc. Am.</em> 100 (1): 131–50. <a href="https://doi.org/10.1785/0120090187" class="uri">https://doi.org/10.1785/0120090187</a>. <a href="http://elygeo.net/2010-BSSA-Ely+2.pdf" class="eprint">⇩PDF</a>
 </div>
 </body>
 </html>

@@ -1,5 +1,7 @@
 index.html : README.md docs/style.html makefile
-	pandoc -Sw html5 -H docs/style.html --template docs/template.html \
+	pandoc \
+	--include-in-header docs/style.html \
+	--template docs/template.html \
 	--email-obfuscation references \
 	--bibliography docs/bibliography.json \
 	--metadata link-citations \

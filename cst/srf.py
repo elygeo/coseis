@@ -10,16 +10,6 @@ import numpy
 from . import coord
 
 
-def open_(fh, mode='r'):
-    if isinstance(fh, str):
-        fh = os.path.expanduser(fh)
-        if fh.endswith('.gz'):
-            fh = gzip.open(fh, mode)
-        else:
-            fh = open(fh, mode)
-    return fh
-
-
 def read(fh):
     """
     Read SRF file.
@@ -29,8 +19,6 @@ def read(fh):
     contains NumPy arrays.
     """
 
-    fh = open_(fh)
-
     # mks units
     u_km = 1000
     u_cm = 0.01
@@ -38,12 +26,12 @@ def read(fh):
 
     # header block
     meta = {}
-    meta['version'] = fh.next().split()[0]
-    s = fh.next().split()
+    meta['version'] = next(fh).split()[0]
+    s = next(fh).split()
     if s[0] == 'PLANE':
         plane = []
         for i in range(int(s[1])):
-            s = fh.next().split() + fh.next().split()
+            s = next(fh).split() + next(fh).split()
             if len(s) != 11:
                 raise Exception('error reading %s' % fh.name)
             j, k = int(s[2]), int(s[3])
@@ -59,8 +47,8 @@ def read(fh):
                 'hypocenter': [float(s[9]) * u_km, float(s[10]) * u_km],
             }
             plane += [seg]
-        s = fh.next().split()
         meta['plane'] = plane
+        s = next(fh).split()
     if s[0] != 'POINTS':
         raise Exception('error reading %s' % fh.name)
     meta['nsource'] = n = int(s[1])
@@ -78,7 +66,7 @@ def read(fh):
         data[k] = numpy.empty(n, 'f')
     sv1, sv2, sv3 = [], [], []
     for i in range(n):
-        k = fh.next().split() + fh.next().split()
+        k = next(fh).split() + next(fh).split()
         if len(k) != 15:
             raise Exception('error reading %s %s' % (fh.name, i))
         data['lon'][i] = float(k[0])
@@ -99,7 +87,7 @@ def read(fh):
         sv = []
         n = numpy.cumsum([nt1, nt2, nt3])
         while len(sv) < n[-1]:
-            sv += fh.next().split()
+            sv += next(fh).split()
         if len(sv) != n[-1]:
             raise Exception('error reading %s %s' % (fh.name, i))
         sv1 += [float(f) * u_cm for f in sv[:n[0]]]
@@ -140,11 +128,6 @@ def read(fh):
 
 
 def write(fh, srf):
-    """
-    Write SRF file.
-    """
-
-    fh = open_(fh)
 
     # mks units
     u_km = 0.001
@@ -332,8 +315,6 @@ def write_awp(
     interp: interpolation method, linear or cubic
     """
 
-    fh = open_(fh)
-
     # parameters
     meta, data = srf
     if not isinstance(delta, (tuple, list)):
@@ -463,26 +444,26 @@ def write_coulomb(path, srf, proj, scut=0):
 
 coulomb_fmt = '  1' + 4*' %10.4f' + ' 100' + 5*' %10.4f' + '    Fault 1'
 
-coulomb_header = '\n'.join(
-    'header line 1',
-    'header line 2',
-    '#reg1=  0  #reg2=  0  #fixed=  {nsource}  sym=  1',
-    ' PR1=       0.250     PR2=       0.250   DEPTH=      12.209',
-    '  E1=     8.000e+005   E2=     8.000e+005',
-    'XSYM=       .000     YSYM=       .000',
-    'FRIC=          0.400',
-    'S1DR=         19.000 S1DP=         -0.010 '
-    'S1IN=        100.000 S1GD=          0.000',
-    'S2DR=         89.990 S2DP=         89.990 '
-    'S2IN=         30.000 S2GD=          0.000',
-    'S3DR=        109.000 S3DP=         -0.010 '
-    'S3IN=          0.000 S3GD=          0.000',
-    '',
-    '  #   X-start    Y-start     X-fin      Y-fin   Kode  rt.lat  '
-    '  reverse   dip angle     top      bot',
-    'xxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxx xxxxxxxxxx '
-    'xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx'
-)
+coulomb_header = """\
+header line 1
+header line 2
+#reg1=  0  #reg2=  0  #fixed=  {nsource}  sym=  1
+ PR1=       0.250     PR2=       0.250   DEPTH=      12.209
+  E1=     8.000e+005   E2=     8.000e+005
+XSYM=       .000     YSYM=       .000
+FRIC=          0.400
+S1DR=         19.000 S1DP=         -0.010 \
+S1IN=        100.000 S1GD=          0.000
+S2DR=         89.990 S2DP=         89.990 \
+S2IN=         30.000 S2GD=          0.000
+S3DR=        109.000 S3DP=         -0.010 \
+S3IN=          0.000 S3GD=          0.000
+
+  #   X-start    Y-start     X-fin      Y-fin   Kode  rt.lat  \
+  reverse   dip angle     top      bot
+xxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxx xxxxxxxxxx \
+xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx xxxxxxxxxx
+"""
 
 coulomb_footer = """
    Grid Parameters

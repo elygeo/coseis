@@ -38,7 +38,7 @@ def cbnga(T, M, R_RUP, R_JB, Z_TOR, Z_25, V_S30, delta, lamb):
     global params
     try:
         params
-    except:
+    except Exception:
         f = os.path.dirname(__file__)
         f = os.path.dirname(f)
         f = os.path.join(f, 'data', 'CBNGA.json')

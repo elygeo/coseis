@@ -380,6 +380,8 @@ def vs30_wald(x, y, mesh=False, region='Western_US', method='nearest'):
     """
     Wald, et al. Vs30 map.
     """
+    raise Exception('File moved. Needs update.')
+    # new file: 'ftp://hazards.cr.usgs.gov/web/data/global_vs30_grd.zip'
     f = os.path.join(repository, 'Vs30-Wald-%s.npy') % region.replace('_', '-')
     u = 'http://earthquake.usgs.gov/hazards/apps/vs30/downloads/%s.grd.gz'
     if not os.path.exists(f):
@@ -448,7 +450,8 @@ def gshhg(
     # url = 'http://www.soest.hawaii.edu/pwessel/gshhg/gshhg-bin-2.3.6.zip'
     url = (
         'https://www.ngdc.noaa.gov/mgg/shorelines/'
-        'data/gshhg/latest/gshhg-bin-2.3.6.zip'
+        'data/gshhg/latest/gshhg-bin-2.3.7.zip'
+http://www.soest.hawaii.edu/pwessel/gshhg/gshhg-bin-2.3.7.zip
     )
     d = repository + 'GSHHG'
     if not os.path.exists(d):
@@ -590,87 +593,6 @@ def lsh_cat():
         numpy.save(f, x)
     x = numpy.load(f, mmap_mode='c')
     return x
-
-
-def cybershake(isrc, irup, islip=None, ihypo=None, version=(3, 2)):
-    """
-    CyberShake SRF sources.
-    Must have account on intensity.usc.edu with auto SSH authentication.
-    isrc: source ID
-    irup: rupture ID
-    islip: slip variation ID
-    ihypo: hypocenter ID
-    """
-    from . import srf as srflib
-
-    # locations
-    v0, v1 = version
-    path = repository + 'CyberShake' + os.sep
-    host = 'intensity.usc.edu'
-    erf = '/home/scec-00/cybershk/reports/'
-    srf = (
-        '/home/rcf-104/CyberShake2007/ruptures/'
-        'RuptureVariations_35_V%d_%d/%d/%d/%d_%d.txt'
-    )
-    try:
-        os.mkdir(path)
-    except OSError:
-        pass
-
-    # segment name
-    for f in 'erf35_source_rups.txt', 'erf35_sources.txt':
-        g = path + f
-        if not os.path.exists(g):
-            print('Retrieving ' + f)
-            f = 'scp', host + ':' + erf + f, g
-            subprocess.check_call(f)
-
-    # metadata
-    f = path + '%1d%1d-%03d-%03d.json' % (v0, v1, isrc, irup)
-    if os.path.exists(f):
-        meta = json.load(open(f))
-    else:
-        print('Retrieving ' + os.path.basename(f))
-        g = path + 'erf35_sources.txt'
-        g = numpy.loadtxt(g, 'i,S64', delimiter='\t', skiprows=1)
-        g = dict(g)[isrc]
-        h = srf % (v0, v1, isrc, irup, isrc, irup)
-        h = 'ssh', host, 'head -2 %s %s.variation.output' % (h, h)
-        h = subprocess.check_output(h).split()
-        meta = {
-            'segment': g,
-            'isrc': isrc,
-            'irup': irup,
-            'nslip': int(h[18]),
-            'nhypo': int(h[20]),
-            'magnitude': float(h[8]),
-            'probability': float(h[5]),
-        }
-        json.dump(meta, open(f, 'w'), indent=4, sort_keys=True)
-    if ihypo is None:
-        return meta
-    meta.update({
-        'islip': islip,
-        'ihypo': ihypo,
-    })
-
-    # fetch SRF
-    f = '%1d%1d-%03d-%03d-%02d-%02d.srf.gz'
-    f = path + f % (v0, v1, isrc, irup, islip, ihypo)
-    if os.path.exists(f):
-        g = gzip.open(f)
-    else:
-        print('Retrieving ' + os.path.basename(f))
-        g = srf + '.variation-s%04d-h%04d'
-        g = g % (v0, v1, isrc, irup, isrc, irup, islip, ihypo)
-        g = 'ssh', host, 'gzip -c ' + g
-        g = subprocess.check_output(g)
-        open(f, 'wb').write(g)
-        g = io.BytesIO(g)
-        g = gzip.GzipFile(fileobj=g)
-    m, data = srflib.read(g)
-    m.update(meta)
-    return m, data
 
 
 def download():

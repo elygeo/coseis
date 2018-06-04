@@ -5,12 +5,7 @@ import os
 import sys
 import math
 import json
-
-try:
-    from urllib.request import urlopen
-except ImportError:
-    from urllib2 import urlopen
-
+import urllib.request
 import numpy
 from . import home
 from . import data
@@ -21,7 +16,7 @@ repository = home + 'repo' + os.sep
 projection = {'proj': 'utm', 'zone': 11, 'datum': 'NAD27'}
 
 
-def catalog(version='CFM5-socal-primary'):
+def catalog(version='CFM5_socal_primary'):
     """
     Return a list of available faults. The CFM database is downloaded if not
     already present.
@@ -34,23 +29,23 @@ def catalog(version='CFM5-socal-primary'):
     if not os.path.exists(path):
         print('Downloading CFM5')
         os.makedirs(path)
-        x = urlopen(url + 'doc/fault_area_table.dat').read()
-        open(path + 'fault_area_table.dat', 'wb').write(x)
+        x = url + 'doc/fault_area_table.dat'
+        x = urllib.request.urlopen(x).read().decode('utf-8')
+        open(path + 'fault_area_table.dat', 'w').write(x)
         cat = []
-        for k in x.split('\n')[2:]:
+        for k in x.strip().split('\n')[2:]:
             k = k.split()[0]
             cat.append(k)
             x = url + 'tsurf/%s/%s.ts' % (version, k)
-            x = urlopen(x).read()
+            x = urllib.request.urlopen(x).read().decode('utf-8')
             tsurf = gocad.tsurf(x)
             if len(tsurf) > 1:
                 raise Exception('Not expecting more than 1 tsurf')
             data = tsurf[0][1]
             numpy.savez(path + k + '.npz', **data)
-        cat = '\n'.join(cat) + '\n'
-        open(path + 'catalog.txt', 'w').write(cat)
+        open(path + 'catalog.txt', 'w').write('\n'.join(cat) + '\n')
     else:
-        open(path + 'catalog.txt').read().strip().split('\n')
+        cat = open(path + 'catalog.txt').read().strip().split('\n')
     return cat
 
 
@@ -117,7 +112,7 @@ def search(items, split=1, maxsplit=3):
     return prefix, groups
 
 
-def read(fault, version='CFM5-socal-primary'):
+def read(fault, version='CFM5_socal_primary'):
     """
     Read triangulated surface data.
     """

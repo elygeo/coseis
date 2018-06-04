@@ -30,23 +30,32 @@ Steven Day, Bernard Minster, Feng Wang, Zheqiang Shi, and Jun Zhou.  It is
 licensed under [BSD](http://opensource.org/licenses/BSD-2-Clause) terms.
 
 <div class="warn">
-**DISCLAIMER**: Coseis is a work-in-progress and frequently broken. You will
-likely need dig and understand the code to make it do what you want.
+**NOTICE**: Coseis is currently only lightly maintained.  You likely will need
+to dig in, understand the code, and fix things to use it.  If you have (or know
+of) means to support planned improvements or custom requirements, please be in
+touch.
 </div>
 
 
-## Install
+## Install MacOS Dependencies
 
-For MacOS only, install
-[Xcode](http://itunes.apple.com/us/app/xcode/id497799835) from the App Store
-followed by the Xcode the Command Line Tools with:
+Install [Xcode](http://itunes.apple.com/us/app/xcode/id497799835) from the App
+Store followed by the Xcode the Command Line Tools with:
 
     xcode-select --install
 
-For MacOS only, install [Homebrew](http://brew.sh/) and use it to install
-[Fortran](http://r.research.att.com/tools/) with:
+Install [Homebrew](http://brew.sh/) and use it to install GCC (for Fortran),
+Python:
 
-    brew install gfortran
+    brew install gcc python3 
+
+For analyisis and graphics also install VTK and usueful Python libs:
+
+    brew install vtk
+    python -m pip install mayavi matplotlib pyproj obspy
+
+
+## Install Coseis
 
 Clone the source code from the [Coseis GitHub
 repository](http://github.com/gely/coseis):
@@ -56,7 +65,7 @@ repository](http://github.com/gely/coseis):
 Setup python to be able to find the `cst` package:
 
     cd coseis
-    python -m cst setup
+    python -m cst.setup
 
 
 
